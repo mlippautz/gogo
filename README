@@ -1,0 +1,10 @@
+GoGo - A Go compiler written in Go
+==================================
+
+Building
+--------
+
+1) $ source go-env
+2) cd src/
+3) make
+
