@@ -8,6 +8,7 @@ import "fmt"
 import "os"
 import "unsafe"
 import "syscall"
+import "./libgogo/_obj/libgogo"
 
 func get_next_byte(fd int) byte {
 	var b [1]byte;
@@ -20,8 +21,11 @@ func main() {
 	if len(os.Args) != 2 {
 		fmt.Printf("Usage: gogo file.go\n");
 		return;	
-	} 
+	}
 
+    // just a simple library test calling assembler code
+    libgogo.Test();
+    
 	var r0 uintptr;
 	var e1 uintptr;
 	r0, _, e1 = syscall.Syscall(syscall.SYS_OPEN, uintptr(unsafe.Pointer(syscall.StringBytePtr(os.Args[1]))), 0, 0);
