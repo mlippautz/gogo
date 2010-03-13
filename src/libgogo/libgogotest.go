@@ -13,7 +13,7 @@ func main() {
   const test_len uint64 = 12;
   var test_ret uint64;
   test_ret = libgogo.Write(1, test_text, test_len);
-  fmt.Printf("Library test (should write %d): %d\n", test_len, test_ret);
+  fmt.Printf("Library test (should write %d and 18): %d and %d\n", test_len, test_ret, libgogo.StringLength("18 characters long\000"));
 
   //Library test II
   var one_char_string string = "_";
