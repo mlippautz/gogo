@@ -1,0 +1,55 @@
+comments := // to EOL
+
+single_char = CHR(32)|...|CHR(127).
+char = "'" single_char "'".
+string = """ {single_char} """.
+
+digit = "0"|...|"9".
+integer = digit {digit}.
+
+letter = "a"|...|"z"|"A"|...|"Z"|"_".
+
+identifier = letter { letter | digit }.
+
+cmp_op = ">" | "<" | ">=" | "<=" | "==" | "!=".
+unary_arith_op = "+" | "-".
+binary_arith_op = "*" | "/" .
+
+selector = { "." identifier | "[" expression "]" }.
+
+expression_list = expression { "," expression }.
+function_call = "(" expression_list ")".
+
+factor = identifier selector [ function_call ] | integer | char | string | "(" expression ")" | "!" factor.
+term = factor { (binary_arith_op | "&&") factor}.
+simple_expression = unary_arith_op term { (unary_arith_op | "||") term }.
+expression = simple_expression [ cmp_op simple_expression].
+
+assignment = identifier selector "=" expression.
+
+if_stmt = "if" expression "{" stmt_sequence "}" [ else_stmt ].
+else_stmt = "else" "{" stmt_sequence "}".
+for_stmt = "for" assignment ";" expression ";" assignment "{" stmt_sequence "}".
+
+struct_type = "struct" "{" var_decl_list "}".
+array_type = "[" integer "]" identifier.
+type = identifier | array_type | struct_type.
+var_decl = "var" identifier type ";".
+var_decl_list = { var_decl }.
+
+stmt_sequence = stmt { stmt }
+stmt = assignment ";" | identifier selector function_call ";" | if_stmt | for_stmt
+
+package_stmt = "package" identifier ";".
+import_stmt = "import" string ";".
+import_stmt_list = { import_stmt }.
+
+identifier_type = identifier type
+identifier_type_list = identifier_type { "," identifier_type }
+func_decl = "func" identifier "(" [identifier_type_list] ")"  [identifier type] "{" func_head func_body func_foot "}"
+func_decl_list = { func_decl }
+func_head = var_decl_list.
+func_body = [stmt_sequence].
+func_foot = ["return" [expression] ";"]
+
+go_program = package_stmt import_stmt_list var_decl_list func_decl_list.
