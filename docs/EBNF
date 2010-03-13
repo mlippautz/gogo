@@ -29,7 +29,7 @@ assignment = identifier selector "=" expression.
 
 if_stmt = "if" expression "{" stmt_sequence "}" [ else_stmt ].
 else_stmt = "else" "{" stmt_sequence "}".
-for_stmt = "for" assignment ";" expression ";" assignment "{" stmt_sequence "}".
+for_stmt = "for" [assignment] ";" [expression] ";" [assignment] "{" stmt_sequence "}".
 
 struct_type = "struct" "{" var_decl_list "}".
 array_type = "[" integer "]" identifier.
