@@ -16,11 +16,14 @@ func main() {
   fmt.Printf("Library test (should write %d, %d and 18): %d, %d and %d\n", test_len, test_len, test_ret, libgogo.StringLength(test_text), libgogo.GoGoStringLength("18 characters long\000"));
 
   //Library test II
-  var one_char_string string = "_";
+  var fd uint64;
+  var ten_char_string string = "##########";
   var read_ret uint64;
-  fmt.Printf("Library test: please type one character and hit return\n");
-  read_ret = libgogo.Read(0, one_char_string, 1);
-  fmt.Printf("Library test (should write the typed character and 1): %s and %d\n", one_char_string, read_ret);
+  fd = libgogo.FileOpen("libgogo.go");
+  read_ret = libgogo.Read(fd, ten_char_string, 10);
+  fmt.Printf("Library test (should neither be 0 nor -1): %d\n", fd);
+  fmt.Printf("Library test (should write the first 10 characters of libgogo.go and 10): '%s' and %d\n", ten_char_string, read_ret);
+  libgogo.FileClose(fd);
 
   //Library test III
   libgogo.Exit(0);

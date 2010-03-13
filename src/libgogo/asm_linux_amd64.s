@@ -12,33 +12,61 @@ TEXT ·Exit(SB),1,$0 //Exit: 1 parameter, no return value
   RET
 
 TEXT ·Write(SB),4,$0 //Write: 3 parameters, 1 return value
-  MOVQ $4, AX //sys_write (4 parameters)
+  MOVQ $4, AX //sys_write (3 parameters)
   MOVQ 8(SP), BX //fd (first parameter => SP+64bit)
-	MOVQ 16(SP), CX //text (second parameter => SP+2*64bit)
-	MOVQ 24(SP), DX //text length (third parameter => SP+3*64bit)
+  MOVQ 16(SP), CX //text (second parameter => SP+2*64bit)
+  MOVQ 24(SP), DX //text length (third parameter => SP+3*64bit)
   INT $0x80 //Linux syscall
   CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
   JLS WRITE_SUCCESS //Return result if successful
 WRITE_ERROR:
   MOVQ $0, 40(SP) //Return 0 (return value after three parameters => SP+4*64bit+64bit?)
   //TODO: Error handling?
+  RET
 WRITE_SUCCESS:
   MOVQ AX, 40(SP) //First return value of syscall is in AX (return value after three parameters => SP+4*64bit+64bit?)
   RET
 
 TEXT ·Read(SB),4,$0 //Read: 3 parameters, 1 return value
-  MOVQ $3, AX //sys_read (4 parameters)
+  MOVQ $3, AX //sys_read (3 parameters)
   MOVQ 8(SP), BX //fd (first parameter => SP+64bit)
-	MOVQ 16(SP), CX //buffer (second parameter => SP+2*64bit)
-	MOVQ 24(SP), DX //buffer size (third parameter => SP+3*64bit)
+  MOVQ 16(SP), CX //buffer (second parameter => SP+2*64bit)
+  MOVQ 24(SP), DX //buffer size (third parameter => SP+3*64bit)
   INT $0x80 //Linux syscall
   CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
   JLS READ_SUCCESS //Return result if successful
 READ_ERROR:
   MOVQ $0, 40(SP) //Return 0 (return value after three parameters => SP+4*64bit+64bit?)
   //TODO: Error handling?
+  RET
 READ_SUCCESS:
   MOVQ AX, 40(SP) //First return value of syscall is in AX (return value after three parameters => SP+4*64bit+64bit?)
+  RET
+
+TEXT ·FileOpen(SB),2,$0 //FileOpen: 1 parameter, 1 return value
+  MOVQ $5, AX //sys_open (3 parameters)
+  MOVQ 8(SP), BX //filename (first parameter => SP+64bit)
+  MOVQ $0, CX //flags (second parameter => SP+2*64bit)
+  MOVQ $0, DX //not used (third parameter => SP+3*64bit)
+  INT $0x80 //Linux syscall
+  CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
+  JLS FILEOPEN_SUCCESS //Return result if successful
+FILEOPEN_ERROR:
+  MOVQ $0, 24(SP) //Return 0 (return value after one parameter => SP+2*64bit+64bit?)
+  //TODO: Error handling?
+  RET
+FILEOPEN_SUCCESS:
+  MOVQ AX, 24(SP) //First return value of syscall is in AX (return value after one parameter => SP+2*64bit+64bit?)
+  RET
+
+TEXT ·FileClose(SB),2,$0 //FileClose: 1 parameter, 1 return value
+  MOVQ $6, AX //sys_open (3 parameters)
+  MOVQ 8(SP), BX //filename (first parameter => SP+64bit)
+  MOVQ $0, CX //flags (second parameter => SP+2*64bit)
+  MOVQ $0, DX //not used (third parameter => SP+3*64bit)
+  INT $0x80 //Linux syscall
+  CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
+  //TODO: Error handling?
   RET
 
 TEXT ·StringLength(SB),2,$0 //Write: 1 parameter, 1 return value

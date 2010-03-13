@@ -11,6 +11,8 @@ package libgogo
 func Exit(return_code uint64); //Exits the program
 func Write(fd uint64, text string, length uint64) uint64; //Writes a defined number of characters of a given string to the file with the given file descriptor
 func Read(fd uint64, buffer string, buffer_size uint64) uint64; //Reads the specified number of characters from the file with the given file descriptor to the given buffer (string)
+func FileOpen(filename string) uint64; //Opens a file and returns the corresponding file descriptor
+func FileClose(fd uint64); //Closes the given file descriptor
 
 func StringLength(str string) uint64; //Determines the length of a string
 
