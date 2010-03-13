@@ -19,7 +19,7 @@ func main() {
   var fd uint64;
   var ten_char_string string = "##########";
   var read_ret uint64;
-  fd = libgogo.FileOpen("libgogo.go");
+  fd = libgogo.FileOpen("libgogo.go", 0);
   read_ret = libgogo.Read(fd, ten_char_string, 10);
   fmt.Printf("Library test (should neither be 0 nor -1): %d\n", fd);
   fmt.Printf("Library test (should write the first 10 characters of libgogo.go and 10): '%s' and %d\n", ten_char_string, read_ret);
