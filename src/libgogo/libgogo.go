@@ -24,8 +24,7 @@ func GoGoStringLength(str string) uint64 { //Determines the length of a GoGo str
   return len;
 }
 
-func StringToByteBuf(from string) [255]byte {
-    var to [255]byte;
+func StringToByteBuf(from string, to [255]byte) {
     var i int;
     for i = 0; i < StringLength(from) ; i = i+1 {
         to[i] = from[i];
