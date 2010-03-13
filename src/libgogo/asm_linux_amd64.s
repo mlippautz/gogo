@@ -52,7 +52,7 @@ TEXT ·FileOpen(SB),3,$0 //FileOpen: 2 parameters, 1 return value
   CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
   JLS FILEOPEN_SUCCESS //Return result if successful
 FILEOPEN_ERROR:
-  MOVQ $0, 32(SP) //Return 0 (return value after one parameter => SP+3*64bit+64bit?)
+  //MOVQ $0, 32(SP) //Return 0 (return value after one parameter => SP+3*64bit+64bit?)
   //TODO: Error handling?
   RET
 FILEOPEN_SUCCESS:
@@ -60,7 +60,7 @@ FILEOPEN_SUCCESS:
   RET
 
 TEXT ·FileClose(SB),2,$0 //FileClose: 1 parameter, 1 return value
-  MOVQ $6, AX //sys_open (3 parameters)
+  MOVQ $6, AX //sys_close (3 parameters)
   MOVQ 8(SP), BX //filename (first parameter => SP+64bit)
   MOVQ $0, CX //flags (second parameter => SP+2*64bit)
   MOVQ $0, DX //not used (third parameter => SP+3*64bit)
@@ -69,7 +69,7 @@ TEXT ·FileClose(SB),2,$0 //FileClose: 1 parameter, 1 return value
   //TODO: Error handling?
   RET
 
-TEXT ·StringLength(SB),2,$0 //Write: 1 parameter, 1 return value
+TEXT ·StringLength(SB),2,$0 //StringLength: 1 parameter, 1 return value
   MOVQ 8(SP), AX //String (first parameter => SP+64bit)
   MOVQ $0, 24(SP) //Initialize length with 0
 LOOP_STRLEN:

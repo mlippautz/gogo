@@ -14,6 +14,7 @@ func Read(fd uint64, buffer string, buffer_size uint64) uint64; //Reads the spec
 func FileOpen(filename string, flags uint64) uint64; //Opens a file with the specified flags and returns the corresponding file descriptor
 func FileClose(fd uint64); //Closes the given file descriptor
 
+func StringCopy(source string, destination string, count uint64); //Copies a maximum of count characters of the source string into the destination string
 func StringLength(str string) uint64; //Determines the length of a string
 
 func GoGoStringLength(str string) uint64 { //Determines the length of a GoGo string (not to be used for Go strings!)
