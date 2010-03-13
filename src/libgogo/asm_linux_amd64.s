@@ -52,11 +52,11 @@ TEXT ·FileOpen(SB),3,$0 //FileOpen: 2 parameters, 1 return value
   CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
   JLS FILEOPEN_SUCCESS //Return result if successful
 FILEOPEN_ERROR:
-  //MOVQ $0, 32(SP) //Return 0 (return value after one parameter => SP+3*64bit+64bit?)
+  //MOVQ $0, 32(SP) //Return 0 (return value after three parameters => SP+3*64bit+64bit?)
   //TODO: Error handling?
   RET
 FILEOPEN_SUCCESS:
-  MOVQ AX, 32(SP) //First return value of syscall is in AX (return value after one parameter => SP+3*64bit+64bit?)
+  MOVQ AX, 32(SP) //First return value of syscall is in AX (return value after three parameters => SP+3*64bit+64bit?)
   RET
 
 TEXT ·FileClose(SB),2,$0 //FileClose: 1 parameter, 1 return value
