@@ -26,7 +26,7 @@ WRITE_SUCCESS:
   MOVQ AX, 40(SP) //First return value of syscall is in AX (return value after three parameters => SP+4*64bit+64bit?)
   RET
 
-TEXT ·Read(SB),4,$0 //Write: 3 parameters, 1 return value
+TEXT ·Read(SB),4,$0 //Read: 3 parameters, 1 return value
   MOVQ $3, AX //sys_read (4 parameters)
   MOVQ 8(SP), BX //fd (first parameter => SP+64bit)
 	MOVQ 16(SP), CX //buffer (second parameter => SP+2*64bit)
@@ -39,4 +39,16 @@ READ_ERROR:
   //TODO: Error handling?
 READ_SUCCESS:
   MOVQ AX, 40(SP) //First return value of syscall is in AX (return value after three parameters => SP+4*64bit+64bit?)
+  RET
+
+TEXT ·StringLength(SB),2,$0 //Write: 1 parameter, 1 return value
+  MOVQ 8(SP), AX //String (first parameter => SP+64bit)
+  MOVQ $0, 24(SP) //Initialize length with 0
+LOOP_STRLEN:
+  CMPB (AX), $0 //Compare character with '\0'
+  JE END_STRLEN //Terminate when '\0' has been found
+  INCQ 24(SP) //Increase length (return value after one parameter => SP+2*64bit+64bit?)
+  INCQ AX //Next character
+  JMP LOOP_STRLEN //Continue
+END_STRLEN:
   RET
