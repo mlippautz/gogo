@@ -22,8 +22,7 @@ func main() {
 	var e int = int(e1);
 	var fd int = int(r0);
 	if e == 0 {
-		//fmt.Printf("%c\n", getNextChar(fd) );
-        GetNextToken(fd);		
+        scanner_test(fd);		
         syscall.Syscall(syscall.SYS_CLOSE, uintptr(fd), 0, 0);
 	} else {
 		fmt.Printf("Error opening file %s.\n", os.Args[1]);
