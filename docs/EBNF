@@ -31,7 +31,9 @@ if_stmt = "if" expression "{" stmt_sequence "}" [ else_stmt ].
 else_stmt = "else" "{" stmt_sequence "}".
 for_stmt = "for" [assignment] ";" [expression] ";" [assignment] "{" stmt_sequence "}".
 
-struct_type = "struct" "{" var_decl_list "}".
+struct_decl = "type" identifier "struct" "{" var_decl_list "}" ";".
+struct_decl_list = struct_decl { struct_decl }. 
+
 array_type = "[" integer "]" identifier.
 type = identifier | array_type | struct_type.
 var_decl = "var" identifier type ";".
@@ -53,4 +55,4 @@ func_body = [stmt_sequence].
 func_foot = ["return" [expression] ";"]
 func_decl_raw = "func" identifier "(" [identifier_type_list] ")"  [identifier type] ";"
 
-go_program = package_stmt import_stmt_list var_decl_list func_decl_list.
+go_program = package_stmt import_stmt_list struct_decl_list var_decl_list func_decl_list.
