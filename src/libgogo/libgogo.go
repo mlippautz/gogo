@@ -8,8 +8,6 @@
 
 package libgogo
 
-import "fmt"
-
 func Exit(return_code uint64); //Exits the program
 func Write(fd uint64, text string, length uint64) uint64; //Writes a defined number of characters of a given string to the file with the given file descriptor
 func Read(fd uint64, buffer string, buffer_size uint64) uint64; //Reads the specified number of characters from the file with the given file descriptor to the given buffer (string)
@@ -26,11 +24,12 @@ func GoGoStringLength(str string) uint64 { //Determines the length of a GoGo str
   return len;
 }
 
-func StringToByteBuf(from string, to []byte) {
+func StringToByteBuf(from string) [255]byte {
     var i uint64;
+    var to [255]byte;
     for i = 0; i < StringLength(from) ; i = i+1 {
         to[i] = from[i];
     }
     to[i] = 0;
-    fmt.Printf("%s\n",to);
+    return to;
 }

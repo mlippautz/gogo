@@ -34,8 +34,8 @@ func main() {
 //	var fd int = int(r0);
     var fd uint64;
     var test [255]byte;
-    libgogo.StringToByteBuf(os.Args[1],&test);
-    fmt.Printf("%s\n",test);
+    test = libgogo.StringToByteBuf(os.Args[1]);
+    fmt.Printf("%s \n",test);
     fd = libgogo.FileOpen("gogo.go",0);
     fmt.Printf("%d\n",fd);    
 	//if e == 0 {
