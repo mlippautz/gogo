@@ -70,18 +70,8 @@ TEXT ·FileClose(SB),2,$0 //FileClose: 1 parameter, 1 return value
   RET
 
 TEXT ·StringLength(SB),2,$0 //StringLength: 1 parameter, 1 return value
-  MOVQ 8(SP), AX //String (first parameter => SP+64bit)
-  MOVQ $0, 24(SP) //Initialize length with 0
-LOOP_STRLEN:
-  CMPB (AX), $0 //Compare character with '\0'
-  JE END_STRLEN //Terminate when '\0' has been found
-  INCQ 24(SP) //Increase length (return value after one parameter => SP+2*64bit+64bit?)
-  INCQ AX //Next character
-  JMP LOOP_STRLEN //Continue
-END_STRLEN:
-  RET
-
-TEXT ·InternalByteBufLength(SB),2,$0 //InternalByteBufLength: 1 parameter, 1 return value (same as StringLength)
+TEXT ·InternalByteBufLength(SB),2,$0 //InternalByteBufLength: 1 parameter, 1 return value
+BBLEN_START:
   MOVQ 8(SP), AX //String (first parameter => SP+64bit)
   MOVQ $0, 24(SP) //Initialize length with 0
 LOOP_BBLEN:
