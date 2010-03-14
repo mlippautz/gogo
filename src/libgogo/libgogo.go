@@ -60,6 +60,7 @@ func GetChar(fd uint64) byte {
   var one_char_buf string = "\000";
   if Read(fd, one_char_buf, 0) == 0 {
     ; //TODO: Error handling?
+    return 0;
   }
   return one_char_buf[0];
 }
