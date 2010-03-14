@@ -80,3 +80,29 @@ LOOP_STRLEN:
   JMP LOOP_STRLEN //Continue
 END_STRLEN:
   RET
+
+TEXT ·InternalByteBufLength(SB),2,$0 //InternalByteBufLength: 1 parameter, 1 return value (same as StringLength)
+  MOVQ 8(SP), AX //String (first parameter => SP+64bit)
+  MOVQ $0, 24(SP) //Initialize length with 0
+LOOP_BBLEN:
+  CMPB (AX), $0 //Compare character with '\0'
+  JE END_BBLEN //Terminate when '\0' has been found
+  INCQ 24(SP) //Increase length (return value after one parameter => SP+2*64bit+64bit?)
+  INCQ AX //Next character
+  JMP LOOP_BBLEN //Continue
+END_BBLEN:
+  RET
+
+TEXT ·InternalByteBufToString(SB),2,$0 //InternalByteBufToString: 2 parameters, no return value
+  MOVQ 8(SP), AX //Buffer (first parameter => SP+64bit)
+  MOVQ 16(SP), BX //String (second parameter => SP+2*64bit)
+LOOP_BUFTOSTR:
+  MOVB (AX), DX //Move byte...
+  MOVB DX, (BX) //...to string
+  CMPB (AX), $0 //Compare byte with 0
+  JE END_BUFTOSTR //Terminate when 0 has been found
+  INCQ AX //Next byte
+  INCQ BX //Next character
+  JMP LOOP_BUFTOSTR //Continue
+END_BUFTOSTR:
+  RET
