@@ -7,7 +7,6 @@ package main
 import "fmt"
 import "./libgogo/_obj/libgogo"
 
-
 const TOKEN_IDENTIFIER uint64 = 1;
 const TOKEN_STRING = 2;
 const TOKEN_EOS = 3; // end of scan
@@ -26,7 +25,6 @@ const TOKEN_COLON = 15;
 const TOKEN_ASSIGN = 16;
 const TOKEN_EQUALS = 17;
 
-
 type Token struct {
     id uint64;
     value [255]byte;
@@ -35,11 +33,6 @@ type Token struct {
     // also need a second token, because we may scan it already when terminating the first one
     nextChar byte;    
 };
-
-func tmp_error ( s string) {
-    fmt.Printf("%s\n",s);
-    libgogo.Exit(1);
-}
 
 //
 // Function getting the next token.
@@ -64,7 +57,7 @@ func GetNextToken(fd uint64, oldToken Token) Token {
         singleChar = oldToken.nextChar;
     }
 
-    // check if it is a valid read
+    // check if it is a valid read, or an EOF
     if singleChar == 0 {
         newToken.id = TOKEN_EOS;
         done = 1;
@@ -84,18 +77,21 @@ func GetNextToken(fd uint64, oldToken Token) Token {
                 }
             }
         } else {
-            
-            // newline
+            // if character is a newline:
+            // 1) if in a comment, exit the comment
+            // 2) skip otherwise
             if singleChar == 10 {
                 if inComment == 1 {
                     inComment = 0;
                 } 
             } else {
-                // skip spaces and tabs
+                // skip spaces and tabs and handle everything else
                 if singleChar != ' ' && singleChar != 9 {
+                    // if not in a comment we have our current valid char
                     if inComment == 0 {
                         space_done = 1;
                     } 
+                    // check if GetChar() returned EOF while skipping
                     if singleChar == 0 {
                         space_done = 1;
                         newToken.id = TOKEN_EOS;
@@ -109,14 +105,17 @@ func GetNextToken(fd uint64, oldToken Token) Token {
         }
     }
 
-    // get identifiers
-    if (done != 1) && (singleChar > 64 && singleChar < 91) || (singleChar > 96 && singleChar < 122) || singleChar == '_' {     
+    // catch identifiers.
+    // identifier = letter { letter | digit }.
+    if (done != 1) && (singleChar >= 'A' && singleChar <= 'Z') || (singleChar >= 'a' && singleChar <= 'z') || singleChar == '_' { // check for letter or _
         newToken.id = TOKEN_IDENTIFIER;
-        for ; (singleChar > 64 && singleChar < 91) || (singleChar > 96 && singleChar < 122) || singleChar == '_'  || (singleChar > 47 && singleChar < 58); singleChar = libgogo.GetChar(fd) {
+        // preceding characters may be letter,_, or a number
+        for ; (singleChar >= 'A' && singleChar <= 'Z') || (singleChar >= 'a' && singleChar <= 'z') || singleChar == '_' || (singleChar >= '0' && singleChar <= '9'); singleChar = libgogo.GetChar(fd) {
             newToken.value[newToken.value_len] = singleChar;
             newToken.value_len = newToken.value_len +1;
         }
         newToken.value[newToken.value_len] = 0;
+        // save the last read character for the next GetNextToken() cycle
         newToken.nextChar = singleChar;
         done = 1;
     }
@@ -237,6 +236,11 @@ func tmp_print(tok Token) {
         }
         fmt.Printf("\n");
     }
+}
+
+func tmp_error ( s string) {
+    fmt.Printf("%s\n",s);
+    libgogo.Exit(1);
 }
 
 func scanner_test(fd uint64) {  
