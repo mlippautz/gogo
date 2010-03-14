@@ -44,7 +44,7 @@ READ_SUCCESS:
   RET
 
 TEXT ·FileOpen(SB),3,$0 //FileOpen: 2 parameters, 1 return value
-  MOVQ $5, AX //sys_open (3 parameters)
+  MOVQ $5, AX //sys_open (2 parameters)
   MOVQ 8(SP), BX //filename (first parameter => SP+64bit)
   MOVQ 16(SP), CX //flags (second parameter => SP+2*64bit)
   MOVQ $0, DX //not used
