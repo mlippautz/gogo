@@ -31,6 +31,15 @@ const TOKEN_SEMICOLON = 14;         // Semi-colon ';'
 const TOKEN_COLON = 15;             // Colon ','
 const TOKEN_ASSIGN = 16;            // Assignment '='
 const TOKEN_EQUALS = 17;            // Equal comparison '=='
+const TOKEN_CHAR = 18;              // Single Quoted Character
+const TOKEN_REL_AND = 19;           // AND Relation
+const TOKEN_REL_OR = 20;            // OR Relation
+const TOKEN_REL_GTOE = 21;          // Greather-Than or Equal
+const TOKEN_REL_GT = 22;            // Greather-Than
+const TOKEN_REL_LTOE = 23;          // Less-Than or Equal
+const TOKEN_REL_LT = 24;            // Less-Than
+const TOKEN_ARITH_PLUS = 25;        // Arith. Plus
+const TOKEN_ARITH_MINUS = 26;       // Arith. Minus
 
 //
 // Token struct holding the relevant data of a parsed token.
@@ -184,6 +193,21 @@ func GetNextToken(fd uint64, oldToken Token) Token {
         done = 1;
     }
 
+    // Single Quoted Character
+    // Needs to be converted later on
+    if (done != 1) && singleChar == 39 {
+        newToken.id = TOKEN_CHAR;
+        for singleChar = libgogo.GetChar(fd); singleChar != 39 && singleChar > 31 && singleChar < 127;singleChar = libgogo.GetChar(fd) {
+            newToken.value[newToken.value_len] = singleChar;
+            newToken.value_len = newToken.value_len +1;
+        }        
+        newToken.value[newToken.value_len] = 0;
+        if singleChar != 39 {
+            tmp_error(">> Scanner: Character not closing. Exiting.");
+        }
+        done = 1;
+    }
+
     // left brace (
     if (done != 1) && singleChar == '(' {
         newToken.id = TOKEN_LBRAC;
@@ -220,22 +244,25 @@ func GetNextToken(fd uint64, oldToken Token) Token {
         done = 1;
     }
 
+    // Left curly bracket '{'
     if (done != 1) && singleChar == '{' {
         newToken.id = TOKEN_LCBRAC;
         done = 1;
     }
     
+    // Right curly bracket '}'
     if (done != 1) && singleChar == '}' {
         newToken.id = TOKEN_RCBRAC;
         done = 1;
     }
 
+    // Point '.'
     if (done != 1) && singleChar == '.' {
         newToken.id = TOKEN_PT;
         done = 1;
     }
 
-    // not or not equal
+    // Not ('!') or Not Equal ('!=')
     if (done != 1) && singleChar == '!' {
         singleChar = libgogo.GetChar(fd);
         if singleChar == '=' {
@@ -247,16 +274,19 @@ func GetNextToken(fd uint64, oldToken Token) Token {
         done = 1;
     }
 
+    // Semicolon ';'
     if (done != 1) && singleChar == ';' {
         newToken.id = TOKEN_SEMICOLON;
         done = 1;
     }
 
+    // Colon ','
     if (done != 1) && singleChar == ',' {
         newToken.id = TOKEN_COLON;
         done = 1;
     }
 
+    // Assignment '=' or Equals comparison '=='
     if (done != 1) && singleChar == '=' {
         singleChar = libgogo.GetChar(fd);
         if singleChar == '=' {
@@ -265,6 +295,62 @@ func GetNextToken(fd uint64, oldToken Token) Token {
             newToken.id = TOKEN_ASSIGN;
             newToken.nextChar = singleChar;
         }
+        done = 1;
+    }
+
+    // AND Relation '&&'
+    if (done != 1) && singleChar == '&' {
+        singleChar = libgogo.GetChar(fd);
+        if singleChar == '&' {
+            newToken.id = TOKEN_REL_AND;
+        } else {
+            tmp_error(">> Scanner: No address operator supported.");
+        }
+        done = 1;
+    }
+
+    // OR Relation '||'
+    if (done != 1) && singleChar == '|' {
+        singleChar = libgogo.GetChar(fd);
+        if singleChar == '|' {
+            newToken.id = TOKEN_REL_OR;
+        } else {
+            tmp_error(">> Scanner: No binary OR (|) supported. Only ||.");
+        }
+        done = 1;
+    } 
+
+    // Greater and Greater-Than relation
+    if (done != 1) && singleChar == '>' {
+        singleChar = libgogo.GetChar(fd);
+        if singleChar == '=' {
+            newToken.id = TOKEN_REL_GTOE;
+        } else {
+            newToken.id = TOKEN_REL_GT;
+            newToken.nextChar = singleChar;
+        }            
+        done = 1;
+    }     
+
+    // Less and Less-Than relation
+    if (done != 1) && singleChar == '<' {
+        singleChar = libgogo.GetChar(fd);
+        if singleChar == '=' {
+            newToken.id = TOKEN_REL_LTOE;
+        } else {
+            newToken.id = TOKEN_REL_LT;
+            newToken.nextChar = singleChar;
+        }            
+        done = 1;
+    }    
+
+    if (done != 1) && singleChar == '+' {
+        newToken.id = TOKEN_ARITH_PLUS;
+        done = 1;
+    }
+
+    if (done != 1) && singleChar == '-' {
+        newToken.id = TOKEN_ARITH_MINUS;
         done = 1;
     }
 
