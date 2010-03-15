@@ -41,6 +41,10 @@ const TOKEN_REL_LT = 24;            // Less-Than
 const TOKEN_ARITH_PLUS = 25;        // Arith. Plus
 const TOKEN_ARITH_MINUS = 26;       // Arith. Minus
 
+// Advanced tokens, that are generated in the 2nd step from identifiers
+const TOKEN_FOR = 27;
+const TOKEN_IF = 28;
+
 //
 // Token struct holding the relevant data of a parsed token.
 //
@@ -48,14 +52,16 @@ type Token struct {
     id uint64; // The id. Is one of TOKEN_*
     value [255]byte; // If the id requires a value to be stored, it is found here 
     value_len uint64; // Length of the value stored in `value`
+    intValue uint64;
 
     nextChar byte; // Sometime the next char is already read. It is stored here to be re-assigned in the next GetNextToken() round
 };
 
 /*
- * Function getting the next token.
+ * Function getting the next raw token. May contain token that must be converted
+ * before the parser can work with them.
  */
-func GetNextToken(fd uint64, oldToken Token) Token {
+func GetNextTokenRaw(fd uint64, oldToken Token) Token {
     var singleChar byte; // Byte holding the last read value
     /* 
      * Flag indicating whether we are in a comment.
@@ -362,6 +368,77 @@ func GetNextToken(fd uint64, oldToken Token) Token {
     return newToken;
 }
 
+func GetNextToken(fd uint64, oldToken Token) Token {
+    var newToken Token;
+    newToken = GetNextTokenRaw(fd,oldToken)
+    
+    // Convert integer from byte array to integer value
+    if newToken.id == TOKEN_INTEGER {
+        newToken.intValue = ByteBufToInt(newToken.value,newToken.value_len);
+    }
+
+    // Convert single quoted characters to integer
+    if newToken.id == TOKEN_CHAR {
+        if newToken.value_len != 1 {
+            tmp_error (">> Scanner: Only single characters are supported!");
+        } else {
+            newToken.id = TOKEN_INTEGER;
+            newToken.intValue = ToIntFromByte(newToken.value[0]);
+        }
+    }
+
+    // Convert identifier to keyworded tokens (if possible)
+    // <TODO>
+
+    return newToken;
+}
+
+// Move to libgogo?
+func ToIntFromByte(b byte) uint64 {
+    return uint64(b);
+}
+
+// Move to libgogo?
+func ByteBufToInt(byteBuf [255]byte, bufLen uint64) uint64 {
+    var m1 uint64;
+    var i uint64;    
+    var val uint64;
+    
+    val = 0;
+
+    for i = 0; bufLen > 0 ; bufLen = bufLen -1 {
+        m1 = pow(10,bufLen);
+        val = val + mul( m1, uint64(byteBuf[i]) - 48 );
+        i = i +1;
+    }
+
+    return val;
+}
+
+// Move to libgogo?
+func mul(m1 uint64, m2 uint64) uint64 {
+    var val uint64;
+    for val = 0 ; m2 > 0 ; m2 = m2 -1  {
+        val = val + m1;
+    }
+    return val;
+}
+
+// Move to libgogo?
+func pow(base uint64, exponent uint64) uint64 {
+    var val uint64;
+    for val = 1; exponent > 1 ; exponent = exponent -1 {
+        val = mul(val,base);
+    }
+    return val;
+}
+
+// Move to libgogo?
+func charToIntToken(oldToken Token) Token {
+    return oldToken;
+}
+
+// Move something like this to libgogo?
 func tmp_print(tok Token) {
     var i int;
     fmt.Printf("Token Id: %d\n",tok.id);
@@ -374,11 +451,13 @@ func tmp_print(tok Token) {
     }
 }
 
+// Move something like this to libgogo?
 func tmp_error ( s string) {
     fmt.Printf("%s\n",s);
     libgogo.Exit(1);
 }
 
+// Temporary test function
 func scanner_test(fd uint64) {  
     var tok Token;
     tok.id = 0;
