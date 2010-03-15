@@ -8,6 +8,9 @@
 
 package libgogo
 
+import "os"
+import "fmt"
+
 func ToIntFromByte(b byte) uint64 {
     return uint64(b);
 }
@@ -24,6 +27,30 @@ func ByteBufToInt(byteBuf [255]byte, bufLen uint64) uint64 {
     }
 
     return val;
+}
+
+func ExitError(msg string, code uint64) {
+    fmt.Printf("%s\n",msg);
+    os.Exit(int(code));
+}
+
+func PrintString(msg string) {
+    fmt.Printf(msg);
+}
+
+func PrintChar(char byte) {
+    fmt.Printf("%c",char);
+}
+
+func PrintNumber(num uint64) {
+    fmt.Printf("%d",num);
+}
+
+func PrintByteBuf(buf [255]byte) {
+    var i uint64;
+    for i = 0; buf[i] != 0; i = i+1 {
+        fmt.Printf("%c",buf[i]);
+    }
 }
 
 //--- Cleanup necessary from here onwards (most functions don't work properly!)
