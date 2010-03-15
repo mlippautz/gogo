@@ -400,36 +400,16 @@ func ToIntFromByte(b byte) uint64 {
 
 // Move to libgogo?
 func ByteBufToInt(byteBuf [255]byte, bufLen uint64) uint64 {
-    var m1 uint64;
     var i uint64;    
     var val uint64;
     
     val = 0;
 
-    for i = 0; bufLen > 0 ; bufLen = bufLen -1 {
-        m1 = pow(10,bufLen);
-        val = val + mul( m1, uint64(byteBuf[i]) - 48 );
-        i = i +1;
+    for i = 0; i < bufLen ; i = i +1 {
+        val = val * 10;
+        val = val + uint64(byteBuf[i]) - 48;
     }
 
-    return val;
-}
-
-// Move to libgogo?
-func mul(m1 uint64, m2 uint64) uint64 {
-    var val uint64;
-    for val = 0 ; m2 > 0 ; m2 = m2 -1  {
-        val = val + m1;
-    }
-    return val;
-}
-
-// Move to libgogo?
-func pow(base uint64, exponent uint64) uint64 {
-    var val uint64;
-    for val = 1; exponent > 1 ; exponent = exponent -1 {
-        val = mul(val,base);
-    }
     return val;
 }
 
@@ -448,6 +428,12 @@ func tmp_print(tok Token) {
             fmt.Printf("%c",tok.value[i]);
         }
         fmt.Printf("\n");
+    } else {
+        if tok.id == TOKEN_INTEGER {
+            fmt.Printf("Integer value: ");
+            fmt.Printf("%d", tok.intValue);
+            fmt.Printf("\n");
+        }
     }
 }
 
