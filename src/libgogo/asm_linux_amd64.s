@@ -1,15 +1,38 @@
 //
-// GoGo's very basic Library functions
+// GoGo Library functions (ASM)
 //
 
 TEXT ·Exit(SB),1,$0 //Exit: 1 parameter, no return value
   MOVQ $1, AX //sys_exit (1 parameter)
   MOVQ 8(SP), BX //return code (first parameter => SP+1*64bit)
   INT $0x80 //Linux syscall
-  CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
-  //If sys_exit was successful this code is not called
-  //TODO: Error handling?
+  RET //Just to be sure (should never be reached)
+
+TEXT ·StringLength(SB),2,$0 //StringLength: 1 parameter, 1 return value
+BBLEN_START:
+  MOVQ 8(SP), AX //String (first parameter => SP+64bit)
+  MOVQ $0, 24(SP) //Initialize length with 0
+LOOP_STRLEN:
+  CMPB (AX), $0 //Compare character with '\0'
+  JE END_STRLEN //Terminate when '\0' has been found
+  INCQ 24(SP) //Increase length (return value after one parameter => SP+2*64bit+64bit?)
+  INCQ AX //Next character
+  JMP LOOP_STRLEN //Continue
+END_STRLEN:
   RET
+
+TEXT ·ToIntFromByte(SB),2,$0 //ToIntFromByte: 1 parameter, 1 return value
+  MOVQ $0, AX //Set AX to 0
+  MOVB 8(SP), AL //Move byte parameter to AL (first parameter => SP+64bit)
+  MOVQ AX, 16(SP) //Move whole AX register with byte parameter to result (return value after one parameter => SP+2*64bit)
+  RET
+
+TEXT ·ToByteFromInt(SB),2,$0 //ToByteFromInt: 1 parameter, 1 return value
+  MOVQ 8(SP), AX //Move whole parameter to AX (first parameter => SP+64bit)
+  MOVB AL, 16(SP) //Move AL (last byte of parameter) to result (return value after one parameter => SP+2*64bit)
+  RET
+
+//--- Cleanup necessary from here onwards (most functions don't work properly!)
 
 TEXT ·Write(SB),4,$0 //Write: 3 parameters, 1 return value
   MOVQ $4, AX //sys_write (3 parameters)
@@ -67,19 +90,6 @@ TEXT ·FileClose(SB),2,$0 //FileClose: 1 parameter, 1 return value
   INT $0x80 //Linux syscall
   CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
   //TODO: Error handling?
-  RET
-
-TEXT ·StringLength(SB),2,$0 //StringLength: 1 parameter, 1 return value
-BBLEN_START:
-  MOVQ 8(SP), AX //String (first parameter => SP+64bit)
-  MOVQ $0, 24(SP) //Initialize length with 0
-LOOP_BBLEN:
-  CMPB (AX), $0 //Compare character with '\0'
-  JE END_BBLEN //Terminate when '\0' has been found
-  INCQ 24(SP) //Increase length (return value after one parameter => SP+2*64bit+64bit?)
-  INCQ AX //Next character
-  JMP LOOP_BBLEN //Continue
-END_BBLEN:
   RET
 
 TEXT ·InternalByteBufToString(SB),2,$0 //InternalByteBufToString: 2 parameters, no return value

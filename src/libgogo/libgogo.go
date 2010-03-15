@@ -8,8 +8,7 @@
 
 package libgogo
 
-import "os"
-import "fmt"
+import "fmt" //TODO (SC): Don't rely on Go libraries
 
 func Min(a uint64, b uint64) uint64 {
     var result uint64 = b;
@@ -26,10 +25,12 @@ func ByteBufLength(buf [255]byte) uint64 {
     return i;
 }
 
-func StringByteBufCmp(str string, buf [255]byte) uint64 {
+func StringLength(str string) uint64;
+
+func StringByteBufCmp(str string, buf [255]byte) uint64 { //TODO (SC): string is passed by reference here, but will not be when compiled by us => write a function StringByteBufCmp(buf1 [255]byte, buf2 [255]byte) and handle string->[255]byte conversion for the regular Go compiler in some other way
     var i uint64;
     var equal uint64 = 1;
-    var strlen uint64 = uint64(len(str));
+    var strlen uint64 = StringLength(str);
     var bufsize uint64 = ByteBufLength(buf);
     var size uint64 = Min(strlen, bufsize);
     if strlen != bufsize {
@@ -44,58 +45,66 @@ func StringByteBufCmp(str string, buf [255]byte) uint64 {
     return equal;
 }
 
-func ToIntFromByte(b byte) uint64 {
-    return uint64(b);
-}
+func ToIntFromByte(b byte) uint64;
+
+func ToByteFromInt(i uint64) byte;
 
 func ByteBufToInt(byteBuf [255]byte, bufLen uint64) uint64 {
     var i uint64;    
-    var val uint64;
-    
-    val = 0;
-
+    var val uint64 = 0;
     for i = 0; i < bufLen ; i = i +1 {
         val = val * 10;
-        val = val + uint64(byteBuf[i]) - 48;
+        val = val + ToIntFromByte(byteBuf[i]) - 48;
     }
-
     return val;
 }
 
 func PrintByteBuf(buf [255]byte) {
     var i uint64;
-    for i = 0; buf[i] != 0; i = i+1 {
-        fmt.Printf("%c",buf[i]);
+    for i = 0; buf[i] != 0; i = i +1 {
+        PrintChar(buf[i]);
     }
 }
 
+func Exit(code uint64);
+
 func ExitError(msg string, code uint64) {
-    fmt.Printf("%s\n",msg);
-    os.Exit(int(code));
+    PrintString(msg);
+    PrintChar('\n');
+    Exit(code);
 }
 
-func PrintString(msg string) {
+func PrintString(msg string) { //TODO (SC): Don't rely on Printf; also, string is passed by reference here, but will not be when compiled by us => use function PrintByteBuf if convenient and handle string->[255]byte conversion for the regular Go compiler in some other way
     fmt.Printf(msg);
 }
 
-func PrintChar(char byte) {
-    fmt.Printf("%c",char);
+func PrintChar(char byte) { //TODO (SC): Don't rely on Printf
+    fmt.Printf("%c", char);
 }
 
 func PrintNumber(num uint64) {
-    fmt.Printf("%d",num);
+    var i uint64;
+    var buf [255]byte;
+    for i = 0; num != 0; i = i +1 {
+        buf[i] = ToByteFromInt(num - (num / 10) * 10 + 48);
+        num = num / 10;
+    }
+    if i == 0 { //Special case: 0
+        buf[0] = 48;
+        i = 1;
+    }
+    for ; i != 0; i = i -1 {
+        PrintChar(buf[i]);
+    }
+    PrintChar(buf[0]);
 }
 
 //--- Cleanup necessary from here onwards (most functions don't work properly!)
-
-func Exit(return_code uint64); //Exits the program
 
 func Write(fd uint64, text string, length uint64) uint64; //Writes a defined number of characters of a given string to the file with the given file descriptor
 func Read(fd uint64, buffer string, buffer_size uint64) uint64; //Reads the specified number of characters from the file with the given file descriptor to the given buffer (string)
 func FileOpen(filename string, flags uint64) uint64; //Opens a file with the specified flags and returns the corresponding file descriptor
 func FileClose(fd uint64); //Closes the given file descriptor
-
-func StringLength(str string) uint64; //Determines the length of a string
 
 func StringToByteBuf(from string) [255]byte {
   var i uint64;
