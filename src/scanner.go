@@ -35,10 +35,12 @@ const TOKEN_REL_LTOE = 23;          // Less-Than or Equal
 const TOKEN_REL_LT = 24;            // Less-Than
 const TOKEN_ARITH_PLUS = 25;        // Arith. Plus
 const TOKEN_ARITH_MINUS = 26;       // Arith. Minus
+const TOKEN_ARITH_MUL = 27;         // Arith. Multiplication
+const TOKEN_ARITH_DIV = 28;         // Arith. Division
 
 // Advanced tokens, that are generated in the 2nd step from identifiers
-const TOKEN_FOR = 27;
-const TOKEN_IF = 28;
+const TOKEN_FOR = 29;
+const TOKEN_IF = 30;
 
 //
 // Token struct holding the relevant data of a parsed token.
@@ -352,6 +354,16 @@ func GetNextTokenRaw(fd uint64, oldToken Token) Token {
 
     if (done != 1) && singleChar == '-' {
         newToken.id = TOKEN_ARITH_MINUS;
+        done = 1;
+    }
+
+    if (done != 1) && singleChar == '*' {
+        newToken.id = TOKEN_ARITH_MUL;
+        done = 1;
+    }
+
+    if (done != 1) && singleChar == '/' {
+        newToken.id = TOKEN_ARITH_DIV;
         done = 1;
     }
 
