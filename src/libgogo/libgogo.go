@@ -8,6 +8,26 @@
 
 package libgogo
 
+func ToIntFromByte(b byte) uint64 {
+    return uint64(b);
+}
+
+func ByteBufToInt(byteBuf [255]byte, bufLen uint64) uint64 {
+    var i uint64;    
+    var val uint64;
+    
+    val = 0;
+
+    for i = 0; i < bufLen ; i = i +1 {
+        val = val * 10;
+        val = val + uint64(byteBuf[i]) - 48;
+    }
+
+    return val;
+}
+
+//--- Cleanup necessary from here onwards (most functions don't work properly!)
+
 func Exit(return_code uint64); //Exits the program
 
 func Write(fd uint64, text string, length uint64) uint64; //Writes a defined number of characters of a given string to the file with the given file descriptor

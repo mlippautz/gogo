@@ -374,7 +374,7 @@ func GetNextToken(fd uint64, oldToken Token) Token {
     
     // Convert integer from byte array to integer value
     if newToken.id == TOKEN_INTEGER {
-        newToken.intValue = ByteBufToInt(newToken.value,newToken.value_len);
+        newToken.intValue = libgogo.ByteBufToInt(newToken.value,newToken.value_len);
     }
 
     // Convert single quoted characters to integer
@@ -383,7 +383,7 @@ func GetNextToken(fd uint64, oldToken Token) Token {
             tmp_error (">> Scanner: Only single characters are supported!");
         } else {
             newToken.id = TOKEN_INTEGER;
-            newToken.intValue = ToIntFromByte(newToken.value[0]);
+            newToken.intValue = libgogo.ToIntFromByte(newToken.value[0]);
         }
     }
 
@@ -391,26 +391,6 @@ func GetNextToken(fd uint64, oldToken Token) Token {
     // <TODO>
 
     return newToken;
-}
-
-// Move to libgogo?
-func ToIntFromByte(b byte) uint64 {
-    return uint64(b);
-}
-
-// Move to libgogo?
-func ByteBufToInt(byteBuf [255]byte, bufLen uint64) uint64 {
-    var i uint64;    
-    var val uint64;
-    
-    val = 0;
-
-    for i = 0; i < bufLen ; i = i +1 {
-        val = val * 10;
-        val = val + uint64(byteBuf[i]) - 48;
-    }
-
-    return val;
 }
 
 // Move to libgogo?
