@@ -26,7 +26,7 @@ func main() {
 	fd = uint64(r0);
     
     if e == 0 {
-        scanner_test(fd);
+        ScannerTest(fd);
         syscall.Syscall(syscall.SYS_CLOSE, uintptr(fd), 0, 0);
 	} else {
 		fmt.Printf("Error opening file %s.\n", os.Args[1]);
