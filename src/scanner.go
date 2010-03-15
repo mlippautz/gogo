@@ -10,37 +10,45 @@ import "./libgogo/_obj/libgogo"
 // Set of recognized tokens 
 //
 const TOKEN_IDENTIFIER uint64 = 1;  // Identifier
-const TOKEN_STRING = 2;             // String using "..."
-const TOKEN_EOS = 3;                // End of Scan
-const TOKEN_LBRAC = 4;              // Left bracket '('
-const TOKEN_RBRAC = 5;              // Right bracket ')'
-const TOKEN_LSBRAC = 6;             // Left square bracket '['
-const TOKEN_RSBRAC = 7;             // Right square bracket ']'
-const TOKEN_INTEGER = 8;            // Integer number
-const TOKEN_LCBRAC = 9;             // Left curly bracket '{'
-const TOKEN_RCBRAC = 10;            // Right curly bracket '}'
-const TOKEN_PT = 11;                // Point '.'
-const TOKEN_NOT = 12;               // Single not '!'
-const TOKEN_NOTEQUAL = 13;          // Comparison, not equal '!='
-const TOKEN_SEMICOLON = 14;         // Semi-colon ';'
-const TOKEN_COLON = 15;             // Colon ','
-const TOKEN_ASSIGN = 16;            // Assignment '='
-const TOKEN_EQUALS = 17;            // Equal comparison '=='
-const TOKEN_CHAR = 18;              // Single Quoted Character
-const TOKEN_REL_AND = 19;           // AND Relation
-const TOKEN_REL_OR = 20;            // OR Relation
-const TOKEN_REL_GTOE = 21;          // Greather-Than or Equal
-const TOKEN_REL_GT = 22;            // Greather-Than
-const TOKEN_REL_LTOE = 23;          // Less-Than or Equal
-const TOKEN_REL_LT = 24;            // Less-Than
-const TOKEN_ARITH_PLUS = 25;        // Arith. Plus
-const TOKEN_ARITH_MINUS = 26;       // Arith. Minus
-const TOKEN_ARITH_MUL = 27;         // Arith. Multiplication
-const TOKEN_ARITH_DIV = 28;         // Arith. Division
+const TOKEN_STRING uint64 = 2;      // String using "..."
+const TOKEN_EOS uint64 = 3;         // End of Scan
+const TOKEN_LBRAC uint64 = 4;       // Left bracket '('
+const TOKEN_RBRAC uint64 = 5;       // Right bracket ')'
+const TOKEN_LSBRAC uint64 = 6;      // Left square bracket '['
+const TOKEN_RSBRAC uint64 = 7;      // Right square bracket ']'
+const TOKEN_INTEGER uint64 = 8;     // Integer number
+const TOKEN_LCBRAC uint64 = 9;      // Left curly bracket '{'
+const TOKEN_RCBRAC uint64 = 10;     // Right curly bracket '}'
+const TOKEN_PT uint64 = 11;         // Point '.'
+const TOKEN_NOT uint64 = 12;        // Single not '!'
+const TOKEN_NOTEQUAL uint64 = 13;   // Comparison, not equal '!='
+const TOKEN_SEMICOLON uint64 = 14;  // Semi-colon ';'
+const TOKEN_COLON uint64 = 15;      // Colon ','
+const TOKEN_ASSIGN uint64 = 16;     // Assignment '='
+const TOKEN_EQUALS uint64 = 17;     // Equal comparison '=='
+const TOKEN_CHAR uint64 = 18;       // Single Quoted Character
+const TOKEN_REL_AND uint64 = 19;    // AND Relation
+const TOKEN_REL_OR uint64 = 20;     // OR Relation
+const TOKEN_REL_GTOE uint64 = 21;   // Greather-Than or Equal
+const TOKEN_REL_GT uint64 = 22;     // Greather-Than
+const TOKEN_REL_LTOE uint64 = 23;   // Less-Than or Equal
+const TOKEN_REL_LT uint64 = 24;     // Less-Than
+const TOKEN_ARITH_PLUS uint64 = 25; // Arith. Plus
+const TOKEN_ARITH_MINUS uint64 = 26;// Arith. Minus
+const TOKEN_ARITH_MUL uint64 = 27;  // Arith. Multiplication
+const TOKEN_ARITH_DIV uint64 = 28;  // Arith. Division
 
 // Advanced tokens, that are generated in the 2nd step from identifiers
-const TOKEN_FOR = 29;
-const TOKEN_IF = 30;
+const TOKEN_FOR uint64 = 101;
+const TOKEN_IF uint64 = 102;
+const TOKEN_TYPE uint64 = 103;
+const TOKEN_CONST uint64 = 104;
+const TOKEN_VAR uint64 = 105;
+const TOKEN_STRUCT uint64 = 106;
+const TOKEN_RETURN uint64 = 107;
+const TOKEN_FUNC uint64 = 108;
+const TOKEN_PACKAGE uint64 = 109;
+const TOKEN_IMPORT uint64 = 110;
 
 //
 // Token struct holding the relevant data of a parsed token.
@@ -397,8 +405,39 @@ func GetNextToken(fd uint64, oldToken Token) Token {
         }
     }
 
-    // Convert identifier to keyworded tokens (if possible)
-    // <TODO>
+    // Convert identifier to keyworded tokens
+    if newToken.id == TOKEN_IDENTIFIER {
+        if libgogo.StringByteBufCmp("if",newToken.value) == 1 {
+            newToken.id = TOKEN_IF;
+        }
+        if libgogo.StringByteBufCmp("for",newToken.value) == 1 {
+            newToken.id = TOKEN_FOR;
+        }
+        if libgogo.StringByteBufCmp("type",newToken.value) == 1 {
+            newToken.id = TOKEN_TYPE;
+        }
+        if libgogo.StringByteBufCmp("const",newToken.value) == 1 {
+            newToken.id = TOKEN_CONST;
+        }
+        if libgogo.StringByteBufCmp("var",newToken.value) == 1 {
+            newToken.id = TOKEN_VAR;
+        }
+        if libgogo.StringByteBufCmp("struct", newToken.value) == 1 {
+            newToken.id = TOKEN_STRUCT;
+        }
+        if libgogo.StringByteBufCmp("return", newToken.value) == 1 {
+            newToken.id = TOKEN_RETURN;
+        }
+        if libgogo.StringByteBufCmp("func", newToken.value) == 1 {
+            newToken.id = TOKEN_FUNC;
+        }
+        if libgogo.StringByteBufCmp("import", newToken.value) == 1 {
+            newToken.id = TOKEN_IMPORT;
+        }
+        if libgogo.StringByteBufCmp("package", newToken.value) == 1 {
+            newToken.id = TOKEN_PACKAGE;
+        }
+    }
 
     return newToken;
 }
