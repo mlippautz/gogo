@@ -26,15 +26,6 @@ func main() {
   var ten_char_string string = "##########";
   var read_ret uint64;
 
-  //Does not work yet as FileOpenByteBuf does not work yet
-  /*var filename [255]byte;
-  filename = libgogo.StringToByteBuf("libgogotest.go"); //Works
-  //filename = libgogo.StringToByteBuf(os.Args[1]); //Does not work!?
-  fmt.Printf("Filename: '");
-  libgogo.WriteByteBuf(1, filename, libgogo.ByteBufLength(filename));
-  fmt.Printf("'\n");
-  fd = libgogo.FileOpenByteBuf(filename, 0);*/
-
   fd = libgogo.FileOpen("libgogotest.go", 0); //Works
   //fd = libgogo.FileOpen(os.Args[1], 0); //Does not work!?
   fmt.Printf("Library test for '%s' (should neither be 0 nor -1): %d\n", os.Args[1], fd);
@@ -47,13 +38,15 @@ func main() {
   //Library test III
   var test [255]byte;
   test = libgogo.StringToByteBuf(test_text);
-  libgogo.WriteByteBuf(1, test, libgogo.ByteBufLength(test));
-  var test_string string;
-  test_string = libgogo.ByteBufToString(test);
-  fmt.Printf("%s", test_string);
-  fmt.Printf("Equality test: %d\n", libgogo.StringByteBufCmp(test_string, test));
+  libgogo.PrintByteBuf(test);
+  fmt.Printf("Equality test: %d\n", libgogo.StringByteBufCmp(test_text, test));
 
   //Library test IV
+  var buf1 [255]byte;
+  buf1 = libgogo.StringToByteBuf(os.Args[1]);
+  fmt.Printf("Length of '%s': %d\n", os.Args[1], libgogo.ByteBufLength(buf1));
+
+  //Library test V
   libgogo.Exit(0);
   fmt.Printf("If you can read this, something is wrong");
 }

@@ -9,7 +9,7 @@ TEXT ·Exit(SB),1,$0 //Exit: 1 parameter, no return value
   RET //Just to be sure (should never be reached)
 
 TEXT ·StringLength(SB),2,$0 //StringLength: 1 parameter, 1 return value
-BBLEN_START:
+STRLEN_START:
   MOVQ 8(SP), AX //String (first parameter => SP+64bit)
   MOVQ $0, 24(SP) //Initialize length with 0
 LOOP_STRLEN:
@@ -90,18 +90,4 @@ TEXT ·FileClose(SB),2,$0 //FileClose: 1 parameter, 1 return value
   INT $0x80 //Linux syscall
   CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
   //TODO: Error handling?
-  RET
-
-TEXT ·InternalByteBufToString(SB),2,$0 //InternalByteBufToString: 2 parameters, no return value
-  MOVQ 8(SP), AX //Buffer (first parameter => SP+64bit)
-  MOVQ 16(SP), BX //String (second parameter => SP+2*64bit)
-LOOP_BUFTOSTR:
-  MOVB (AX), DX //Move byte...
-  MOVB DX, (BX) //...to string
-  CMPB (AX), $0 //Compare byte with 0
-  JE END_BUFTOSTR //Terminate when 0 has been found
-  INCQ AX //Next byte
-  INCQ BX //Next character
-  JMP LOOP_BUFTOSTR //Continue
-END_BUFTOSTR:
   RET
