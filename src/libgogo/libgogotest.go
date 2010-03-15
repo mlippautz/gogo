@@ -51,6 +51,7 @@ func main() {
   var test_string string;
   test_string = libgogo.ByteBufToString(test);
   fmt.Printf("%s", test_string);
+  fmt.Printf("Equality test: %d\n", libgogo.StringByteBufCmp(test_string, test));
 
   //Library test IV
   libgogo.Exit(0);

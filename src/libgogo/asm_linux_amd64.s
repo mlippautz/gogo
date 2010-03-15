@@ -70,7 +70,6 @@ TEXT ·FileClose(SB),2,$0 //FileClose: 1 parameter, 1 return value
   RET
 
 TEXT ·StringLength(SB),2,$0 //StringLength: 1 parameter, 1 return value
-TEXT ·InternalByteBufLength(SB),2,$0 //InternalByteBufLength: 1 parameter, 1 return value
 BBLEN_START:
   MOVQ 8(SP), AX //String (first parameter => SP+64bit)
   MOVQ $0, 24(SP) //Initialize length with 0

@@ -8,6 +8,39 @@
 
 package libgogo
 
+func Min(a uint64, b uint64) uint64 {
+    var result uint64 = b;
+    if a < b {
+        result = a;
+    }
+    return result;
+}
+
+func ByteBufLength(buf [255]byte) uint64 {
+    var i uint64;
+    for i = 0; buf[i] != 0; i = i +1 {
+        }
+    return i;
+}
+
+func StringByteBufCmp(str string, buf [255]byte) uint64 {
+    var i uint64;
+    var equal uint64 = 1;
+    var strlen uint64 = uint64(len(str));
+    var bufsize uint64 = ByteBufLength(buf);
+    var size uint64 = Min(strlen, bufsize);
+    if strlen != bufsize {
+        equal = 0;
+    } else {
+        for i = 0; i < size; i = i +1 {
+            if str[i] != buf[i] {
+                equal = 0;
+            }
+        }
+    }
+    return equal;
+}
+
 func ToIntFromByte(b byte) uint64 {
     return uint64(b);
 }
@@ -64,12 +97,6 @@ func ByteBufToString(from [255]byte) string {
   var to string = "\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000";
   InternalByteBufToString(&from[0], to);
   return to;
-}
-
-func InternalByteBufLength(buf *byte) uint64;
-
-func ByteBufLength(buf [255]byte) uint64 {
-  return InternalByteBufLength(&buf[0]);
 }
 
 func WriteByteBuf(fd uint64, buf [255]byte, buflen uint64) {
