@@ -2,32 +2,29 @@
 // Use of this source code is governed by the MIT
 // license that can be found in the LICENSE file.
 
+// This file holds the basic scanning routines that separate a source file
+// into the various tokens
+
 package main
 
 import "./libgogo/_obj/libgogo"
 import "fmt"
 
-//
+
 // Token struct holding the relevant data of a parsed token.
-//
 type Token struct {
     id uint64; // The id. Is one of TOKEN_*
-    /* value storing the integer value if the token is TOKEN_INTEGER */
-    intValue uint64;
-    /* Value that should be used instead of byte arrays */
-    newValue string;
-
+    intValue uint64; // value storing the integer value if the token is TOKEN_INTEGER
+    newValue string; // Value that should be used instead of byte arrays
     nextChar byte; // Sometime the next char is already read. It is stored here to be re-assigned in the next GetNextToken() round
 };
 
 func GetNextTokenRaw(fd uint64, tok *Token) {
     var singleChar byte; // Byte holding the last read value
-    /* 
-     * Flag indicating whether we are in a comment.
-     * 0 for no comment
-     * 1 for a single line comment 
-     * 2 for a multi line comment
-     */
+    // Flag indicating whether we are in a comment.
+    // 0 for no comment
+    // 1 for a single line comment 
+    // 2 for a multi line comment
     var inComment uint64;
     var done uint64; // Flag indicating whether a cycle (Token) is finsihed 
     var spaceDone uint64; // Flag indicating whether an abolishment cycle is finished 
@@ -37,10 +34,10 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     spaceDone = 0;
     inComment = 0;  
 
-    // If the old Token had to read the next char (and stored it), we can now
-    // get it back
+    // If the previous cycle had to read the next char (and stored it), it is 
+    // now used as first read
     if tok.nextChar == 0 {       
-        singleChar=libgogo.GetChar(fd)
+        singleChar = libgogo.GetChar(fd)
     } else {
         singleChar = tok.nextChar;
         tok.nextChar = 0;
@@ -338,6 +335,12 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     }
 }
 
+
+//
+// GetNextToken should be called by the parser. It bascially fetches the next
+// token by calling GetNextTokenRaw() and filters the identifiers for known
+// keywords.
+//
 func GetNextToken(fd uint64, tok *Token) {
     GetNextTokenRaw(fd,tok)
 
@@ -376,19 +379,9 @@ func GetNextToken(fd uint64, tok *Token) {
     }
 }
 
-func debugToken (tok Token) {
-    /*
-    libgogo.PrintString("Token Id: ");
-    libgogo.PrintNumber(tok.id);
-    libgogo.PrintString("\n");
-
-    if tok.id == TOKEN_IDENTIFIER || tok.id == TOKEN_STRING {
-        libgogo.PrintString("Identifier/String value: ");
-        libgogo.PrintByteBuf(tok.value);
-        libgogo.PrintString("\n");
-    }*/
-
-}
+//
+// Debugging and temporary functions
+//
 
 // Temporary test function
 func ScannerTest(fd uint64) {  
