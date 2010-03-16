@@ -7,6 +7,7 @@ include $(GOROOT)/src/Make.$(GOARCH)
 TARG=gogo
 GOFILES=\
     gogo.go\
-    scanner.go
+    scanner.go\
+    token.go
 
 include $(GOROOT)/src/Make.cmd

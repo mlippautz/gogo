@@ -5,68 +5,22 @@
 package main
 
 import "./libgogo/_obj/libgogo"
-
-//
-// Set of recognized tokens 
-//
-const TOKEN_IDENTIFIER uint64 = 1;  // Identifier
-const TOKEN_STRING uint64 = 2;      // String using "..."
-const TOKEN_EOS uint64 = 3;         // End of Scan
-const TOKEN_LBRAC uint64 = 4;       // Left bracket '('
-const TOKEN_RBRAC uint64 = 5;       // Right bracket ')'
-const TOKEN_LSBRAC uint64 = 6;      // Left square bracket '['
-const TOKEN_RSBRAC uint64 = 7;      // Right square bracket ']'
-const TOKEN_INTEGER uint64 = 8;     // Integer number
-const TOKEN_LCBRAC uint64 = 9;      // Left curly bracket '{'
-const TOKEN_RCBRAC uint64 = 10;     // Right curly bracket '}'
-const TOKEN_PT uint64 = 11;         // Point '.'
-const TOKEN_NOT uint64 = 12;        // Single not '!'
-const TOKEN_NOTEQUAL uint64 = 13;   // Comparison, not equal '!='
-const TOKEN_SEMICOLON uint64 = 14;  // Semi-colon ';'
-const TOKEN_COLON uint64 = 15;      // Colon ','
-const TOKEN_ASSIGN uint64 = 16;     // Assignment '='
-const TOKEN_EQUALS uint64 = 17;     // Equal comparison '=='
-const TOKEN_CHAR uint64 = 18;       // Single Quoted Character
-const TOKEN_REL_AND uint64 = 19;    // AND Relation
-const TOKEN_REL_OR uint64 = 20;     // OR Relation
-const TOKEN_REL_GTOE uint64 = 21;   // Greather-Than or Equal
-const TOKEN_REL_GT uint64 = 22;     // Greather-Than
-const TOKEN_REL_LTOE uint64 = 23;   // Less-Than or Equal
-const TOKEN_REL_LT uint64 = 24;     // Less-Than
-const TOKEN_ARITH_PLUS uint64 = 25; // Arith. Plus
-const TOKEN_ARITH_MINUS uint64 = 26;// Arith. Minus
-const TOKEN_ARITH_MUL uint64 = 27;  // Arith. Multiplication
-const TOKEN_ARITH_DIV uint64 = 28;  // Arith. Division
-
-// Advanced tokens, that are generated in the 2nd step from identifiers
-const TOKEN_FOR uint64 = 101;
-const TOKEN_IF uint64 = 102;
-const TOKEN_TYPE uint64 = 103;
-const TOKEN_CONST uint64 = 104;
-const TOKEN_VAR uint64 = 105;
-const TOKEN_STRUCT uint64 = 106;
-const TOKEN_RETURN uint64 = 107;
-const TOKEN_FUNC uint64 = 108;
-const TOKEN_PACKAGE uint64 = 109;
-const TOKEN_IMPORT uint64 = 110;
+import "fmt"
 
 //
 // Token struct holding the relevant data of a parsed token.
 //
 type Token struct {
     id uint64; // The id. Is one of TOKEN_*
-    value [255]byte; // If the id requires a value to be stored, it is found here 
-    value_len uint64; // Length of the value stored in `value`
+    /* value storing the integer value if the token is TOKEN_INTEGER */
     intValue uint64;
+    /* Value that should be used instead of byte arrays */
+    newValue string;
 
     nextChar byte; // Sometime the next char is already read. It is stored here to be re-assigned in the next GetNextToken() round
 };
 
-/*
- * Function getting the next raw token. May contain token that must be converted
- * before the parser can work with them.
- */
-func GetNextTokenRaw(fd uint64, oldToken Token) Token {
+func GetNextTokenRaw(fd uint64, tok *Token) {
     var singleChar byte; // Byte holding the last read value
     /* 
      * Flag indicating whether we are in a comment.
@@ -77,27 +31,24 @@ func GetNextTokenRaw(fd uint64, oldToken Token) Token {
     var inComment uint64;
     var done uint64; // Flag indicating whether a cycle (Token) is finsihed 
     var spaceDone uint64; // Flag indicating whether an abolishment cycle is finished 
-    var newToken Token; // The new token that is returned
 
     // Initialize variables
     done = 0;
     spaceDone = 0;
-    newToken.id = 0;
-    newToken.value_len = 0;
-    newToken.nextChar = 0; 
-    inComment = 0;   
+    inComment = 0;  
 
     // If the old Token had to read the next char (and stored it), we can now
     // get it back
-    if oldToken.nextChar == 0 {       
+    if tok.nextChar == 0 {       
         singleChar=libgogo.GetChar(fd)
     } else {
-        singleChar = oldToken.nextChar;
+        singleChar = tok.nextChar;
+        tok.nextChar = 0;
     }
 
     // check if it is a valid read, or an EOF
     if singleChar == 0 {
-        newToken.id = TOKEN_EOS;
+        tok.id = TOKEN_EOS;
         done = 1;
         spaceDone = 1;
     }
@@ -158,7 +109,7 @@ func GetNextTokenRaw(fd uint64, oldToken Token) Token {
 
             // check if GetChar() returned EOF while skipping
             if singleChar == 0 {
-                newToken.id = TOKEN_EOS;
+                tok.id = TOKEN_EOS;
                 spaceDone = 1;
                 done = 1;
             }   
@@ -178,26 +129,22 @@ func GetNextTokenRaw(fd uint64, oldToken Token) Token {
     // Catch identifiers
     // identifier = letter { letter | digit }.
     if (done != 1) && (singleChar >= 'A' && singleChar <= 'Z') || (singleChar >= 'a' && singleChar <= 'z') || singleChar == '_' { // check for letter or _
-        newToken.id = TOKEN_IDENTIFIER;
+        tok.id = TOKEN_IDENTIFIER;
         // preceding characters may be letter,_, or a number
         for ; (singleChar >= 'A' && singleChar <= 'Z') || (singleChar >= 'a' && singleChar <= 'z') || singleChar == '_' || (singleChar >= '0' && singleChar <= '9'); singleChar = libgogo.GetChar(fd) {
-            newToken.value[newToken.value_len] = singleChar;
-            newToken.value_len = newToken.value_len +1;
+            tmp_StrAppend(tok.newValue,singleChar);
         }
-        newToken.value[newToken.value_len] = 0;
         // save the last read character for the next GetNextToken() cycle
-        newToken.nextChar = singleChar;
+        tok.nextChar = singleChar;
         done = 1;
     }
 
     // string "..."
     if (done != 1) && singleChar == '"' {
-        newToken.id = TOKEN_STRING;        
+        tok.id = TOKEN_STRING;        
         for singleChar = libgogo.GetChar(fd); singleChar != '"' &&singleChar > 31 && singleChar < 127;singleChar = libgogo.GetChar(fd) {
-            newToken.value[newToken.value_len] = singleChar;
-            newToken.value_len = newToken.value_len +1;
+            tmp_StrAppend(tok.newValue,singleChar);
         }
-        newToken.value[newToken.value_len] = 0;
         if singleChar != '"' {
             libgogo.ExitError(">> Scanner: String not closing. Exiting.",1);
         }
@@ -205,71 +152,77 @@ func GetNextTokenRaw(fd uint64, oldToken Token) Token {
     }
 
     // Single Quoted Character
-    // Needs to be converted later on
     if (done != 1) && singleChar == 39 {
-        newToken.id = TOKEN_CHAR;
-        for singleChar = libgogo.GetChar(fd); singleChar != 39 && singleChar > 31 && singleChar < 127;singleChar = libgogo.GetChar(fd) {
-            newToken.value[newToken.value_len] = singleChar;
-            newToken.value_len = newToken.value_len +1;
-        }        
-        newToken.value[newToken.value_len] = 0;
+        singleChar = libgogo.GetChar(fd);
+        if singleChar != 39 && singleChar > 31 && singleChar < 127 {
+            tok.id = TOKEN_INTEGER;
+            tok.intValue = tmp_toInt(singleChar);
+        } else {
+            libgogo.ExitError(">> Scanner: Unknown character. Exiting.",1);
+        }
+        singleChar = libgogo.GetChar(fd);
         if singleChar != 39 {
-            libgogo.ExitError(">> Scanner: Character not closing. Exiting.",1);
+            libgogo.ExitError(">> Scanner: Only single characters allowed. Use corresponding integer for special characters. Exiting.",1);
         }
         done = 1;
     }
 
     // left brace (
     if (done != 1) && singleChar == '(' {
-        newToken.id = TOKEN_LBRAC;
+        tok.id = TOKEN_LBRAC;
         done = 1;
     }
 
     // right brace )
     if (done != 1) && singleChar == ')' {
-        newToken.id = TOKEN_RBRAC;
+        tok.id = TOKEN_RBRAC;
         done = 1;
     }
 
     // left square bracket [
     if (done != 1) && singleChar == '[' {
-        newToken.id = TOKEN_LSBRAC;
+        tok.id = TOKEN_LSBRAC;
         done = 1;    
     }
     
     // right square bracket ]
     if (done != 1) && singleChar == ']' {
-        newToken.id = TOKEN_RSBRAC;
+        tok.id = TOKEN_RSBRAC;
         done = 1;
     }
 
     // integer
     if (done != 1) && singleChar > 47 && singleChar < 58 {
-        newToken.id = TOKEN_INTEGER;
-        for ; singleChar > 47 && singleChar < 58 ; singleChar = libgogo.GetChar(fd) {
-            newToken.value[newToken.value_len] = singleChar;
-            newToken.value_len = newToken.value_len +1;
+        var byteBuf [255]byte;
+        var i uint64;
+        
+        for i = 0; singleChar > 47 && singleChar < 58 ; singleChar = libgogo.GetChar(fd) {
+            byteBuf[i] = singleChar;
+            i = i +1;
         }
-        newToken.value[newToken.value_len] = 0
-        newToken.nextChar = singleChar;  
+
+        tok.nextChar = singleChar;  
+        tok.id = TOKEN_INTEGER;
+        tok.intValue = libgogo.ByteBufToInt(byteBuf,i);
+
         done = 1;
     }
 
     // Left curly bracket '{'
     if (done != 1) && singleChar == '{' {
-        newToken.id = TOKEN_LCBRAC;
+        tok.id = TOKEN_LCBRAC;
         done = 1;
     }
     
     // Right curly bracket '}'
     if (done != 1) && singleChar == '}' {
-        newToken.id = TOKEN_RCBRAC;
+        tok.id = TOKEN_RCBRAC;
         done = 1;
     }
 
     // Point '.'
     if (done != 1) && singleChar == '.' {
-        newToken.id = TOKEN_PT;
+        tok.id = TOKEN_PT;
         done = 1;
     }
 
@@ -277,23 +230,23 @@ func GetNextTokenRaw(fd uint64, oldToken Token) Token {
     if (done != 1) && singleChar == '!' {
         singleChar = libgogo.GetChar(fd);
         if singleChar == '=' {
-            newToken.id = TOKEN_NOTEQUAL;
+            tok.id = TOKEN_NOTEQUAL;
         } else {
-            newToken.id = TOKEN_NOT;
-            newToken.nextChar = singleChar;
+            tok.id = TOKEN_NOT;
+            tok.nextChar = singleChar;
         }
         done = 1;
     }
 
     // Semicolon ';'
     if (done != 1) && singleChar == ';' {
-        newToken.id = TOKEN_SEMICOLON;
+        tok.id = TOKEN_SEMICOLON;
         done = 1;
     }
 
     // Colon ','
     if (done != 1) && singleChar == ',' {
-        newToken.id = TOKEN_COLON;
+        tok.id = TOKEN_COLON;
         done = 1;
     }
 
@@ -301,10 +254,10 @@ func GetNextTokenRaw(fd uint64, oldToken Token) Token {
     if (done != 1) && singleChar == '=' {
         singleChar = libgogo.GetChar(fd);
         if singleChar == '=' {
-            newToken.id = TOKEN_EQUALS;
+            tok.id = TOKEN_EQUALS;
         } else {
-            newToken.id = TOKEN_ASSIGN;
-            newToken.nextChar = singleChar;
+            tok.id = TOKEN_ASSIGN;
+            tok.nextChar = singleChar;
         }
         done = 1;
     }
@@ -313,9 +266,10 @@ func GetNextTokenRaw(fd uint64, oldToken Token) Token {
     if (done != 1) && singleChar == '&' {
         singleChar = libgogo.GetChar(fd);
         if singleChar == '&' {
-            newToken.id = TOKEN_REL_AND;
+            tok.id = TOKEN_REL_AND;
         } else {
-            libgogo.ExitError(">> Scanner: No address operator supported.",1);
+            tok.id = TOKEN_OP_ADR;
+            tok.nextChar = singleChar;
         }
         done = 1;
     }
@@ -324,7 +278,7 @@ func GetNextTokenRaw(fd uint64, oldToken Token) Token {
     if (done != 1) && singleChar == '|' {
         singleChar = libgogo.GetChar(fd);
         if singleChar == '|' {
-            newToken.id = TOKEN_REL_OR;
+            tok.id = TOKEN_REL_OR;
         } else {    
             libgogo.ExitError(">> Scanner: No binary OR (|) supported. Only ||.",1);
         }
@@ -335,10 +289,10 @@ func GetNextTokenRaw(fd uint64, oldToken Token) Token {
     if (done != 1) && singleChar == '>' {
         singleChar = libgogo.GetChar(fd);
         if singleChar == '=' {
-            newToken.id = TOKEN_REL_GTOE;
+            tok.id = TOKEN_REL_GTOE;
         } else {
-            newToken.id = TOKEN_REL_GT;
-            newToken.nextChar = singleChar;
+            tok.id = TOKEN_REL_GT;
+            tok.nextChar = singleChar;
         }            
         done = 1;
     }     
@@ -347,31 +301,31 @@ func GetNextTokenRaw(fd uint64, oldToken Token) Token {
     if (done != 1) && singleChar == '<' {
         singleChar = libgogo.GetChar(fd);
         if singleChar == '=' {
-            newToken.id = TOKEN_REL_LTOE;
+            tok.id = TOKEN_REL_LTOE;
         } else {
-            newToken.id = TOKEN_REL_LT;
-            newToken.nextChar = singleChar;
+            tok.id = TOKEN_REL_LT;
+            tok.nextChar = singleChar;
         }            
         done = 1;
     }    
 
     if (done != 1) && singleChar == '+' {
-        newToken.id = TOKEN_ARITH_PLUS;
+        tok.id = TOKEN_ARITH_PLUS;
         done = 1;
     }
 
     if (done != 1) && singleChar == '-' {
-        newToken.id = TOKEN_ARITH_MINUS;
+        tok.id = TOKEN_ARITH_MINUS;
         done = 1;
     }
 
     if (done != 1) && singleChar == '*' {
-        newToken.id = TOKEN_ARITH_MUL;
+        tok.id = TOKEN_ARITH_MUL;
         done = 1;
     }
 
     if (done != 1) && singleChar == '/' {
-        newToken.id = TOKEN_ARITH_DIV;
+        tok.id = TOKEN_ARITH_DIV;
         done = 1;
     }
 
@@ -382,67 +336,48 @@ func GetNextTokenRaw(fd uint64, oldToken Token) Token {
         libgogo.PrintString("'. ");
         libgogo.ExitError("Exiting.",1);
     }
-
-    return newToken;
 }
 
-func GetNextToken(fd uint64, oldToken Token) Token {
-    var newToken Token;
-    newToken = GetNextTokenRaw(fd,oldToken)
-    
-    // Convert integer from byte array to integer value
-    if newToken.id == TOKEN_INTEGER {
-        newToken.intValue = libgogo.ByteBufToInt(newToken.value,newToken.value_len);
-    }
-
-    // Convert single quoted characters to integer
-    if newToken.id == TOKEN_CHAR {
-        if newToken.value_len != 1 {
-            libgogo.ExitError (">> Scanner: Only single characters are supported!",1);
-        } else {
-            newToken.id = TOKEN_INTEGER;
-            newToken.intValue = libgogo.ToIntFromByte(newToken.value[0]);
-        }
-    }
+func GetNextToken(fd uint64, tok *Token) {
+    GetNextTokenRaw(fd,tok)
 
     // Convert identifier to keyworded tokens
-    if newToken.id == TOKEN_IDENTIFIER {
-        if libgogo.StringByteBufCmp("if",newToken.value) == 1 {
-            newToken.id = TOKEN_IF;
+    if tok.id == TOKEN_IDENTIFIER {
+        if tmp_StrCmp("if",tok.newValue) == 0 {
+            tok.id = TOKEN_IF;
         }
-        if libgogo.StringByteBufCmp("for",newToken.value) == 1 {
-            newToken.id = TOKEN_FOR;
+        if tmp_StrCmp("for",tok.newValue) == 0 {
+            tok.id = TOKEN_FOR;
         }
-        if libgogo.StringByteBufCmp("type",newToken.value) == 1 {
-            newToken.id = TOKEN_TYPE;
+        if tmp_StrCmp("type",tok.newValue) == 0 {
+            tok.id = TOKEN_TYPE;
         }
-        if libgogo.StringByteBufCmp("const",newToken.value) == 1 {
-            newToken.id = TOKEN_CONST;
+        if tmp_StrCmp("const",tok.newValue) == 0 {
+            tok.id = TOKEN_CONST;
         }
-        if libgogo.StringByteBufCmp("var",newToken.value) == 1 {
-            newToken.id = TOKEN_VAR;
+        if tmp_StrCmp("var",tok.newValue) == 0 {
+            tok.id = TOKEN_VAR;
         }
-        if libgogo.StringByteBufCmp("struct", newToken.value) == 1 {
-            newToken.id = TOKEN_STRUCT;
+        if tmp_StrCmp("struct", tok.newValue) == 0 {
+            tok.id = TOKEN_STRUCT;
         }
-        if libgogo.StringByteBufCmp("return", newToken.value) == 1 {
-            newToken.id = TOKEN_RETURN;
+        if tmp_StrCmp("return", tok.newValue) == 0 {
+            tok.id = TOKEN_RETURN;
         }
-        if libgogo.StringByteBufCmp("func", newToken.value) == 1 {
-            newToken.id = TOKEN_FUNC;
+        if tmp_StrCmp("func", tok.newValue) == 0 {
+            tok.id = TOKEN_FUNC;
         }
-        if libgogo.StringByteBufCmp("import", newToken.value) == 1 {
-            newToken.id = TOKEN_IMPORT;
+        if tmp_StrCmp("import", tok.newValue) == 0 {
+            tok.id = TOKEN_IMPORT;
         }
-        if libgogo.StringByteBufCmp("package", newToken.value) == 1 {
-            newToken.id = TOKEN_PACKAGE;
+        if tmp_StrCmp("package", tok.newValue) == 0 {
+            tok.id = TOKEN_PACKAGE;
         }
     }
-
-    return newToken;
 }
 
 func debugToken (tok Token) {
+    /*
     libgogo.PrintString("Token Id: ");
     libgogo.PrintNumber(tok.id);
     libgogo.PrintString("\n");
@@ -451,16 +386,44 @@ func debugToken (tok Token) {
         libgogo.PrintString("Identifier/String value: ");
         libgogo.PrintByteBuf(tok.value);
         libgogo.PrintString("\n");
-    }
+    }*/
+
 }
 
 // Temporary test function
 func ScannerTest(fd uint64) {  
     var tok Token;
+
     tok.id = 0;
     tok.nextChar = 0;
 
-    for tok = GetNextToken(fd,tok); tok.id != TOKEN_EOS; tok = GetNextToken(fd,tok) {
-        debugToken(tok);
+    for GetNextToken(fd,&tok); tok.id != TOKEN_EOS; GetNextToken(fd,&tok) {
+        fmt.Printf("%d\n",tok.id);
     }
+}
+
+// libgogo ...
+func tmp_StrAppend(str string, b byte) {
+    str += string(b);
+}
+
+// libgogo ...
+func tmp_StrLen(str string) int {
+    return len(str);
+}
+
+// libgogo ...
+func tmp_StrCmp(str1 string, str2 string) uint64 {
+    var ret uint64;    
+    if str1 == str2 {
+        ret = 0;
+    } else {
+        ret = 1;
+    }
+    return ret;
+}
+
+// libgogo ...
+func tmp_toInt(b byte) uint64 {
+    return uint64(b);
 }
