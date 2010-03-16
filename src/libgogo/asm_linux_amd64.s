@@ -8,7 +8,7 @@ TEXT ·Exit(SB),1,$0 //Exit: 1 parameter, no return value
   INT $0x80 //Linux syscall
   RET //Just to be sure (should never be reached)
 
-TEXT ·StringLength(SB),2,$0 //StringLength: 1 parameter, 1 return value
+TEXT ·StringLength(SB),3,$0 //StringLength: 1 parameter, 1 return value
 STRLEN_START:
   MOVQ 8(SP), AX //String (first parameter => SP+64bit)
   MOVQ $0, 24(SP) //Initialize length with 0
@@ -33,9 +33,23 @@ TEXT ·ToByteFromInt(SB),2,$0 //ToByteFromInt: 1 parameter, 1 return value
   MOVB AL, 16(SP) //Move AL (last byte of parameter) to result (return value after one parameter => SP+2*64bit)
   RET
 
+//Prototype (does not work yet fully as expected)
+/*TEXT ·GetChar(SB),2,$0 //Read: 1 parameter, 1 return value
+  MOVQ $3, AX //sys_read (3 parameters)
+  MOVQ 8(SP), BX //fd (first parameter => SP+64bit)
+  MOVQ 16(SP), CX //buffer (return value after one parameter => SP+2*64bit)
+  MOVQ $1, DX //buffer size (size 1)
+  INT $0x80 //Linux syscall
+  CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
+  JLS READ_SUCCESS //Return result if successful
+GETCHAR_ERROR:
+  MOVQ $0, 16(SP) //Return 0 (return value after one parameter => SP+2*64bit)
+GETCHAR_SUCCESS:
+  RET*/
+
 //--- Cleanup necessary from here onwards (most functions don't work properly!)
 
-TEXT ·Write(SB),4,$0 //Write: 3 parameters, 1 return value
+TEXT ·Write(SB),5,$0 //Write: 3 parameters, 1 return value
   MOVQ $4, AX //sys_write (3 parameters)
   MOVQ 8(SP), BX //fd (first parameter => SP+64bit)
   MOVQ 16(SP), CX //text (second parameter => SP+2*64bit)
@@ -51,7 +65,7 @@ WRITE_SUCCESS:
   MOVQ AX, 40(SP) //First return value of syscall is in AX (return value after three parameters => SP+5*64bit)
   RET
 
-TEXT ·Read(SB),4,$0 //Read: 3 parameters, 1 return value
+TEXT ·Read(SB),5,$0 //Read: 3 parameters, 1 return value
   MOVQ $3, AX //sys_read (3 parameters)
   MOVQ 8(SP), BX //fd (first parameter => SP+64bit)
   MOVQ 16(SP), CX //buffer (second parameter => SP+2*64bit)
@@ -67,7 +81,7 @@ READ_SUCCESS:
   MOVQ AX, 40(SP) //First return value of syscall is in AX (return value after three parameters => SP+5*64bit)
   RET
 
-TEXT ·FileOpen(SB),3,$0 //FileOpen: 2 parameters, 1 return value
+TEXT ·FileOpen(SB),4,$0 //FileOpen: 2 parameters, 1 return value
   MOVQ $5, AX //sys_open (2 parameters)
   MOVQ 8(SP), BX //filename (first parameter => SP+64bit)
   MOVQ 16(SP), CX //flags (second parameter => SP+2*64bit)

@@ -27,7 +27,7 @@ func ByteBufLength(buf [255]byte) uint64 {
 
 func StringLength(str string) uint64;
 
-func StringByteBufCmp(str string, buf [255]byte) uint64 { //TODO (SC): string is passed by reference here, but will not be when compiled by us => write a function StringByteBufCmp(buf1 [255]byte, buf2 [255]byte) and handle string->[255]byte conversion for the regular Go compiler in some other way
+func StringByteBufCmp(str string, buf [255]byte) uint64 {
     var i uint64;
     var equal uint64 = 1;
     var strlen uint64 = StringLength(str);
@@ -45,7 +45,7 @@ func StringByteBufCmp(str string, buf [255]byte) uint64 { //TODO (SC): string is
     return equal;
 }
 
-func StringToByteBuf(from string) [255]byte { //string is passed by reference here, but will already be a [255]byte when compiled by us => make this function obsolete in our compiler and handle string->[255]byte conversion for the regular Go compiler in some other way
+func StringToByteBuf(from string) [255]byte {
   var i uint64;
   var to [255]byte;
   for i = 0; i < StringLength(from) ; i = i+1 {
@@ -84,7 +84,7 @@ func ExitError(msg string, code uint64) {
     Exit(code);
 }
 
-func PrintString(msg string) { //TODO (SC): Don't rely on Printf; also, string is passed by reference here, but will not be when compiled by us => use function PrintByteBuf if convenient and handle string->[255]byte conversion for the regular Go compiler in some other way
+func PrintString(msg string) { //TODO (SC): Don't rely on Printf
     fmt.Printf(msg);
 }
 
@@ -108,6 +108,8 @@ func PrintNumber(num uint64) {
     }
     PrintChar(buf[0]);
 }
+
+//func GetChar(fd uint64) byte;
 
 //--- Cleanup necessary from here onwards (most functions don't work properly!)
 
