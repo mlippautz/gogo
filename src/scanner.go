@@ -34,6 +34,8 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     spaceDone = 0;
     inComment = 0;  
 
+    tok.newValue = "";
+
     // If the previous cycle had to read the next char (and stored it), it is 
     // now used as first read
     if tok.nextChar == 0 {       
@@ -129,7 +131,8 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
         tok.id = TOKEN_IDENTIFIER;
         // preceding characters may be letter,_, or a number
         for ; (singleChar >= 'A' && singleChar <= 'Z') || (singleChar >= 'a' && singleChar <= 'z') || singleChar == '_' || (singleChar >= '0' && singleChar <= '9'); singleChar = libgogo.GetChar(fd) {
-            tmp_StrAppend(tok.newValue,singleChar);
+            // TODO
+            tok.newValue += string(singleChar);
         }
         // save the last read character for the next GetNextToken() cycle
         tok.nextChar = singleChar;
@@ -140,7 +143,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     if (done != 1) && singleChar == '"' {
         tok.id = TOKEN_STRING;        
         for singleChar = libgogo.GetChar(fd); singleChar != '"' &&singleChar > 31 && singleChar < 127;singleChar = libgogo.GetChar(fd) {
-            tmp_StrAppend(tok.newValue,singleChar);
+            tok.newValue += string(singleChar);
         }
         if singleChar != '"' {
             libgogo.ExitError(">> Scanner: String not closing. Exiting.",1);
@@ -397,7 +400,7 @@ func ScannerTest(fd uint64) {
 
 // libgogo ...
 func tmp_StrAppend(str string, b byte) {
-    str += string(b);
+    str += "x";
 }
 
 // libgogo ...
@@ -410,8 +413,8 @@ func tmp_StrCmp(str1 string, str2 string) uint64 {
     var ret uint64;    
     if str1 == str2 {
         ret = 0;
-    } else {
-        ret = 1;
+    } else {   
+        ret =1;
     }
     return ret;
 }
