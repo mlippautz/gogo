@@ -84,8 +84,10 @@ func ExitError(msg string, code uint64) {
     Exit(code);
 }
 
-func PrintString(msg string) { //TODO (SC): Don't rely on Printf
-    fmt.Printf(msg);
+func Write(fd uint64, text string, length uint64) uint64;
+
+func PrintString(msg string) {
+    Write(1, msg, StringLength(msg));
 }
 
 func PrintChar(char byte) { //TODO (SC): Don't rely on Printf
@@ -113,7 +115,6 @@ func PrintNumber(num uint64) {
 
 //--- Cleanup necessary from here onwards (most functions don't work properly!)
 
-func Write(fd uint64, text string, length uint64) uint64; //Writes a defined number of characters of a given string to the file with the given file descriptor
 func Read(fd uint64, buffer string, buffer_size uint64) uint64; //Reads the specified number of characters from the file with the given file descriptor to the given buffer (string)
 func FileOpen(filename string, flags uint64) uint64; //Opens a file with the specified flags and returns the corresponding file descriptor
 func FileClose(fd uint64); //Closes the given file descriptor

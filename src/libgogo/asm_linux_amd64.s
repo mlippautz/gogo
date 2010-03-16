@@ -33,22 +33,6 @@ TEXT ·ToByteFromInt(SB),2,$0 //ToByteFromInt: 1 parameter, 1 return value
   MOVB AL, 16(SP) //Move AL (last byte of parameter) to result (return value after one parameter => SP+2*64bit)
   RET
 
-//Prototype (does not work yet fully as expected)
-/*TEXT ·GetChar(SB),2,$0 //Read: 1 parameter, 1 return value
-  MOVQ $3, AX //sys_read (3 parameters)
-  MOVQ 8(SP), BX //fd (first parameter => SP+64bit)
-  MOVQ 16(SP), CX //buffer (return value after one parameter => SP+2*64bit)
-  MOVQ $1, DX //buffer size (size 1)
-  INT $0x80 //Linux syscall
-  CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
-  JLS READ_SUCCESS //Return result if successful
-GETCHAR_ERROR:
-  MOVQ $0, 16(SP) //Return 0 (return value after one parameter => SP+2*64bit)
-GETCHAR_SUCCESS:
-  RET*/
-
-//--- Cleanup necessary from here onwards (most functions don't work properly!)
-
 TEXT ·Write(SB),5,$0 //Write: 3 parameters, 1 return value
   MOVQ $4, AX //sys_write (3 parameters)
   MOVQ 8(SP), BX //fd (first parameter => SP+64bit)
@@ -58,12 +42,30 @@ TEXT ·Write(SB),5,$0 //Write: 3 parameters, 1 return value
   CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
   JLS WRITE_SUCCESS //Return result if successful
 WRITE_ERROR:
-  MOVQ $0, 40(SP) //Return 0 (return value after three parameters => SP+5*64bit)
-  //TODO: Error handling?
+  MOVQ $0, 40(SP) //Return 0 to indicate that an error occured (return value after three parameters => SP+5*64bit)
   RET
 WRITE_SUCCESS:
   MOVQ AX, 40(SP) //First return value of syscall is in AX (return value after three parameters => SP+5*64bit)
   RET
+
+//Prototype (does not work yet fully as expected)
+/*TEXT ·GetChar(SB),2,$0 //Read: 1 parameter, 1 return value
+  MOVQ $3, AX //sys_read (3 parameters)
+  MOVQ 8(SP), BX //fd (first parameter => SP+64bit)
+  LEAQ 8(SP), CX //buffer (reuse first parameter => SP+64bit)
+  MOVQ $1, DX //buffer size (size 1)
+  INT $0x80 //Linux syscall
+  MOVQ $0, DX //Overwrite DX (initialize with 0)
+  MOVB (CX), DL //Move buffer to DL
+  MOVQ DX, 16(SP) //Move whole DX register to result (return value after one parameter => SP+2*64bit)
+  CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
+  JLS READ_SUCCESS //Return result if successful
+GETCHAR_ERROR:
+  MOVQ $0, 16(SP) //Return 0 (return value after one parameter => SP+2*64bit)
+GETCHAR_SUCCESS:
+  RET*/
+
+//--- Cleanup necessary from here onwards (most functions don't work properly!)
 
 TEXT ·Read(SB),5,$0 //Read: 3 parameters, 1 return value
   MOVQ $3, AX //sys_read (3 parameters)
