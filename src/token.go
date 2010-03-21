@@ -51,3 +51,131 @@ const TOKEN_RETURN uint64 = 107;
 const TOKEN_FUNC uint64 = 108;
 const TOKEN_PACKAGE uint64 = 109;
 const TOKEN_IMPORT uint64 = 110;
+
+//
+// Helper functions
+//
+
+func TokenToString (id uint64) string {
+    var retStr string;
+
+    if id == TOKEN_IDENTIFIER {
+        retStr = "<identifier>";
+    }
+    if id == TOKEN_STRING {
+        retStr = "<string>";
+    }
+    if id == TOKEN_EOS {
+        retStr = "<END-OF-SCAN>";
+    }
+    if id == TOKEN_LBRAC {
+        retStr = "(";
+    }
+    if id == TOKEN_RBRAC {
+        retStr = ")";
+    }
+    if id == TOKEN_LSBRAC {
+        retStr = "[";
+    }
+    if id == TOKEN_RSBRAC {
+        retStr = "]";
+    }
+    if id == TOKEN_INTEGER {
+        retStr = "<integer>";
+    }
+    if id == TOKEN_LCBRAC {
+        retStr = "{";
+    }
+    if id == TOKEN_RCBRAC {
+        retStr = "}";
+    }
+    if id == TOKEN_PT {
+        retStr = ".";
+    }
+    if id == TOKEN_NOT {
+        retStr = "!";
+    }
+    if id == TOKEN_NOTEQUAL {
+        retStr = "!=";
+    }
+    if id == TOKEN_SEMICOLON {
+        retStr = ";";
+    }
+    if id == TOKEN_COLON {
+        retStr = ",";
+    }
+    if id == TOKEN_ASSIGN {
+        retStr = "=";
+    }
+    if id == TOKEN_EQUALS {
+        retStr = "==";
+    }
+    if id == TOKEN_CHAR {
+        retStr = "'<char>'";
+    }
+    if id == TOKEN_REL_AND {
+        retStr = "&&";
+    }
+    if id == TOKEN_REL_OR {
+        retStr = "||"
+    }
+    if id == TOKEN_REL_GTOE {
+        retStr = ">=";
+    }
+    if id == TOKEN_REL_GT {
+        retStr = ">";
+    }
+    if id == TOKEN_REL_LTOE {
+        retStr = "<=";
+    }
+    if id == TOKEN_REL_LT {
+        retStr = "<";
+    }
+    if id == TOKEN_ARITH_PLUS {
+        retStr = "+";
+    }
+    if id == TOKEN_ARITH_MINUS {
+        retStr = "-";
+    }
+    if id == TOKEN_ARITH_MUL {
+        retStr = "*";
+    }
+    if id == TOKEN_ARITH_DIV {
+        retStr = "/";
+    }
+    if id == TOKEN_OP_ADR {
+        retStr = "&";
+    }
+    if id == TOKEN_FOR {
+        retStr = "for";
+    }
+    if id == TOKEN_IF {
+        retStr = "if";
+    }
+    if id == TOKEN_TYPE {
+        retStr = "type";
+    }
+    if id == TOKEN_CONST {
+        retStr = "const";
+    }
+    if id == TOKEN_VAR {
+        retStr = "var";
+    }
+    if id == TOKEN_STRUCT {
+        retStr = "struct";
+    }
+    if id == TOKEN_RETURN {
+        retStr = "return";
+    }
+    if id == TOKEN_FUNC {
+        retStr = "func";
+    }
+    if id == TOKEN_PACKAGE {
+        retStr = "package";
+    }
+    if id == TOKEN_IMPORT {
+        retStr = "import";
+    }
+
+    return retStr;
+}
