@@ -404,18 +404,12 @@ func debugToken(tok *Token) {
 // Temporary test function
 func ScannerTest(fd uint64) {  
     var tok Token;
-    var tmpCnt uint64;
 
     tok.id = 0;
     tok.nextChar = 0;
-    tmpCnt = 0;
 
     for GetNextToken(fd,&tok); tok.id != TOKEN_EOS; GetNextToken(fd,&tok) {
         debugToken(&tok);
-        if tmpCnt == 5 {
-            libgogo.Exit(0);
-        }
-        tmpCnt = tmpCnt + 1;
     }
 }
 
