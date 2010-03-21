@@ -4,21 +4,36 @@
 # Use of this source code is governed by the MIT
 # license that can be found in the LICENSE file.
 
+#
+# This tool can test against predefined source files by comparing various
+# compiled results. New valid sets can be generated and need to be 
+# acknowlegded before code can be tested against.
+#
+
+# change to this directory for easier handling of paths
 SELF="test.sh"
 BASEDIR=`dirname $0`
 cd $BASEDIR
 
+# tools that are used
+SHA256SUM=/usr/bin/sha256sum
+
+# configuration
 TESTDIR="tests"
 TMPDIR="tmp"
-SHAPATH=/usr/bin/sha256sum
+GOGODIR=../src
+GOGO=$GOGODIR/gogo
 
+# Performs internal checks to make sure everything is set up.
 function do_checks() {
-    echo "--------------------------------------------------------------------------------"
+    echo "---------------------------------------------------------------------\
+-----------"
     echo "Performing internal checks"
-    echo "--------------------------------------------------------------------------------"
+    echo "---------------------------------------------------------------------\
+-----------"
 
     echo -n "Checking for sha256sum tool... "
-    if [ -e $SHAPATH ]; then
+    if [ -e $SHA256SUM ]; then
         echo "ok"
     else
         echo "failed"
@@ -26,7 +41,7 @@ function do_checks() {
     fi
 
     echo -n "Checking for gogo compiler... "
-    if [ -e ../src/gogo ]; then
+    if [ -e $GOGO ]; then
         echo "ok"
     else
         echo "failed"
@@ -50,6 +65,7 @@ function do_checks() {
     fi    
 }
 
+# Generates new results that can be marked as valid
 function new_valids() {
     do_checks
 
@@ -62,13 +78,15 @@ function new_valids() {
         rm valids_acked
     fi
 
-    echo "--------------------------------------------------------------------------------"
+    echo "---------------------------------------------------------------------\
+-----------"
     echo "Generating new valid results"
-    echo "--------------------------------------------------------------------------------"
+    echo "---------------------------------------------------------------------\
+-----------"
     for filename in $( ls $TESTDIR )
     do
-        ../src/gogo $TESTDIR/$filename > $TMPDIR/$filename.tmp
-        result=$(sha256sum $TMPDIR/$filename.tmp)
+        $GOGO $TESTDIR/$filename > $TMPDIR/$filename.tmp
+        result=$($SHA256SUM $TMPDIR/$filename.tmp)
         echo "$result"
         echo "$result" >> valid_results
     done
@@ -79,41 +97,52 @@ function new_valids() {
     fi
 }
 
+# Acknowledges the previously generated results
 function ack_valids() {
     if [ -e valid_results ]; then
-        echo "--------------------------------------------------------------------------------"
+        echo "-----------------------------------------------------------------\
+---------------"
         echo "Acknowledging the generated results"
-        echo "--------------------------------------------------------------------------------"
+        echo "-----------------------------------------------------------------\
+---------------"
         touch valids_acked    
     else
-        echo "No last valid results found. Run './test newvalids' to generate them"
+        echo "No last valid results found. Run './test newvalids' to generate \
+them"
         exit 1 
     fi
 }
 
+# Performs a checksum comparison against the previously acked results
 function do_tests() {
     do_checks
     if [ -e valids_acked ]; then
-        echo "--------------------------------------------------------------------------------"
+        echo "-----------------------------------------------------------------\
+---------------"
         echo "Performing tests against last valid results"
-        echo "--------------------------------------------------------------------------------"
+        echo "-----------------------------------------------------------------\
+---------------"
         for filename in $( ls $TESTDIR )
         do
-            ../src/gogo $TESTDIR/$filename > $TMPDIR/$filename.tmp
+            $GOGO $TESTDIR/$filename > $TMPDIR/$filename.tmp
         done
-        sha256sum -c valid_results
+        $SHA256SUM -c valid_results
     else
-        echo "--------------------------------------------------------------------------------"
+        echo "-----------------------------------------------------------------\
+---------------"
         echo "No last acknowlegded valid results found. Run './test newvalids' 
 and './test ackvalids' to generate and acknowledge them."
         exit 1
     fi
 }
 
+# Removes all temporary files (except the valid_results checksum file)
 function do_clean() {
-    echo "--------------------------------------------------------------------------------"
+    echo "---------------------------------------------------------------------\
+-----------"
     echo "Cleaning"
-    echo "--------------------------------------------------------------------------------"
+    echo "---------------------------------------------------------------------\
+-----------"
 
     echo -n "Removing $TMPDIR... "
     if [ -d $TMPDIR ]; then
@@ -129,10 +158,13 @@ function do_clean() {
     fi
 }
 
+# Prints the help (little howto)
 function do_help() {
-    echo "--------------------------------------------------------------------------------"
+    echo "---------------------------------------------------------------------\
+-----------"
     echo "GoGo testsuite"
-    echo "--------------------------------------------------------------------------------"
+    echo "---------------------------------------------------------------------\
+-----------"
     echo "To generate new results run './test newvalids'"
     echo "To acknowlegde them run './test ackvalids'"
     echo "To test against acked results run './test test'"
