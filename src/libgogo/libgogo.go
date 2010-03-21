@@ -10,6 +10,10 @@ package libgogo
 
 import "fmt" //TODO (SC): Get rid of Go library dependencies
 
+func StringAppend(str *string, char byte) { //TODO (SC): Get rid of magic string concatenation and cast operator
+  *str += string(char);
+}
+
 func Min(a uint64, b uint64) uint64 {
     var result uint64 = b;
     if a < b {

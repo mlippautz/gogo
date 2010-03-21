@@ -414,5 +414,5 @@ func ScannerTest(fd uint64) {
 }
 
 func tmp_TokAppendStr(tok *Token, b byte) {
-    tok.strValue += string(b);
+    libgogo.StringAppend(&tok.strValue, b);
 }
