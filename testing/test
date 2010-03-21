@@ -26,7 +26,7 @@ function do_checks() {
     fi
 
     echo -n "Checking for gogo compiler... "
-    if [ -e ../gogo ]; then
+    if [ -e ../src/gogo ]; then
         echo "ok"
     else
         echo "failed"
@@ -67,7 +67,7 @@ function new_valids() {
     echo "--------------------------------------------------------------------------------"
     for filename in $( ls $TESTDIR )
     do
-        ../gogo $TESTDIR/$filename > $TMPDIR/$filename.tmp
+        ../src/gogo $TESTDIR/$filename > $TMPDIR/$filename.tmp
         result=$(sha256sum $TMPDIR/$filename.tmp)
         echo "$result"
         echo "$result" >> valid_results
@@ -99,7 +99,7 @@ function do_tests() {
         echo "--------------------------------------------------------------------------------"
         for filename in $( ls $TESTDIR )
         do
-            ../gogo $TESTDIR/$filename > $TMPDIR/$filename.tmp
+            ../src/gogo $TESTDIR/$filename > $TMPDIR/$filename.tmp
         done
         sha256sum -c valid_results
     else
