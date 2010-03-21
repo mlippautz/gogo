@@ -42,6 +42,9 @@ func main() {
   fmt.Printf("Equality test: %d\n", libgogo.StringByteBufCmp(test_text, test));
 
   //Library test IV
+  var testString string = "Hell";
+  testString += "o";
+  fmt.Printf("Test: string length of '%s' (len vs. myLen): %d vs. %d\n", testString, len(testString), libgogo.StringLength(testString));
   var buf1 [255]byte;
   buf1 = libgogo.StringToByteBuf(os.Args[1]);
   fmt.Printf("Length of '%s': %d\n", os.Args[1], libgogo.ByteBufLength(buf1));

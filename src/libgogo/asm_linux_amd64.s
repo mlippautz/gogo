@@ -9,16 +9,9 @@ TEXT ·Exit(SB),1,$0 //Exit: 1 parameter, no return value
   RET //Just to be sure (should never be reached)
 
 TEXT ·StringLength(SB),3,$0 //StringLength: 1 parameter, 1 return value
-STRLEN_START:
-  MOVQ 8(SP), AX //String (first parameter => SP+64bit)
-  MOVQ $0, 24(SP) //Initialize length with 0
-LOOP_STRLEN:
-  CMPB (AX), $0 //Compare character with '\0'
-  JE END_STRLEN //Terminate when '\0' has been found
-  INCQ 24(SP) //Increase length (return value after one parameter => SP+3*64bit)
-  INCQ AX //Next character
-  JMP LOOP_STRLEN //Continue
-END_STRLEN:
+  MOVQ $0, 24(SP) //Set return value to 0
+  MOVW 16(SP), AX //String length is stored together with the string (first parameter = SP+64bit -> +64bit = SP+2*64bit)
+  MOVW AX, 24(SP) //Move length to result with only 32 bits (return value after one parameter => SP+3*64bit)
   RET
 
 TEXT ·ToIntFromByte(SB),2,$0 //ToIntFromByte: 1 parameter, 1 return value
@@ -37,7 +30,7 @@ TEXT ·Write(SB),5,$0 //Write: 3 parameters, 1 return value
   MOVQ $4, AX //sys_write (3 parameters)
   MOVQ 8(SP), BX //fd (first parameter => SP+64bit)
   MOVQ 16(SP), CX //text (second parameter => SP+2*64bit)
-  MOVQ 24(SP), DX //text length (third parameter => SP+3*64bit)
+  MOVQ 32(SP), DX //text length (third parameter => SP+4*64bit)
   INT $0x80 //Linux syscall
   CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
   JLS WRITE_SUCCESS //Return result if successful
@@ -96,7 +89,7 @@ TEXT ·Read(SB),5,$0 //Read: 3 parameters, 1 return value
   MOVQ $3, AX //sys_read (3 parameters)
   MOVQ 8(SP), BX //fd (first parameter => SP+64bit)
   MOVQ 16(SP), CX //buffer (second parameter => SP+2*64bit)
-  MOVQ 24(SP), DX //buffer size (third parameter => SP+3*64bit)
+  MOVQ 32(SP), DX //buffer size (third parameter => SP+4*64bit)
   INT $0x80 //Linux syscall
   CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
   JLS READ_SUCCESS //Return result if successful
@@ -111,7 +104,7 @@ READ_SUCCESS:
 TEXT ·FileOpen(SB),4,$0 //FileOpen: 2 parameters, 1 return value
   MOVQ $5, AX //sys_open (2 parameters)
   MOVQ 8(SP), BX //filename (first parameter => SP+64bit)
-  MOVQ 16(SP), CX //flags (second parameter => SP+2*64bit)
+  MOVQ 24(SP), CX //flags (second parameter => SP+3*64bit)
   MOVQ $0, DX //not used
   INT $0x80 //Linux syscall
   CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
