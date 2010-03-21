@@ -142,7 +142,7 @@ func FileOpen(filename string, flags uint64) uint64; //Opens a file with the spe
 
 func GetChar(fd uint64) byte {
   var one_char_buf string = "\000";
-  if Read(fd, one_char_buf, 0) == 0 {
+  if Read(fd, one_char_buf, 1) == 0 {
     ; //TODO: Error handling?
     return 0;
   }
