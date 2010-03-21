@@ -346,34 +346,34 @@ func GetNextToken(fd uint64, tok *Token) {
 
     // Convert identifier to keyworded tokens
     if tok.id == TOKEN_IDENTIFIER {
-        if StringCompare("if",tok.strValue) == 0 {
+        if libgogo.StringCompare("if",tok.strValue) == 0 {
             tok.id = TOKEN_IF;
         }
-        if StringCompare("for",tok.strValue) == 0 {
+        if libgogo.StringCompare("for",tok.strValue) == 0 {
             tok.id = TOKEN_FOR;
         }
-        if StringCompare("type",tok.strValue) == 0 {
+        if libgogo.StringCompare("type",tok.strValue) == 0 {
             tok.id = TOKEN_TYPE;
         }
-        if StringCompare("const",tok.strValue) == 0 {
+        if libgogo.StringCompare("const",tok.strValue) == 0 {
             tok.id = TOKEN_CONST;
         }
-        if StringCompare("var",tok.strValue) == 0 {
+        if libgogo.StringCompare("var",tok.strValue) == 0 {
             tok.id = TOKEN_VAR;
         }
-        if StringCompare("struct", tok.strValue) == 0 {
+        if libgogo.StringCompare("struct", tok.strValue) == 0 {
             tok.id = TOKEN_STRUCT;
         }
-        if StringCompare("return", tok.strValue) == 0 {
+        if libgogo.StringCompare("return", tok.strValue) == 0 {
             tok.id = TOKEN_RETURN;
         }
-        if StringCompare("func", tok.strValue) == 0 {
+        if libgogo.StringCompare("func", tok.strValue) == 0 {
             tok.id = TOKEN_FUNC;
         }
-        if StringCompare("import", tok.strValue) == 0 {
+        if libgogo.StringCompare("import", tok.strValue) == 0 {
             tok.id = TOKEN_IMPORT;
         }
-        if StringCompare("package", tok.strValue) == 0 {
+        if libgogo.StringCompare("package", tok.strValue) == 0 {
             tok.id = TOKEN_PACKAGE;
         }
     }
@@ -414,14 +414,4 @@ func ScannerTest(fd uint64) {
 
 func tmp_TokAppendStr(tok *Token, b byte) {
     tok.strValue += string(b);
-}
-
-func StringCompare(str1 string, str2 string) uint64 {
-    var ret uint64;    
-    if str1 == str2 {
-        ret = 0;
-    } else {   
-        ret =1;
-    }
-    return ret;
 }

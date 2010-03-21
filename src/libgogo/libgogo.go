@@ -8,7 +8,7 @@
 
 package libgogo
 
-import "fmt" //TODO (SC): Don't rely on Go libraries
+import "fmt" //TODO (SC): Get rid of Go library dependencies
 
 func Min(a uint64, b uint64) uint64 {
     var result uint64 = b;
@@ -26,6 +26,24 @@ func ByteBufLength(buf [255]byte) uint64 {
 }
 
 func StringLength(str string) uint64;
+
+func StringCompare(str1 string, str2 string) uint64 {
+    var i uint64;
+    var equal uint64 = 1;
+    var strlen1 uint64 = StringLength(str1);
+    var strlen2 uint64 = StringLength(str2);
+    var minstrlen uint64 = Min(strlen1, strlen2);
+    if strlen1 != strlen2 {
+       equal = 0;
+    } else {
+        for i = 0; i < minstrlen; i = i +1 {
+            if str1[i] != str2[i] {
+                equal = 0;
+            }
+        }
+    }
+    return equal;
+}
 
 func StringByteBufCmp(str string, buf [255]byte) uint64 {
     var i uint64;
@@ -90,9 +108,11 @@ func PrintString(msg string) {
     Write(1, msg, StringLength(msg));
 }
 
-func PrintChar(char byte) { //TODO (SC): Don't rely on Printf
+func PrintChar(char byte) { //TODO (SC): Get rid of Printf dependency
     fmt.Printf("%c", char);
 }
+
+//func PrintChar(char byte);
 
 func PrintNumber(num uint64) {
     var i uint64;
@@ -113,11 +133,12 @@ func PrintNumber(num uint64) {
 
 //func GetChar(fd uint64) byte;
 
+func FileClose(fd uint64) uint64;
+
 //--- Cleanup necessary from here onwards (most functions don't work properly!)
 
 func Read(fd uint64, buffer string, buffer_size uint64) uint64; //Reads the specified number of characters from the file with the given file descriptor to the given buffer (string)
 func FileOpen(filename string, flags uint64) uint64; //Opens a file with the specified flags and returns the corresponding file descriptor
-func FileClose(fd uint64); //Closes the given file descriptor
 
 func GetChar(fd uint64) byte {
   var one_char_buf string = "\000";

@@ -49,6 +49,15 @@ WRITE_SUCCESS:
   RET
 
 //Prototype (does not work yet fully as expected)
+/*TEXT ·PrintChar(SB),1,$0 //PrintChar: 1 parameter, no return value
+  MOVQ $4, AX //sys_write (3 parameters)
+  MOVQ $1, BX //fd (1 = stdout)
+  LEAQ 8(SP), CX //text (address of second parameter => SP+64bit)
+  MOVQ $1, DX //text length (1)
+  INT $0x80 //Linux syscall
+  RET*/
+
+//Prototype (does not work yet fully as expected)
 /*TEXT ·GetChar(SB),2,$0 //Read: 1 parameter, 1 return value
   MOVQ $3, AX //sys_read (3 parameters)
   MOVQ 8(SP), BX //fd (first parameter => SP+64bit)
@@ -64,6 +73,22 @@ GETCHAR_ERROR:
   MOVQ $0, 16(SP) //Return 0 (return value after one parameter => SP+2*64bit)
 GETCHAR_SUCCESS:
   RET*/
+
+TEXT ·FileClose(SB),2,$0 //FileClose: 1 parameter, 1 return value
+  MOVQ $6, AX //sys_close (3 parameters)
+  MOVQ 8(SP), BX //filename (first parameter => SP+64bit)
+  MOVQ $0, CX //not used
+  MOVQ $0, DX //not used
+  INT $0x80 //Linux syscall
+  CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
+  JLS CLOSE_SUCCESS //Return result if successful
+CLOSE_ERROR:
+  NEGQ AX //Negate AX to get errno
+  MOVQ AX, 16(SP) //Return errno
+  RET
+CLOSE_SUCCESS:
+  MOVQ $0, 16(SP) //Set to zero to indicate successful call (return value after one parameter => SP+2*64bit)
+  RET
 
 //--- Cleanup necessary from here onwards (most functions don't work properly!)
 
@@ -97,14 +122,4 @@ FILEOPEN_ERROR:
   RET
 FILEOPEN_SUCCESS:
   MOVQ AX, 32(SP) //First return value of syscall is in AX (return value after three parameters => SP+4*64bit)
-  RET
-
-TEXT ·FileClose(SB),2,$0 //FileClose: 1 parameter, 1 return value
-  MOVQ $6, AX //sys_close (3 parameters)
-  MOVQ 8(SP), BX //filename (first parameter => SP+64bit)
-  MOVQ $0, CX //flags (second parameter => SP+2*64bit)
-  MOVQ $0, DX //not used
-  INT $0x80 //Linux syscall
-  CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
-  //TODO: Error handling?
   RET

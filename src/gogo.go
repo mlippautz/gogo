@@ -8,7 +8,7 @@ import "fmt"
 import "os"
 import "unsafe"
 import "syscall"
-//import "./libgogo/_obj/libgogo"
+import "./libgogo/_obj/libgogo"
 
 func main() {
 
@@ -21,13 +21,17 @@ func main() {
 	var e1 uintptr;
     var e int;
     var fd uint64;
+  var errno uint64;
 	r0, _, e1 = syscall.Syscall(syscall.SYS_OPEN, uintptr(unsafe.Pointer(syscall.StringBytePtr(os.Args[1]))), 0, 0);
 	e = int(e1);
 	fd = uint64(r0);
     
     if e == 0 {
         ScannerTest(fd);
-        syscall.Syscall(syscall.SYS_CLOSE, uintptr(fd), 0, 0);
+        errno = libgogo.FileClose(fd);
+        if errno != 0 {
+            libgogo.ExitError("Error closing file", errno);
+        }
 	} else {
 		fmt.Printf("Error opening file %s.\n", os.Args[1]);
 	}
