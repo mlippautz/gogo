@@ -122,11 +122,7 @@ function do_clean() {
     else
         echo "not needed"
 
-    fi
-    if [ -e valid_results ]; then
-        echo "Removing valid_results... ok"
-        rm valid_results
-    fi  
+    fi 
     if [ -e valids_acked ]; then
         echo "Removing valids_acked... ok"
         rm valids_acked

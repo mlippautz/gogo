@@ -8,6 +8,7 @@
 package main
 
 import "./libgogo/_obj/libgogo"
+import "fmt"
 
 // Token struct holding the relevant data of a parsed token.
 type Token struct {
@@ -346,34 +347,34 @@ func GetNextToken(fd uint64, tok *Token) {
 
     // Convert identifier to keyworded tokens
     if tok.id == TOKEN_IDENTIFIER {
-        if libgogo.StringCompare("if",tok.strValue) == 0 {
+        if libgogo.StringCompare("if",tok.strValue) != 0 {
             tok.id = TOKEN_IF;
-        }
-        if libgogo.StringCompare("for",tok.strValue) == 0 {
+       }
+        if libgogo.StringCompare("for",tok.strValue) != 0 {
             tok.id = TOKEN_FOR;
         }
-        if libgogo.StringCompare("type",tok.strValue) == 0 {
+        if libgogo.StringCompare("type",tok.strValue) != 0 {
             tok.id = TOKEN_TYPE;
         }
-        if libgogo.StringCompare("const",tok.strValue) == 0 {
+        if libgogo.StringCompare("const",tok.strValue) != 0 {
             tok.id = TOKEN_CONST;
         }
-        if libgogo.StringCompare("var",tok.strValue) == 0 {
+        if libgogo.StringCompare("var",tok.strValue) != 0 {
             tok.id = TOKEN_VAR;
         }
-        if libgogo.StringCompare("struct", tok.strValue) == 0 {
+        if libgogo.StringCompare("struct", tok.strValue) != 0 {
             tok.id = TOKEN_STRUCT;
         }
-        if libgogo.StringCompare("return", tok.strValue) == 0 {
+        if libgogo.StringCompare("return", tok.strValue) != 0 {
             tok.id = TOKEN_RETURN;
         }
-        if libgogo.StringCompare("func", tok.strValue) == 0 {
+        if libgogo.StringCompare("func", tok.strValue) != 0 {
             tok.id = TOKEN_FUNC;
         }
-        if libgogo.StringCompare("import", tok.strValue) == 0 {
+        if libgogo.StringCompare("import", tok.strValue) != 0 {
             tok.id = TOKEN_IMPORT;
         }
-        if libgogo.StringCompare("package", tok.strValue) == 0 {
+        if libgogo.StringCompare("package", tok.strValue) != 0 {
             tok.id = TOKEN_PACKAGE;
         }
     }
@@ -390,7 +391,7 @@ func debugToken(tok *Token) {
     libgogo.PrintString("\n");
     if tok.id == TOKEN_IDENTIFIER || tok.id == TOKEN_STRING {
         libgogo.PrintString("Stored string: ");
-        libgogo.PrintString(tok.strValue);
+        fmt.Printf(tok.strValue);
         libgogo.PrintString("\n");
     }
     if tok.id == TOKEN_INTEGER {
