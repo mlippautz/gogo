@@ -8,6 +8,7 @@ TARG=gogo
 GOFILES=\
     gogo.go\
     scanner.go\
-    token.go
+    token.go\
+	parser.go
 
 include $(GOROOT)/src/Make.cmd

@@ -27,7 +27,8 @@ func main() {
 	fd = uint64(r0);
     
     if e == 0 {
-        ScannerTest(fd);
+        //ScannerTest(fd);
+        Parse(fd);
         errno = libgogo.FileClose(fd);
         if errno != 0 {
             libgogo.ExitError("Error closing file", errno);
