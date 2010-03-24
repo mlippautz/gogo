@@ -8,9 +8,7 @@
 
 package libgogo
 
-import "fmt" //TODO (SC): Get rid of Go library dependencies
-
-func StringAppend(str *string, char byte) { //TODO (SC): Get rid of magic string concatenation and cast operator
+func StringAppend(str *string, char byte) { //TODO (SC): Get rid of magic string concatenation (needs memory management!) and cast operator
   *str += string(char);
 }
 
@@ -112,11 +110,7 @@ func PrintString(msg string) {
     Write(1, msg, StringLength(msg));
 }
 
-func PrintChar(char byte) { //TODO (SC): Get rid of Printf dependency
-    fmt.Printf("%c", char);
-}
-
-//func PrintChar(char byte);
+func PrintChar(char byte);
 
 func PrintNumber(num uint64) {
     var i uint64;
@@ -135,20 +129,10 @@ func PrintNumber(num uint64) {
     PrintChar(buf[0]);
 }
 
-//func GetChar(fd uint64) byte;
+func Read(fd uint64, buffer string, buffer_size uint64) uint64;
+
+func GetChar(fd uint64) byte;
+
+func FileOpen(filename string, flags uint64) uint64;
 
 func FileClose(fd uint64) uint64;
-
-//--- Cleanup necessary from here onwards (most functions don't work properly!)
-
-func Read(fd uint64, buffer string, buffer_size uint64) uint64; //Reads the specified number of characters from the file with the given file descriptor to the given buffer (string)
-func FileOpen(filename string, flags uint64) uint64; //Opens a file with the specified flags and returns the corresponding file descriptor
-
-func GetChar(fd uint64) byte {
-  var one_char_buf string = "\000";
-  if Read(fd, one_char_buf, 1) == 0 {
-    ; //TODO: Error handling?
-    return 0;
-  }
-  return one_char_buf[0];
-}

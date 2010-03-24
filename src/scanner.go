@@ -8,7 +8,6 @@
 package main
 
 import "./libgogo/_obj/libgogo"
-import "fmt"
 
 // Token struct holding the relevant data of a parsed token.
 type Token struct {
@@ -391,7 +390,7 @@ func debugToken(tok *Token) {
     libgogo.PrintString("\n");
     if tok.id == TOKEN_IDENTIFIER || tok.id == TOKEN_STRING {
         libgogo.PrintString("Stored string: ");
-        fmt.Printf(tok.strValue);
+        libgogo.PrintString(tok.strValue);
         libgogo.PrintString("\n");
     }
     if tok.id == TOKEN_INTEGER {
