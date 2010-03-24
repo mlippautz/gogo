@@ -3,9 +3,9 @@
 //
 
 TEXT ·Exit(SB),1,$0 //Exit: 1 parameter, no return value
-  MOVQ $1, AX //sys_exit (1 parameter)
-  MOVQ 8(SP), BX //return code (first parameter => SP+1*64bit)
-  INT $0x80 //Linux syscall
+  MOVQ $60, AX //sys_exit (1 parameter)
+  MOVQ 8(SP), DI //return code (first parameter => SP+1*64bit)
+  SYSCALL //Linux syscall
   RET //Just to be sure (should never be reached)
 
 TEXT ·StringLength(SB),3,$0 //StringLength: 1 parameter, 1 return value
@@ -27,11 +27,11 @@ TEXT ·ToByteFromInt(SB),2,$0 //ToByteFromInt: 1 parameter, 1 return value
   RET
 
 TEXT ·Write(SB),5,$0 //Write: 3 parameters, 1 return value
-  MOVQ $4, AX //sys_write (3 parameters)
-  MOVQ 8(SP), BX //fd (first parameter => SP+64bit)
-  MOVQ 16(SP), CX //text (second parameter => SP+2*64bit)
+  MOVQ $1, AX //sys_write (3 parameters)
+  MOVQ 8(SP), DI //fd (first parameter => SP+64bit)
+  MOVQ 16(SP), SI //text (second parameter => SP+2*64bit)
   MOVQ 32(SP), DX //text length (third parameter => SP+4*64bit)
-  INT $0x80 //Linux syscall
+  SYSCALL //Linux syscall
   CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
   JLS WRITE_SUCCESS //Return result if successful
 WRITE_ERROR:
@@ -43,20 +43,20 @@ WRITE_SUCCESS:
 
 //Prototype (does not work yet fully as expected)
 /*TEXT ·PrintChar(SB),1,$0 //PrintChar: 1 parameter, no return value
-  MOVQ $4, AX //sys_write (3 parameters)
-  MOVQ $1, BX //fd (1 = stdout)
-  LEAQ 8(SP), CX //text (address of second parameter => SP+64bit)
+  MOVQ $1, AX //sys_write (3 parameters)
+  MOVQ $1, DI //fd (1 = stdout)
+  LEAQ 8(SP), SI //text (address of second parameter => SP+64bit)
   MOVQ $1, DX //text length (1)
-  INT $0x80 //Linux syscall
+  SYSCALL //Linux syscall
   RET*/
 
 //Prototype (does not work yet fully as expected)
 /*TEXT ·GetChar(SB),2,$0 //Read: 1 parameter, 1 return value
-  MOVQ $3, AX //sys_read (3 parameters)
-  MOVQ 8(SP), BX //fd (first parameter => SP+64bit)
-  LEAQ 8(SP), CX //buffer (reuse first parameter => SP+64bit)
+  MOVQ $0, AX //sys_read (3 parameters)
+  MOVQ 8(SP), DI //fd (first parameter => SP+64bit)
+  LEAQ 8(SP), SI //buffer (reuse first parameter => SP+64bit)
   MOVQ $1, DX //buffer size (size 1)
-  INT $0x80 //Linux syscall
+  SYSCALL //Linux syscall
   MOVQ $0, DX //Overwrite DX (initialize with 0)
   MOVB (CX), DL //Move buffer to DL
   MOVQ DX, 16(SP) //Move whole DX register to result (return value after one parameter => SP+2*64bit)
@@ -68,11 +68,11 @@ GETCHAR_SUCCESS:
   RET*/
 
 TEXT ·FileClose(SB),2,$0 //FileClose: 1 parameter, 1 return value
-  MOVQ $6, AX //sys_close (3 parameters)
-  MOVQ 8(SP), BX //filename (first parameter => SP+64bit)
-  MOVQ $0, CX //not used
+  MOVQ $3, AX //sys_close (3 parameters)
+  MOVQ 8(SP), DI //filename (first parameter => SP+64bit)
+  MOVQ $0, SI //not used
   MOVQ $0, DX //not used
-  INT $0x80 //Linux syscall
+  SYSCALL //Linux syscall
   CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
   JLS CLOSE_SUCCESS //Return result if successful
 CLOSE_ERROR:
@@ -86,11 +86,11 @@ CLOSE_SUCCESS:
 //--- Cleanup necessary from here onwards (most functions don't work properly!)
 
 TEXT ·Read(SB),5,$0 //Read: 3 parameters, 1 return value
-  MOVQ $3, AX //sys_read (3 parameters)
-  MOVQ 8(SP), BX //fd (first parameter => SP+64bit)
-  MOVQ 16(SP), CX //buffer (second parameter => SP+2*64bit)
+  MOVQ $0, AX //sys_read (3 parameters)
+  MOVQ 8(SP), DI //fd (first parameter => SP+64bit)
+  MOVQ 16(SP), SI //buffer (second parameter => SP+2*64bit)
   MOVQ 32(SP), DX //buffer size (third parameter => SP+4*64bit)
-  INT $0x80 //Linux syscall
+  SYSCALL //Linux syscall
   CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
   JLS READ_SUCCESS //Return result if successful
 READ_ERROR:
@@ -102,11 +102,11 @@ READ_SUCCESS:
   RET
 
 TEXT ·FileOpen(SB),4,$0 //FileOpen: 2 parameters, 1 return value
-  MOVQ $5, AX //sys_open (2 parameters)
-  MOVQ 8(SP), BX //filename (first parameter => SP+64bit)
-  MOVQ 24(SP), CX //flags (second parameter => SP+3*64bit)
+  MOVQ $2, AX //sys_open (2 parameters)
+  MOVQ 8(SP), DI //filename (first parameter => SP+64bit)
+  MOVQ 24(SP), SI //flags (second parameter => SP+3*64bit)
   MOVQ $0, DX //not used
-  INT $0x80 //Linux syscall
+  SYSCALL //Linux syscall
   CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
   JLS FILEOPEN_SUCCESS //Return result if successful
 FILEOPEN_ERROR:

@@ -45,7 +45,7 @@ func main() {
   var testString string = "Hell";
   testString += "o";
   fmt.Printf("Test: string length of '%s' (len vs. myLen): %d vs. %d\n", testString, len(testString), libgogo.StringLength(testString));
-  fmt.Printf("Write verification (currently failing): '%s' and '", testString);
+  fmt.Printf("Write verification: '%s' and '", testString);
   libgogo.PrintString(testString);
   fmt.Printf("' are identical\n");
   var buf1 [255]byte;
