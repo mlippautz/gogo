@@ -35,31 +35,21 @@ func main() {
   libgogo.FileClose(fd);
 
   //Library test III
-  var test [255]byte;
-  test = libgogo.StringToByteBuf(test_text);
-  fmt.Printf("Library test (should print Hello world): ");
-  libgogo.PrintByteBuf(test);
-  fmt.Printf("Library test (should write 1): %d\n", libgogo.StringByteBufCmp(test_text, test));
-
-  //Library test IV
   var testString string = "Hell";
   testString += "o";
   fmt.Printf("Library test: string length of '%s' (len vs. myLen): %d vs. %d\n", testString, len(testString), libgogo.StringLength(testString));
   fmt.Printf("Library test: '%s' and '", testString);
   libgogo.PrintString(testString);
   fmt.Printf("' are identical\n");
-  var buf1 [255]byte;
-  buf1 = libgogo.StringToByteBuf(os.Args[1]);
-  fmt.Printf("Length of '%s': %d\n", os.Args[1], libgogo.ByteBufLength(buf1));
 
-  //Library test V
+  //Library test IV
   var chr byte = '\n';
   for fd = libgogo.FileOpen(os.Args[1], 0); chr != 0; chr = libgogo.GetChar(fd) {
     //libgogo.PrintChar(chr);
   }
   libgogo.FileClose(fd);
 
-  //Library test VI
+  //Library test V
   libgogo.Exit(0);
   fmt.Printf("If you can read this, something is wrong");
 }

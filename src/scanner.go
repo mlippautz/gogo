@@ -190,17 +190,15 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
 
     // integer
     if (done != 1) && singleChar > 47 && singleChar < 58 {
-        var byteBuf [255]byte;
-        var i uint64;
+        var numBuf string = "";
         
-        for i = 0; singleChar > 47 && singleChar < 58 ; singleChar = libgogo.GetChar(fd) {
-            byteBuf[i] = singleChar;
-            i = i +1;
+        for ; singleChar > 47 && singleChar < 58 ; singleChar = libgogo.GetChar(fd) {
+            libgogo.StringAppend(&numBuf, singleChar);
         }
 
         tok.nextChar = singleChar;  
         tok.id = TOKEN_INTEGER;
-        tok.intValue = libgogo.ByteBufToInt(byteBuf,i);
+        tok.intValue = libgogo.StringToInt(numBuf);
 
         done = 1;
     }

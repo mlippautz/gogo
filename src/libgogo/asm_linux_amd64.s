@@ -2,12 +2,6 @@
 // GoGo Library functions (ASM)
 //
 
-TEXT ·Exit(SB),1,$0 //Exit: 1 parameter, no return value
-  MOVQ $60, AX //sys_exit (1 parameter)
-  MOVQ 8(SP), DI //return code (first parameter => SP+1*64bit)
-  SYSCALL //Linux syscall
-  RET //Just to be sure (should never be reached)
-
 TEXT ·StringLength(SB),3,$0 //StringLength: 1 parameter, 1 return value
   MOVQ $0, 24(SP) //Set return value to 0
   MOVW 16(SP), AX //String length is stored together with the string (first parameter = SP+64bit -> +64bit = SP+2*64bit)
@@ -25,6 +19,12 @@ TEXT ·ToByteFromInt(SB),2,$0 //ToByteFromInt: 1 parameter, 1 return value
   MOVQ 8(SP), AX //Move whole parameter to AX (first parameter => SP+64bit)
   MOVB AL, 16(SP) //Move AL (last byte of parameter) to result (return value after one parameter => SP+2*64bit)
   RET
+
+TEXT ·Exit(SB),1,$0 //Exit: 1 parameter, no return value
+  MOVQ $60, AX //sys_exit (1 parameter)
+  MOVQ 8(SP), DI //return code (first parameter => SP+1*64bit)
+  SYSCALL //Linux syscall
+  RET //Just to be sure (should never be reached)
 
 TEXT ·Write(SB),5,$0 //Write: 3 parameters, 1 return value
   MOVQ $1, AX //sys_write (3 parameters)
