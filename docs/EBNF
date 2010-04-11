@@ -34,7 +34,7 @@ for_stmt = "for" [assignment] ";" [expression] ";" [assignment] "{" stmt_sequenc
 struct_var_decl = identifier type ";".
 struct_var_decl_list = { struct_var_decl }.
 struct_decl = "type" identifier "struct" "{" struct_var_decl_list "}" ";".
-struct_decl_list = struct_decl { struct_decl }. 
+struct_decl_list = { struct_decl }. 
 
 array_type = "[" integer "]" identifier.
 type = identifier | array_type | "uint64" | "byte" | "string".
