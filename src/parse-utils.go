@@ -34,7 +34,8 @@ func ParseError(ue uint64, e [255]uint64, eLen uint64) {
             libgogo.PrintString(", ");        
         }
         libgogo.PrintString("\n");
-    }
+    } 
+    libgogo.PrintString("\n");
     libgogo.Exit(2); 
 }
 
