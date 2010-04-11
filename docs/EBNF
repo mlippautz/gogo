@@ -44,7 +44,7 @@ stmt_sequence = stmt { stmt }
 stmt = assignment ";" | identifier selector function_call ";" | if_stmt | for_stmt
 
 package_stmt = "package" identifier ";".
-import_stmt = "import" string ";".
+import_stmt = "import" string.
 import_stmt_list = { import_stmt }.
 
 identifier_type = identifier [ "*" ] type
