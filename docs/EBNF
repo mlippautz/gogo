@@ -48,7 +48,7 @@ package_stmt = "package" identifier ";".
 import_stmt = "import" string ";".
 import_stmt_list = { import_stmt }.
 
-identifier_type = identifier type
+identifier_type = identifier [ "*" ] type
 identifier_type_list = [ identifier_type { "," identifier_type } ]
 func_decl = "func" identifier "(" identifier_type_list ")"  [identifier type] "{" func_head func_body func_foot "}"
 func_decl_list = { func_decl }
