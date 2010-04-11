@@ -59,3 +59,21 @@ func SyncToken(tok *Token) {
     }
 }
 
+//
+//
+//
+func AssertNextToken(fd uint64,tok *Token, tokenNumber uint64) {
+    GetNextTokenSafe(fd, tok);
+    AssertToken(tok, tokenNumber);
+}
+
+//
+//
+//
+func AssertToken(tok *Token, tokenNumber uint64) {
+    var expectedTokens [255]uint64;
+    if tok.id != tokenNumber {
+        expectedTokens[0] = tokenNumber;
+        ParseError(tok.id, expectedTokens, 1);        
+    }
+}
