@@ -9,15 +9,6 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
-// Token struct holding the relevant data of a parsed token.
-type Token struct {
-    id uint64; // The id. Is one of TOKEN_*
-    intValue uint64; // value storing the integer value if the token is TOKEN_INTEGER
-    strValue string; // Value storing the token string if the token is TOKEN_STRING or TOKEN_IDENTIFIER
-    nextChar byte; // Sometime the next char is already read. It is stored here to be re-assigned in the next GetNextToken() round
-    nextToken uint64;
-};
-
 var lineCounter uint64 = 1;
 
 func GetNextTokenRaw(fd uint64, tok *Token) {

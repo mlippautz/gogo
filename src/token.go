@@ -5,6 +5,21 @@
 package main
 
 //
+// Token struct holding the relevant token data.
+// The struct is used by the scanner and parser.
+//
+type Token struct {
+    id uint64;          // The id. Is one of TOKEN_*
+    intValue uint64;    /* value storing the integer value if the token is 
+TOKEN_INTEGER */
+    strValue string;    /* Value storing the token string if the token is 
+TOKEN_STRING or TOKEN_IDENTIFIER */
+    nextChar byte;      /* Sometime the next char is already read. It is stored 
+here to be re-assigned in the next GetNextToken() round [used by the scanner] */
+    nextToken uint64;   // look-ahead (LL1) token [used by the parser]
+};
+
+//
 // Set of recognized tokens 
 //
 var TOKEN_IDENTIFIER uint64 = 1;  // Identifier
@@ -57,6 +72,10 @@ var TOKEN_ELSE uint64 = 111;
 // Helper functions
 //
 
+
+//
+// Returns a string representation of a supplied token.
+//
 func TokenToString (id uint64) string {
     var retStr string;
 
