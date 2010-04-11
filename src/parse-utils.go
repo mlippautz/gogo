@@ -33,7 +33,6 @@ func ParseError(ue uint64, e [255]uint64, eLen uint64) {
             libgogo.PrintString(str);
             libgogo.PrintString(", ");        
         }
-        libgogo.PrintString("\n");
     } 
     libgogo.PrintString("\n");
     libgogo.Exit(2); 
@@ -48,7 +47,7 @@ func GetNextTokenSafe(fd uint64, tok *Token) {
         tok.nextToken = 0;  
     } else {
         GetNextToken(fd, tok);
-    }    
+    }
 }
 
 //
