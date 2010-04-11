@@ -135,30 +135,17 @@ func ParseStructVarDecl(fd uint64, tok *Token) uint64 {
 // Parses: [ "[" integer "]" ] identifier 
 //
 func ParseType(fd uint64, tok *Token) {
-    var es [255]uint64;
-
     GetNextTokenSafe(fd, tok);
-    if tok.id == TOKEN_LSBRAC {        
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_INTEGER  {
-            es[0] = TOKEN_INTEGER;
-            ParseError(tok.id,es,1);
-        }       
-
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_RSBRAC  {
-            es[0] = TOKEN_RSBRAC;
-            ParseError(tok.id,es,1);
-        }
+    if tok.id == TOKEN_LSBRAC {   
+        AssertNextToken(fd, tok, TOKEN_INTEGER);
+        // value of integer in tok.intValue
+        AssertNextToken(fd, tok, TOKEN_RSBRAC);        
     } else {
-        tok.nextToken = tok.id;
+        SyncToken(tok);
     }
 
-    GetNextTokenSafe(fd, tok);
-    if tok.id != TOKEN_IDENTIFIER  {
-        es[0] = TOKEN_IDENTIFIER;
-        ParseError(tok.id,es,0);
-    } 
+    AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
+    // value in tok.strValue
 }
 
 //
