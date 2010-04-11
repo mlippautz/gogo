@@ -505,43 +505,31 @@ func ParseFuncDeclRaw(fd uint64, tok *Token) uint64 {
     if tok.id == TOKEN_SEMICOLON {
         boolFlag = 0;
     } else {
-        tok.nextToken = tok.id;
+        SyncToken(tok);
     }
     return boolFlag;
 }
 
 func ParseFuncDecl(fd uint64, tok *Token) uint64 {
-    var boolFlag uint64 = 1;
-    var es [255]uint64; 
-    GetNextTokenSafe(fd, tok);
+    var boolFlag uint64;
 
+    GetNextTokenSafe(fd, tok);
     if tok.id == TOKEN_LCBRAC {
-        boolFlag = 0;
         ParseVarDeclList(fd, tok);
         ParseStatementSequence(fd, tok);
         GetNextTokenSafe(fd, tok);
         if tok.id == TOKEN_RETURN {
             ParseExpression(fd, tok);
-            GetNextTokenSafe(fd, tok);
-            if tok.id != TOKEN_SEMICOLON {
-                es[0] = TOKEN_SEMICOLON;
-                ParseError(tok.id,es,1);
-            }
+            AssertNextToken(fd, tok, TOKEN_SEMICOLON);
         } else {
-            tok.nextToken = tok.id;
+            SyncToken(tok);
         }
-        
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_RCBRAC {
-            es[0] = TOKEN_RCBRAC;
-            ParseError(tok.id,es,1);
-        }
-       
+        AssertNextToken(fd, tok, TOKEN_RCBRAC);
+        boolFlag = 0;
     } else {
+        SyncToken(tok);
         boolFlag = 1;
-        tok.nextToken = tok.id;
     }
-
     return boolFlag;
 }
 
