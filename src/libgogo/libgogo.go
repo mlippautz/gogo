@@ -24,15 +24,15 @@ func StringLength(str string) uint64;
 
 func StringCompare(str1 string, str2 string) uint64 {
     var i uint64;
-    var equal uint64 = 1;
+    var equal uint64 = 0;
     var strlen1 uint64 = StringLength(str1);
     var strlen2 uint64 = StringLength(str2);
     if strlen1 != strlen2 {
-       equal = 0;
+       equal = 1;
     } else {
         for i = 0; i < strlen1; i = i +1 {
             if str1[i] != str2[i] {
-                equal = 0;
+                equal = 1;
             }
         }
     }
