@@ -51,34 +51,38 @@ func ParsePackageStatement(fd uint64, tok *Token) {
 
 //
 // Parses: { import_stmt }
+// Function parsing the whole import block (which is optional) of a go program
 //
 func ParseImportStatementList(fd uint64, tok *Token) {
-    var boolFlag uint64;
-    for boolFlag = ParseImportStatement(fd, tok);boolFlag == 0;boolFlag = ParseImportStatement(fd, tok) {
-    }
+    var validImport uint64;
+    for validImport = ParseImportStatement(fd, tok);
+        validImport == 0;
+        validImport = ParseImportStatement(fd, tok) { }
 }
 
 
 //
 // Parses: "import" string
+// This function parses a single import line.
+// Returning 0 if import statement is valid, 1 otherwise.
 //
 func ParseImportStatement(fd uint64, tok *Token) uint64 {
-    var es [255]uint64;
+    var expectedTokens [255]uint64;
     var boolFlag uint64;
 
     GetNextTokenSafe(fd,tok);
     if tok.id == TOKEN_IMPORT {
         GetNextTokenSafe(fd, tok);
         if tok.id != TOKEN_STRING  {
-            es[0] = TOKEN_STRING;
-            ParseError(tok.id,es,1);
+            expectedTokens[0] = TOKEN_STRING;
+            ParseError(tok.id, expectedTokens, 1);
         } else {
-            // import ok
+            // import ok, value in tok.strValue
         }   
         boolFlag = 0;
     } else {
         boolFlag = 1;
-        tok.nextToken = tok.id;
+        SyncToken(tok);
     }    
     return boolFlag;
 }
