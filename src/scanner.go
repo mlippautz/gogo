@@ -20,6 +20,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     var inComment uint64;
     var done uint64; // Flag indicating whether a cycle (Token) is finsihed 
     var spaceDone uint64; // Flag indicating whether an abolishment cycle is finished 
+    var numBuf string;
 
     // Initialize variables
     done = 0;
@@ -31,7 +32,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     // If the previous cycle had to read the next char (and stored it), it is 
     // now used as first read
     if tok.nextChar == 0 {       
-        singleChar = libgogo.GetChar(fd)
+        singleChar = libgogo.GetChar(fd);
     } else {
         singleChar = tok.nextChar;
         tok.nextChar = 0;
@@ -93,7 +94,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
         } 
 
         // handle everything that is not a space,tab,newline
-        if singleChar != ' ' && singleChar != 9 && singleChar != 10 {
+        if (singleChar != ' ') && (singleChar != 9) && (singleChar != 10) {
             // if not in a comment we have our current valid char
             if inComment == 0 {
                 spaceDone = 1;
@@ -120,10 +121,10 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
 
     // Catch identifiers
     // identifier = letter { letter | digit }.
-    if (done != 1) && (singleChar >= 'A' && singleChar <= 'Z') || (singleChar >= 'a' && singleChar <= 'z') || singleChar == '_' { // check for letter or _
+    if (done != 1) && ((singleChar >= 'A') && (singleChar <= 'Z')) || ((singleChar >= 'a') && (singleChar <= 'z')) || (singleChar == '_') { // check for letter or _
         tok.id = TOKEN_IDENTIFIER;
         // preceding characters may be letter,_, or a number
-        for ; (singleChar >= 'A' && singleChar <= 'Z') || (singleChar >= 'a' && singleChar <= 'z') || singleChar == '_' || (singleChar >= '0' && singleChar <= '9'); singleChar = libgogo.GetChar(fd) {
+        for ; ((singleChar >= 'A') && (singleChar <= 'Z')) || ((singleChar >= 'a') && (singleChar <= 'z')) || (singleChar == '_') || ((singleChar >= '0') && (singleChar <= '9')); singleChar = libgogo.GetChar(fd) {
             tmp_TokAppendStr(tok,singleChar);
         }
         // save the last read character for the next GetNextToken() cycle
@@ -132,9 +133,9 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     }
 
     // string "..."
-    if (done != 1) && singleChar == '"' {
+    if (done != 1) && (singleChar == '"') {
         tok.id = TOKEN_STRING;        
-        for singleChar = libgogo.GetChar(fd); singleChar != '"' &&singleChar > 31 && singleChar < 127;singleChar = libgogo.GetChar(fd) {
+        for singleChar = libgogo.GetChar(fd); (singleChar != '"') && (singleChar > 31) && (singleChar < 127);singleChar = libgogo.GetChar(fd) {
             tmp_TokAppendStr(tok,singleChar);
         }
         if singleChar != '"' {
@@ -146,7 +147,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     // Single Quoted Character
     if (done != 1) && singleChar == 39 {
         singleChar = libgogo.GetChar(fd);
-        if singleChar != 39 && singleChar > 31 && singleChar < 127 {
+        if (singleChar != 39) && (singleChar > 31) && (singleChar < 127) {
             tok.id = TOKEN_INTEGER;
             tok.intValue = libgogo.ToIntFromByte(singleChar);
         } else {
@@ -184,10 +185,10 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     }
 
     // integer
-    if (done != 1) && singleChar > 47 && singleChar < 58 {
-        var numBuf string = "";
+    if (done != 1) && (singleChar > 47) && (singleChar < 58) {
+        numBuf = "";
         
-        for ; singleChar > 47 && singleChar < 58 ; singleChar = libgogo.GetChar(fd) {
+        for ; (singleChar > 47) && (singleChar < 58) ; singleChar = libgogo.GetChar(fd) {
             libgogo.StringAppend(&numBuf, singleChar);
         }
 
@@ -199,25 +200,25 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     }
 
     // Left curly bracket '{'
-    if (done != 1) && singleChar == '{' {
+    if (done != 1) && (singleChar == '{') {
         tok.id = TOKEN_LCBRAC;
         done = 1;
     }
     
     // Right curly bracket '}'
-    if (done != 1) && singleChar == '}' {
+    if (done != 1) && (singleChar == '}') {
         tok.id = TOKEN_RCBRAC;
         done = 1;
     }
 
     // Point '.'
-    if (done != 1) && singleChar == '.' {
+    if (done != 1) && (singleChar == '.') {
         tok.id = TOKEN_PT;
         done = 1;
     }
 
     // Not ('!') or Not Equal ('!=')
-    if (done != 1) && singleChar == '!' {
+    if (done != 1) && (singleChar == '!') {
         singleChar = libgogo.GetChar(fd);
         if singleChar == '=' {
             tok.id = TOKEN_NOTEQUAL;
@@ -229,19 +230,19 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     }
 
     // Semicolon ';'
-    if (done != 1) && singleChar == ';' {
+    if (done != 1) && (singleChar == ';') {
         tok.id = TOKEN_SEMICOLON;
         done = 1;
     }
 
     // Colon ','
-    if (done != 1) && singleChar == ',' {
+    if (done != 1) && (singleChar == ',') {
         tok.id = TOKEN_COLON;
         done = 1;
     }
 
     // Assignment '=' or Equals comparison '=='
-    if (done != 1) && singleChar == '=' {
+    if (done != 1) && (singleChar == '=') {
         singleChar = libgogo.GetChar(fd);
         if singleChar == '=' {
             tok.id = TOKEN_EQUALS;
@@ -253,7 +254,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     }
 
     // AND Relation '&&'
-    if (done != 1) && singleChar == '&' {
+    if (done != 1) && (singleChar == '&') {
         singleChar = libgogo.GetChar(fd);
         if singleChar == '&' {
             tok.id = TOKEN_REL_AND;
@@ -265,7 +266,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     }
 
     // OR Relation '||'
-    if (done != 1) && singleChar == '|' {
+    if (done != 1) && (singleChar == '|') {
         singleChar = libgogo.GetChar(fd);
         if singleChar == '|' {
             tok.id = TOKEN_REL_OR;
@@ -276,7 +277,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     } 
 
     // Greater and Greater-Than relation
-    if (done != 1) && singleChar == '>' {
+    if (done != 1) && (singleChar == '>') {
         singleChar = libgogo.GetChar(fd);
         if singleChar == '=' {
             tok.id = TOKEN_REL_GTOE;
@@ -288,7 +289,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     }     
 
     // Less and Less-Than relation
-    if (done != 1) && singleChar == '<' {
+    if (done != 1) && (singleChar == '<') {
         singleChar = libgogo.GetChar(fd);
         if singleChar == '=' {
             tok.id = TOKEN_REL_LTOE;
@@ -299,27 +300,27 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
         done = 1;
     }    
 
-    if (done != 1) && singleChar == '+' {
+    if (done != 1) && (singleChar == '+') {
         tok.id = TOKEN_ARITH_PLUS;
         done = 1;
     }
 
-    if (done != 1) && singleChar == '-' {
+    if (done != 1) && (singleChar == '-') {
         tok.id = TOKEN_ARITH_MINUS;
         done = 1;
     }
 
-    if (done != 1) && singleChar == '*' {
+    if (done != 1) && (singleChar == '*') {
         tok.id = TOKEN_ARITH_MUL;
         done = 1;
     }
 
-    if (done != 1) && singleChar == '/' {
+    if (done != 1) && (singleChar == '/') {
         tok.id = TOKEN_ARITH_DIV;
         done = 1;
     }
 
-    if done != 1 {
+    if (done != 1) {
         
         libgogo.PrintString(">> Scanner: Unkown char '");
         libgogo.PrintChar(singleChar);
@@ -386,7 +387,7 @@ func debugToken(tok *Token) {
     libgogo.PrintString("Token Id: ");
     libgogo.PrintNumber(tok.id);
     libgogo.PrintString("\n");
-    if tok.id == TOKEN_IDENTIFIER || tok.id == TOKEN_STRING {
+    if (tok.id == TOKEN_IDENTIFIER) || (tok.id == TOKEN_STRING) {
         libgogo.PrintString("Stored string: ");
         libgogo.PrintString(tok.strValue);
         libgogo.PrintString("\n");
@@ -395,18 +396,6 @@ func debugToken(tok *Token) {
         libgogo.PrintString("Stored integer: ");
         libgogo.PrintNumber(tok.intValue);
         libgogo.PrintString("\n");
-    }
-}
-
-// Temporary test function
-func ScannerTest(fd uint64) {  
-    var tok Token;
-
-    tok.id = 0;
-    tok.nextChar = 0;
-
-    for GetNextToken(fd,&tok); tok.id != TOKEN_EOS; GetNextToken(fd,&tok) {
-        debugToken(&tok);
     }
 }
 
