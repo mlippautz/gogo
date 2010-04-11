@@ -18,14 +18,15 @@ binary_arith_op = "*" | "/" .
 selector = { "." identifier | "[" (integer | identifier selector) "]" }.
 
 expression_list = expression { "," expression }.
-function_call = "(" expression_list ")".
+function_call = "(" [expression_list] ")".
+function_call_stmt = identifier selector function_call.
 
-factor = identifier selector | integer | char | string | "(" expression ")" | "!" factor.
+factor = [ "&" ] identifier selector [function_call] | integer | char | string | "(" expression ")" | "!" factor.
 term = factor { (binary_arith_op | "&&") factor}.
 simple_expression = [ unary_arith_op ] term { (unary_arith_op | "||") term }.
 expression = simple_expression [ cmp_op simple_expression ].
 
-assignment = identifier selector "=" (expression | function_call).
+assignment = identifier selector "=" expression
 
 if_stmt = "if" expression "{" stmt_sequence "}" [ else_stmt ].
 else_stmt = "else" "{" stmt_sequence "}".
@@ -40,20 +41,19 @@ type = ([ "[" integer "]" ] identifier | "uint64" | "byte") | "string".
 var_decl = "var" identifier type [ "=" expression ] ";".
 var_decl_list = { var_decl }.
 
-stmt_sequence = stmt { stmt }
-stmt = assignment ";" | identifier selector function_call ";" | if_stmt | for_stmt
+stmt_sequence = { stmt }
+stmt = assignment ";" | function_call_stmt ";" | if_stmt | for_stmt | ";".
 
 package_stmt = "package" identifier ";".
 import_stmt = "import" string.
 import_stmt_list = { import_stmt }.
 
-identifier_type = identifier [ "*" ] type
-identifier_type_list = [ identifier_type { "," identifier_type } ]
-func_decl = "func" identifier "(" identifier_type_list ")"  [identifier_type] "{" func_head func_body func_foot "}"
-func_decl_list = { func_decl | func_decl_raw }
-func_head = var_decl_list.
-func_body = [stmt_sequence].
-func_foot = ["return" [expression] ";"]
-func_decl_raw = "func" identifier "(" identifier_type_list ")"  [identifier_type] ";"
+identifier_type = identifier [ "*" ] type.
+identifier_type_list = [ identifier_type { "," identifier_type } ].
+func_decl_head = "func" identifier "(" identifier_type_list ")"  [type].
+func_decl = "{" var_decl_list stmt_sequence ["return" expression ";"] "}".
+func_decl_raw = ";".
+func_decl_list = { func_decl_head (func_decl | func_decl_raw) }.
+
 
 go_program = package_stmt import_stmt_list struct_decl_list var_decl_list func_decl_list.
