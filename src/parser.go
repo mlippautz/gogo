@@ -145,7 +145,7 @@ func ParseType(fd uint64, tok *Token) {
     }
 
     AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
-    // value in tok.strValue
+    // typename in tok.strValue
 }
 
 //
@@ -183,45 +183,34 @@ func ParseTypeOptional(fd uint64, tok *Token) {
 //
 func ParseVarDeclList(fd uint64, tok *Token) {
     var boolFlag uint64;
-    for boolFlag = ParseVarDecl(fd, tok);boolFlag == 0;boolFlag = ParseVarDecl(fd, tok) {
-    }
+    for boolFlag = ParseVarDecl(fd, tok);
+        boolFlag == 0;
+        boolFlag = ParseVarDecl(fd, tok) { }
 }
 
 //
 //
 //
 func ParseVarDecl(fd uint64, tok *Token) uint64 {
-    var es [255]uint64;
     var boolFlag uint64;
-
     GetNextTokenSafe(fd,tok);
     if tok.id == TOKEN_VAR {
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_IDENTIFIER {
-            es[0] = TOKEN_IDENTIFIER;
-            ParseError(tok.id,es,1);
-        } 
-        
+        AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
+        // variable name in tok.strValue
         ParseType(fd, tok);
 
         GetNextTokenSafe(fd, tok);
         if tok.id == TOKEN_ASSIGN {
             ParseExpression(fd, tok);        
         } else {
-            tok.nextToken = tok.id;
+            SyncToken(tok);
         } 
 
-        
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_SEMICOLON {
-            es[0] = TOKEN_SEMICOLON;
-            ParseError(tok.id,es,1);
-        }
-
+        AssertNextToken(fd, tok, TOKEN_SEMICOLON);
         boolFlag = 0;
     } else {
         boolFlag = 1;
-        tok.nextToken = tok.id;
+        SyncToken(tok);
     }    
     return boolFlag;
 }
