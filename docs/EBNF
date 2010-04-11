@@ -37,7 +37,7 @@ struct_decl = "type" identifier "struct" "{" struct_var_decl_list "}" ";".
 struct_decl_list = { struct_decl }. 
 
 type = ([ "[" integer "]" ] identifier | "uint64" | "byte") | "string".
-var_decl = "var" identifier_type [ "=" expression ] ";".
+var_decl = "var" identifier type [ "=" expression ] ";".
 var_decl_list = { var_decl }.
 
 stmt_sequence = stmt { stmt }
