@@ -58,18 +58,11 @@ func ParseImportStatementList(fd uint64, tok *Token) {
 // Returning 0 if import statement is valid, 1 otherwise.
 //
 func ParseImportStatement(fd uint64, tok *Token) uint64 {
-    var expectedTokens [255]uint64;
     var boolFlag uint64;
-
     GetNextTokenSafe(fd,tok);
     if tok.id == TOKEN_IMPORT {
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_STRING  {
-            expectedTokens[0] = TOKEN_STRING;
-            ParseError(tok.id, expectedTokens, 1);
-        } else {
-            // import ok, value in tok.strValue
-        }   
+        AssertNextToken(fd, tok, TOKEN_STRING);
+        // import ok, value in tok.strValue
         boolFlag = 0;
     } else {
         boolFlag = 1;
