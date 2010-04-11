@@ -218,6 +218,7 @@ func ParseTypeOptional(fd uint64, tok *Token) {
     var es [255]uint64;
 
     GetNextTokenSafe(fd, tok);
+
     if tok.id == TOKEN_LSBRAC {        
         GetNextTokenSafe(fd, tok);
         if tok.id != TOKEN_INTEGER  {
@@ -237,7 +238,7 @@ func ParseTypeOptional(fd uint64, tok *Token) {
     GetNextTokenSafe(fd, tok);
     if tok.id != TOKEN_IDENTIFIER  {
         tok.nextToken = tok.id;
-    } 
+    }
 }
 
 //
@@ -273,6 +274,7 @@ func ParseVarDecl(fd uint64, tok *Token) uint64 {
             tok.nextToken = tok.id;
         } 
 
+        
         GetNextTokenSafe(fd, tok);
         if tok.id != TOKEN_SEMICOLON {
             es[0] = TOKEN_SEMICOLON;
@@ -546,6 +548,7 @@ func ParseFuncDeclListSub(fd uint64, tok *Token) uint64 {
     var boolFlag uint64;    
     boolFlag = ParseFuncDeclHead(fd, tok);
     if boolFlag == 0 {
+
         boolFlag = ParseFuncDeclRaw(fd, tok);
         if boolFlag != 0 {
             boolFlag = ParseFuncDecl(fd, tok);
@@ -556,6 +559,7 @@ func ParseFuncDeclListSub(fd uint64, tok *Token) uint64 {
             ParseError(tok.id,es,2);
         }
     }
+    
     return boolFlag;
 }
 
@@ -588,12 +592,11 @@ func ParseFuncDeclHead(fd uint64, tok *Token) uint64 {
         if tok.id != TOKEN_RBRAC  {
             es[0] = TOKEN_RBRAC;
             ParseError(tok.id,es,1);        
-        }
-        
+        } 
+
         ParseTypeOptional(fd, tok);
         boolFlag = 0;
-    }
-
+    }    
     return boolFlag;
 }
 
@@ -602,6 +605,8 @@ func ParseFuncDeclRaw(fd uint64, tok *Token) uint64 {
     GetNextTokenSafe(fd, tok);
     if tok.id == TOKEN_SEMICOLON {
         boolFlag = 0;
+    } else {
+        tok.nextToken = tok.id;
     }
     return boolFlag;
 }
@@ -610,9 +615,9 @@ func ParseFuncDecl(fd uint64, tok *Token) uint64 {
     var boolFlag uint64 = 1;
     var es [255]uint64; 
     GetNextTokenSafe(fd, tok);
+
     if tok.id == TOKEN_LCBRAC {
         boolFlag = 0;
-    } else {
         ParseVarDeclList(fd, tok);
         ParseStatementSequence(fd, tok);
         GetNextTokenSafe(fd, tok);
@@ -626,7 +631,11 @@ func ParseFuncDecl(fd uint64, tok *Token) uint64 {
         } else {
             tok.nextToken = tok.id;
         }
+    } else {
+        boolFlag = 1;
+        tok.nextToken = tok.id;
     }
+
     return boolFlag;
 }
 
