@@ -12,25 +12,29 @@ var filename string;
 func main() {
     var fd uint64;
     var errno uint64;
+    var doRest uint64 = 1;
 
     if len(os.Args) != 2 {
         libgogo.PrintString("Usage: gogo file.go\n");
-        return;	
+        doRest = 0;
     }
     
-    filename = os.Args[1];
+    if doRest != 0 {
 
-    fd = libgogo.FileOpen(filename, 0);
-    if fd != 0 {
-        //ScannerTest(fd);
-        Parse(fd);
-        errno = libgogo.FileClose(fd);
-        if errno != 0 {
-            libgogo.ExitError("Error closing file", errno);
+        filename = os.Args[1];
+
+        fd = libgogo.FileOpen(filename, 0);
+        if fd != 0 {
+            //ScannerTest(fd);
+            Parse(fd);
+            errno = libgogo.FileClose(fd);
+            if errno != 0 {
+                libgogo.ExitError("Error closing file", errno);
+            }
+        } else {
+            libgogo.PrintString("Error opening file ");
+            libgogo.PrintString(filename);
+            libgogo.PrintString(".\n");
         }
-    } else {
-        libgogo.PrintString("Error opening file ");
-        libgogo.PrintString(filename);
-        libgogo.PrintString(".\n");
     }
 }
