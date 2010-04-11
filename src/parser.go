@@ -756,75 +756,49 @@ func ParseFunctionCallStatement(fd uint64, tok *Token) uint64 {
 }
 
 func ParseForStatement(fd uint64, tok *Token) {
-    var es [255]uint64;
     GetNextTokenSafe(fd, tok);
     if tok.id == TOKEN_FOR {
         GetNextTokenSafe(fd, tok);
         if tok.id == TOKEN_SEMICOLON {
-            tok.nextToken = tok.id;
+            SyncToken(tok);
         } else {
-            tok.nextToken = tok.id;
-            GetNextTokenSafe(fd,tok);
-            if tok.id == TOKEN_IDENTIFIER {
-                ParseSelector(fd, tok);
-            } else {
-                es[0] = TOKEN_IDENTIFIER;
-                ParseError(tok.id,es,1);
-            }
+            SyncToken(tok);
+            AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
+            // tok.strValue
+            ParseSelector(fd, tok);
             ParseAssignmentWithoutSC(fd, tok);
         }
         
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_SEMICOLON {
-            es[0] = TOKEN_SEMICOLON;
-            ParseError(tok.id,es,1);
-        }
+        AssertNextToken(fd, tok, TOKEN_SEMICOLON);
+
 
         GetNextTokenSafe(fd, tok);
         if tok.id == TOKEN_SEMICOLON {
-            tok.nextToken = tok.id;
+            SyncToken(tok);
         } else {
-            tok.nextToken = tok.id;
+            SyncToken(tok);
             ParseExpression(fd, tok);
         }
 
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_SEMICOLON {
-            es[0] = TOKEN_SEMICOLON;
-            ParseError(tok.id,es,1);
-        }
+        AssertNextToken(fd, tok, TOKEN_SEMICOLON);
 
         GetNextTokenSafe(fd, tok);
         if tok.id == TOKEN_LCBRAC {
-            tok.nextToken = tok.id;
+            SyncToken(tok);
         } else {
-            tok.nextToken = tok.id;
-            GetNextTokenSafe(fd,tok);
-            if tok.id == TOKEN_IDENTIFIER {
-                ParseSelector(fd, tok);
-            } else {
-                es[0] = TOKEN_IDENTIFIER;
-                ParseError(tok.id,es,1);
-            }
+            SyncToken(tok);
+            AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
+            // tok.strValue
+            ParseSelector(fd, tok);
             ParseAssignmentWithoutSC(fd, tok);
         }
 
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_LCBRAC {
-            es[0] = TOKEN_LCBRAC;
-            ParseError(tok.id,es,1);
-        }
-        
+        AssertNextToken(fd, tok, TOKEN_LCBRAC);        
         ParseStatementSequence(fd, tok);
-
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_RCBRAC {
-            es[0] = TOKEN_RCBRAC;
-            ParseError(tok.id,es,1);
-        }        
+        AssertNextToken(fd, tok, TOKEN_RCBRAC);
 
     } else {
-        tok.nextToken = tok.id;
+        SyncToken(tok);
     }   
 }
 
