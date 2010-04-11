@@ -9,6 +9,7 @@ GOFILES=\
     gogo.go\
     scanner.go\
     token.go\
-	parser.go
+	parser.go\
+    parse-utils.go
 
 include $(GOROOT)/src/Make.cmd
