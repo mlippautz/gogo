@@ -65,6 +65,7 @@ func Parse( fd uint64 ) {
     ParseImportStatementList(fd, &tok);
     ParseStructDeclList(fd, &tok);
     ParseVarDeclList(fd, &tok);
+    ParseFuncDeclList(fd, &tok);
 
     // Scan the rest for debugging purposes
     for GetNextToken(fd,&tok); tok.id != TOKEN_EOS; GetNextToken(fd,&tok) {
@@ -251,6 +252,35 @@ func ParseType(fd uint64, tok *Token) {
 }
 
 //
+// Parses: [ "[" integer "]" ] identifier 
+//
+func ParseTypeOptional(fd uint64, tok *Token) {
+    var es [255]uint64;
+
+    GetNextTokenSafe(fd, tok);
+    if tok.id == TOKEN_LSBRAC {        
+        GetNextTokenSafe(fd, tok);
+        if tok.id != TOKEN_INTEGER  {
+            es[0] = TOKEN_INTEGER;
+            parseError(tok.id,es,1);
+        }       
+
+        GetNextTokenSafe(fd, tok);
+        if tok.id != TOKEN_RSBRAC  {
+            es[0] = TOKEN_RSBRAC;
+            parseError(tok.id,es,1);
+        }
+    } else {
+        tok.nextToken = tok.id;
+    }
+
+    GetNextTokenSafe(fd, tok);
+    if tok.id != TOKEN_IDENTIFIER  {
+        tok.nextToken = tok.id;
+    } 
+}
+
+//
 //
 //
 func ParseVarDeclList(fd uint64, tok *Token) {
@@ -297,11 +327,17 @@ func ParseVarDecl(fd uint64, tok *Token) uint64 {
     return boolFlag;
 }
 
+//
+//
+//
 func ParseExpression(fd uint64, tok *Token) {
     ParseSimpleExpression(fd, tok);    
     ParseCmpOp(fd, tok);
 }
 
+//
+//
+//
 func ParseCmpOp(fd uint64, tok *Token) {
     GetNextTokenSafe(fd, tok);
 
@@ -312,6 +348,9 @@ func ParseCmpOp(fd uint64, tok *Token) {
     }
 }
 
+//
+//
+//
 func ParseSimpleExpression(fd uint64, tok *Token) {
     var boolFlag uint64;
    
@@ -322,6 +361,9 @@ func ParseSimpleExpression(fd uint64, tok *Token) {
     }
 }
 
+//
+//
+//
 func ParseSimpleExpressionOp(fd uint64, tok *Token) uint64 {
     var boolFlag uint64;
     
@@ -346,6 +388,9 @@ func ParseSimpleExpressionOp(fd uint64, tok *Token) uint64 {
     return boolFlag;
 }
 
+//
+//
+//
 func ParseUnaryArithOp(fd uint64, tok *Token) uint64 {
     var boolFlag uint64;
     
@@ -364,6 +409,9 @@ func ParseUnaryArithOp(fd uint64, tok *Token) uint64 {
     return boolFlag;   
 }
 
+//
+//
+//
 func ParseBinaryArithOp(fd uint64, tok *Token) uint64 {
     var boolFlag uint64;
     
@@ -382,6 +430,9 @@ func ParseBinaryArithOp(fd uint64, tok *Token) uint64 {
     return boolFlag; 
 }
 
+//
+//
+//
 func ParseTerm(fd uint64, tok *Token) {
     var boolFlag uint64;
     ParseFactor(fd, tok);
@@ -389,6 +440,9 @@ func ParseTerm(fd uint64, tok *Token) {
     }      
 }
 
+//
+//
+//
 func ParseTermOp(fd uint64, tok *Token) uint64 {
     var boolFlag uint64;
     
@@ -413,12 +467,26 @@ func ParseTermOp(fd uint64, tok *Token) uint64 {
     return boolFlag;
 }
 
+//
+//
+//
 func ParseFactor(fd uint64, tok *Token) {
     var es [255]uint64;
     var doneFlag uint64 = 1;
 
     GetNextTokenSafe(fd, tok);
 
+    if doneFlag == 1 && tok.id == TOKEN_OP_ADR {
+        GetNextTokenSafe(fd, tok);        
+        if tok.id == TOKEN_IDENTIFIER {
+            ParseSelector(fd ,tok);
+            ParseFunctionCallOptional(fd, tok);
+            doneFlag = 0;
+        } else {
+            es[0] = TOKEN_IDENTIFIER;
+            parseError(tok.id, es, 1);
+        }
+    }
     if doneFlag == 1 && tok.id == TOKEN_IDENTIFIER {
         ParseSelector(fd ,tok);
         doneFlag = 0;
@@ -443,8 +511,6 @@ func ParseFactor(fd uint64, tok *Token) {
         ParseFactor(fd, tok);
         doneFlag = 0;
     }
-    
-   
 
     if doneFlag != 0 {
         es[0] = TOKEN_IDENTIFIER;
@@ -456,12 +522,18 @@ func ParseFactor(fd uint64, tok *Token) {
     }
 }
 
+//
+//
+//
 func ParseSelector(fd uint64, tok *Token) {
     var boolFlag uint64;
     for boolFlag = ParseSelectorSub(fd, tok);boolFlag == 0; boolFlag = ParseSelectorSub(fd, tok) {
     }
 }
 
+//
+//
+//
 func ParseSelectorSub(fd uint64, tok *Token) uint64 {
     var boolFlag uint64;
     var es [255]uint64;
@@ -501,4 +573,405 @@ func ParseSelectorSub(fd uint64, tok *Token) uint64 {
     }
 
     return boolFlag;
+}
+
+func ParseFuncDeclList(fd uint64, tok *Token) {
+    var boolFlag uint64; 
+    for boolFlag = ParseFuncDeclListSub(fd, tok);boolFlag == 0; boolFlag = ParseFuncDeclListSub(fd, tok) {
+    }
+}
+
+func ParseFuncDeclListSub(fd uint64, tok *Token) uint64 {
+    var es [255]uint64;
+    var boolFlag uint64;    
+    boolFlag = ParseFuncDeclHead(fd, tok);
+    if boolFlag == 0 {
+        boolFlag = ParseFuncDeclRaw(fd, tok);
+        if boolFlag != 0 {
+            boolFlag = ParseFuncDecl(fd, tok);
+        }
+        if boolFlag != 0 {
+            es[0] = TOKEN_SEMICOLON;
+            es[1] = TOKEN_LCBRAC;
+            parseError(tok.id,es,2);
+        }
+    }
+    return boolFlag;
+}
+
+func ParseFuncDeclHead(fd uint64, tok *Token) uint64 {
+    var es [255]uint64; 
+    var boolFlag uint64;
+
+    GetNextTokenSafe(fd, tok);
+    if tok.id != TOKEN_FUNC {
+        boolFlag = 1;
+        tok.nextToken = tok.id;
+    } else  {
+        GetNextTokenSafe(fd, tok);
+        if tok.id == TOKEN_IDENTIFIER  {
+
+        } else {
+            es[0] = TOKEN_IDENTIFIER;
+            parseError(tok.id,es,1);        
+        }
+
+        GetNextTokenSafe(fd, tok);
+        if tok.id != TOKEN_LBRAC  {
+            es[0] = TOKEN_LBRAC;
+            parseError(tok.id,es,1);        
+        }
+
+        ParseIdentifierTypeList(fd, tok);
+
+        GetNextTokenSafe(fd, tok);
+        if tok.id != TOKEN_RBRAC  {
+            es[0] = TOKEN_RBRAC;
+            parseError(tok.id,es,1);        
+        }
+        
+        ParseTypeOptional(fd, tok);
+        boolFlag = 0;
+    }
+
+    return boolFlag;
+}
+
+func ParseFuncDeclRaw(fd uint64, tok *Token) uint64 {
+    var boolFlag uint64 = 1;
+    GetNextTokenSafe(fd, tok);
+    if tok.id == TOKEN_SEMICOLON {
+        boolFlag = 0;
+    }
+    return boolFlag;
+}
+
+func ParseFuncDecl(fd uint64, tok *Token) uint64 {
+    var boolFlag uint64 = 1;
+    var es [255]uint64; 
+    GetNextTokenSafe(fd, tok);
+    if tok.id == TOKEN_LCBRAC {
+        boolFlag = 0;
+    } else {
+        ParseVarDeclList(fd, tok);
+        ParseStatementSequence(fd, tok);
+        GetNextTokenSafe(fd, tok);
+        if tok.id == TOKEN_RETURN {
+            ParseExpression(fd, tok);
+            GetNextTokenSafe(fd, tok);
+            if tok.id != TOKEN_SEMICOLON {
+                es[0] = TOKEN_SEMICOLON;
+                parseError(tok.id,es,1);
+            }
+        } else {
+            tok.nextToken = tok.id;
+        }
+    }
+    return boolFlag;
+}
+
+func ParseIdentifierTypeList(fd uint64, tok *Token) {
+    var boolFlag uint64;
+
+    boolFlag = ParseIdentifierType(fd, tok);
+    if boolFlag == 0 {
+        for boolFlag = ParseIdentifierTypeListSub(fd, tok);boolFlag == 0; boolFlag = ParseIdentifierTypeListSub(fd, tok) {
+        }   
+    }
+}
+
+func ParseIdentifierTypeListSub(fd uint64, tok *Token) uint64 {
+    var boolFlag uint64;
+    GetNextTokenSafe(fd, tok);
+    if tok.id == TOKEN_COLON {
+        boolFlag = ParseIdentifierType(fd, tok);
+    } else {
+        boolFlag = 1;
+        tok.nextToken = tok.id;
+    }
+    return boolFlag;
+}
+
+func ParseIdentifierType(fd uint64, tok *Token) uint64 {
+    var boolFlag uint64;
+
+    GetNextTokenSafe(fd, tok);
+    if tok.id != TOKEN_IDENTIFIER {
+        tok.nextToken = tok.id;
+        boolFlag = 1;        
+    } else {
+        GetNextTokenSafe(fd, tok);
+        if tok.id == TOKEN_ARITH_MUL {
+
+        } else {
+            tok.nextToken = tok.id;
+        }
+        ParseType(fd, tok);
+        boolFlag = 0;
+    }
+
+    return boolFlag;
+}
+
+func ParseStatementSequence(fd uint64, tok *Token) {
+    var boolFlag uint64; 
+    for boolFlag = ParseStatement(fd, tok);boolFlag == 0; boolFlag = ParseStatement(fd, tok) {
+    }
+}
+
+func ParseStatement(fd uint64, tok *Token) uint64 {
+    var boolFlag uint64;
+    var doneFlag uint64;
+    var es [255]uint64; 
+
+    doneFlag = 1;
+
+    GetNextTokenSafe(fd, tok);
+    if doneFlag == 1 && tok.id == TOKEN_IDENTIFIER {
+        tok.nextToken = tok.id;
+        boolFlag = ParseAssignment(fd, tok);
+        if boolFlag != 0 {
+            boolFlag = ParseFunctionCallStatement(fd, tok);
+        }        
+        if boolFlag != 0 {
+            parseError(tok.id,es,0);
+        }
+        doneFlag = 0;
+    }
+    
+    if doneFlag == 1 && tok.id == TOKEN_IF {
+        ParseIfStatement(fd, tok);
+        doneFlag = 0;
+    }
+
+    if doneFlag == 1 && tok.id == TOKEN_FOR {
+        ParseForStatement(fd, tok);
+        doneFlag = 0;
+    }
+
+    if doneFlag == 1 && tok.id == TOKEN_SEMICOLON {
+        // NOP    
+        doneFlag = 0;
+    }
+
+    if doneFlag != 0 {
+        boolFlag = 1;
+    } else {
+        boolFlag = 0;
+    }
+
+    return boolFlag;
+}
+
+func ParseAssignment(fd uint64, tok *Token) uint64 {
+    var boolFlag uint64;
+    var es [255]uint64;
+
+    GetNextTokenSafe(fd, tok);
+    if tok.id == TOKEN_IDENTIFIER {
+        ParseSelector(fd, tok);
+        
+        GetNextTokenSafe(fd, tok);
+        if tok.id == TOKEN_ASSIGN {
+            ParseExpression(fd, tok);
+            GetNextTokenSafe(fd, tok);
+            if tok.id != TOKEN_SEMICOLON {
+                es[0] = TOKEN_SEMICOLON;
+                parseError(tok.id, es, 1);
+            }   
+        } else {
+            tok.nextToken = tok.id;
+            boolFlag = 1;
+        }
+    } else {
+        tok.nextToken = tok.id;
+        boolFlag = 1;
+    }
+
+    return boolFlag;
+}
+
+func ParseFunctionCallOptional(fd uint64, tok *Token) {
+    var es [255]uint64;
+    GetNextTokenSafe(fd, tok);
+    if tok.id == TOKEN_LBRAC {
+        GetNextTokenSafe(fd, tok);
+        if tok.id == TOKEN_RBRAC {
+
+        } else {
+            ParseExpressionList(fd, tok);
+            GetNextTokenSafe(fd, tok);
+            if tok.id != TOKEN_RBRAC {
+                es[0] = TOKEN_RBRAC;
+                parseError(tok.id, es, 1);
+            }        
+        }
+    }
+}
+
+func ParseFunctionCall(fd uint64, tok *Token) {
+    var es [255]uint64;
+    GetNextTokenSafe(fd, tok);
+    if tok.id == TOKEN_LBRAC {
+        if tok.id == TOKEN_RBRAC {
+
+        } else {
+            ParseExpressionList(fd, tok);
+            GetNextTokenSafe(fd, tok);
+            if tok.id != TOKEN_RBRAC {
+                es[0] = TOKEN_RBRAC;
+                parseError(tok.id, es, 1);
+            }        
+        }     
+    } else {
+        es[0] = TOKEN_LBRAC;
+        parseError(tok.id,es,1);
+    }
+}
+
+func ParseExpressionList(fd uint64, tok *Token) {
+    var boolFlag uint64;
+
+    ParseExpression(fd, tok);
+    for boolFlag = ParseExpressionListSub(fd, tok);boolFlag == 0; boolFlag = ParseExpressionListSub(fd, tok) {
+    }   
+}
+
+func ParseExpressionListSub(fd uint64, tok *Token) uint64 {
+    var boolFlag uint64;
+    GetNextTokenSafe(fd, tok);
+    if tok.id == TOKEN_COLON {
+        ParseExpression(fd, tok);
+        boolFlag = 0;
+    } else {
+        boolFlag = 1;
+        tok.nextToken = tok.id;
+    }
+    return boolFlag;   
+}
+
+func ParseFunctionCallStatement(fd uint64, tok *Token) uint64 {
+    var boolFlag uint64;
+    GetNextTokenSafe(fd, tok);
+    if tok.id == TOKEN_IDENTIFIER {
+        ParseSelector(fd, tok);
+        ParseFunctionCall(fd, tok);                
+    } else {
+        tok.nextToken = tok.id;
+        boolFlag = 1;
+    }
+    return boolFlag;
+}
+
+func ParseForStatement(fd uint64, tok *Token) {
+    var es [255]uint64;
+    GetNextTokenSafe(fd, tok);
+    if tok.id == TOKEN_FOR {
+        GetNextTokenSafe(fd, tok);
+        if tok.id == TOKEN_SEMICOLON {
+            tok.nextToken = tok.id;
+        } else {
+            tok.nextToken = tok.id;
+            ParseAssignment(fd, tok);
+        }
+        
+        GetNextTokenSafe(fd, tok);
+        if tok.id != TOKEN_SEMICOLON {
+            es[0] = TOKEN_SEMICOLON;
+            parseError(tok.id,es,1);
+        }
+
+        GetNextTokenSafe(fd, tok);
+        if tok.id == TOKEN_SEMICOLON {
+            tok.nextToken = tok.id;
+        } else {
+            tok.nextToken = tok.id;
+            ParseExpression(fd, tok);
+        }
+
+        GetNextTokenSafe(fd, tok);
+        if tok.id != TOKEN_SEMICOLON {
+            es[0] = TOKEN_SEMICOLON;
+            parseError(tok.id,es,1);
+        }
+
+        GetNextTokenSafe(fd, tok);
+        if tok.id == TOKEN_LCBRAC {
+            tok.nextToken = tok.id;
+        } else {
+            tok.nextToken = tok.id;
+            ParseAssignment(fd, tok);
+        }
+
+        GetNextTokenSafe(fd, tok);
+        if tok.id != TOKEN_LCBRAC {
+            es[0] = TOKEN_LCBRAC;
+            parseError(tok.id,es,1);
+        }
+        
+        ParseStatementSequence(fd, tok);
+
+        GetNextTokenSafe(fd, tok);
+        if tok.id != TOKEN_RCBRAC {
+            es[0] = TOKEN_RCBRAC;
+            parseError(tok.id,es,1);
+        }        
+
+    } else {
+        tok.nextToken = tok.id;
+    }   
+}
+
+func ParseIfStatement(fd uint64, tok *Token) {
+    var es [255]uint64;
+    GetNextTokenSafe(fd, tok);
+    if tok.id == TOKEN_IF {
+        ParseExpression(fd, tok);
+
+        GetNextTokenSafe(fd, tok);
+        if tok.id != TOKEN_LCBRAC {
+            es[0] = TOKEN_LCBRAC;
+            parseError(tok.id,es,1);
+        } 
+
+        ParseStatementSequence(fd, tok);
+
+        GetNextTokenSafe(fd, tok);
+        if tok.id != TOKEN_RCBRAC {
+            es[0] = TOKEN_RCBRAC;
+            parseError(tok.id,es,1);
+        } 
+
+        GetNextTokenSafe(fd, tok);
+        if tok.id == TOKEN_ELSE {
+            tok.nextToken = tok.id;
+            ParseElseStatement(fd, tok);
+        } else {
+            tok.nextToken = tok.id;
+        }
+
+    } else {
+        tok.nextToken = tok.id;
+    }
+}
+
+func ParseElseStatement(fd uint64, tok *Token) {
+    var es [255]uint64;
+
+    GetNextTokenSafe(fd, tok);
+    if tok.id == TOKEN_ELSE {
+        GetNextTokenSafe(fd, tok);
+        if tok.id != TOKEN_LCBRAC {
+            es[0] = TOKEN_LCBRAC;
+            parseError(tok.id,es,1);
+        } 
+
+        ParseStatementSequence(fd, tok);
+
+        GetNextTokenSafe(fd, tok);
+        if tok.id != TOKEN_RCBRAC {
+            es[0] = TOKEN_RCBRAC;
+            parseError(tok.id,es,1);
+        } 
+    }
 }

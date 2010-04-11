@@ -350,7 +350,10 @@ func GetNextToken(fd uint64, tok *Token) {
     if tok.id == TOKEN_IDENTIFIER {
         if libgogo.StringCompare("if",tok.strValue) == 0 {
             tok.id = TOKEN_IF;
-       }
+        }
+        if libgogo.StringCompare("else",tok.strValue) == 0 {
+            tok.id = TOKEN_ELSE;
+        }
         if libgogo.StringCompare("for",tok.strValue) == 0 {
             tok.id = TOKEN_FOR;
         }

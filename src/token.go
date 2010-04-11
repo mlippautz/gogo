@@ -51,6 +51,7 @@ var TOKEN_RETURN uint64 = 107;
 var TOKEN_FUNC uint64 = 108;
 var TOKEN_PACKAGE uint64 = 109;
 var TOKEN_IMPORT uint64 = 110;
+var TOKEN_ELSE uint64 = 111;
 
 //
 // Helper functions
