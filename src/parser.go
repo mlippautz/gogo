@@ -35,19 +35,8 @@ func Parse( fd uint64 ) {
 // This is enforced by the go language as first statement in a source file.
 //
 func ParsePackageStatement(fd uint64, tok *Token) {    
-    var expectedTokens [255]uint64;
-
-    GetNextTokenSafe(fd,tok);
-    if tok.id != TOKEN_PACKAGE {
-        expectedTokens[0] = TOKEN_PACKAGE;
-        ParseError(tok.id,expectedTokens,1);
-    } else {
-        GetNextTokenSafe(fd,tok);
-        if tok.id != TOKEN_IDENTIFIER {
-            expectedTokens[0] = TOKEN_IDENTIFIER;
-            ParseError(tok.id,expectedTokens,1);
-        }
-    }
+    AssertNextToken(fd, tok, TOKEN_PACKAGE);
+    AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
     // package ok, value in tok.strValue
 }
 
