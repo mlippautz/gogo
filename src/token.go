@@ -137,7 +137,7 @@ func TokenToString (id uint64) string {
         retStr = "&&";
     }
     if id == TOKEN_REL_OR {
-        retStr = "||"
+        retStr = "||";
     }
     if id == TOKEN_REL_GTOE {
         retStr = ">=";
