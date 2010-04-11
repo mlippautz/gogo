@@ -76,52 +76,25 @@ func ParseImportStatement(fd uint64, tok *Token) uint64 {
 //
 func ParseStructDeclList(fd uint64, tok *Token) {
     var boolFlag uint64;
-    for boolFlag = ParseStructDecl(fd, tok);boolFlag == 0;boolFlag = ParseStructDecl(fd, tok) {
-    }
+    for boolFlag = ParseStructDecl(fd, tok);
+        boolFlag == 0;
+        boolFlag = ParseStructDecl(fd, tok) { }
 }
 
 //
 // Parses: "type" identifier "struct" "{" struct_var_decl_list "}" ";"
 //
 func ParseStructDecl(fd uint64, tok *Token) uint64 {
-    var es [255]uint64;
     var boolFlag uint64;
-
     GetNextTokenSafe(fd,tok);
     if tok.id == TOKEN_TYPE {
-
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_IDENTIFIER  {
-            es[0] = TOKEN_IDENTIFIER;
-            ParseError(tok.id,es,1);
-        }
-
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_STRUCT  {
-            es[0] = TOKEN_STRUCT;
-            ParseError(tok.id,es,1);
-        }    
-
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_LCBRAC  {
-            es[0] = TOKEN_LCBRAC;
-            ParseError(tok.id,es,1);
-        }
-
+        AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
+        // identifier of struct in tok.strValue
+        AssertNextToken(fd, tok, TOKEN_STRUCT);
+        AssertNextToken(fd, tok, TOKEN_LCBRAC);
         ParseStructVarDeclList(fd, tok);
-
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_RCBRAC  {
-            es[0] = TOKEN_RCBRAC;
-            ParseError(tok.id,es,1);
-        }
-
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_SEMICOLON  {
-            es[0] = TOKEN_SEMICOLON;
-            ParseError(tok.id,es,1);
-        }
-         
+        AssertNextToken(fd, tok, TOKEN_RCBRAC);
+        AssertNextToken(fd, tok, TOKEN_SEMICOLON);
         boolFlag = 0;
     } else {
         boolFlag = 1;
