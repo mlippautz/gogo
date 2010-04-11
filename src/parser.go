@@ -324,8 +324,9 @@ func ParseBinaryArithOp(fd uint64, tok *Token) uint64 {
 func ParseTerm(fd uint64, tok *Token) {
     var boolFlag uint64;
     ParseFactor(fd, tok);
-    for boolFlag = ParseTermOp(fd, tok);boolFlag == 0;boolFlag = ParseTermOp(fd, tok) {
-    }      
+    for boolFlag = ParseTermOp(fd, tok);
+        boolFlag == 0;
+        boolFlag = ParseTermOp(fd, tok) { }      
 }
 
 //
@@ -426,18 +427,12 @@ func ParseSelector(fd uint64, tok *Token) {
 //
 func ParseSelectorSub(fd uint64, tok *Token) uint64 {
     var boolFlag uint64;
-    var es [255]uint64;
 
     GetNextTokenSafe(fd, tok);
     if tok.id == TOKEN_PT {
-        
-        GetNextTokenSafe(fd, tok);
-        if tok.id == TOKEN_IDENTIFIER  {
-            boolFlag = 0;
-        } else {
-            es[0] = TOKEN_IDENTIFIER;
-            ParseError(tok.id,es,1);
-        }
+        AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
+        // value in tok.strValue
+        boolFlag = 0;
     } else {
         if tok.id == TOKEN_LSBRAC {
             GetNextTokenSafe(fd, tok);
@@ -449,26 +444,21 @@ func ParseSelectorSub(fd uint64, tok *Token) uint64 {
                 }
             } 
 
-            GetNextTokenSafe(fd, tok);
-            if tok.id == TOKEN_RSBRAC {
-                boolFlag = 0;
-            } else {
-                es[0] = TOKEN_RSBRAC;
-                ParseError(tok.id,es,1);
-            }
+            AssertNextToken(fd, tok, TOKEN_RSBRAC);
+            boolFlag = 0;
         } else {
             tok.nextToken = tok.id;
             boolFlag = 1;
         }
     }
-
     return boolFlag;
 }
 
 func ParseFuncDeclList(fd uint64, tok *Token) {
     var boolFlag uint64; 
-    for boolFlag = ParseFuncDeclListSub(fd, tok);boolFlag == 0; boolFlag = ParseFuncDeclListSub(fd, tok) {
-    }
+    for boolFlag = ParseFuncDeclListSub(fd, tok);
+        boolFlag == 0; 
+        boolFlag = ParseFuncDeclListSub(fd, tok) { }
 }
 
 func ParseFuncDeclListSub(fd uint64, tok *Token) uint64 {
@@ -492,39 +482,20 @@ func ParseFuncDeclListSub(fd uint64, tok *Token) uint64 {
 }
 
 func ParseFuncDeclHead(fd uint64, tok *Token) uint64 {
-    var es [255]uint64; 
     var boolFlag uint64;
-
     GetNextTokenSafe(fd, tok);
-    if tok.id != TOKEN_FUNC {
-        boolFlag = 1;
-        tok.nextToken = tok.id;
-    } else  {
-        GetNextTokenSafe(fd, tok);
-        if tok.id == TOKEN_IDENTIFIER  {
-
-        } else {
-            es[0] = TOKEN_IDENTIFIER;
-            ParseError(tok.id,es,1);        
-        }
-
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_LBRAC  {
-            es[0] = TOKEN_LBRAC;
-            ParseError(tok.id,es,1);        
-        }
-
+    if tok.id == TOKEN_FUNC {
+        AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
+        // function name in tok.strValue
+        AssertNextToken(fd, tok, TOKEN_LBRAC);
         ParseIdentifierTypeList(fd, tok);
-
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_RBRAC  {
-            es[0] = TOKEN_RBRAC;
-            ParseError(tok.id,es,1);        
-        } 
-
+        AssertNextToken(fd, tok, TOKEN_RBRAC);
         ParseTypeOptional(fd, tok);
         boolFlag = 0;
-    }    
+    } else {    
+        SyncToken(tok);
+        boolFlag = 1;
+    }
     return boolFlag;
 }
 
