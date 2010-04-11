@@ -53,7 +53,10 @@ func GetNextTokenSafe(fd uint64, tok *Token) {
 //
 // Syncing a token after a look-ahead (LL1) has taken place.
 //
-func SyncToken(tok *Token, nextToken uint64) {
-    tok.nextToken = nextToken;
+func SyncToken(tok *Token) {
+    if tok.nextToken != 0 {
+        tok.id = tok.nextToken;
+        tok.nextToken = 0;
+    }
 }
 
