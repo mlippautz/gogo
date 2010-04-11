@@ -18,7 +18,7 @@ type Token struct {
     nextToken uint64;
 };
 
-var lineCounter uint64 = 0;
+var lineCounter uint64 = 1;
 
 func GetNextTokenRaw(fd uint64, tok *Token) {
     var singleChar byte; // Byte holding the last read value
