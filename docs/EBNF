@@ -15,7 +15,7 @@ cmp_op = ">" | "<" | ">=" | "<=" | "==" | "!=".
 unary_arith_op = "+" | "-".
 binary_arith_op = "*" | "/" .
 
-selector = { "." identifier | "[" expression "]" }.
+selector = { "." identifier | "[" (integer | identifier selector) "]" }.
 
 expression_list = expression { "," expression }.
 function_call = "(" expression_list ")".
