@@ -7,6 +7,8 @@ package main
 import "os"
 import "./libgogo/_obj/libgogo"
 
+var filename string;
+
 func main() {
     var fd uint64;
     var errno uint64;
@@ -16,7 +18,9 @@ func main() {
         return;	
     }
     
-    fd = libgogo.FileOpen(os.Args[1], 0);
+    filename = os.Args[1];
+
+    fd = libgogo.FileOpen(filename, 0);
     if fd != 0 {
         //ScannerTest(fd);
         Parse(fd);
@@ -26,7 +30,7 @@ func main() {
         }
     } else {
         libgogo.PrintString("Error opening file ");
-        libgogo.PrintString(os.Args[1]);
+        libgogo.PrintString(filename);
         libgogo.PrintString(".\n");
     }
 }
