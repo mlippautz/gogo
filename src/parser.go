@@ -108,28 +108,21 @@ func ParseStructDecl(fd uint64, tok *Token) uint64 {
 //
 func ParseStructVarDeclList(fd uint64, tok *Token) {
     var boolFlag uint64;
-    for boolFlag = ParseStructVarDecl(fd, tok);boolFlag == 0;boolFlag = ParseStructVarDecl(fd, tok) {
-    }
+    for boolFlag = ParseStructVarDecl(fd, tok);
+        boolFlag == 0;
+        boolFlag = ParseStructVarDecl(fd, tok) { }
 }
 
 //
 // Parses: identifier type ";"
 //
 func ParseStructVarDecl(fd uint64, tok *Token) uint64 {
-    var es [255]uint64;
     var boolFlag uint64;
 
     GetNextTokenSafe(fd,tok);
     if tok.id == TOKEN_IDENTIFIER {
-
         ParseType(fd, tok);
-
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_SEMICOLON  {
-            es[0] = TOKEN_SEMICOLON;
-            ParseError(tok.id,es,1);
-        }
-        
+        AssertNextToken(fd, tok, TOKEN_SEMICOLON);
         boolFlag = 0;
     } else {
         boolFlag = 1;
