@@ -578,8 +578,9 @@ func ParseIdentifierType(fd uint64, tok *Token) uint64 {
 
 func ParseStatementSequence(fd uint64, tok *Token) {
     var boolFlag uint64; 
-    for boolFlag = ParseStatement(fd, tok);boolFlag == 0; boolFlag = ParseStatement(fd, tok) {
-    }
+    for boolFlag = ParseStatement(fd, tok);
+        boolFlag == 0;
+        boolFlag = ParseStatement(fd, tok) { }
 }
 
 func ParseStatement(fd uint64, tok *Token) uint64 {
@@ -636,43 +637,26 @@ func ParseStatement(fd uint64, tok *Token) uint64 {
 
 func ParseAssignment(fd uint64, tok *Token) uint64 {
     var boolFlag uint64;
-    var es [255]uint64;
-
-    //GetNextTokenSafe(fd, tok);
-    //if tok.id == TOKEN_IDENTIFIER {
-    //    ParseSelector(fd, tok);
-        
-        GetNextTokenSafe(fd, tok);
-        if tok.id == TOKEN_ASSIGN {
-            
-            ParseExpression(fd, tok);
-
-            GetNextTokenSafe(fd, tok);
-            if tok.id != TOKEN_SEMICOLON {
-                es[0] = TOKEN_SEMICOLON;
-                ParseError(tok.id, es, 1);
-            }   
-        } else {
-            tok.nextToken = tok.id;
-            boolFlag = 1;
-        }
-//    } 
-//else {
-//        tok.nextToken = tok.id;
- //       boolFlag = 1;
-  //  }
-
+    GetNextTokenSafe(fd, tok);
+    if tok.id == TOKEN_ASSIGN {
+        ParseExpression(fd, tok);
+        AssertNextToken(fd, tok, TOKEN_SEMICOLON);
+        boolFlag = 0;
+    } else {
+        SyncToken(tok);
+        boolFlag = 1;
+    }
     return boolFlag;
 }
 
 func ParseAssignmentWithoutSC(fd uint64, tok *Token) uint64 {
     var boolFlag uint64;
-        
     GetNextTokenSafe(fd, tok);
     if tok.id == TOKEN_ASSIGN {      
         ParseExpression(fd, tok);
+        boolFlag = 0;
     } else {
-        tok.nextToken = tok.id;
+        SyncToken(tok);
         boolFlag = 1;
     }
 
@@ -761,7 +745,6 @@ func ParseForStatement(fd uint64, tok *Token) {
         }
         
         AssertNextToken(fd, tok, TOKEN_SEMICOLON);
-
 
         GetNextTokenSafe(fd, tok);
         if tok.id == TOKEN_SEMICOLON {
