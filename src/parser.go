@@ -228,11 +228,12 @@ func ParseExpression(fd uint64, tok *Token) {
 //
 func ParseCmpOp(fd uint64, tok *Token) {
     GetNextTokenSafe(fd, tok);
-
-    if (tok.id == TOKEN_EQUALS) || (tok.id == TOKEN_NOTEQUAL) || (tok.id == TOKEN_REL_LT) || (tok.id == TOKEN_REL_LTOE) || (tok.id == TOKEN_REL_GT) || (tok.id == TOKEN_REL_GTOE) {
+    if (tok.id == TOKEN_EQUALS) || (tok.id == TOKEN_NOTEQUAL) || 
+        (tok.id == TOKEN_REL_LT) || (tok.id == TOKEN_REL_LTOE) || 
+        (tok.id == TOKEN_REL_GT) || (tok.id == TOKEN_REL_GTOE) {
         ParseSimpleExpression(fd, tok);
     } else {
-        tok.nextToken = tok.id;
+        SyncToken(tok);
     }
 }
 
@@ -243,7 +244,6 @@ func ParseSimpleExpression(fd uint64, tok *Token) {
     var boolFlag uint64;
     ParseUnaryArithOp(fd, tok);
     ParseTerm(fd, tok);
-
     for boolFlag = ParseSimpleExpressionOp(fd, tok);
         boolFlag == 0;
         boolFlag = ParseSimpleExpressionOp(fd, tok) { }
@@ -829,55 +829,27 @@ func ParseForStatement(fd uint64, tok *Token) {
 }
 
 func ParseIfStatement(fd uint64, tok *Token) {
-    var es [255]uint64;
     GetNextTokenSafe(fd, tok);
     if tok.id == TOKEN_IF {
         ParseExpression(fd, tok);
-
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_LCBRAC {
-            es[0] = TOKEN_LCBRAC;
-            ParseError(tok.id,es,1);
-        } 
-
+        AssertNextToken(fd, tok, TOKEN_LCBRAC);
         ParseStatementSequence(fd, tok);
-
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_RCBRAC {
-            es[0] = TOKEN_RCBRAC;
-            ParseError(tok.id,es,1);
-        } 
+        AssertNextToken(fd, tok, TOKEN_RCBRAC);
 
         GetNextTokenSafe(fd, tok);
         if tok.id == TOKEN_ELSE {
-            tok.nextToken = tok.id;
             ParseElseStatement(fd, tok);
         } else {
-            tok.nextToken = tok.id;
+            SyncToken(tok);
         }
 
     } else {
-        tok.nextToken = tok.id;
+        SyncToken(tok);
     }
 }
 
 func ParseElseStatement(fd uint64, tok *Token) {
-    var es [255]uint64;
-
-    GetNextTokenSafe(fd, tok);
-    if tok.id == TOKEN_ELSE {
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_LCBRAC {
-            es[0] = TOKEN_LCBRAC;
-            ParseError(tok.id,es,1);
-        } 
-
-        ParseStatementSequence(fd, tok);
-
-        GetNextTokenSafe(fd, tok);
-        if tok.id != TOKEN_RCBRAC {
-            es[0] = TOKEN_RCBRAC;
-            ParseError(tok.id,es,1);
-        } 
-    }
+    AssertNextToken(fd, tok, TOKEN_LCBRAC);
+    ParseStatementSequence(fd, tok);
+    AssertNextToken(fd, tok, TOKEN_RCBRAC);
 }
