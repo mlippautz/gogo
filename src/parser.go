@@ -5,7 +5,8 @@
 package main
 
 //
-// Main parsing function
+// Main parsing function. Corresponds to the EBNF main structure called 
+// go_program.
 //
 func Parse( fd uint64 ) {
     var tok Token;
@@ -21,29 +22,31 @@ func Parse( fd uint64 ) {
 
     // Scan the rest for debugging purposes
     // To be removed when parser is able to parse the complete EBNF
+    // Is actually not EBNF compliant!
     for GetNextToken(fd,&tok); tok.id != TOKEN_EOS; GetNextToken(fd,&tok) {
         debugToken(&tok);
     }
 }
 
 //
-// Check for package "identifier" as the golang forces this.
+// Parses: package identifier
+// This is enforced by the go language as first statement in a source file.
 //
 func ParsePackageStatement(fd uint64, tok *Token) {    
-    var es [255]uint64;
+    var expectedTokens [255]uint64;
 
     GetNextTokenSafe(fd,tok);
     if tok.id != TOKEN_PACKAGE {
-        es[0] = TOKEN_PACKAGE;
-        ParseError(tok.id,es,1);
+        expectedTokens[0] = TOKEN_PACKAGE;
+        ParseError(tok.id,expectedTokens,1);
     } else {
         GetNextTokenSafe(fd,tok);
         if tok.id != TOKEN_IDENTIFIER {
-            es[0] = TOKEN_IDENTIFIER;
-            ParseError(tok.id,es,1);
+            expectedTokens[0] = TOKEN_IDENTIFIER;
+            ParseError(tok.id,expectedTokens,1);
         }
     }
-    // package ok
+    // package ok, value in tok.strValue
 }
 
 //
