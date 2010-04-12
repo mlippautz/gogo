@@ -6,7 +6,25 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
-func PrintErrorHead() {
+func PrintDebugString(msg string, debugLevel uint64) {
+    if debugLevel <= DEBUG_LEVEL {
+        PrintHead();   
+        libgogo.PrintString(": DEBUG: ");
+        libgogo.PrintString(msg);
+        libgogo.PrintString("\n");
+    }
+}
+
+func PrintDebugChar(char byte, debugLevel uint64) {
+    if debugLevel >= DEBUG_LEVEL {
+        PrintHead();   
+        libgogo.PrintString(": DEBUG: ");
+        libgogo.PrintChar(char);
+        libgogo.PrintString("\n");
+    }
+}
+
+func PrintHead() {
     libgogo.PrintString(fileInfo[curFileIndex].filename);
     libgogo.PrintString(":");
     libgogo.PrintNumber(fileInfo[curFileIndex].lineCounter);
@@ -15,19 +33,19 @@ func PrintErrorHead() {
 }
 
 func GlobalError(msg string) {
-    PrintErrorHead();
+    PrintHead();
     libgogo.PrintString(": error: ");
     libgogo.ExitError(msg,1);
 }
 
 func ScanErrorString(msg string) {
-    PrintErrorHead();
+    PrintHead();
     libgogo.PrintString(": syntax error: ");
     libgogo.ExitError(msg,2);
 }
 
 func ScanErrorChar(char byte) {
-    PrintErrorHead();
+    PrintHead();
     libgogo.PrintString(": syntax error: Unknown char '");
     libgogo.PrintChar(char);
     libgogo.PrintString("'.\n");
@@ -44,7 +62,7 @@ func ParseError(ue uint64, e [255]uint64, eLen uint64) {
     var i uint64;
     var str string;
 
-    PrintErrorHead();
+    PrintHead();
     libgogo.PrintString(": syntax error: unexpected token '");
     str = TokenToString(ue);
     libgogo.PrintString(str);

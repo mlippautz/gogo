@@ -7,12 +7,15 @@ package main
 //
 // Safely gets the next token and stores it in the supplied token.
 //
-func GetNextTokenSafe(fd uint64, tok *Token) {
+func GetNextTokenSafe(tok *Token) {
+    var tokenString string;
     if tok.nextToken != 0 {
         tok.id = tok.nextToken;      
         tok.nextToken = 0;  
     } else {
-        GetNextToken(fd, tok);
+        GetNextToken(tok);
+        tokenString = TokenToString(tok.id);
+        PrintDebugString(tokenString, 1000);
     }
 }
 
@@ -28,8 +31,8 @@ func SyncToken(tok *Token) {
 //
 //
 //
-func AssertNextToken(fd uint64,tok *Token, tokenNumber uint64) {
-    GetNextTokenSafe(fd, tok);
+func AssertNextToken(tok *Token, tokenNumber uint64) {
+    GetNextTokenSafe(tok);
     AssertToken(tok, tokenNumber);
 }
 

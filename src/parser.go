@@ -8,40 +8,44 @@ package main
 // Main parsing function. Corresponds to the EBNF main structure called 
 // go_program.
 //
-func Parse( fd uint64 ) {
+func Parse() {
     var tok Token;
     tok.id = 0;
     tok.nextChar = 0;
     tok.nextToken = 0;    
 
-    ParsePackageStatement(fd, &tok);    
-    ParseImportStatementList(fd, &tok);
-    ParseStructDeclList(fd, &tok);
-    ParseVarDeclList(fd, &tok);
-    ParseFuncDeclList(fd, &tok);
+    ParsePackageStatement(&tok);    
+    ParseImportStatementList(&tok);
+    ParseStructDeclList(&tok);
+    ParseVarDeclList(&tok);
+    ParseFuncDeclList(&tok);
 
-    AssertNextToken(fd, &tok, TOKEN_EOS);
+    AssertNextToken(&tok, TOKEN_EOS);
 }
 
 //
 // Parses: package identifier
 // This is enforced by the go language as first statement in a source file.
 //
-func ParsePackageStatement(fd uint64, tok *Token) {    
-    AssertNextToken(fd, tok, TOKEN_PACKAGE);
-    AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
+func ParsePackageStatement(tok *Token) {    
+    PrintDebugString("Entering ParsePackageStatement()",1000);
+    AssertNextToken(tok, TOKEN_PACKAGE);
+    AssertNextToken(tok, TOKEN_IDENTIFIER);
     // package ok, value in tok.strValue
+    PrintDebugString("Leaving ParsePackageStatement()",1000);
 }
 
 //
 // Parses: { import_stmt }
 // Function parsing the whole import block (which is optional) of a go program
 //
-func ParseImportStatementList(fd uint64, tok *Token) {
+func ParseImportStatementList(tok *Token) {
     var validImport uint64;
-    for validImport = ParseImportStatement(fd, tok);
+    PrintDebugString("Entering ParseImportStatementList()",1000);
+    for validImport = ParseImportStatement(tok);
         validImport == 0;
-        validImport = ParseImportStatement(fd, tok) { }
+        validImport = ParseImportStatement(tok) { }
+    PrintDebugString("Leaving ParseImportStatementList()",1000);
 }
 
 
@@ -50,113 +54,123 @@ func ParseImportStatementList(fd uint64, tok *Token) {
 // This function parses a single import line.
 // Returning 0 if import statement is valid, 1 otherwise.
 //
-func ParseImportStatement(fd uint64, tok *Token) uint64 {
+func ParseImportStatement(tok *Token) uint64 {
     var boolFlag uint64;
-    GetNextTokenSafe(fd,tok);
+    PrintDebugString("Entering ParseImportStatement()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_IMPORT {
-        AssertNextToken(fd, tok, TOKEN_STRING);
+        AssertNextToken(tok, TOKEN_STRING);
         // import ok, value in tok.strValue
         boolFlag = 0;
     } else {
         boolFlag = 1;
         SyncToken(tok);
     }    
+    PrintDebugString("Leaving ParseImportStatement()",1000);
     return boolFlag;
 }
 
 //
 // Parses: { struct_decl }
 //
-func ParseStructDeclList(fd uint64, tok *Token) {
+func ParseStructDeclList(tok *Token) {
     var boolFlag uint64;
-    for boolFlag = ParseStructDecl(fd, tok);
+    PrintDebugString("Entering ParseStructDeclList()",1000);
+    for boolFlag = ParseStructDecl(tok);
         boolFlag == 0;
-        boolFlag = ParseStructDecl(fd, tok) { }
+        boolFlag = ParseStructDecl(tok) { }
+    PrintDebugString("Leaving ParseStructDeclList()",1000);
 }
 
 //
 // Parses: "type" identifier "struct" "{" struct_var_decl_list "}" ";"
 //
-func ParseStructDecl(fd uint64, tok *Token) uint64 {
+func ParseStructDecl(tok *Token) uint64 {
     var boolFlag uint64;
-    GetNextTokenSafe(fd,tok);
+    PrintDebugString("Entering ParseStructDecl()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_TYPE {
-        AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
+        AssertNextToken(tok, TOKEN_IDENTIFIER);
         // identifier of struct in tok.strValue
-        AssertNextToken(fd, tok, TOKEN_STRUCT);
-        AssertNextToken(fd, tok, TOKEN_LCBRAC);
-        ParseStructVarDeclList(fd, tok);
-        AssertNextToken(fd, tok, TOKEN_RCBRAC);
-        AssertNextToken(fd, tok, TOKEN_SEMICOLON);
+        AssertNextToken(tok, TOKEN_STRUCT);
+        AssertNextToken(tok, TOKEN_LCBRAC);
+        ParseStructVarDeclList(tok);
+        AssertNextToken(tok, TOKEN_RCBRAC);
+        AssertNextToken(tok, TOKEN_SEMICOLON);
         boolFlag = 0;
     } else {
         boolFlag = 1;
         tok.nextToken = tok.id;
     }    
+    PrintDebugString("Leaving ParseStructDecl()",1000);
     return boolFlag;
 }
 
 //
 // Parses: { struct_var_decl }
 //
-func ParseStructVarDeclList(fd uint64, tok *Token) {
+func ParseStructVarDeclList(tok *Token) {
     var boolFlag uint64;
-    for boolFlag = ParseStructVarDecl(fd, tok);
+    PrintDebugString("Entering ParseStructVarDeclList()",1000);
+    for boolFlag = ParseStructVarDecl(tok);
         boolFlag == 0;
-        boolFlag = ParseStructVarDecl(fd, tok) { }
+        boolFlag = ParseStructVarDecl(tok) { }
+    PrintDebugString("Leaving ParseStructVarDeclList()",1000);
 }
 
 //
 // Parses: identifier type ";"
 //
-func ParseStructVarDecl(fd uint64, tok *Token) uint64 {
+func ParseStructVarDecl(tok *Token) uint64 {
     var boolFlag uint64;
-
-    GetNextTokenSafe(fd,tok);
+    PrintDebugString("Entering ParseStructVarDecl()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_IDENTIFIER {
-        ParseType(fd, tok);
-        AssertNextToken(fd, tok, TOKEN_SEMICOLON);
+        ParseType(tok);
+        AssertNextToken(tok, TOKEN_SEMICOLON);
         boolFlag = 0;
     } else {
         boolFlag = 1;
         tok.nextToken = tok.id;
     }    
+    PrintDebugString("Leaving ParseStructVarDecl()",1000);
     return boolFlag;    
 }
 
 //
 // Parses: [ "[" integer "]" ] identifier 
 //
-func ParseType(fd uint64, tok *Token) {
-    GetNextTokenSafe(fd, tok);
+func ParseType(tok *Token) {
+    PrintDebugString("Entering ParseType()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_LSBRAC {   
-        AssertNextToken(fd, tok, TOKEN_INTEGER);
+        AssertNextToken(tok, TOKEN_INTEGER);
         // value of integer in tok.intValue
-        AssertNextToken(fd, tok, TOKEN_RSBRAC);        
+        AssertNextToken(tok, TOKEN_RSBRAC);        
     } else {
         SyncToken(tok);
     }
 
-    AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
+    AssertNextToken(tok, TOKEN_IDENTIFIER);
     // typename in tok.strValue
+    PrintDebugString("Leaving ParseType()",1000);
 }
 
 //
 // Parses: [ "[" integer "]" ] identifier 
 //
-func ParseTypeOptional(fd uint64, tok *Token) {
+func ParseTypeOptional(tok *Token) {
     var es [255]uint64;
-
-    GetNextTokenSafe(fd, tok);
-
+    PrintDebugString("Entering ParseTypeOptional()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_LSBRAC {        
-        GetNextTokenSafe(fd, tok);
+        GetNextTokenSafe(tok);
         if tok.id != TOKEN_INTEGER  {
             es[0] = TOKEN_INTEGER;
             ParseError(tok.id,es,1);
         }       
 
-        GetNextTokenSafe(fd, tok);
+        GetNextTokenSafe(tok);
         if tok.id != TOKEN_RSBRAC  {
             es[0] = TOKEN_RSBRAC;
             ParseError(tok.id,es,1);
@@ -165,94 +179,105 @@ func ParseTypeOptional(fd uint64, tok *Token) {
         tok.nextToken = tok.id;
     }
 
-    GetNextTokenSafe(fd, tok);
+    GetNextTokenSafe(tok);
     if tok.id != TOKEN_IDENTIFIER  {
         tok.nextToken = tok.id;
     }
+    PrintDebugString("Leaving ParseTypeOptional()",1000);
 }
 
 //
 //
 //
-func ParseVarDeclList(fd uint64, tok *Token) {
+func ParseVarDeclList(tok *Token) {
     var boolFlag uint64;
-    for boolFlag = ParseVarDecl(fd, tok);
+    PrintDebugString("Entering ParseVarDeclList()",1000);
+    for boolFlag = ParseVarDecl(tok);
         boolFlag == 0;
-        boolFlag = ParseVarDecl(fd, tok) { }
+        boolFlag = ParseVarDecl(tok) { }
+    PrintDebugString("Leaving ParseVarDeclList()",1000);
 }
 
 //
 //
 //
-func ParseVarDecl(fd uint64, tok *Token) uint64 {
+func ParseVarDecl(tok *Token) uint64 {
     var boolFlag uint64;
-    GetNextTokenSafe(fd,tok);
+    PrintDebugString("Entering ParseVarDecl()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_VAR {
-        AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
+        AssertNextToken(tok, TOKEN_IDENTIFIER);
         // variable name in tok.strValue
-        ParseType(fd, tok);
+        ParseType(tok);
 
-        GetNextTokenSafe(fd, tok);
+        GetNextTokenSafe(tok);
         if tok.id == TOKEN_ASSIGN {
-            ParseExpression(fd, tok);        
+            ParseExpression(tok);        
         } else {
             SyncToken(tok);
         } 
 
-        AssertNextToken(fd, tok, TOKEN_SEMICOLON);
+        AssertNextToken(tok, TOKEN_SEMICOLON);
         boolFlag = 0;
     } else {
         boolFlag = 1;
         SyncToken(tok);
-    }    
+    }
+    PrintDebugString("Leaving ParseVarDecl()",1000);
     return boolFlag;
 }
 
 //
 //
 //
-func ParseExpression(fd uint64, tok *Token) {
-    ParseSimpleExpression(fd, tok);    
-    ParseCmpOp(fd, tok);
+func ParseExpression(tok *Token) {
+    PrintDebugString("Entering ParseExpression()",1000);
+    ParseSimpleExpression(tok);    
+    ParseCmpOp(tok);
+    PrintDebugString("Leaving ParseExpression()",1000);
 }
 
 //
 //
 //
-func ParseCmpOp(fd uint64, tok *Token) {
-    GetNextTokenSafe(fd, tok);
+func ParseCmpOp(tok *Token) {
+    PrintDebugString("Entering ParseCmpOp()",1000);
+    GetNextTokenSafe(tok);
     if (tok.id == TOKEN_EQUALS) || (tok.id == TOKEN_NOTEQUAL) || 
         (tok.id == TOKEN_REL_LT) || (tok.id == TOKEN_REL_LTOE) || 
         (tok.id == TOKEN_REL_GT) || (tok.id == TOKEN_REL_GTOE) {
-        ParseSimpleExpression(fd, tok);
+        ParseSimpleExpression(tok);
     } else {
         SyncToken(tok);
     }
+    PrintDebugString("Leaving ParseCmpOp()",1000);
 }
 
 //
 //
 //
-func ParseSimpleExpression(fd uint64, tok *Token) {
+func ParseSimpleExpression(tok *Token) {
     var boolFlag uint64;
-    ParseUnaryArithOp(fd, tok);
-    ParseTerm(fd, tok);
-    for boolFlag = ParseSimpleExpressionOp(fd, tok);
+    PrintDebugString("Entering ParseSimpleExpression()",1000);
+    ParseUnaryArithOp(tok);
+    ParseTerm(tok);
+    for boolFlag = ParseSimpleExpressionOp(tok);
         boolFlag == 0;
-        boolFlag = ParseSimpleExpressionOp(fd, tok) { }
+        boolFlag = ParseSimpleExpressionOp(tok) { }
+    PrintDebugString("Leaving ParseSimpleExpression()",1000);
 }
 
 //
 //
 //
-func ParseSimpleExpressionOp(fd uint64, tok *Token) uint64 {
+func ParseSimpleExpressionOp(tok *Token) uint64 {
     var boolFlag uint64;
-    
-    boolFlag = ParseUnaryArithOp(fd, tok);
+    PrintDebugString("Entering ParseSimpleExpressionOp()",1000);
+    boolFlag = ParseUnaryArithOp(tok);
     if boolFlag == 0 {
         // read +/-
     } else {
-        GetNextTokenSafe(fd, tok);
+        GetNextTokenSafe(tok);
         if tok.id == TOKEN_REL_OR {
             // read ||
             boolFlag = 0;
@@ -263,19 +288,19 @@ func ParseSimpleExpressionOp(fd uint64, tok *Token) uint64 {
     }
 
     if boolFlag == 0 {
-        ParseTerm(fd, tok);
+        ParseTerm(tok);
     }
-
+    PrintDebugString("Leaving ParseSimpleExpressionOp()",1000);
     return boolFlag;
 }
 
 //
 //
 //
-func ParseUnaryArithOp(fd uint64, tok *Token) uint64 {
+func ParseUnaryArithOp(tok *Token) uint64 {
     var boolFlag uint64;
-    
-    GetNextTokenSafe(fd, tok);
+    PrintDebugString("Entering ParseUnaryArithOp()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_ARITH_PLUS {
         boolFlag = 0;
     } else {
@@ -286,17 +311,17 @@ func ParseUnaryArithOp(fd uint64, tok *Token) uint64 {
             boolFlag = 1;
         }
     }
-
+    PrintDebugString("Leaving ParseUnaryArithOp()",1000);
     return boolFlag;   
 }
 
 //
 //
 //
-func ParseBinaryArithOp(fd uint64, tok *Token) uint64 {
+func ParseBinaryArithOp(tok *Token) uint64 {
     var boolFlag uint64;
-    
-    GetNextTokenSafe(fd, tok);
+    PrintDebugString("Entering ParseBinaryArithOp()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_ARITH_MUL {
         boolFlag = 0;
     } else {
@@ -307,31 +332,34 @@ func ParseBinaryArithOp(fd uint64, tok *Token) uint64 {
             boolFlag = 1;
         }
     }
-
+    PrintDebugString("Leaving ParseBinaryArithOp()",1000);
     return boolFlag; 
 }
 
 //
 //
 //
-func ParseTerm(fd uint64, tok *Token) {
+func ParseTerm(tok *Token) {
     var boolFlag uint64;
-    ParseFactor(fd, tok);
-    for boolFlag = ParseTermOp(fd, tok);
+    PrintDebugString("Entering ParseTerm()",1000);
+    ParseFactor(tok);
+    for boolFlag = ParseTermOp(tok);
         boolFlag == 0;
-        boolFlag = ParseTermOp(fd, tok) { }      
+        boolFlag = ParseTermOp(tok) { }      
+    PrintDebugString("Leaving ParseTerm()",1000);
 }
 
 //
 //
 //
-func ParseTermOp(fd uint64, tok *Token) uint64 {
+func ParseTermOp(tok *Token) uint64 {
     var boolFlag uint64;
-    boolFlag = ParseBinaryArithOp(fd, tok);
+    PrintDebugString("Entering ParseTermOp()",1000);
+    boolFlag = ParseBinaryArithOp(tok);
     if boolFlag == 0 {
         // read *//
     } else {
-        GetNextTokenSafe(fd, tok);
+        GetNextTokenSafe(tok);
         if tok.id == TOKEN_REL_AND {
             // read &&
             boolFlag = 0;
@@ -342,28 +370,28 @@ func ParseTermOp(fd uint64, tok *Token) uint64 {
     }
 
     if boolFlag == 0 {
-        ParseFactor(fd, tok);
+        ParseFactor(tok);
     }
-
+    PrintDebugString("Leaving ParseTermOp()",1000);
     return boolFlag;
 }
 
 //
 //
 //
-func ParseFactor(fd uint64, tok *Token) uint64 {
+func ParseFactor(tok *Token) uint64 {
     var es [255]uint64;
     var doneFlag uint64 = 1;
     var boolFlag uint64;
-
-    GetNextTokenSafe(fd, tok);
+    PrintDebugString("Entering ParseFactor()",1000);
+    GetNextTokenSafe(tok);
 
     if (doneFlag == 1) && (tok.id == TOKEN_OP_ADR) {
-        GetNextTokenSafe(fd, tok); 
+        GetNextTokenSafe(tok); 
 
         if tok.id == TOKEN_IDENTIFIER {
-            ParseSelector(fd ,tok);
-            ParseFunctionCallOptional(fd, tok);
+            ParseSelector(tok);
+            ParseFunctionCallOptional(tok);
             doneFlag = 0;
         } else {
             es[0] = TOKEN_IDENTIFIER;
@@ -371,8 +399,8 @@ func ParseFactor(fd uint64, tok *Token) uint64 {
         }
     }
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
-        ParseSelector(fd ,tok);
-        ParseFunctionCallOptional(fd, tok);
+        ParseSelector(tok);
+        ParseFunctionCallOptional(tok);
         doneFlag = 0;
     } 
     if (doneFlag == 1) && (tok.id == TOKEN_INTEGER) {
@@ -383,8 +411,8 @@ func ParseFactor(fd uint64, tok *Token) uint64 {
     }
     if (doneFlag) == 1 && (tok.id == TOKEN_LBRAC) {
 
-        ParseExpression(fd, tok);
-        GetNextTokenSafe(fd, tok);
+        ParseExpression(tok);
+        GetNextTokenSafe(tok);
         if tok.id == TOKEN_RBRAC {
             doneFlag = 0;
         } else {
@@ -393,7 +421,7 @@ func ParseFactor(fd uint64, tok *Token) uint64 {
         }
     }
     if (doneFlag == 1) && (tok.id == TOKEN_NOT) {
-        ParseFactor(fd, tok);
+        ParseFactor(tok);
         doneFlag = 0;
     }
 
@@ -403,66 +431,75 @@ func ParseFactor(fd uint64, tok *Token) uint64 {
     } else {
         boolFlag = 0;
     }
+    PrintDebugString("Leaving ParseFactor()",1000);
     return boolFlag;
 }
 
 //
 //
 //
-func ParseSelector(fd uint64, tok *Token) {
+func ParseSelector(tok *Token) {
     var boolFlag uint64;
-    for boolFlag = ParseSelectorSub(fd, tok);boolFlag == 0; boolFlag = ParseSelectorSub(fd, tok) {
+    PrintDebugString("Entering ParseSelector()",1000);
+    for boolFlag = ParseSelectorSub(tok);
+        boolFlag == 0; 
+        boolFlag = ParseSelectorSub(tok) {
     }
+    PrintDebugString("Leaving ParseSelector()",1000);
 }
 
 //
 //
 //
-func ParseSelectorSub(fd uint64, tok *Token) uint64 {
+func ParseSelectorSub(tok *Token) uint64 {
     var boolFlag uint64;
-
-    GetNextTokenSafe(fd, tok);
+    PrintDebugString("Entering ParseSelectorSub()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_PT {
-        AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
+        AssertNextToken(tok, TOKEN_IDENTIFIER);
         // value in tok.strValue
         boolFlag = 0;
     } else {
         if tok.id == TOKEN_LSBRAC {
-            GetNextTokenSafe(fd, tok);
+            GetNextTokenSafe(tok);
             if tok.id == TOKEN_INTEGER {
                 
             } else {
                 if tok.id == TOKEN_IDENTIFIER {  
-                    ParseSelector(fd, tok);
+                    ParseSelector(tok);
                 }
             } 
 
-            AssertNextToken(fd, tok, TOKEN_RSBRAC);
+            AssertNextToken(tok, TOKEN_RSBRAC);
             boolFlag = 0;
         } else {
             tok.nextToken = tok.id;
             boolFlag = 1;
         }
     }
+    PrintDebugString("Leaving ParseSelectorSub()",1000);
     return boolFlag;
 }
 
-func ParseFuncDeclList(fd uint64, tok *Token) {
+func ParseFuncDeclList(tok *Token) {
     var boolFlag uint64; 
-    for boolFlag = ParseFuncDeclListSub(fd, tok);
+    PrintDebugString("Entering ParseFuncDeclList()",1000);
+    for boolFlag = ParseFuncDeclListSub(tok);
         boolFlag == 0; 
-        boolFlag = ParseFuncDeclListSub(fd, tok) { }
+        boolFlag = ParseFuncDeclListSub(tok) { }
+    PrintDebugString("Leaving ParseFuncDeclList()",1000);
 }
 
-func ParseFuncDeclListSub(fd uint64, tok *Token) uint64 {
+func ParseFuncDeclListSub(tok *Token) uint64 {
     var es [255]uint64;
     var boolFlag uint64;    
-    boolFlag = ParseFuncDeclHead(fd, tok);
+    PrintDebugString("Entering ParseFuncDeclListSub()",1000);
+    boolFlag = ParseFuncDeclHead(tok);
     if boolFlag == 0 {
 
-        boolFlag = ParseFuncDeclRaw(fd, tok);
+        boolFlag = ParseFuncDeclRaw(tok);
         if boolFlag != 0 {
-            boolFlag = ParseFuncDecl(fd, tok);
+            boolFlag = ParseFuncDecl(tok);
         }
         if boolFlag != 0 {
             es[0] = TOKEN_SEMICOLON;
@@ -470,130 +507,141 @@ func ParseFuncDeclListSub(fd uint64, tok *Token) uint64 {
             ParseError(tok.id,es,2);
         }
     }
-    
+    PrintDebugString("Leaving ParseFuncDeclListSub()",1000);
     return boolFlag;
 }
 
-func ParseFuncDeclHead(fd uint64, tok *Token) uint64 {
+func ParseFuncDeclHead(tok *Token) uint64 {
     var boolFlag uint64;
-    GetNextTokenSafe(fd, tok);
+    PrintDebugString("Entering ParseFuncDeclHead()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_FUNC {
-        AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
+        AssertNextToken(tok, TOKEN_IDENTIFIER);
         // function name in tok.strValue
-        AssertNextToken(fd, tok, TOKEN_LBRAC);
-        ParseIdentifierTypeList(fd, tok);
-        AssertNextToken(fd, tok, TOKEN_RBRAC);
-        ParseTypeOptional(fd, tok);
+        AssertNextToken(tok, TOKEN_LBRAC);
+        ParseIdentifierTypeList(tok);
+        AssertNextToken(tok, TOKEN_RBRAC);
+        ParseTypeOptional(tok);
         boolFlag = 0;
     } else {    
         SyncToken(tok);
         boolFlag = 1;
     }
+    PrintDebugString("Leaving ParseFuncDeclHead()",1000);
     return boolFlag;
 }
 
-func ParseFuncDeclRaw(fd uint64, tok *Token) uint64 {
+func ParseFuncDeclRaw(tok *Token) uint64 {
     var boolFlag uint64 = 1;
-    GetNextTokenSafe(fd, tok);
+    PrintDebugString("Entering ParseFuncDeclRaw()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_SEMICOLON {
         boolFlag = 0;
     } else {
         SyncToken(tok);
     }
+    PrintDebugString("Leaving ParseFuncDeclRaw()",1000);
     return boolFlag;
 }
 
-func ParseFuncDecl(fd uint64, tok *Token) uint64 {
+func ParseFuncDecl(tok *Token) uint64 {
     var boolFlag uint64;
-
-    GetNextTokenSafe(fd, tok);
+    PrintDebugString("Entering ParseFuncDecl()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_LCBRAC {
-        ParseVarDeclList(fd, tok);
-        ParseStatementSequence(fd, tok);
-        GetNextTokenSafe(fd, tok);
+        ParseVarDeclList(tok);
+        ParseStatementSequence(tok);
+        GetNextTokenSafe(tok);
         if tok.id == TOKEN_RETURN {
-            ParseExpression(fd, tok);
-            AssertNextToken(fd, tok, TOKEN_SEMICOLON);
+            ParseExpression(tok);
+            AssertNextToken(tok, TOKEN_SEMICOLON);
         } else {
             SyncToken(tok);
         }
-        AssertNextToken(fd, tok, TOKEN_RCBRAC);
+        AssertNextToken(tok, TOKEN_RCBRAC);
         boolFlag = 0;
     } else {
         SyncToken(tok);
         boolFlag = 1;
     }
+    PrintDebugString("Leaving ParseFuncDecl()",1000);
     return boolFlag;
 }
 
-func ParseIdentifierTypeList(fd uint64, tok *Token) {
+func ParseIdentifierTypeList(tok *Token) {
     var boolFlag uint64;
-
-    boolFlag = ParseIdentifierType(fd, tok);
+    PrintDebugString("Entering ParseIdentifierTypeList()",1000);
+    boolFlag = ParseIdentifierType(tok);
     if boolFlag == 0 {
-        for boolFlag = ParseIdentifierTypeListSub(fd, tok);boolFlag == 0; boolFlag = ParseIdentifierTypeListSub(fd, tok) {
-        }   
+        for boolFlag = ParseIdentifierTypeListSub(tok);
+            boolFlag == 0; 
+            boolFlag = ParseIdentifierTypeListSub(tok) { }   
     }
+    PrintDebugString("Leaving ParseIdentifierTypeList()",1000);
 }
 
-func ParseIdentifierTypeListSub(fd uint64, tok *Token) uint64 {
+func ParseIdentifierTypeListSub(tok *Token) uint64 {
     var boolFlag uint64;
-    GetNextTokenSafe(fd, tok);
+    PrintDebugString("Entering ParseIdentifierTypeListSub()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_COLON {
-        boolFlag = ParseIdentifierType(fd, tok);
+        boolFlag = ParseIdentifierType(tok);
     } else {
         boolFlag = 1;
         tok.nextToken = tok.id;
     }
+    PrintDebugString("Leaving ParseIdentifierTypeListSub()",1000);
     return boolFlag;
 }
 
-func ParseIdentifierType(fd uint64, tok *Token) uint64 {
+func ParseIdentifierType(tok *Token) uint64 {
     var boolFlag uint64;
-
-    GetNextTokenSafe(fd, tok);
+    PrintDebugString("Entering ParseIdentifierType()",1000);
+    GetNextTokenSafe(tok);
     if tok.id != TOKEN_IDENTIFIER {
         tok.nextToken = tok.id;
         boolFlag = 1;        
     } else {
-        GetNextTokenSafe(fd, tok);
+        GetNextTokenSafe(tok);
         if tok.id == TOKEN_ARITH_MUL {
 
         } else {
             tok.nextToken = tok.id;
         }
-        ParseType(fd, tok);
+        ParseType(tok);
         boolFlag = 0;
     }
-
+    PrintDebugString("Leaving ParseIdentifierType()",1000);
     return boolFlag;
 }
 
-func ParseStatementSequence(fd uint64, tok *Token) {
+func ParseStatementSequence(tok *Token) {
     var boolFlag uint64; 
-    for boolFlag = ParseStatement(fd, tok);
+    PrintDebugString("Entering ParseStatementSequence()",1000);
+    for boolFlag = ParseStatement(tok);
         boolFlag == 0;
-        boolFlag = ParseStatement(fd, tok) { }
+        boolFlag = ParseStatement(tok) { }
+    PrintDebugString("Leaving ParseStatementSequence()",1000);
 }
 
-func ParseStatement(fd uint64, tok *Token) uint64 {
+func ParseStatement(tok *Token) uint64 {
     var boolFlag uint64;
     var doneFlag uint64;
     var es [255]uint64; 
-
+    PrintDebugString("Entering ParseStatement()",1000);
     doneFlag = 1;
 
-    GetNextTokenSafe(fd, tok);
+    GetNextTokenSafe(tok);
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
         // Could be assignment or a function call.
         // Cannnot be resolved until selectors are all parsed
         // To be improved!
-        ParseSelector(fd, tok);
+        ParseSelector(tok);
         tok.nextToken = tok.id;
-        boolFlag = ParseAssignment(fd, tok);
+        boolFlag = ParseAssignment(tok);
         if boolFlag != 0 {
             tok.nextToken = tok.id;
-            boolFlag = ParseFunctionCallStatement(fd, tok);
+            boolFlag = ParseFunctionCallStatement(tok);
         }        
         if boolFlag != 0 {
             ParseError(tok.id,es,0);
@@ -603,13 +651,13 @@ func ParseStatement(fd uint64, tok *Token) uint64 {
     
     if (doneFlag == 1) && (tok.id == TOKEN_IF) {
         tok.nextToken = tok.id;
-        ParseIfStatement(fd, tok);
+        ParseIfStatement(tok);
         doneFlag = 0;
     }
 
     if (doneFlag == 1) && (tok.id == TOKEN_FOR) {
         tok.nextToken = tok.id;
-        ParseForStatement(fd, tok);
+        ParseForStatement(tok);
         doneFlag = 0;
     }
 
@@ -624,162 +672,172 @@ func ParseStatement(fd uint64, tok *Token) uint64 {
     } else {
         boolFlag = 0;
     }
-
+    PrintDebugString("Leaving ParseStatement()",1000);
     return boolFlag;
 }
 
-func ParseAssignment(fd uint64, tok *Token) uint64 {
+func ParseAssignment(tok *Token) uint64 {
     var boolFlag uint64;
-    GetNextTokenSafe(fd, tok);
+    PrintDebugString("Entering ParseAssignment()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_ASSIGN {
-        ParseExpression(fd, tok);
-        AssertNextToken(fd, tok, TOKEN_SEMICOLON);
+        ParseExpression(tok);
+        AssertNextToken(tok, TOKEN_SEMICOLON);
         boolFlag = 0;
     } else {
         SyncToken(tok);
         boolFlag = 1;
     }
+    PrintDebugString("Leaving ParseAssignment()",1000);
     return boolFlag;
 }
 
-func ParseAssignmentWithoutSC(fd uint64, tok *Token) uint64 {
+func ParseAssignmentWithoutSC(tok *Token) uint64 {
     var boolFlag uint64;
-    GetNextTokenSafe(fd, tok);
+    PrintDebugString("Entering ParseAssignmentWithoutSC()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_ASSIGN {      
-        ParseExpression(fd, tok);
+        ParseExpression(tok);
         boolFlag = 0;
     } else {
         SyncToken(tok);
         boolFlag = 1;
     }
-
+    PrintDebugString("Leaving ParseAssignmentWithoutSC()",1000);
     return boolFlag;
 }
 
-func ParseFunctionCallOptional(fd uint64, tok *Token) {
-    var es [255]uint64;
-    GetNextTokenSafe(fd, tok);
+func ParseFunctionCallOptional(tok *Token) {
+    PrintDebugString("Entering ParseFunctionCallOptional()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_LBRAC {
-        GetNextTokenSafe(fd, tok);
+        GetNextTokenSafe(tok);
         if tok.id == TOKEN_RBRAC {
 
         } else {
             tok.nextToken = tok.id;
-            ParseExpressionList(fd, tok);
-            GetNextTokenSafe(fd, tok);
-            if tok.id != TOKEN_RBRAC {
-                es[0] = TOKEN_RBRAC;
-                ParseError(tok.id, es, 1);
-            }        
+            ParseExpressionList(tok);
+            AssertNextToken(tok, TOKEN_RBRAC);    
         }
     } else {
         SyncToken(tok);
     }
+    PrintDebugString("Leaving ParseFunctionCallOptional()",1000);
 }
 
-func ParseFunctionCall(fd uint64, tok *Token) {
-    AssertNextToken(fd, tok, TOKEN_LBRAC);
-    GetNextTokenSafe(fd, tok);
+func ParseFunctionCall(tok *Token) {
+    PrintDebugString("Entering ParseFunctionCall()",1000);
+    AssertNextToken(tok, TOKEN_LBRAC);
+    GetNextTokenSafe(tok);
     if tok.id != TOKEN_RBRAC {
         SyncToken(tok);
-        ParseExpressionList(fd, tok);
-        AssertNextToken(fd, tok, TOKEN_RBRAC);     
+        ParseExpressionList(tok);
+        AssertNextToken(tok, TOKEN_RBRAC);     
     }     
+    PrintDebugString("Leaving ParseFunctionCall()",1000);
 }
 
-func ParseExpressionList(fd uint64, tok *Token) {
+func ParseExpressionList(tok *Token) {
     var boolFlag uint64;
-
-    ParseExpression(fd, tok);
-    for boolFlag = ParseExpressionListSub(fd, tok);
+    PrintDebugString("Entering ParseExpressionList()",1000);
+    ParseExpression(tok);
+    for boolFlag = ParseExpressionListSub(tok);
         boolFlag == 0;
-        boolFlag = ParseExpressionListSub(fd, tok) { }   
+        boolFlag = ParseExpressionListSub(tok) { }   
+    PrintDebugString("Leaving ParseExpressionList()",1000);
 }
 
-func ParseExpressionListSub(fd uint64, tok *Token) uint64 {
+func ParseExpressionListSub(tok *Token) uint64 {
     var boolFlag uint64;
-    GetNextTokenSafe(fd, tok);
+    PrintDebugString("Entering ParseExpressionListSub()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_COLON {
-        ParseExpression(fd, tok);
+        ParseExpression(tok);
         boolFlag = 0;
     } else {
         SyncToken(tok);
         boolFlag = 1;
     }
+    PrintDebugString("Leaving ParseExpressionListSub()",1000);
     return boolFlag;   
 }
 
-func ParseFunctionCallStatement(fd uint64, tok *Token) uint64 {
+func ParseFunctionCallStatement(tok *Token) uint64 {
     var boolFlag uint64;
-    GetNextTokenSafe(fd, tok);
+    PrintDebugString("Entering ParseFunctionCallStatement()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_LBRAC {
         tok.nextToken = tok.id;
-        ParseFunctionCall(fd, tok);                
+        ParseFunctionCall(tok);                
         boolFlag = 0;
     } else {
         tok.nextToken = tok.id;
         boolFlag = 1;
     }
+    PrintDebugString("Leaving ParseFunctionCallStatement()",1000);
     return boolFlag;
 }
 
-func ParseForStatement(fd uint64, tok *Token) {
-    GetNextTokenSafe(fd, tok);
+func ParseForStatement(tok *Token) {
+    PrintDebugString("Entering ParseForStatement()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_FOR {
-        GetNextTokenSafe(fd, tok);
+        GetNextTokenSafe(tok);
         if tok.id == TOKEN_SEMICOLON {
             SyncToken(tok);
         } else {
             SyncToken(tok);
-            AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
+            AssertNextToken(tok, TOKEN_IDENTIFIER);
             // tok.strValue
-            ParseSelector(fd, tok);
-            ParseAssignmentWithoutSC(fd, tok);
+            ParseSelector(tok);
+            ParseAssignmentWithoutSC(tok);
         }
         
-        AssertNextToken(fd, tok, TOKEN_SEMICOLON);
+        AssertNextToken(tok, TOKEN_SEMICOLON);
 
-        GetNextTokenSafe(fd, tok);
+        GetNextTokenSafe(tok);
         if tok.id == TOKEN_SEMICOLON {
             SyncToken(tok);
         } else {
             SyncToken(tok);
-            ParseExpression(fd, tok);
+            ParseExpression(tok);
         }
 
-        AssertNextToken(fd, tok, TOKEN_SEMICOLON);
+        AssertNextToken(tok, TOKEN_SEMICOLON);
 
-        GetNextTokenSafe(fd, tok);
+        GetNextTokenSafe(tok);
         if tok.id == TOKEN_LCBRAC {
             SyncToken(tok);
         } else {
             SyncToken(tok);
-            AssertNextToken(fd, tok, TOKEN_IDENTIFIER);
+            AssertNextToken(tok, TOKEN_IDENTIFIER);
             // tok.strValue
-            ParseSelector(fd, tok);
-            ParseAssignmentWithoutSC(fd, tok);
+            ParseSelector(tok);
+            ParseAssignmentWithoutSC(tok);
         }
 
-        AssertNextToken(fd, tok, TOKEN_LCBRAC);        
-        ParseStatementSequence(fd, tok);
-        AssertNextToken(fd, tok, TOKEN_RCBRAC);
+        AssertNextToken(tok, TOKEN_LCBRAC);        
+        ParseStatementSequence(tok);
+        AssertNextToken(tok, TOKEN_RCBRAC);
 
     } else {
         SyncToken(tok);
     }   
+    PrintDebugString("Leaving ParseForStatement()",1000);
 }
 
-func ParseIfStatement(fd uint64, tok *Token) {
-    GetNextTokenSafe(fd, tok);
+func ParseIfStatement(tok *Token) {
+    PrintDebugString("Entering ParseIfStatement()",1000);
+    GetNextTokenSafe(tok);
     if tok.id == TOKEN_IF {
-        ParseExpression(fd, tok);
-        AssertNextToken(fd, tok, TOKEN_LCBRAC);
-        ParseStatementSequence(fd, tok);
-        AssertNextToken(fd, tok, TOKEN_RCBRAC);
+        ParseExpression(tok);
+        AssertNextToken(tok, TOKEN_LCBRAC);
+        ParseStatementSequence(tok);
+        AssertNextToken(tok, TOKEN_RCBRAC);
 
-        GetNextTokenSafe(fd, tok);
+        GetNextTokenSafe(tok);
         if tok.id == TOKEN_ELSE {
-            ParseElseStatement(fd, tok);
+            ParseElseStatement(tok);
         } else {
             SyncToken(tok);
         }
@@ -787,10 +845,13 @@ func ParseIfStatement(fd uint64, tok *Token) {
     } else {
         SyncToken(tok);
     }
+    PrintDebugString("Leaving ParseIfStatement()",1000);
 }
 
-func ParseElseStatement(fd uint64, tok *Token) {
-    AssertNextToken(fd, tok, TOKEN_LCBRAC);
-    ParseStatementSequence(fd, tok);
-    AssertNextToken(fd, tok, TOKEN_RCBRAC);
+func ParseElseStatement(tok *Token) {
+    PrintDebugString("Entering ParseElseStatement()",1000);
+    AssertNextToken(tok, TOKEN_LCBRAC);
+    ParseStatementSequence(tok);
+    AssertNextToken(tok, TOKEN_RCBRAC);
+    PrintDebugString("Leaving ParseElseStatement()",1000);
 }

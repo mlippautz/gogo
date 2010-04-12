@@ -18,6 +18,8 @@ var fileInfo [255]FileInfo;
 var fileInfoLen uint64 = 0;
 var curFileIndex uint64 = 0;
 
+var DEBUG_LEVEL uint64 = 0;
+
 func main() {
     var errno uint64;
     var i uint64;
@@ -40,7 +42,7 @@ func main() {
     fileInfoLen = i-1;
 
     for curFileIndex=0;curFileIndex<fileInfoLen;curFileIndex=curFileIndex+1 {
-        Parse(fileInfo[curFileIndex].fd);
+        Parse();
     }
 
     for curFileIndex=0;curFileIndex<fileInfoLen;curFileIndex=curFileIndex+1 {
