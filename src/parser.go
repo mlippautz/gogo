@@ -811,6 +811,10 @@ func ParseForStatement(tok *Token) {
     PrintDebugString("Leaving ParseForStatement()",1000);
 }
 
+//
+// Parses: "if" expression "{" stmt_sequence [ "}" "else" else_stmt ].
+// Represents an if statement. Else is parsed in a separate function.
+//
 func ParseIfStatement(tok *Token) {
     PrintDebugString("Entering ParseIfStatement()",1000);
     GetNextTokenSafe(tok);
@@ -833,6 +837,10 @@ func ParseIfStatement(tok *Token) {
     PrintDebugString("Leaving ParseIfStatement()",1000);
 }
 
+//
+// Parses: "{" stmt_sequence "}"
+// The optional else branch of an if.
+//
 func ParseElseStatement(tok *Token) {
     PrintDebugString("Entering ParseElseStatement()",1000);
     AssertNextToken(tok, TOKEN_LCBRAC);
