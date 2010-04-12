@@ -5,6 +5,22 @@
 package main
 
 //
+// Function looks 1 token ahead and checks if it equals the provided one
+// Returns: 0 if tokens match, 1 otherwise
+//
+func LookAheadAndCheck(tok *Token, tokenNumber uint64) uint64 {
+    var boolFlag uint64;
+    GetNextTokenSafe(tok);
+    if (tok.id == tokenNumber) {
+        boolFlag = 0;
+    } else {
+        boolFlag = 1;
+    }
+    tok.id = tok.nextToken;
+    return boolFlag;
+}
+
+//
 // Safely gets the next token and stores it in the supplied token.
 //
 func GetNextTokenSafe(tok *Token) {
