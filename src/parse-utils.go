@@ -4,40 +4,6 @@
 
 package main
 
-import "./libgogo/_obj/libgogo"
-
-//
-// Function printing a parse error using only libgogo.
-// ue ... unexpected token
-// e .... array of expected tokens
-// eLen . actual length (items) of array
-//
-func ParseError(ue uint64, e [255]uint64, eLen uint64) {
-    var i uint64;
-    var str string;
-
-    libgogo.PrintString(filename);
-    libgogo.PrintString(":");
-    libgogo.PrintNumber(lineCounter);
-    libgogo.PrintString(": syntax error: unexpected token '");
-    str = TokenToString(ue);
-    libgogo.PrintString(str);
-    libgogo.PrintString("'");
-
-    if eLen > 0 {
-        libgogo.PrintString(", expecting one of: ");
-        str = TokenToString(e[i]);
-        libgogo.PrintString(str);
-        for i = 1; i < eLen; i = i+1 {
-            str = TokenToString(e[i]);
-            libgogo.PrintString(str);
-            libgogo.PrintString(", ");        
-        }
-    } 
-    libgogo.PrintString("\n");
-    libgogo.Exit(2); 
-}
-
 //
 // Safely gets the next token and stores it in the supplied token.
 //
