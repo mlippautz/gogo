@@ -48,7 +48,6 @@ func ParseImportStatementList(tok *Token) {
     PrintDebugString("Leaving ParseImportStatementList()",1000);
 }
 
-
 //
 // Parses: "import" string
 // This function parses a single import line.
@@ -72,6 +71,7 @@ func ParseImportStatement(tok *Token) uint64 {
 
 //
 // Parses: { struct_decl }
+// A list of struct declarations.
 //
 func ParseStructDeclList(tok *Token) {
     var boolFlag uint64;
@@ -84,6 +84,7 @@ func ParseStructDeclList(tok *Token) {
 
 //
 // Parses: "type" identifier "struct" "{" struct_var_decl_list "}" ";"
+// This is basically the skeleton of a struct.
 //
 func ParseStructDecl(tok *Token) uint64 {
     var boolFlag uint64;
@@ -108,6 +109,7 @@ func ParseStructDecl(tok *Token) uint64 {
 
 //
 // Parses: { struct_var_decl }
+// The variable declaration list of a struct.
 //
 func ParseStructVarDeclList(tok *Token) {
     var boolFlag uint64;
@@ -120,6 +122,7 @@ func ParseStructVarDeclList(tok *Token) {
 
 //
 // Parses: identifier type ";"
+// A single variable declaration in a struct.
 //
 func ParseStructVarDecl(tok *Token) uint64 {
     var boolFlag uint64;
@@ -139,6 +142,8 @@ func ParseStructVarDecl(tok *Token) uint64 {
 
 //
 // Parses: [ "[" integer "]" ] identifier 
+// Use for variable declarations in a struct and for declarations in function
+// heads and functions
 //
 func ParseType(tok *Token) {
     PrintDebugString("Entering ParseType()",1000);
@@ -157,7 +162,9 @@ func ParseType(tok *Token) {
 }
 
 //
-// Parses: [ "[" integer "]" ] identifier 
+// Parses: [ "[" integer "]" ] identifier
+// Is completelly optional. Only used to parse return value of a function
+// declaration.
 //
 func ParseTypeOptional(tok *Token) {
     PrintDebugString("Entering ParseTypeOptional()",1000); 
@@ -168,7 +175,6 @@ func ParseTypeOptional(tok *Token) {
     } else {
         tok.nextToken = tok.id;
     }
-
     GetNextTokenSafe(tok);
     if tok.id != TOKEN_IDENTIFIER  {
         tok.nextToken = tok.id;
@@ -177,7 +183,9 @@ func ParseTypeOptional(tok *Token) {
 }
 
 //
-//
+// Parses: { var_decl }
+// Is used for a list of variable declarations. Can either be global or in 
+// functions.
 //
 func ParseVarDeclList(tok *Token) {
     var boolFlag uint64;
@@ -189,7 +197,8 @@ func ParseVarDeclList(tok *Token) {
 }
 
 //
-//
+// Parses: "var" identifier type [ "=" expression ];
+// Is used to parse a single variable declaration with optional initializer.
 //
 func ParseVarDecl(tok *Token) uint64 {
     var boolFlag uint64;
@@ -236,7 +245,7 @@ func ParseCmpOp(tok *Token) {
         (tok.id == TOKEN_REL_GT) || (tok.id == TOKEN_REL_GTOE) {
         ParseSimpleExpression(tok);
     } else {
-        SyncToken(tok);
+        tok.nextToken = tok.id;
     }
     PrintDebugString("Leaving ParseCmpOp()",1000);
 }
@@ -259,24 +268,20 @@ func ParseSimpleExpression(tok *Token) {
 //
 //
 func ParseSimpleExpressionOp(tok *Token) uint64 {
-    var boolFlag uint64;
+    var boolFlag uint64 = 1;
     PrintDebugString("Entering ParseSimpleExpressionOp()",1000);
-    boolFlag = ParseUnaryArithOp(tok);
-    if boolFlag == 0 {
-        // read +/-
-    } else {
+    boolFlag = ParseUnaryArithOp(tok); // +,-
+    if boolFlag != 0 {
         GetNextTokenSafe(tok);
         if tok.id == TOKEN_REL_OR {
-            // read ||
+            // ||
             boolFlag = 0;
-        } else {
-            tok.nextToken = tok.id;
-            boolFlag = 1;   
-        }
+        } 
     }
-
     if boolFlag == 0 {
         ParseTerm(tok);
+    } else {
+        tok.nextToken = tok.id;
     }
     PrintDebugString("Leaving ParseSimpleExpressionOp()",1000);
     return boolFlag;
@@ -284,6 +289,7 @@ func ParseSimpleExpressionOp(tok *Token) uint64 {
 
 //
 // Function parsing the unary arithmetic ops PLUS (+) and MINUS (-)
+// Returns: 0 if matched, 1 otherwise.
 //
 func ParseUnaryArithOp(tok *Token) uint64 {
     var boolFlag uint64 = 1;
@@ -305,7 +311,44 @@ func ParseUnaryArithOp(tok *Token) uint64 {
 }
 
 //
+//
+//
+func ParseTerm(tok *Token) {
+    var boolFlag uint64;
+    PrintDebugString("Entering ParseTerm()",1000);
+    ParseFactor(tok);
+    for boolFlag = ParseTermOp(tok);
+        boolFlag == 0;
+        boolFlag = ParseTermOp(tok) { }      
+    PrintDebugString("Leaving ParseTerm()",1000);
+}
+
+//
+//
+//
+func ParseTermOp(tok *Token) uint64 {
+    var boolFlag uint64;
+    PrintDebugString("Entering ParseTermOp()",1000);
+    boolFlag = ParseBinaryArithOp(tok); // *,/
+    if boolFlag != 0 {
+        GetNextTokenSafe(tok);
+        if tok.id == TOKEN_REL_AND {
+            // &&
+            boolFlag = 0;
+        }
+    }
+    if boolFlag == 0 {
+        ParseFactor(tok);
+    } else {
+        tok.nextToken = tok.id;
+    }
+    PrintDebugString("Leaving ParseTermOp()",1000);
+    return boolFlag;
+}
+
+//
 // Function parsing the binary airthmetic ops MUL (*) and DIV (/)
+// Returns: 0 if matched, 1 otherwise.
 //
 func ParseBinaryArithOp(tok *Token) uint64 {
     var boolFlag uint64 = 1;
@@ -329,52 +372,11 @@ func ParseBinaryArithOp(tok *Token) uint64 {
 //
 //
 //
-func ParseTerm(tok *Token) {
-    var boolFlag uint64;
-    PrintDebugString("Entering ParseTerm()",1000);
-    ParseFactor(tok);
-    for boolFlag = ParseTermOp(tok);
-        boolFlag == 0;
-        boolFlag = ParseTermOp(tok) { }      
-    PrintDebugString("Leaving ParseTerm()",1000);
-}
-
-//
-//
-//
-func ParseTermOp(tok *Token) uint64 {
-    var boolFlag uint64;
-    PrintDebugString("Entering ParseTermOp()",1000);
-    boolFlag = ParseBinaryArithOp(tok);
-    if boolFlag == 0 {
-        // read *//
-    } else {
-        GetNextTokenSafe(tok);
-        if tok.id == TOKEN_REL_AND {
-            // read &&
-            boolFlag = 0;
-        } else {
-            tok.nextToken = tok.id;
-            boolFlag = 1;   
-        }
-    }
-
-    if boolFlag == 0 {
-        ParseFactor(tok);
-    }
-    PrintDebugString("Leaving ParseTermOp()",1000);
-    return boolFlag;
-}
-
-//
-//
-//
 func ParseFactor(tok *Token) uint64 {
     var doneFlag uint64 = 1;
     var boolFlag uint64;
     PrintDebugString("Entering ParseFactor()",1000);
     GetNextTokenSafe(tok);
-
     if (doneFlag == 1) && (tok.id == TOKEN_OP_ADR) {
         AssertNextToken(tok, TOKEN_IDENTIFIER);
         ParseSelector(tok);
@@ -458,6 +460,9 @@ func ParseSelectorSub(tok *Token) uint64 {
     return boolFlag;
 }
 
+//
+//
+//
 func ParseFuncDeclList(tok *Token) {
     var boolFlag uint64; 
     PrintDebugString("Entering ParseFuncDeclList()",1000);
@@ -467,6 +472,9 @@ func ParseFuncDeclList(tok *Token) {
     PrintDebugString("Leaving ParseFuncDeclList()",1000);
 }
 
+//
+//
+//
 func ParseFuncDeclListSub(tok *Token) uint64 {
     var es [255]uint64;
     var boolFlag uint64;    
