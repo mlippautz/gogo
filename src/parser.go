@@ -63,7 +63,7 @@ func ParseImportStatement(tok *Token) uint64 {
         boolFlag = 0;
     } else {
         boolFlag = 1;
-        SyncToken(tok);
+        tok.nextToken = tok.id;
     }    
     PrintDebugString("Leaving ParseImportStatement()",1000);
     return boolFlag;
@@ -153,7 +153,7 @@ func ParseType(tok *Token) {
         // value of integer in tok.intValue
         AssertNextToken(tok, TOKEN_RSBRAC);        
     } else {
-        SyncToken(tok);
+        tok.nextToken = tok.id;
     }
 
     AssertNextToken(tok, TOKEN_IDENTIFIER);
@@ -214,7 +214,7 @@ func ParseVarDecl(tok *Token) uint64 {
         if tok.id == TOKEN_ASSIGN {
             ParseExpression(tok);        
         } else {
-            SyncToken(tok);
+            tok.nextToken = tok.id;
         } 
 
         AssertNextToken(tok, TOKEN_SEMICOLON);
@@ -509,7 +509,7 @@ func ParseFuncDeclHead(tok *Token) uint64 {
         ParseTypeOptional(tok);
         boolFlag = 0;
     } else {    
-        SyncToken(tok);
+        tok.nextToken = tok.id;
         boolFlag = 1;
     }
     PrintDebugString("Leaving ParseFuncDeclHead()",1000);
@@ -523,7 +523,7 @@ func ParseFuncDeclRaw(tok *Token) uint64 {
     if tok.id == TOKEN_SEMICOLON {
         boolFlag = 0;
     } else {
-        SyncToken(tok);
+        tok.nextToken = tok.id;
     }
     PrintDebugString("Leaving ParseFuncDeclRaw()",1000);
     return boolFlag;
@@ -541,12 +541,12 @@ func ParseFuncDecl(tok *Token) uint64 {
             ParseExpression(tok);
             AssertNextToken(tok, TOKEN_SEMICOLON);
         } else {
-            SyncToken(tok);
+            tok.nextToken = tok.id;
         }
         AssertNextToken(tok, TOKEN_RCBRAC);
         boolFlag = 0;
     } else {
-        SyncToken(tok);
+        tok.nextToken = tok.id;
         boolFlag = 1;
     }
     PrintDebugString("Leaving ParseFuncDecl()",1000);
@@ -670,7 +670,7 @@ func ParseAssignment(tok *Token) uint64 {
         AssertNextToken(tok, TOKEN_SEMICOLON);
         boolFlag = 0;
     } else {
-        SyncToken(tok);
+        tok.nextToken = tok.id;
         boolFlag = 1;
     }
     PrintDebugString("Leaving ParseAssignment()",1000);
@@ -685,7 +685,7 @@ func ParseAssignmentWithoutSC(tok *Token) uint64 {
         ParseExpression(tok);
         boolFlag = 0;
     } else {
-        SyncToken(tok);
+        tok.nextToken = tok.id;
         boolFlag = 1;
     }
     PrintDebugString("Leaving ParseAssignmentWithoutSC()",1000);
@@ -705,7 +705,7 @@ func ParseFunctionCallOptional(tok *Token) {
             AssertNextToken(tok, TOKEN_RBRAC);    
         }
     } else {
-        SyncToken(tok);
+        tok.nextToken = tok.id;
     }
     PrintDebugString("Leaving ParseFunctionCallOptional()",1000);
 }
@@ -715,7 +715,7 @@ func ParseFunctionCall(tok *Token) {
     AssertNextToken(tok, TOKEN_LBRAC);
     GetNextTokenSafe(tok);
     if tok.id != TOKEN_RBRAC {
-        SyncToken(tok);
+        tok.nextToken = tok.id;
         ParseExpressionList(tok);
         AssertNextToken(tok, TOKEN_RBRAC);     
     }     
@@ -740,7 +740,7 @@ func ParseExpressionListSub(tok *Token) uint64 {
         ParseExpression(tok);
         boolFlag = 0;
     } else {
-        SyncToken(tok);
+        tok.nextToken = tok.id;
         boolFlag = 1;
     }
     PrintDebugString("Leaving ParseExpressionListSub()",1000);
@@ -769,9 +769,9 @@ func ParseForStatement(tok *Token) {
     if tok.id == TOKEN_FOR {
         GetNextTokenSafe(tok);
         if tok.id == TOKEN_SEMICOLON {
-            SyncToken(tok);
+            tok.nextToken = tok.id;
         } else {
-            SyncToken(tok);
+            tok.nextToken = tok.id;
             AssertNextToken(tok, TOKEN_IDENTIFIER);
             // tok.strValue
             ParseSelector(tok);
@@ -782,9 +782,9 @@ func ParseForStatement(tok *Token) {
 
         GetNextTokenSafe(tok);
         if tok.id == TOKEN_SEMICOLON {
-            SyncToken(tok);
+            tok.nextToken = tok.id;
         } else {
-            SyncToken(tok);
+            tok.nextToken = tok.id;
             ParseExpression(tok);
         }
 
@@ -792,9 +792,9 @@ func ParseForStatement(tok *Token) {
 
         GetNextTokenSafe(tok);
         if tok.id == TOKEN_LCBRAC {
-            SyncToken(tok);
+            tok.nextToken = tok.id;
         } else {
-            SyncToken(tok);
+            tok.nextToken = tok.id;
             AssertNextToken(tok, TOKEN_IDENTIFIER);
             // tok.strValue
             ParseSelector(tok);
@@ -806,7 +806,7 @@ func ParseForStatement(tok *Token) {
         AssertNextToken(tok, TOKEN_RCBRAC);
 
     } else {
-        SyncToken(tok);
+        tok.nextToken = tok.id;
     }   
     PrintDebugString("Leaving ParseForStatement()",1000);
 }
@@ -824,11 +824,11 @@ func ParseIfStatement(tok *Token) {
         if tok.id == TOKEN_ELSE {
             ParseElseStatement(tok);
         } else {
-            SyncToken(tok);
+            tok.nextToken = tok.id;
         }
 
     } else {
-        SyncToken(tok);
+        tok.nextToken = tok.id;
     }
     PrintDebugString("Leaving ParseIfStatement()",1000);
 }

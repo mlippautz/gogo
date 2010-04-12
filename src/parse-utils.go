@@ -36,16 +36,7 @@ func GetNextTokenSafe(tok *Token) {
 }
 
 //
-// Syncing a token after a look-ahead (LL1) has taken place.
-//
-func SyncToken(tok *Token) {
-    if tok.id != 0 {
-        tok.nextToken = tok.id;
-    }
-}
-
-//
-//
+// Checks if the next token matches a tokenNumber, or produces an error.
 //
 func AssertNextToken(tok *Token, tokenNumber uint64) {
     GetNextTokenSafe(tok);
