@@ -80,6 +80,8 @@ func PrintNumber(num uint64) {
     if i == 0 { //Special case: 0
         buf[0] = 48;
         i = 1;
+    } else {
+        i = i -1;
     }
     for ; i != 0; i = i -1 {
         PrintChar(buf[i]);
