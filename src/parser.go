@@ -194,8 +194,9 @@ func ParseVarDeclList(tok *Token) {
 func ParseVarDecl(tok *Token) uint64 {
     var boolFlag uint64;
     PrintDebugString("Entering ParseVarDecl()",1000);
-    GetNextTokenSafe(tok);
-    if tok.id == TOKEN_VAR {
+    boolFlag = LookAheadAndCheck(tok, TOKEN_VAR);
+    if boolFlag == 0 {
+        AssertNextToken(tok, TOKEN_VAR);
         AssertNextToken(tok, TOKEN_IDENTIFIER);
         // variable name in tok.strValue
         ParseType(tok);
@@ -209,9 +210,6 @@ func ParseVarDecl(tok *Token) uint64 {
 
         AssertNextToken(tok, TOKEN_SEMICOLON);
         boolFlag = 0;
-    } else {
-        boolFlag = 1;
-        SyncToken(tok);
     }
     PrintDebugString("Leaving ParseVarDecl()",1000);
     return boolFlag;
@@ -290,16 +288,14 @@ func ParseSimpleExpressionOp(tok *Token) uint64 {
 func ParseUnaryArithOp(tok *Token) uint64 {
     var boolFlag uint64;
     PrintDebugString("Entering ParseUnaryArithOp()",1000);
-    GetNextTokenSafe(tok);
-    if tok.id == TOKEN_ARITH_PLUS {
-        boolFlag = 0;
+    boolFlag = LookAheadAndCheck(tok, TOKEN_ARITH_PLUS);
+    if boolFlag != 0 {
+        boolFlag = LookAheadAndCheck(tok, TOKEN_ARITH_MINUS);
+        if boolFlag == 0 {
+            // -
+        } 
     } else {
-        if tok.id == TOKEN_ARITH_MINUS {
-            boolFlag = 0;            
-        } else {
-            tok.nextToken = tok.id;
-            boolFlag = 1;
-        }
+        // +
     }
     PrintDebugString("Leaving ParseUnaryArithOp()",1000);
     return boolFlag;   
