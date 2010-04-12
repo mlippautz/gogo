@@ -2,6 +2,10 @@
 // Use of this source code is governed by the MIT
 // license that can be found in the LICENSE file.
 
+//
+// File containing utility functions that are used by the parser.
+//
+
 package main
 
 //
@@ -44,7 +48,7 @@ func AssertNextToken(tok *Token, tokenNumber uint64) {
 }
 
 //
-//
+// Asserts an already read token. (no GetNextToken() before the check)
 //
 func AssertToken(tok *Token, tokenNumber uint64) {
     var expectedTokens [255]uint64;
