@@ -283,40 +283,44 @@ func ParseSimpleExpressionOp(tok *Token) uint64 {
 }
 
 //
-//
+// Function parsing the unary arithmetic ops PLUS (+) and MINUS (-)
 //
 func ParseUnaryArithOp(tok *Token) uint64 {
-    var boolFlag uint64;
+    var boolFlag uint64 = 1;
     PrintDebugString("Entering ParseUnaryArithOp()",1000);
-    boolFlag = LookAheadAndCheck(tok, TOKEN_ARITH_PLUS);
+    GetNextTokenSafe(tok);
+    if tok.id == TOKEN_ARITH_PLUS {
+        // *
+        boolFlag = 0;
+    }
+    if tok.id == TOKEN_ARITH_MINUS {
+        // /
+        boolFlag = 0;
+    }
     if boolFlag != 0 {
-        boolFlag = LookAheadAndCheck(tok, TOKEN_ARITH_MINUS);
-        if boolFlag == 0 {
-            // -
-        } 
-    } else {
-        // +
+        tok.nextToken = tok.id;
     }
     PrintDebugString("Leaving ParseUnaryArithOp()",1000);
     return boolFlag;   
 }
 
 //
-//
+// Function parsing the binary airthmetic ops MUL (*) and DIV (/)
 //
 func ParseBinaryArithOp(tok *Token) uint64 {
-    var boolFlag uint64;
+    var boolFlag uint64 = 1;
     PrintDebugString("Entering ParseBinaryArithOp()",1000);
     GetNextTokenSafe(tok);
     if tok.id == TOKEN_ARITH_MUL {
+        // *
         boolFlag = 0;
-    } else {
-        if tok.id == TOKEN_ARITH_DIV {
-            boolFlag = 0;            
-        } else {
-            tok.nextToken = tok.id;
-            boolFlag = 1;
-        }
+    }
+    if tok.id == TOKEN_ARITH_DIV {
+        // /
+        boolFlag = 0;
+    }
+    if boolFlag != 0 {
+        tok.nextToken = tok.id;
     }
     PrintDebugString("Leaving ParseBinaryArithOp()",1000);
     return boolFlag; 
