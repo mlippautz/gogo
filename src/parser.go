@@ -160,21 +160,11 @@ func ParseType(tok *Token) {
 // Parses: [ "[" integer "]" ] identifier 
 //
 func ParseTypeOptional(tok *Token) {
-    var es [255]uint64;
-    PrintDebugString("Entering ParseTypeOptional()",1000);
+    PrintDebugString("Entering ParseTypeOptional()",1000); 
     GetNextTokenSafe(tok);
-    if tok.id == TOKEN_LSBRAC {        
-        GetNextTokenSafe(tok);
-        if tok.id != TOKEN_INTEGER  {
-            es[0] = TOKEN_INTEGER;
-            ParseError(tok.id,es,1);
-        }       
-
-        GetNextTokenSafe(tok);
-        if tok.id != TOKEN_RSBRAC  {
-            es[0] = TOKEN_RSBRAC;
-            ParseError(tok.id,es,1);
-        }
+    if tok.id == TOKEN_LSBRAC {
+        AssertNextToken(tok, TOKEN_INTEGER);        
+        AssertNextToken(tok, TOKEN_RSBRAC);
     } else {
         tok.nextToken = tok.id;
     }
@@ -380,23 +370,16 @@ func ParseTermOp(tok *Token) uint64 {
 //
 //
 func ParseFactor(tok *Token) uint64 {
-    var es [255]uint64;
     var doneFlag uint64 = 1;
     var boolFlag uint64;
     PrintDebugString("Entering ParseFactor()",1000);
     GetNextTokenSafe(tok);
 
     if (doneFlag == 1) && (tok.id == TOKEN_OP_ADR) {
-        GetNextTokenSafe(tok); 
-
-        if tok.id == TOKEN_IDENTIFIER {
-            ParseSelector(tok);
-            ParseFunctionCallOptional(tok);
-            doneFlag = 0;
-        } else {
-            es[0] = TOKEN_IDENTIFIER;
-            ParseError(tok.id, es, 1);
-        }
+        AssertNextToken(tok, TOKEN_IDENTIFIER);
+        ParseSelector(tok);
+        ParseFunctionCallOptional(tok);
+        doneFlag = 0;
     }
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
         ParseSelector(tok);
@@ -410,15 +393,9 @@ func ParseFactor(tok *Token) uint64 {
         doneFlag = 0;
     }
     if (doneFlag) == 1 && (tok.id == TOKEN_LBRAC) {
-
         ParseExpression(tok);
-        GetNextTokenSafe(tok);
-        if tok.id == TOKEN_RBRAC {
-            doneFlag = 0;
-        } else {
-            es[0] = TOKEN_RBRAC;
-            ParseError(tok.id,es,1);
-        }
+        AssertNextToken(tok, TOKEN_RBRAC);
+        doneFlag = 0;
     }
     if (doneFlag == 1) && (tok.id == TOKEN_NOT) {
         ParseFactor(tok);
