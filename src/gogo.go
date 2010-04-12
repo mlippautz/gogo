@@ -7,34 +7,46 @@ package main
 import "os"
 import "./libgogo/_obj/libgogo"
 
-var filename string;
+type FileInfo struct {
+    filename string;
+    lineCounter uint64;
+    charCounter uint64;
+    fd uint64;
+}; 
+
+var fileInfo [255]FileInfo;
+var fileInfoLen uint64 = 0;
+var curFileIndex uint64 = 0;
 
 func main() {
-    var fd uint64;
     var errno uint64;
-    var doRest uint64 = 1;
+    var i uint64;
 
-    if len(os.Args) != 2 {
-        libgogo.PrintString("Usage: gogo file.go\n");
-        doRest = 0;
+    if len(os.Args) == 1 {
+        libgogo.ExitError("Usage: gogo file1.go [file2.go ...]",1);
     }
-    
-    if doRest != 0 {
 
-        filename = os.Args[1];
+    for i=1; i < uint64(len(os.Args)) ; i= i+1 { // (SC) TODO: remove cast and os.Args
+        curFileIndex = i-1;
+        fileInfo[curFileIndex].filename = os.Args[i];
+        fileInfo[curFileIndex].lineCounter = 1;
+        fileInfo[curFileIndex].charCounter = 1;
 
-        fd = libgogo.FileOpen(filename, 0);
-        if fd != 0 {
-            //ScannerTest(fd);
-            Parse(fd);
-            errno = libgogo.FileClose(fd);
-            if errno != 0 {
-                libgogo.ExitError("Error closing file", errno);
-            }
-        } else {
-            libgogo.PrintString("Error opening file ");
-            libgogo.PrintString(filename);
-            libgogo.PrintString(".\n");
+        fileInfo[curFileIndex].fd = libgogo.FileOpen(fileInfo[curFileIndex].filename, 0);
+        if (fileInfo[curFileIndex].fd == 0) {
+            GlobalError("Cannot open file.");
+        }
+    }
+    fileInfoLen = i-1;
+
+    for curFileIndex=0;curFileIndex<fileInfoLen;curFileIndex=curFileIndex+1 {
+        Parse(fileInfo[curFileIndex].fd);
+    }
+
+    for curFileIndex=0;curFileIndex<fileInfoLen;curFileIndex=curFileIndex+1 {
+        errno = libgogo.FileClose(fileInfo[curFileIndex].fd);
+        if errno != 0 {
+            GlobalError("Cannot close file.");
         }
     }
 }

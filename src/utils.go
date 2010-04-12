@@ -6,22 +6,32 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
-func ScanErrorString(msg string) {
-    libgogo.PrintString(filename);
+func PrintErrorHead() {
+    libgogo.PrintString(fileInfo[curFileIndex].filename);
     libgogo.PrintString(":");
-    libgogo.PrintNumber(lineCounter);
-    libgogo.PrintString(": syntax error: ");
+    libgogo.PrintNumber(fileInfo[curFileIndex].lineCounter);
+    libgogo.PrintString(":");
+    libgogo.PrintNumber(fileInfo[curFileIndex].charCounter);   
+}
+
+func GlobalError(msg string) {
+    PrintErrorHead();
+    libgogo.PrintString(": error: ");
     libgogo.ExitError(msg,1);
 }
 
+func ScanErrorString(msg string) {
+    PrintErrorHead();
+    libgogo.PrintString(": syntax error: ");
+    libgogo.ExitError(msg,2);
+}
+
 func ScanErrorChar(char byte) {
-    libgogo.PrintString(filename);
-    libgogo.PrintString(":");
-    libgogo.PrintNumber(lineCounter);
+    PrintErrorHead();
     libgogo.PrintString(": syntax error: Unknown char '");
     libgogo.PrintChar(char);
     libgogo.PrintString("'.\n");
-    libgogo.Exit(1);
+    libgogo.Exit(2);
 }
 
 //
@@ -34,9 +44,7 @@ func ParseError(ue uint64, e [255]uint64, eLen uint64) {
     var i uint64;
     var str string;
 
-    libgogo.PrintString(filename);
-    libgogo.PrintString(":");
-    libgogo.PrintNumber(lineCounter);
+    PrintErrorHead();
     libgogo.PrintString(": syntax error: unexpected token '");
     str = TokenToString(ue);
     libgogo.PrintString(str);
@@ -53,6 +61,6 @@ func ParseError(ue uint64, e [255]uint64, eLen uint64) {
         }
     } 
     libgogo.PrintString("\n");
-    libgogo.Exit(2); 
+    libgogo.Exit(3); 
 }
 

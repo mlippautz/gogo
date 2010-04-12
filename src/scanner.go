@@ -9,7 +9,17 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
-var lineCounter uint64 = 1;
+func GetCharWrapped(fd uint64) byte {
+    var singleChar byte;
+    singleChar = libgogo.GetChar(fd);
+    if (singleChar == 10) {
+        fileInfo[curFileIndex].charCounter = 1;
+        fileInfo[curFileIndex].lineCounter = fileInfo[curFileIndex].lineCounter + 1;
+    } else {
+        fileInfo[curFileIndex].charCounter = fileInfo[curFileIndex].charCounter + 1;
+    }
+    return singleChar;
+}
 
 func GetNextTokenRaw(fd uint64, tok *Token) {
     var singleChar byte; // Byte holding the last read value
@@ -26,13 +36,12 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     done = 0;
     spaceDone = 0;
     inComment = 0;  
-
     tok.strValue = "";
 
     // If the previous cycle had to read the next char (and stored it), it is 
     // now used as first read
     if tok.nextChar == 0 {       
-        singleChar = libgogo.GetChar(fd);
+        singleChar = GetCharWrapped(fd);
     } else {
         singleChar = tok.nextChar;
         tok.nextChar = 0;
@@ -57,7 +66,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
         if singleChar == '/' {
             // if we are in a comment skip the rest, get the next char otherwise
             if inComment == 0 {
-                singleChar = libgogo.GetChar(fd); 
+                singleChar = GetCharWrapped(fd); 
                 if singleChar == '/' {
                     // we are in a single line comment (until newline is found)
                     inComment = 1;
@@ -74,11 +83,11 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
 
         // check whether a multi-line comment is ending
         if singleChar == '*' {
-            singleChar = libgogo.GetChar(fd);
+            singleChar = GetCharWrapped(fd);
             if singleChar == '/' {
                 if inComment == 2 {
                     inComment = 0;
-                    singleChar = libgogo.GetChar(fd);
+                    singleChar = GetCharWrapped(fd);
                 }
             }
         }
@@ -87,7 +96,6 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
         //  *) if in a singleline comment, exit the comment
         //  *) skip otherwise
         if singleChar == 10 {
-            lineCounter = lineCounter + 1;
             if inComment == 1 {
                 inComment = 0;
             } 
@@ -111,7 +119,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
         
         // if we are not done until now, get a new character and start another abolishing cycle        
         if spaceDone == 0 {        
-            singleChar=libgogo.GetChar(fd);
+            singleChar=GetCharWrapped(fd);
         }
     }
 
@@ -124,7 +132,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     if (done != 1) && ((singleChar >= 'A') && (singleChar <= 'Z')) || ((singleChar >= 'a') && (singleChar <= 'z')) || (singleChar == '_') { // check for letter or _
         tok.id = TOKEN_IDENTIFIER;
         // preceding characters may be letter,_, or a number
-        for ; ((singleChar >= 'A') && (singleChar <= 'Z')) || ((singleChar >= 'a') && (singleChar <= 'z')) || (singleChar == '_') || ((singleChar >= '0') && (singleChar <= '9')); singleChar = libgogo.GetChar(fd) {
+        for ; ((singleChar >= 'A') && (singleChar <= 'Z')) || ((singleChar >= 'a') && (singleChar <= 'z')) || (singleChar == '_') || ((singleChar >= '0') && (singleChar <= '9')); singleChar = GetCharWrapped(fd) {
             tmp_TokAppendStr(tok,singleChar);
         }
         // save the last read character for the next GetNextToken() cycle
@@ -135,7 +143,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     // string "..."
     if (done != 1) && (singleChar == '"') {
         tok.id = TOKEN_STRING;        
-        for singleChar = libgogo.GetChar(fd); (singleChar != '"') && (singleChar > 31) && (singleChar < 127);singleChar = libgogo.GetChar(fd) {
+        for singleChar = GetCharWrapped(fd); (singleChar != '"') && (singleChar > 31) && (singleChar < 127);singleChar = GetCharWrapped(fd) {
             tmp_TokAppendStr(tok,singleChar);
         }
         if singleChar != '"' {
@@ -146,14 +154,14 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
 
     // Single Quoted Character
     if (done != 1) && singleChar == 39 {
-        singleChar = libgogo.GetChar(fd);
+        singleChar = GetCharWrapped(fd);
         if (singleChar != 39) && (singleChar > 31) && (singleChar < 127) {
             tok.id = TOKEN_INTEGER;
             tok.intValue = libgogo.ToIntFromByte(singleChar);
         } else {
             ScanErrorString("Unknown character.");
         }
-        singleChar = libgogo.GetChar(fd);
+        singleChar = GetCharWrapped(fd);
         if singleChar != 39 {
             ScanErrorString("Only single characters allowed. Use corresponding integer for special characters.");
         }
@@ -188,7 +196,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     if (done != 1) && (singleChar > 47) && (singleChar < 58) {
         numBuf = "";
         
-        for ; (singleChar > 47) && (singleChar < 58) ; singleChar = libgogo.GetChar(fd) {
+        for ; (singleChar > 47) && (singleChar < 58) ; singleChar = GetCharWrapped(fd) {
             libgogo.StringAppend(&numBuf, singleChar);
         }
 
@@ -219,7 +227,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
 
     // Not ('!') or Not Equal ('!=')
     if (done != 1) && (singleChar == '!') {
-        singleChar = libgogo.GetChar(fd);
+        singleChar = GetCharWrapped(fd);
         if singleChar == '=' {
             tok.id = TOKEN_NOTEQUAL;
         } else {
@@ -243,7 +251,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
 
     // Assignment '=' or Equals comparison '=='
     if (done != 1) && (singleChar == '=') {
-        singleChar = libgogo.GetChar(fd);
+        singleChar = GetCharWrapped(fd);
         if singleChar == '=' {
             tok.id = TOKEN_EQUALS;
         } else {
@@ -255,7 +263,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
 
     // AND Relation '&&'
     if (done != 1) && (singleChar == '&') {
-        singleChar = libgogo.GetChar(fd);
+        singleChar = GetCharWrapped(fd);
         if singleChar == '&' {
             tok.id = TOKEN_REL_AND;
         } else {
@@ -267,7 +275,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
 
     // OR Relation '||'
     if (done != 1) && (singleChar == '|') {
-        singleChar = libgogo.GetChar(fd);
+        singleChar = GetCharWrapped(fd);
         if singleChar == '|' {
             tok.id = TOKEN_REL_OR;
         } else {    
@@ -278,7 +286,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
 
     // Greater and Greater-Than relation
     if (done != 1) && (singleChar == '>') {
-        singleChar = libgogo.GetChar(fd);
+        singleChar = GetCharWrapped(fd);
         if singleChar == '=' {
             tok.id = TOKEN_REL_GTOE;
         } else {
@@ -290,7 +298,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
 
     // Less and Less-Than relation
     if (done != 1) && (singleChar == '<') {
-        singleChar = libgogo.GetChar(fd);
+        singleChar = GetCharWrapped(fd);
         if singleChar == '=' {
             tok.id = TOKEN_REL_LTOE;
         } else {
