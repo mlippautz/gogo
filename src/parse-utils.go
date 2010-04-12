@@ -16,7 +16,7 @@ func LookAheadAndCheck(tok *Token, tokenNumber uint64) uint64 {
     } else {
         boolFlag = 1;
     }
-    tok.id = tok.nextToken;
+    tok.nextToken = tok.id;
     return boolFlag;
 }
 
