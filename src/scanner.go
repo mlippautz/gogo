@@ -66,7 +66,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
                         // we are in a multiline comment (until ending is found)
                         inComment = 2;
                     } else {
-                        libgogo.ExitError(">> Scanner: Unkown character combination for comments. Exiting.",1);
+                        ScanErrorString("Unknown character combination for comments.");
                     }
                 }
             }
@@ -139,7 +139,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
             tmp_TokAppendStr(tok,singleChar);
         }
         if singleChar != '"' {
-            libgogo.ExitError(">> Scanner: String not closing. Exiting.",1);
+            ScanErrorString("String not closing.");
         }
         done = 1;
     }
@@ -151,11 +151,11 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
             tok.id = TOKEN_INTEGER;
             tok.intValue = libgogo.ToIntFromByte(singleChar);
         } else {
-            libgogo.ExitError(">> Scanner: Unknown character. Exiting.",1);
+            ScanErrorString("Unknown character.");
         }
         singleChar = libgogo.GetChar(fd);
         if singleChar != 39 {
-            libgogo.ExitError(">> Scanner: Only single characters allowed. Use corresponding integer for special characters. Exiting.",1);
+            ScanErrorString("Only single characters allowed. Use corresponding integer for special characters.");
         }
         done = 1;
     }
@@ -271,7 +271,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
         if singleChar == '|' {
             tok.id = TOKEN_REL_OR;
         } else {    
-            libgogo.ExitError(">> Scanner: No binary OR (|) supported. Only ||.",1);
+            ScanErrorString("No binary OR (|) supported. Only ||.");
         }
         done = 1;
     } 
@@ -321,11 +321,7 @@ func GetNextTokenRaw(fd uint64, tok *Token) {
     }
 
     if (done != 1) {
-        
-        libgogo.PrintString(">> Scanner: Unkown char '");
-        libgogo.PrintChar(singleChar);
-        libgogo.PrintString("'. ");
-        libgogo.ExitError("Exiting.",1);
+        ScanErrorChar(singleChar);
     }
 }
 

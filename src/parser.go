@@ -20,14 +20,7 @@ func Parse( fd uint64 ) {
     ParseVarDeclList(fd, &tok);
     ParseFuncDeclList(fd, &tok);
 
-    // Scan the rest for debugging purposes
-    // To be removed when parser is able to parse the complete EBNF
-    // Is actually not EBNF compliant!
-    GetNextToken(fd,&tok)
-    for ; tok.id != TOKEN_EOS; {
-        debugToken(&tok);
-        GetNextToken(fd,&tok)
-    }
+    AssertNextToken(fd, &tok, TOKEN_EOS);
 }
 
 //
