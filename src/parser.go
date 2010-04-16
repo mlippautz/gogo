@@ -4,7 +4,12 @@
 
 package main
 
+
+
 var tok Token;
+
+var maxDepth uint64 = 5;
+var curDepth uint64 = 1;
 
 //
 // Main parsing function. Corresponds to the EBNF main structure called 
@@ -230,8 +235,10 @@ func ParseVarDecl() uint64 {
 //
 func ParseExpression() {
     PrintDebugString("Entering ParseExpression()",1000);
+    IncAndCheckDepth();
     ParseSimpleExpression();    
     ParseCmpOp();
+    DecDepth();
     PrintDebugString("Leaving ParseExpression()",1000);
 }
 

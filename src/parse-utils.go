@@ -8,6 +8,19 @@
 
 package main
 
+import "./libgogo/_obj/libgogo"
+
+func IncAndCheckDepth() {
+    curDepth = curDepth +1;
+    if curDepth > maxDepth {
+        libgogo.ExitError("Max code depth reached. Please modify your code.",2);
+    }
+}
+
+func DecDepth() {
+    curDepth = curDepth -1;
+}
+
 //
 // Function looks 1 token ahead and checks if it equals the provided one
 // Returns: 0 if tokens match, 1 otherwise
