@@ -35,7 +35,7 @@ func GetArgv() {
 
     errno = FileClose(fd);
     if errno != 0 {
-        ExitError("Error closing file",2);
+        ExitError("Error closing file /proc/self/cmdline",1);
     }
 }
 
