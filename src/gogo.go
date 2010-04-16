@@ -25,11 +25,11 @@ func main() {
 
     libgogo.GetArgv()
 
-    if libgogo.ArgvLen <= 1 {
+    if libgogo.Argc <= 1 {
         libgogo.ExitError("Usage: gogo file1.go [file2.go ...]",1);
     }
 
-    for i=1; i < libgogo.ArgvLen ; i= i+1 {
+    for i=1; i < libgogo.Argc ; i= i+1 {
         curFileIndex = i-1;
         fileInfo[curFileIndex].filename = libgogo.Argv[i];
         fileInfo[curFileIndex].lineCounter = 1;

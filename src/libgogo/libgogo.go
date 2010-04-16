@@ -9,7 +9,7 @@
 package libgogo
 
 var Argv [255]string;
-var ArgvLen uint64 = 0;
+var Argc uint64 = 0;
 
 func GetArgv() {
     var fd uint64;
@@ -25,10 +25,10 @@ func GetArgv() {
     for errno = Read(fd, char, 1) ; errno != 0 ; errno = Read(fd, char, 1) {
         if char[0] == 0 {
             inArgv = 1;
-            ArgvLen = ArgvLen + 1;
+            Argc = Argc + 1;
         } else {
             if inArgv == 1 {
-                Argv[ArgvLen] += string(char[0]); // (SC) TODO: Remove cast, str append
+                Argv[Argc] += string(char[0]); // (SC) TODO: Remove cast, str append
             }
         }
     }
