@@ -13,7 +13,7 @@ type FileInfo struct {
     fd uint64;
 }; 
 
-var fileInfo [255]FileInfo;
+var fileInfo [10]FileInfo;
 var fileInfoLen uint64 = 0;
 var curFileIndex uint64 = 0;
 
@@ -27,6 +27,10 @@ func main() {
 
     if libgogo.Argc <= 1 {
         libgogo.ExitError("Usage: gogo file1.go [file2.go ...]",1);
+    }
+
+    if libgogo.Argc > 11 {
+        libgogo.ExitError("Cannot compile more than 10 files at once",1);
     }
 
     for i=1; i < libgogo.Argc ; i= i+1 {
