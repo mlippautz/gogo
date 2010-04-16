@@ -15,7 +15,7 @@ func GetArgv() {
     var fd uint64;
     var errno uint64;    
     var char string = "#";
-    var inArgv = 0;
+    var inArgv uint64 = 0;
 
     fd = FileOpen("/proc/self/cmdline", 0);
     if fd == 0 {
