@@ -15,7 +15,6 @@ func GetArgv() {
     var fd uint64;
     var errno uint64;    
     var char string = "#";
-    var inArgv uint64 = 0;
 
     fd = FileOpen("/proc/self/cmdline", 0);
     if fd == 0 {
@@ -24,12 +23,9 @@ func GetArgv() {
 
     for errno = Read(fd, char, 1) ; errno != 0 ; errno = Read(fd, char, 1) {
         if char[0] == 0 {
-            inArgv = 1;
             Argc = Argc + 1;
         } else {
-            if inArgv == 1 {
-                Argv[Argc] += string(char[0]); // (SC) TODO: Remove cast, str append
-            }
+            Argv[Argc] += string(char[0]); // (SC) TODO: Remove cast, str append
         }
     }
 
