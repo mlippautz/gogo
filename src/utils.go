@@ -58,7 +58,7 @@ func ScanErrorChar(char byte) {
 // e .... array of expected tokens
 // eLen . actual length (items) of array
 //
-func ParseError(ue uint64, e [255]uint64, eLen uint64) {
+func ParseError(ue uint64, e [2]uint64, eLen uint64) {
     var i uint64;
     var str string;
 

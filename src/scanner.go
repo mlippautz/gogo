@@ -21,7 +21,7 @@ func GetCharWrapped() byte {
     return singleChar;
 }
 
-func GetNextTokenRaw(tok *Token) {
+func GetNextTokenRaw() {
     var singleChar byte; // Byte holding the last read value
     // Flag indicating whether we are in a comment.
     // 0 for no comment
@@ -133,7 +133,7 @@ func GetNextTokenRaw(tok *Token) {
         tok.id = TOKEN_IDENTIFIER;
         // preceding characters may be letter,_, or a number
         for ; ((singleChar >= 'A') && (singleChar <= 'Z')) || ((singleChar >= 'a') && (singleChar <= 'z')) || (singleChar == '_') || ((singleChar >= '0') && (singleChar <= '9')); singleChar = GetCharWrapped() {
-            tmp_TokAppendStr(tok,singleChar);
+            tmp_TokAppendStr(singleChar);
         }
         // save the last read character for the next GetNextToken() cycle
         tok.nextChar = singleChar;
@@ -144,7 +144,7 @@ func GetNextTokenRaw(tok *Token) {
     if (done != 1) && (singleChar == '"') {
         tok.id = TOKEN_STRING;        
         for singleChar = GetCharWrapped(); (singleChar != '"') && (singleChar > 31) && (singleChar < 127);singleChar = GetCharWrapped() {
-            tmp_TokAppendStr(tok,singleChar);
+            tmp_TokAppendStr(singleChar);
         }
         if singleChar != '"' {
             ScanErrorString("String not closing.");
@@ -339,8 +339,8 @@ func GetNextTokenRaw(tok *Token) {
 // token by calling GetNextTokenRaw() and filters the identifiers for known
 // keywords.
 //
-func GetNextToken(tok *Token) {
-    GetNextTokenRaw(tok);
+func GetNextToken() {
+    GetNextTokenRaw();
 
     // Convert identifier to keyworded tokens
     if tok.id == TOKEN_IDENTIFIER {
@@ -403,6 +403,6 @@ func debugToken(tok *Token) {
     }
 }
 
-func tmp_TokAppendStr(tok *Token, b byte) {
+func tmp_TokAppendStr(b byte) {
     libgogo.StringAppend(&tok.strValue, b);
 }
