@@ -4,7 +4,6 @@
 
 package main
 
-import "os"
 import "./libgogo/_obj/libgogo"
 
 type FileInfo struct {
@@ -24,13 +23,15 @@ func main() {
     var errno uint64;
     var i uint64;
 
-    if len(os.Args) == 1 {
+    libgogo.GetArgv()
+
+    if libgogo.ArgvLen <= 1 {
         libgogo.ExitError("Usage: gogo file1.go [file2.go ...]",1);
     }
 
-    for i=1; i < uint64(len(os.Args)) ; i= i+1 { // (SC) TODO: remove cast and os.Args
+    for i=1; i < libgogo.ArgvLen ; i= i+1 {
         curFileIndex = i-1;
-        fileInfo[curFileIndex].filename = os.Args[i];
+        fileInfo[curFileIndex].filename = libgogo.Argv[i];
         fileInfo[curFileIndex].lineCounter = 1;
         fileInfo[curFileIndex].charCounter = 1;
 

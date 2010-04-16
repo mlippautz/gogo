@@ -8,6 +8,37 @@
 
 package libgogo
 
+var Argv [255]string;
+var ArgvLen uint64 = 0;
+
+func GetArgv() {
+    var fd uint64;
+    var errno uint64;    
+    var char string = "#";
+    var inArgv = 0;
+
+    fd = FileOpen("/proc/self/cmdline", 0);
+    if fd == 0 {
+        ExitError("Error opening /proc/self/cmdline. Currently GoGo is only supported on systems with /proc enabled.", 1);
+    }
+
+    for errno = Read(fd, char, 1) ; errno != 0 ; errno = Read(fd, char, 1) {
+        if char[0] == 0 {
+            inArgv = 1;
+            ArgvLen = ArgvLen + 1;
+        } else {
+            if inArgv == 1 {
+                Argv[ArgvLen] += string(char[0]); // (SC) TODO: Remove cast, str append
+            }
+        }
+    }
+
+    errno = FileClose(fd);
+    if errno != 0 {
+        ExitError("Error closing file",2);
+    }
+}
+
 func StringAppend(str *string, char byte) { //TODO (SC): Get rid of magic string concatenation (needs memory management!) and cast operator
   *str += string(char);
 }
