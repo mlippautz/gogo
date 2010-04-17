@@ -25,7 +25,7 @@ func GetArgv() {
         if char[0] == 0 {
             Argc = Argc + 1;
         } else {
-            Argv[Argc] += string(char[0]); // (SC) TODO: Remove cast, str append
+            StringAppend(&Argv[Argc], char[0]);
         }
     }
 
