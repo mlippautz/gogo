@@ -22,9 +22,9 @@ func TestStringLength(t *testing.T) {
 		t.Fatalf("libgogo.StringLength() = %d, want 100", len)
     }
 
-    len = libgogo.StringLength("°!§$%&/()=?");
-    if len != 11 {
-		t.Fatalf("libgogo.StringLength() = %d, want 11", len)
+    len = libgogo.StringLength("+-*/&|!{}[].,;=<>");
+    if len != 17 {
+		t.Fatalf("libgogo.StringLength() = %d, want 17", len)
     } 
 }
 
