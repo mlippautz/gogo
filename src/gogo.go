@@ -6,6 +6,9 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
+//
+// Struct holding the information about a file that is compiled
+//
 type FileInfo struct {
     filename string;
     lineCounter uint64;
@@ -13,12 +16,23 @@ type FileInfo struct {
     fd uint64;
 }; 
 
+//
+// Fileinformation for all files that are compiled in this run
+// Is limited by 10 to reduce memory etc.
+//
 var fileInfo [10]FileInfo;
 var fileInfoLen uint64 = 0;
 var curFileIndex uint64 = 0;
 
+//
+// A very basic debug flag
+// Set to 1000 to enable all parsing strings
+//
 var DEBUG_LEVEL uint64 = 0;
 
+//
+// Entry point of the compiler
+//
 func main() {
     var errno uint64;
     var i uint64;

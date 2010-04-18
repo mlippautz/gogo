@@ -8,9 +8,17 @@
 
 package libgogo
 
+//
+// Argc/Argv variables.
+// Are available AFTER they have been set by libgogo.GetArgv()
+//
 var Argv [255]string;
 var Argc uint64 = 0;
 
+//
+// Function setting the globally available variables libgogo.Argc and libgogo.Argv.
+// This function uses the Linux proc fs to determine its command line!
+//
 func GetArgv() {
     var fd uint64;
     var errno uint64;    
@@ -35,10 +43,9 @@ func GetArgv() {
     }
 }
 
-func StringAppend(str *string, char byte) { //TODO (SC): Get rid of magic string concatenation (needs memory management!) and cast operator
-  *str += string(char);
-}
-
+//
+// Simple minimum function
+//
 func Min(a uint64, b uint64) uint64 {
     var result uint64 = b;
     if a < b {
@@ -47,8 +54,16 @@ func Min(a uint64, b uint64) uint64 {
     return result;
 }
 
+//
+// Function returning the length of an ASCII (!) string.
+// See asm_linux_amd64.s for details
+//
 func StringLength(str string) uint64;
 
+//
+// Simple string compare function.
+// Returns 0 if strings are equal, 1 otherwise.
+//
 func StringCompare(str1 string, str2 string) uint64 {
     var i uint64;
     var equal uint64 = 0;
@@ -66,9 +81,22 @@ func StringCompare(str1 string, str2 string) uint64 {
     return equal;
 }
 
+//
+// Converts a byte value to an integer
+// See asm_linux_amd64.s for details
+//
 func ToIntFromByte(b byte) uint64;
 
+//
+// Converts an unsigned 64bit integer to a byte
+// See asm_linux_amd64.s for details
+//
 func ToByteFromInt(i uint64) byte;
+
+
+func StringAppend(str *string, char byte) { //TODO (SC): Get rid of magic string concatenation (needs memory management!) and cast operator
+  *str += string(char);
+}
 
 func StringToInt(str string) uint64 {
     var n uint64 = StringLength(str);
