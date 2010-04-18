@@ -9,6 +9,10 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
+//
+// Function fetching a new character from the file that is compiled
+// Adds counters for line and columns
+//
 func GetCharWrapped() byte {
     var singleChar byte;
     singleChar = libgogo.GetChar(fileInfo[curFileIndex].fd);
