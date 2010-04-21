@@ -15,7 +15,12 @@ import "./libgogo/_obj/libgogo"
 //
 func GetCharWrapped() byte {
     var singleChar byte;
-    singleChar = libgogo.GetChar(fileInfo[curFileIndex].fd);
+    if tok.nextChar == 0 {       
+        singleChar = libgogo.GetChar(fileInfo[curFileIndex].fd);
+    } else {
+        singleChar = tok.nextChar;
+        tok.nextChar = 0;
+    }
     if (singleChar == 10) {
         fileInfo[curFileIndex].charCounter = 1;
         fileInfo[curFileIndex].lineCounter = fileInfo[curFileIndex].lineCounter + 1;
@@ -44,12 +49,7 @@ func GetNextTokenRaw() {
 
     // If the previous cycle had to read the next char (and stored it), it is 
     // now used as first read
-    if tok.nextChar == 0 {       
-        singleChar = GetCharWrapped();
-    } else {
-        singleChar = tok.nextChar;
-        tok.nextChar = 0;
-    }
+    singleChar = GetCharWrapped();
 
     // check if it is a valid read, or an EOF
     if singleChar == 0 {
@@ -79,7 +79,8 @@ func GetNextTokenRaw() {
                         // we are in a multiline comment (until ending is found)
                         inComment = 2;
                     } else {
-                        ScanErrorString("Unknown character combination for comments.");
+                        tok.nextChar = singleChar;
+                        singleChar = '/';
                     }
                 }
             }

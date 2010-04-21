@@ -148,7 +148,7 @@ func IntToString(num uint64) string {
     var i uint64;
     var buf [255]byte;
     for i = 0; num != 0; i = i +1 {
-        buf[i] = ToByteFromInt(num - (num / 10) * 10 + 48);
+        buf[i] = ToByteFromInt( num - (num/10) * 10 + 48 );
         num = num / 10;
     }
     if i == 0 { //Special case: 0

@@ -6,7 +6,7 @@ package main
 
 var tok Token;
 
-var maxDepth uint64 = 5;
+var maxDepth uint64 = 10;
 var curDepth uint64 = 1;
 
 //
@@ -179,6 +179,11 @@ func ParseTypeOptional() {
     } else {
         tok.nextToken = tok.id;
     }
+    if tok.id == TOKEN_ARITH_MUL {
+        // Return type is a pointer
+        GetNextTokenSafe();
+    }
+
     GetNextTokenSafe();
     if tok.id != TOKEN_IDENTIFIER  {
         tok.nextToken = tok.id;
