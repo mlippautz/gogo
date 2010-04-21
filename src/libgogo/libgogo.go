@@ -60,6 +60,13 @@ func Min(a uint64, b uint64) uint64 {
 //
 func StringLength(str string) uint64;
 
+
+//
+// Function returning the length of an ASCII (!) string.
+// See asm_linux_amd64.s for details
+//
+func StringLength2(str *string) uint64;
+
 //
 // Simple string compare function.
 // Returns 0 if strings are equal, 1 otherwise.
@@ -93,9 +100,24 @@ func ToIntFromByte(b byte) uint64;
 //
 func ToByteFromInt(i uint64) byte;
 
+func GetStringAddress(str *string) uint64;
 
-func StringAppend(str *string, char byte) { //TODO (SC): Get rid of magic string concatenation (needs memory management!) and cast operator
-  *str += string(char);
+func GetStringFromAddress(addr uint64) *string;
+
+func CopyMem(source uint64, dest uint64, size uint64);
+
+func ToUint64FromBytePtr(char *byte) uint64;
+
+func SetStringAddressAndLength(str *string, new_addr uint64, new_length uint64);
+
+func StringAppend(str *string, char byte) {
+    var strlen uint64 = StringLength2(str);
+    var new_length uint64 = strlen + 1;
+    var new_addr uint64 = Alloc(new_length);
+    var old_addr uint64 = GetStringAddress(str);
+    CopyMem(old_addr, new_addr, strlen);
+    CopyMem(ToUint64FromBytePtr(&char), new_addr + strlen, 1);
+    SetStringAddressAndLength(str, new_addr, new_length);
 }
 
 func StringToInt(str string) uint64 {
@@ -113,7 +135,7 @@ func Exit(code uint64);
 
 func ExitError(msg string, code uint64) {
     PrintString(msg);
-    PrintChar('\n');
+    PrintChar(10);
     Exit(code);
 }
 

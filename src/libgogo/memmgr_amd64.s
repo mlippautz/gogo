@@ -34,7 +34,7 @@ GETBRK_SUCCESS:
   RET
 
 TEXT ·TestMem(SB),$0-16 //Write: 1 parameter, 1 return value
-  MOVQ 8(SP), AX //Move address to AX (first parameter => SP+8*64bit)
+  MOVQ 8(SP), AX //Move address to AX (first parameter => SP+64bit)
   MOVQ $1234567890, (AX) //Move some value to address
   MOVQ (AX), BX //Move value back to BX
   XORQ $1234567890, BX //value XOR value => 0

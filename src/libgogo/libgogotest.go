@@ -38,6 +38,8 @@ func main() {
   var testString string = "Hell";
   testString += "o";
   fmt.Printf("Library test: string length of '%s' (len vs. myLen): %d vs. %d\n", testString, len(testString), libgogo.StringLength(testString));
+  var testStringPtr *string = &testString;
+  fmt.Printf("Library test 2: string length 2 of '%s' (len vs. myLen): %d vs. %d\n", *testStringPtr, len(*testStringPtr), libgogo.StringLength2(testStringPtr));
   fmt.Printf("Library test: '%s' and '", testString);
   libgogo.PrintString(testString);
   fmt.Printf("' are identical\n");
