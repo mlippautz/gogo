@@ -85,13 +85,15 @@ func GetNextTokenRaw() {
             }
         } 
 
-        // check whether a multi-line comment is ending
-        if singleChar == '*' {
-            singleChar = GetCharWrapped();
-            if singleChar == '/' {
-                if inComment == 2 {
-                    inComment = 0;
-                    singleChar = GetCharWrapped();
+        if inComment == 2 {
+            // check whether a multi-line comment is ending
+            if singleChar == '*' {
+                singleChar = GetCharWrapped();
+                if singleChar == '/' {
+                    if inComment == 2 {
+                        inComment = 0;
+                        singleChar = GetCharWrapped();
+                    }
                 }
             }
         }
