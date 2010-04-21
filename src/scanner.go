@@ -201,7 +201,7 @@ func GetNextTokenRaw() {
         numBuf = "";
         
         for ; (singleChar > 47) && (singleChar < 58) ; singleChar = GetCharWrapped() {
-            libgogo.StringAppend(&numBuf, singleChar);
+            libgogo.CharAppend(&numBuf, singleChar);
         }
 
         tok.nextChar = singleChar;  
@@ -408,5 +408,5 @@ func debugToken(tok *Token) {
 }
 
 func tmp_TokAppendStr(b byte) {
-    libgogo.StringAppend(&tok.strValue, b);
+    libgogo.CharAppend(&tok.strValue, b);
 }

@@ -33,7 +33,7 @@ func GetArgv() {
         if char[0] == 0 {
             Argc = Argc + 1;
         } else {
-            StringAppend(&Argv[Argc], char[0]);
+            CharAppend(&Argv[Argc], char[0]);
         }
     }
 
@@ -110,13 +110,25 @@ func ToUint64FromBytePtr(char *byte) uint64;
 
 func SetStringAddressAndLength(str *string, new_addr uint64, new_length uint64);
 
-func StringAppend(str *string, char byte) {
+func CharAppend(str *string, char byte) {
     var strlen uint64 = StringLength2(str);
     var new_length uint64 = strlen + 1;
     var new_addr uint64 = Alloc(new_length);
     var old_addr uint64 = GetStringAddress(str);
     CopyMem(old_addr, new_addr, strlen);
     CopyMem(ToUint64FromBytePtr(&char), new_addr + strlen, 1);
+    SetStringAddressAndLength(str, new_addr, new_length);
+}
+
+func StringAppend(str *string, append_str string) {
+    var strlen uint64 = StringLength2(str);
+    var strappendlen uint64 = StringLength(append_str);
+    var new_length uint64 = strlen + strappendlen;
+    var new_addr uint64 = Alloc(new_length);
+    var old_addr uint64 = GetStringAddress(str);
+    var append_addr uint64 = GetStringAddress(&append_str);
+    CopyMem(old_addr, new_addr, strlen);
+    CopyMem(append_addr, new_addr + strlen, strappendlen);
     SetStringAddressAndLength(str, new_addr, new_length);
 }
 
@@ -146,9 +158,9 @@ func IntToString(num uint64) string {
         i = i -1;
     }
     for ; i != 0; i = i -1 {
-        StringAppend(&str,buf[i]);
+        CharAppend(&str,buf[i]);
     }
-    StringAppend(&str,buf[0]);
+    CharAppend(&str,buf[0]);
     return str;
 }
 
