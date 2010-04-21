@@ -4,8 +4,6 @@
 
 package main
 
-
-
 var tok Token;
 
 var maxDepth uint64 = 5;
@@ -304,11 +302,11 @@ func ParseUnaryArithOp() uint64 {
     PrintDebugString("Entering ParseUnaryArithOp()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_ARITH_PLUS {
-        // *
+        // +
         boolFlag = 0;
     }
     if tok.id == TOKEN_ARITH_MINUS {
-        // /
+        // -
         boolFlag = 0;
     }
     if boolFlag != 0 {

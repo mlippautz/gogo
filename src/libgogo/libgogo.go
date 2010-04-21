@@ -131,6 +131,27 @@ func StringToInt(str string) uint64 {
     return val;
 }
 
+func IntToString(num uint64) string {
+    var str string;
+    var i uint64;
+    var buf [255]byte;
+    for i = 0; num != 0; i = i +1 {
+        buf[i] = ToByteFromInt(num - (num / 10) * 10 + 48);
+        num = num / 10;
+    }
+    if i == 0 { //Special case: 0
+        buf[0] = 48;
+        i = 1;
+    } else {
+        i = i -1;
+    }
+    for ; i != 0; i = i -1 {
+        StringAppend(&str,buf[i]);
+    }
+    StringAppend(&str,buf[0]);
+    return str;
+}
+
 func Exit(code uint64);
 
 func ExitError(msg string, code uint64) {
@@ -148,22 +169,7 @@ func PrintString(msg string) {
 func PrintChar(char byte);
 
 func PrintNumber(num uint64) {
-    var i uint64;
-    var buf [255]byte;
-    for i = 0; num != 0; i = i +1 {
-        buf[i] = ToByteFromInt(num - (num / 10) * 10 + 48);
-        num = num / 10;
-    }
-    if i == 0 { //Special case: 0
-        buf[0] = 48;
-        i = 1;
-    } else {
-        i = i -1;
-    }
-    for ; i != 0; i = i -1 {
-        PrintChar(buf[i]);
-    }
-    PrintChar(buf[0]);
+    PrintString(IntToString(num));
 }
 
 func Read(fd uint64, buffer string, buffer_size uint64) uint64;

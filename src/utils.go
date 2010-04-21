@@ -68,6 +68,18 @@ func ParseError(ue uint64, e [2]uint64, eLen uint64) {
     libgogo.PrintString(str);
     libgogo.PrintString("'");
 
+    if tok.id == TOKEN_INTEGER {
+        libgogo.PrintString(" (value: ");
+        libgogo.PrintNumber(tok.intValue);
+        libgogo.PrintString(")");
+    }
+
+    if tok.id == TOKEN_STRING {
+        libgogo.PrintString(" (value: ");
+        libgogo.PrintString(tok.strValue);
+        libgogo.PrintString(")");
+    }
+
     if eLen > 0 {
         libgogo.PrintString(", expecting one of: ");
         str = TokenToString(e[i]);

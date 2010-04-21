@@ -4,6 +4,8 @@
 
 package main
 
+import "./libgogo/_obj/libgogo"
+
 //
 // Token struct holding the relevant token data.
 // The struct is used by the scanner and parser.
@@ -78,12 +80,22 @@ var TOKEN_ELSE uint64 = 111;
 //
 func TokenToString (id uint64) string {
     var retStr string;
+    var strBuf string;
+    var i uint64;
 
     if id == TOKEN_IDENTIFIER {
-        retStr = "<identifier>";
+        retStr = "<identifier> (value: ";
+        for i=0;i<libgogo.StringLength(tok.strValue);i = i+1 {
+            libgogo.StringAppend(&retStr,tok.strValue[i]);
+        }
+        libgogo.StringAppend(&retStr,')');
     }
     if id == TOKEN_STRING {
-        retStr = "<string>";
+        retStr = "<string> (value: ";
+        for i=0;i<libgogo.StringLength(tok.strValue);i = i+1 {
+            libgogo.StringAppend(&retStr,tok.strValue[i]);
+        }
+        libgogo.StringAppend(&retStr,')');
     }
     if id == TOKEN_EOS {
         retStr = "<END-OF-SCAN>";
@@ -101,7 +113,12 @@ func TokenToString (id uint64) string {
         retStr = "]";
     }
     if id == TOKEN_INTEGER {
-        retStr = "<integer>";
+        retStr = "<integer> (value: ";
+        strBuf = libgogo.IntToString(tok.intValue);
+        for i=0;i<libgogo.StringLength(strBuf);i = i+1 {
+            libgogo.StringAppend(&retStr,strBuf[i]);
+        }
+        libgogo.StringAppend(&retStr,')');
     }
     if id == TOKEN_LCBRAC {
         retStr = "{";
