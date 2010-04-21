@@ -50,6 +50,31 @@ func main() {
   libgogo.FileClose(fd);
 
   //Library test V
+  var oldsize uint64 = libgogo.GetBrk();
+  if oldsize != 0 {
+    fmt.Printf("Brk returned: %d\n", oldsize);
+    var newsize uint64 = oldsize + 100 * 1024 * 1024;
+    var errno uint64 = libgogo.Brk(newsize);
+    if errno == 0 {
+      fmt.Printf("Brk successfully allocated 100 MB\n");
+      var newreadsize uint64 = libgogo.GetBrk();
+      if newreadsize != 0 {
+        fmt.Printf("Brk returned: %d, so %d MB of space have been allocated\n", newreadsize, (newreadsize - oldsize) >> 20);
+        newreadsize = libgogo.TestMem(oldsize + 1);
+        if newreadsize == 0 {
+          fmt.Printf("Successfully wrote to address %d\n", oldsize + 1);
+        } else {
+          fmt.Printf("Failed to write to address %d\n", oldsize + 1);
+        }
+      }
+    } else {
+      fmt.Printf("Brk failed to allocate 100 MB: errno %d\n", errno);
+    }
+  } else {
+    fmt.Printf("Brk failed\n");
+  }
+
+  //Library test VI
   libgogo.Exit(0);
   fmt.Printf("If you can read this, something is wrong");
 }
