@@ -57,6 +57,7 @@ func Min(a uint64, b uint64) uint64 {
 
 //
 // Function returning the length of an ASCII (!) string.
+// Parameter the Go string.
 // See asm_linux_amd64.s for details
 //
 func StringLength(str string) uint64;
@@ -64,6 +65,7 @@ func StringLength(str string) uint64;
 
 //
 // Function returning the length of an ASCII (!) string.
+// Takes the pointer of a Go string.
 // See asm_linux_amd64.s for details
 //
 func StringLength2(str *string) uint64;
@@ -107,10 +109,19 @@ func GetStringFromAddress(addr uint64) *string;
 
 func CopyMem(source uint64, dest uint64, size uint64);
 
+//
+// Returns the address of the byte as uint64.
+// See asm_linux_amd64.s for details
+//
 func ToUint64FromBytePtr(char *byte) uint64;
 
 func SetStringAddressAndLength(str *string, new_addr uint64, new_length uint64);
 
+//
+// Function appending a single character to a string.
+// Basically moving a new copy of the string with the additional character 
+// appended to a new place in the heap.
+//
 func CharAppend(str *string, char byte) {
     var strlen uint64 = StringLength2(str);
     var new_length uint64 = strlen + 1;
@@ -121,6 +132,10 @@ func CharAppend(str *string, char byte) {
     SetStringAddressAndLength(str, new_addr, new_length);
 }
 
+//
+// Function appending a whole string to a given string.
+// Moving both strings to a new allocated place in the heap.
+//
 func StringAppend(str *string, append_str string) {
     var strlen uint64 = StringLength2(str);
     var strappendlen uint64 = StringLength(append_str);
@@ -133,6 +148,9 @@ func StringAppend(str *string, append_str string) {
     SetStringAddressAndLength(str, new_addr, new_length);
 }
 
+//
+// Converter returning the integer (uint64) representation of a given string.
+//
 func StringToInt(str string) uint64 {
     var n uint64 = StringLength(str);
     var i uint64;
@@ -144,6 +162,9 @@ func StringToInt(str string) uint64 {
     return val;
 }
 
+//
+// Converter returning a string representation (heap) of a given number.
+//
 func IntToString(num uint64) string {
     var str string;
     var i uint64;
@@ -165,8 +186,16 @@ func IntToString(num uint64) string {
     return str;
 }
 
+//
+// Exit the current program. (syscall)
+// Takes the error number as parameter.
+// See asm_linux_amd64.s for details
+//
 func Exit(code uint64);
 
+//
+// Wrapper printing a given message and exiting the program with an error number
+//
 func ExitError(msg string, code uint64) {
     PrintString(msg);
     PrintChar(10);
