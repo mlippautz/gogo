@@ -147,7 +147,7 @@ func StringAppend(str *string, append_str string) {
     var append_addr uint64 = GetStringAddress(&append_str);
     CopyMem(old_addr, new_addr, strlen);
     CopyMem(append_addr, new_addr + strlen, strappendlen);
-    CopyMem(ToUint64FromBytePtr(&nullByte), new_addr+strlen +1, 1);
+    CopyMem(ToUint64FromBytePtr(&nullByte), new_addr + strlen + strappendlen + 1, 1);
     SetStringAddressAndLength(str, new_addr, new_length);
 }
 

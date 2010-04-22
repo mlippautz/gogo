@@ -76,12 +76,19 @@ func main() {
     fmt.Printf("Brk failed\n");
   }
     
-
-    var a uint64 = 0;
-    var someString string = libgogo.IntToString(a);
-    fmt.Printf("Value %s\n",someString);
-
   //Library test VI
+  var a uint64 = 0;
+  var someString string = libgogo.IntToString(a);
+  fmt.Printf("Library test: %s (should be '0')\n", someString);
+
+  //Library test VII
+  var test_str string = "Hello ";
+  var test_appendstr string = "world";
+  libgogo.StringAppend(&test_str, test_appendstr);
+  libgogo.PrintString(test_str);
+  libgogo.PrintString("\n");
+
+  //Library test VIIII
   libgogo.Exit(0);
   fmt.Printf("If you can read this, something is wrong");
 }
