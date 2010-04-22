@@ -81,22 +81,15 @@ var TOKEN_ELSE uint64 = 111;
 func TokenToString (id uint64) string {
     var retStr string = "";
     var strBuf string = "";
-    var i uint64;
 
     if id == TOKEN_IDENTIFIER {
         retStr = "<identifier> (value: ";
-        //libgogo.StringAppend(&retStr, tok.strValue);
-        for i=0;i< libgogo.StringLength(tok.strValue); i = i+1 {
-            libgogo.CharAppend(&retStr,tok.strValue[i]);
-        }
+        libgogo.StringAppend(&retStr, tok.strValue);
         libgogo.CharAppend(&retStr,')');
     }
     if id == TOKEN_STRING {
         retStr = "<string> (value: ";
-        //libgogo.StringAppend(&retStr, tok.strValue);
-        for i=0;i< libgogo.StringLength(tok.strValue); i = i+1 {
-            libgogo.CharAppend(&retStr,tok.strValue[i]);
-        }
+        libgogo.StringAppend(&retStr, tok.strValue);
         libgogo.CharAppend(&retStr,')');
     }
     if id == TOKEN_EOS {
@@ -117,10 +110,7 @@ func TokenToString (id uint64) string {
     if id == TOKEN_INTEGER {
         retStr = "<integer> (value: ";
         strBuf = libgogo.IntToString(tok.intValue);
-        for i=0;i< libgogo.StringLength(strBuf); i = i+1 {
-            libgogo.CharAppend(&retStr,strBuf[i]);
-        }
-        //libgogo.StringAppend(&retStr, strBuf);
+        libgogo.StringAppend(&retStr, strBuf);
         libgogo.CharAppend(&retStr,')');
     }
     if id == TOKEN_LCBRAC {
