@@ -31,7 +31,6 @@ func GetArgv() {
 
     for errno = Read(fd, char, 1) ; errno != 0 ; errno = Read(fd, char, 1) {
         if char[0] == 0 {
-            CharAppend(&Argv[Argc], 0); // write \0 at and (c string style)
             Argc = Argc + 1;            
         } else {
             CharAppend(&Argv[Argc], char[0]);
@@ -123,15 +122,14 @@ func SetStringAddressAndLength(str *string, new_addr uint64, new_length uint64);
 // appended to a new place in the heap.
 //
 func CharAppend(str *string, char byte) {
-    //var nullByte byte = 0;
+    var nullByte byte = 0;
     var strlen uint64 = StringLength2(str);
     var new_length uint64 = strlen + 1;
-    var new_addr uint64 = Alloc(new_length);
-    //var new_addr uint64 = Alloc(new_length+1);
+    var new_addr uint64 = Alloc(new_length+1);
     var old_addr uint64 = GetStringAddress(str);
     CopyMem(old_addr, new_addr, strlen);
     CopyMem(ToUint64FromBytePtr(&char), new_addr + strlen, 1);
-    //CopyMem(ToUint64FromBytePtr(&nullByte), new_addr+strlen +1, 1);
+    CopyMem(ToUint64FromBytePtr(&nullByte), new_addr+strlen +1, 1);
     SetStringAddressAndLength(str, new_addr, new_length);
 }
 
@@ -140,17 +138,16 @@ func CharAppend(str *string, char byte) {
 // Moving both strings to a new allocated place in the heap.
 //
 func StringAppend(str *string, append_str string) {
-    //var nullByte byte = 0;
+    var nullByte byte = 0;
     var strlen uint64 = StringLength2(str);
     var strappendlen uint64 = StringLength(append_str);
     var new_length uint64 = strlen + strappendlen;
-    var new_addr uint64 = Alloc(new_length);
-    //var new_addr uint64 = Alloc(new_length+1);
+    var new_addr uint64 = Alloc(new_length+1);
     var old_addr uint64 = GetStringAddress(str);
     var append_addr uint64 = GetStringAddress(&append_str);
     CopyMem(old_addr, new_addr, strlen);
     CopyMem(append_addr, new_addr + strlen, strappendlen);
-    //CopyMem(ToUint64FromBytePtr(&nullByte), new_addr+strlen +1, 1);
+    CopyMem(ToUint64FromBytePtr(&nullByte), new_addr+strlen +1, 1);
     SetStringAddressAndLength(str, new_addr, new_length);
 }
 
@@ -172,7 +169,7 @@ func StringToInt(str string) uint64 {
 // Converter returning a string representation (heap) of a given number.
 //
 func IntToString(num uint64) string {
-    var str string;
+    var str string = "";
     var i uint64;
     var buf [255]byte;
     for i = 0; num != 0; i = i +1 {
@@ -181,7 +178,7 @@ func IntToString(num uint64) string {
     }
     if i == 0 { //Special case: 0
         buf[0] = 48;
-        i = 1;
+        i = 0;
     } else {
         i = i -1;
     }

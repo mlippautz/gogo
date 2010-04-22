@@ -75,6 +75,11 @@ func main() {
   } else {
     fmt.Printf("Brk failed\n");
   }
+    
+
+    var a uint64 = 0;
+    var someString string = libgogo.IntToString(a);
+    fmt.Printf("Value %s\n",someString);
 
   //Library test VI
   libgogo.Exit(0);
