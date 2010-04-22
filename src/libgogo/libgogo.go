@@ -31,7 +31,8 @@ func GetArgv() {
 
     for errno = Read(fd, char, 1) ; errno != 0 ; errno = Read(fd, char, 1) {
         if char[0] == 0 {
-            Argc = Argc + 1;
+            CharAppend(&Argv[Argc], 0); // write \0 at and (c string style)
+            Argc = Argc + 1;            
         } else {
             CharAppend(&Argv[Argc], char[0]);
         }

@@ -52,8 +52,8 @@ func main() {
         fileInfo[curFileIndex].filename = libgogo.Argv[i];
         fileInfo[curFileIndex].lineCounter = 1;
         fileInfo[curFileIndex].charCounter = 1;
-
-        fileInfo[curFileIndex].fd = libgogo.FileOpen(fileInfo[curFileIndex].filename, 0);
+        
+        fileInfo[curFileIndex].fd = libgogo.FileOpen(libgogo.Argv[i], 0);
         if (fileInfo[curFileIndex].fd == 0) {
             GlobalError("Cannot open file.");
         }
