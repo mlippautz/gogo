@@ -123,12 +123,15 @@ func SetStringAddressAndLength(str *string, new_addr uint64, new_length uint64);
 // appended to a new place in the heap.
 //
 func CharAppend(str *string, char byte) {
+    //var nullByte byte = 0;
     var strlen uint64 = StringLength2(str);
     var new_length uint64 = strlen + 1;
     var new_addr uint64 = Alloc(new_length);
+    //var new_addr uint64 = Alloc(new_length+1);
     var old_addr uint64 = GetStringAddress(str);
     CopyMem(old_addr, new_addr, strlen);
     CopyMem(ToUint64FromBytePtr(&char), new_addr + strlen, 1);
+    //CopyMem(ToUint64FromBytePtr(&nullByte), new_addr+strlen +1, 1);
     SetStringAddressAndLength(str, new_addr, new_length);
 }
 
@@ -137,14 +140,17 @@ func CharAppend(str *string, char byte) {
 // Moving both strings to a new allocated place in the heap.
 //
 func StringAppend(str *string, append_str string) {
+    //var nullByte byte = 0;
     var strlen uint64 = StringLength2(str);
     var strappendlen uint64 = StringLength(append_str);
     var new_length uint64 = strlen + strappendlen;
     var new_addr uint64 = Alloc(new_length);
+    //var new_addr uint64 = Alloc(new_length+1);
     var old_addr uint64 = GetStringAddress(str);
     var append_addr uint64 = GetStringAddress(&append_str);
     CopyMem(old_addr, new_addr, strlen);
     CopyMem(append_addr, new_addr + strlen, strappendlen);
+    //CopyMem(ToUint64FromBytePtr(&nullByte), new_addr+strlen +1, 1);
     SetStringAddressAndLength(str, new_addr, new_length);
 }
 
