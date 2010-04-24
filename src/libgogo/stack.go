@@ -14,8 +14,6 @@ type Stack struct {
     capacity uint64; //How many items there can be max. (not to be changed from outside the library)
 };
 
-func ToUint64FromUint64Ptr(value *uint64) uint64;
-
 func InitializeStack(uninitializedStack *Stack) {
     uninitializedStack.baseAddress = Alloc(16 * 8); //Allocate 16 items by default
     uninitializedStack.capacity = 16;
