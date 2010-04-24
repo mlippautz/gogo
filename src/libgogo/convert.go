@@ -9,60 +9,70 @@
 package libgogo
 
 //
-// Converts a byte value to an integer
-// See asm_linux_amd64.s for details
+// Converts a byte to an unsigned 64-bit integer
+// Implemented in assembler (see corresponding .s file)
 //
 func ToIntFromByte(b byte) uint64;
 
 //
-// Converts an unsigned 64bit integer to a byte
-// See asm_linux_amd64.s for details
+// Converts an unsigned 64-bit integer to a byte
+// Implemented in assembler (see corresponding .s file)
 //
 func ToByteFromInt(i uint64) byte;
 
-func ToUint64FromUint64Ptr(value *uint64) uint64;
-
 //
-// Returns the address of the byte as uint64.
-// See asm_linux_amd64.s for details
+// Converts a pointer to an unsigned 64-bit integer
+// Implemented in assembler (see corresponding .s file)
 //
 func ToUint64FromBytePtr(char *byte) uint64;
 
 //
-// Converter returning the integer (uint64) representation of a given string.
+// Converts a pointer to an unsigned 64-bit integer
+// Implemented in assembler (see corresponding .s file)
+//
+func ToUint64FromUint64Ptr(value *uint64) uint64;
+
+//
+// Interprets the given address as a string pointer and returns it
+// Implemented in assembler (see corresponding .s file)
+//
+func GetStringFromAddress(addr uint64) *string;
+
+//
+// Converts a string to a string to an unsigned 64-bit integer by intepreting it as valid a decimal number in form of ASCII characters
 //
 func StringToInt(str string) uint64 {
     var n uint64 = StringLength(str);
     var i uint64;
     var val uint64 = 0;
-    for i = 0; i < n ; i = i +1 {
-        val = val * 10;
-        val = val + ToIntFromByte(str[i]) - 48;
+    for i = 0; i < n ; i = i + 1 { //Process digit by digit
+        val = val * 10; //Next digit => Move old value one digit to the left
+        val = val + ToIntFromByte(str[i]) - 48; //Add the new digit as the last (rightmost) one (ASCII 48 = '0', 49 = '1' etc.)
     }
     return val;
 }
 
 //
-// Converter returning a string representation (heap) of a given number.
+// Converts an unsigned 64-bit integer to a string denoting its decimal digits
 //
 func IntToString(num uint64) string {
     var str string = "";
     var i uint64;
-    var buf [255]byte;
-    for i = 0; num != 0; i = i +1 {
-        buf[i] = ToByteFromInt( num - (num/10) * 10 + 48 );
-        num = num / 10;
+    var buf [20]byte; //The decimal representation of the longest unsigned 64-bit integer possible is 20 digits long
+    for i = 0; num != 0; i = i + 1 { //Process digits one by one in reverse order
+        buf[i] = ToByteFromInt(num - (num / 10) * 10 + 48); //Get first (leftmost) digit (ASCII '0' = 48, '1' = 49 etc.)
+        num = num / 10; //Next digit => Move value one digit to the right
     }
-    if i == 0 { //Special case: 0
-        buf[0] = 48;
+    if i == 0 { //Special case: 0 (no digits processed)
+        buf[0] = 48; //Put ASCII '0' into buffer
         i = 0;
     } else {
-        i = i -1;
+        i = i - 1; //Decrement i due to the last loop increment
     }
-    for ; i != 0; i = i -1 {
-        CharAppend(&str,buf[i]);
+    for ; i != 0; i = i - 1 { //Reverse the digit order (for all digits but the last one)
+        CharAppend(&str, buf[i]);
     }
-    CharAppend(&str,buf[0]);
+    CharAppend(&str,buf[0]); //Get the last digit (has to be appended if the value is 0)
     return str;
 }
 

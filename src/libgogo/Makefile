@@ -8,12 +8,14 @@ TARG=libgogo
 GOFILES=\
         libgogo.go \
         convert.go \
+        io.go \
         string.go \
         memmgr.go \
         stack.go
 OFILES=\
         libgogo_$(GOARCH).$O \
         convert_$(GOARCH).$O \
+        io_$(GOARCH).$O \
         string_$(GOARCH).$O \
         memmgr_$(GOARCH).$O \
 
