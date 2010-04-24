@@ -88,7 +88,28 @@ func main() {
   libgogo.PrintString(test_str);
   libgogo.PrintString("\n");
 
-  //Library test VIIII
+  //Library test VIII
+  var stack libgogo.Stack;
+  libgogo.InitializeStack(&stack);
+  fmt.Printf("Stack initialized: item count: %d, capacity: %d\n", libgogo.GetStackItemCount(&stack), libgogo.GetStackCapacity(&stack));
+  var val uint64;
+  fmt.Printf("Pushing the 20 values onto the stack\n");
+  for val = 1; val <= 20; val++ {
+    libgogo.Push(&stack, val);
+    //fmt.Printf("DEBUG %d: item count: %d, capacity: %d, peek item: %d\n", val, libgogo.GetStackItemCount(&stack), libgogo.GetStackCapacity(&stack), libgogo.Peek(&stack));
+  }
+  fmt.Printf("Taking 19 values from the stack\n");
+  var j uint64;
+  for j = 20; j > 1; j-- {
+    val = libgogo.Pop(&stack);
+    //fmt.Printf("DEBUG %d: item count: %d, capacity: %d, peek item: %d\n", j, libgogo.GetStackItemCount(&stack), libgogo.GetStackCapacity(&stack), libgogo.Peek(&stack));
+    if (j != val) {
+      fmt.Printf("ERROR: Unexpected value from stack: %d (should be %d)\n", val, j);
+    }
+  }
+  fmt.Printf("Library test: Number of values left on stack and peek value (should both be 1): %d and %d\n", libgogo.GetStackItemCount(&stack), libgogo.Peek(&stack));
+
+  //Library test IX
   libgogo.Exit(0);
   fmt.Printf("If you can read this, something is wrong");
 }

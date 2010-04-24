@@ -7,9 +7,11 @@ include $(GOROOT)/src/Make.$(GOARCH)
 TARG=libgogo
 GOFILES=\
         libgogo.go \
-        memmgr.go
+        memmgr.go \
+        stack.go
 OFILES=\
         libgogo_$(GOARCH).$O \
-        memmgr_$(GOARCH).$O
+        memmgr_$(GOARCH).$O \
+        stack_$(GOARCH).$O
 
 include $(GOROOT)/src/Make.pkg
