@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 //
-// GoGo stack functions
+// GoGo list functions
 //
 
 package libgogo
