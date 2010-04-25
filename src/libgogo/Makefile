@@ -11,7 +11,8 @@ GOFILES=\
         io.go \
         string.go \
         memmgr.go \
-        stack.go
+        stack.go \
+        list.go
 OFILES=\
         libgogo_$(GOARCH).$O \
         convert_$(GOARCH).$O \

@@ -110,6 +110,25 @@ func main() {
   fmt.Printf("Library test: Number of values left on stack and peek value (should both be 1): %d and %d\n", libgogo.GetStackItemCount(&stack), libgogo.Peek(&stack));
 
   //Library test IX
+  var list libgogo.List;
+  libgogo.InitializeList(&list);
+  fmt.Printf("List initialized: item count: %d, capacity: %d\n", libgogo.GetListItemCount(&list), libgogo.GetListCapacity(&list));
+  fmt.Printf("Putting the 20 values into the list\n");
+  for val = 1; val <= 20; val++ {
+    libgogo.AddItem(&list, val);
+    //fmt.Printf("DEBUG %d: item count: %d, capacity: %d, first item: %d, last item: %d\n", val, libgogo.GetListItemCount(&list), libgogo.GetListCapacity(&list), libgogo.GetItemAt(&list, 0), libgogo.GetItemAt(&list, libgogo.GetListItemCount(&list) - 1));
+  }
+  fmt.Printf("Removing 19 values from the list\n");
+  for j = 1; j < 20; j++ {
+    val = libgogo.RemoveItemAt(&list, 0);
+    //fmt.Printf("DEBUG %d: item count: %d, capacity: %d, first item: %d, last item: %d\n", j, libgogo.GetListItemCount(&list), libgogo.GetListCapacity(&list), libgogo.GetItemAt(&list, 0), libgogo.GetItemAt(&list, libgogo.GetListItemCount(&list) - 1));
+    if (j != val) {
+      fmt.Printf("ERROR: Unexpected value from list: %d (should be %d)\n", val, j);
+    }
+  }
+  fmt.Printf("Library test: Number of values left in list and value (should be 1 and 20): %d and %d\n", libgogo.GetListItemCount(&list), libgogo.GetItemAt(&list, 0));
+
+  //Library test X
   libgogo.Exit(0);
   fmt.Printf("If you can read this, something is wrong");
 }
