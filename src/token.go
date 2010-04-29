@@ -69,6 +69,8 @@ var TOKEN_FUNC uint64 = 108;
 var TOKEN_PACKAGE uint64 = 109;
 var TOKEN_IMPORT uint64 = 110;
 var TOKEN_ELSE uint64 = 111;
+var TOKEN_BREAK uint64 = 112;
+var TOKEN_CONTINUE uint64 = 113;
 
 //
 // Helper functions

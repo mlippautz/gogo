@@ -4,6 +4,8 @@
 
 package main
 
+import "./libgogo/_obj/libgogo"
+
 var tok Token;
 
 var maxDepth uint64 = 10;
@@ -159,8 +161,12 @@ func ParseType() {
     } else {
         tok.nextToken = tok.id;
     }
-
+    GetNextTokenSafe();
+    if tok.id != TOKEN_ARITH_MUL {
+        tok.nextToken = tok.id;
+    }
     AssertNextToken(TOKEN_IDENTIFIER);
+    ParseSelector();
     // typename in tok.strValue
     PrintDebugString("Leaving ParseType()",1000);
 }
@@ -211,11 +217,14 @@ func ParseVarDeclList() {
 //
 func ParseVarDecl() uint64 {
     var boolFlag uint64;
+    var tmpObj *libgogo.ObjectDesc;
     PrintDebugString("Entering ParseVarDecl()",1000);
     boolFlag = LookAheadAndCheck(TOKEN_VAR);
     if boolFlag == 0 {
         AssertNextToken(TOKEN_VAR);
         AssertNextToken(TOKEN_IDENTIFIER);
+        tmpObj = libgogo.NewObject(tok.strValue);
+        libgogo.PrependObject(tmpObj,libgogo.GlobalObjects);
         // variable name in tok.strValue
         ParseType();
 
@@ -655,6 +664,17 @@ func ParseStatement() uint64 {
     if (doneFlag == 1) && (tok.id == TOKEN_FOR) {
         tok.nextToken = tok.id;
         ParseForStatement();
+        doneFlag = 0;
+    }
+
+    if (doneFlag == 1) && (tok.id == TOKEN_BREAK) {
+        // simple break statement
+        AssertNextToken(TOKEN_SEMICOLON);
+        doneFlag = 0;
+    }
+
+    if (doneFlag == 1) && (tok.id == TOKEN_CONTINUE) {
+        AssertNextToken(TOKEN_SEMICOLON);
         doneFlag = 0;
     }
 

@@ -384,6 +384,12 @@ func GetNextToken() {
         if libgogo.StringCompare("package", tok.strValue) == 0 {
             tok.id = TOKEN_PACKAGE;
         }
+        if libgogo.StringCompare("break", tok.strValue) == 0 {
+            tok.id = TOKEN_BREAK;
+        }
+        if libgogo.StringCompare("continue", tok.strValue) == 0 {
+            tok.id = TOKEN_CONTINUE;
+        }
     }
 
     tok.nextToken = 0;
