@@ -11,6 +11,8 @@ var tok Token;
 var maxDepth uint64 = 10;
 var curDepth uint64 = 1;
 
+var CurrentType *libgogo.TypeDesc;
+
 //
 // Main parsing function. Corresponds to the EBNF main structure called 
 // go_program.
@@ -98,12 +100,14 @@ func ParseStructDecl() uint64 {
     GetNextTokenSafe();
     if tok.id == TOKEN_TYPE {
         AssertNextToken(TOKEN_IDENTIFIER);
+        CurrentType = libgogo.NewType(tok.strValue);
         // identifier of struct in tok.strValue
         AssertNextToken(TOKEN_STRUCT);
         AssertNextToken(TOKEN_LCBRAC);
         ParseStructVarDeclList();
         AssertNextToken(TOKEN_RCBRAC);
         AssertNextToken(TOKEN_SEMICOLON);
+				libgogo.Types = libgogo.AppendType(CurrentType, libgogo.Types);
         boolFlag = 0;
     } else {
         boolFlag = 1;
@@ -132,9 +136,13 @@ func ParseStructVarDeclList() {
 //
 func ParseStructVarDecl() uint64 {
     var boolFlag uint64;
+    var ObjDesc *libgogo.ObjectDesc;
     PrintDebugString("Entering ParseStructVarDecl()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_IDENTIFIER {
+        ObjDesc = libgogo.NewObject(tok.strValue, libgogo.CLASS_FIELD);
+        libgogo.AddFields(ObjDesc, CurrentType);
+        //TODO: Set type of ObjDesc (uint64, byte,...) inside ParseType
         ParseType();
         AssertNextToken(TOKEN_SEMICOLON);
         boolFlag = 0;
@@ -143,7 +151,7 @@ func ParseStructVarDecl() uint64 {
         tok.nextToken = tok.id;
     }    
     PrintDebugString("Leaving ParseStructVarDecl()",1000);
-    return boolFlag;    
+    return boolFlag;
 }
 
 //
@@ -223,8 +231,8 @@ func ParseVarDecl() uint64 {
     if boolFlag == 0 {
         AssertNextToken(TOKEN_VAR);
         AssertNextToken(TOKEN_IDENTIFIER);
-        tmpObj = libgogo.NewObject(tok.strValue);
-        libgogo.PrependObject(tmpObj,libgogo.GlobalObjects);
+        tmpObj = libgogo.NewObject(tok.strValue, libgogo.CLASS_VAR);
+        libgogo.GlobalObjects = libgogo.AppendObject(tmpObj,libgogo.GlobalObjects);
         // variable name in tok.strValue
         ParseType();
 

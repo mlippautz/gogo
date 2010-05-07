@@ -23,14 +23,15 @@ type TypeDesc struct {
 //
 // Pseudo constants that specify the descriptor sizes 
 //
-var OBJECT_SIZE uint64 = 32; // 4*8 bytes space for an object
-var TYPE_SIZE uint64 = 32;  // 4*8 bytes space for a type
+var OBJECT_SIZE uint64 = 32+8; //4*8 bytes space for an object
+var TYPE_SIZE uint64 = 48+8;  //6*8 bytes space for a type
 
 //
 // Classes for objects
 //
 var CLASS_VAR uint64 = 1;
 var CLASS_TYPE uint64 = 2;
+var CLASS_FIELD uint64 = 3;
 
 //
 // Available types
@@ -58,31 +59,45 @@ func Uint64ToTypeDescPtr(adr uint64) *TypeDesc;
 
 
 //
-// Prepend an object to the list
+// Appends an object to the list
 //
-func PrependObject(object *ObjectDesc, list *ObjectDesc) *ObjectDesc {
-    var tmpObject *ObjectDesc;
+func AppendObject(object *ObjectDesc, list *ObjectDesc) *ObjectDesc {
+    var tmpObj *ObjectDesc = object;
     if list != nil {
-        list.next = object;
-        tmpObject = list;
-    } else {
-        tmpObject = object;
+        for tmpObj = list; tmpObj.next != nil; tmpObj = tmpObj.next {
+        }
+        tmpObj.next = object;
+        tmpObj = list;
     }
-    return tmpObject;
+    return tmpObj;    
+
+		//Alternate version: PrependObject:
+		/*object.next = list;
+    return object;*/
 }
 
 //
-// Prepend type to the list
+// Appends a type to the list
 // 
-func PreprendType(objtype *TypeDesc, list *TypeDesc) *TypeDesc {
-    var tmpObject *TypeDesc;
+func AppendType(objtype *TypeDesc, list *TypeDesc) *TypeDesc {
+    var tmpObjType *TypeDesc = objtype;
     if list != nil {
-        list.next = objtype;
-        tmpObject = list;
-    } else {
-        tmpObject = objtype;
+        for tmpObjType = list; tmpObjType.next != nil; tmpObjType = tmpObjType.next { }
+        tmpObjType.next = objtype;
+        tmpObjType = list;
     }
-    return tmpObject;
+    return tmpObjType;
+
+    //Alternate version: PrependType:
+    /*objtype.next = list;
+    return objtype;*/
+}
+
+//
+// Add a field in form of an object descriptor to the type descriptor given
+//
+func AddFields(object *ObjectDesc, objtype *TypeDesc) {
+    objtype.fields = AppendObject(object, objtype.fields);
 }
 
 //
@@ -114,9 +129,12 @@ func GetType(name string, list *TypeDesc) *TypeDesc {
 //
 // Creates a new object
 //
-func NewObject(name string) *ObjectDesc {
+func NewObject(name string, class uint64) *ObjectDesc {
     var adr uint64 = Alloc(OBJECT_SIZE);
     var obj *ObjectDesc = Uint64ToObjectDescPtr(adr);
+    obj.name = name; //TODO: Copy string?
+    obj.objtype = nil;
+    obj.class = class;
     obj.next = nil;
     return obj;
 }
@@ -127,6 +145,38 @@ func NewObject(name string) *ObjectDesc {
 func NewType(name string) *TypeDesc {
     var adr uint64 = Alloc(TYPE_SIZE);
     var objtype *TypeDesc = Uint64ToTypeDescPtr(adr);
+    objtype.name = name; //TODO: Copy string?
     objtype.next = nil;
+    objtype.fields = nil;
     return objtype;
+}
+
+func PrintObjects(list *ObjectDesc) {
+    var o *ObjectDesc;
+    for o = list; o != nil; o = o.next {
+        PrintString("Object ");
+        PrintString(o.name);
+        if o.objtype != nil {
+            PrintString(" (type ");
+            PrintString(o.objtype.name);
+            PrintString(")");
+        }
+        PrintString("\n");
+    }
+}
+
+func PrintTypes(list *TypeDesc) {
+    var t *TypeDesc;
+    var o *ObjectDesc;
+    for t = list; t != nil; t = t.next {
+        PrintString("Type ");
+        PrintString(t.name);
+        PrintString("\n");
+				for o = t.fields; o != nil; o = o.next {
+            PrintString("  ");
+            PrintString(o.name);
+            //TODO: Type
+            PrintString("\n");
+        }
+    }
 }

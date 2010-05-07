@@ -70,4 +70,9 @@ func main() {
             GlobalError("Cannot close file.");
         }
     }
+
+    //TEMP DEBUG: symbol table
+		/*libgogo.PrintTypes(libgogo.Types);
+		libgogo.PrintObjects(libgogo.GlobalObjects);*/
+    //---
 }
