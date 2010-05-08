@@ -57,6 +57,9 @@ func main() {
     libgogo.Types = libgogo.AppendType(temptype, libgogo.Types);
     temptype = libgogo.NewType("string", 16, nil);
     libgogo.Types = libgogo.AppendType(temptype, libgogo.Types);
+    //For debugging purposes only
+    /*temptype = libgogo.NewType("libgogo.TypeDesc", 16, nil);
+    libgogo.Types = libgogo.AppendType(temptype, libgogo.Types);*/
 
     //Default objects
     tempobject = libgogo.NewObject("nil", 0);

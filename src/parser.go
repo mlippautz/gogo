@@ -165,7 +165,9 @@ func ParseType() {
     var arraydim uint64 = 0;
     var basetype *libgogo.TypeDesc;
     var temptype *libgogo.TypeDesc;
-    var tempstr = "";
+    var boolFlag uint64;
+    var tempstr string = "";
+    var typename string;
 
     PrintDebugString("Entering ParseType()",1000);
     GetNextTokenSafe();
@@ -185,7 +187,17 @@ func ParseType() {
     }
     AssertNextToken(TOKEN_IDENTIFIER);
     // typename in tok.strValue
-    basetype = libgogo.GetType(tok.strValue, libgogo.Types);
+    typename = tok.strValue;
+    boolFlag = ParseSimpleSelector();
+    if boolFlag == 0 { //Take selector into consideration if there is one
+        libgogo.CharAppend(&typename, '.');
+        libgogo.StringAppend(&typename, tok.strValue);
+    }
+
+    basetype = libgogo.GetType(typename, libgogo.Types);
+    /*if CurrentObject.objtype == nil {
+        //TODO: Type forward declaration
+    }*/
     if arraydim == 0 { //No array
         libgogo.SetObjType(CurrentObject, basetype);
     } else { //Array
@@ -197,10 +209,6 @@ func ParseType() {
         temptype = libgogo.NewType(tempstr, arraydim, basetype);
         libgogo.SetObjType(CurrentObject, temptype);
     }
-    /*if CurrentObject.objtype == nil {
-        //TODO: Type forward declaration
-    }*/
-    ParseSelector(); //TODO: Take types with selector into consideration (p.e. libgogo.TypeDesc)
     PrintDebugString("Leaving ParseType()",1000);
 }
 
@@ -467,6 +475,20 @@ func ParseFactor() uint64 {
         boolFlag = 0;
     }
     PrintDebugString("Leaving ParseFactor()",1000);
+    return boolFlag;
+}
+
+func ParseSimpleSelector() uint64 {
+    var boolFlag uint64;
+    GetNextTokenSafe();
+    if tok.id == TOKEN_PT {
+        AssertNextToken(TOKEN_IDENTIFIER);
+        // value in tok.strValue
+        boolFlag = 0;
+    } else {
+        tok.nextToken = tok.id;
+        boolFlag = 1;
+    }
     return boolFlag;
 }
 
