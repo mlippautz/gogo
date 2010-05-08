@@ -37,6 +37,7 @@ func main() {
     var errno uint64;
     var i uint64;
     var temptype *libgogo.TypeDesc;
+    var tempobject *libgogo.ObjectDesc;
 
     libgogo.GetArgv();
 
@@ -49,12 +50,18 @@ func main() {
     }
 
     //Default data types
-    temptype = libgogo.NewType("uint64", 8);
+    temptype = libgogo.NewType("uint64", 8, nil);
     libgogo.Types = libgogo.AppendType(temptype, libgogo.Types);
-    temptype = libgogo.NewType("byte", 1);
+    temptype = libgogo.NewType("byte", 1, nil);
     libgogo.Types = libgogo.AppendType(temptype, libgogo.Types);
-    temptype = libgogo.NewType("string", 16);
+    temptype = libgogo.NewType("string", 16, nil);
     libgogo.Types = libgogo.AppendType(temptype, libgogo.Types);
+
+    //Default objects
+    tempobject = libgogo.NewObject("nil", 0);
+    libgogo.SetObjType(tempobject, nil);
+    libgogo.FlagObjectTypeAsPointer(tempobject); //nil is a pointer to no specified type (universal)
+    libgogo.GlobalObjects = libgogo.AppendObject(tempobject, libgogo.GlobalObjects);
 
     for i=1; i < libgogo.Argc ; i= i+1 {
         curFileIndex = i-1;

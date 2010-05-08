@@ -31,16 +31,14 @@ var TYPE_SIZE uint64 = 56;  //7*8 bytes space for a type, extra 8 for the string
 // Classes for objects
 //
 var CLASS_VAR uint64 = 1;
-var CLASS_TYPE uint64 = 2;
-var CLASS_FIELD uint64 = 3;
+var CLASS_FIELD uint64 = 2;
 
 //
-// Available types
+// Forms for types
 //
-var TYPE_UINT64 uint64 = 1;
-var TYPE_STRING uint64 = 2;
-var TYPE_STRUCT uint64 = 3;
-var TYPE_ARRAY uint64 = 4;
+var FORM_SIMPLE uint64 = 1;
+var FORM_STRUCT uint64 = 2;
+var FORM_ARRAY uint64 = 3;
 
 //
 // List of global objects and declared types
@@ -99,6 +97,7 @@ func AppendType(objtype *TypeDesc, list *TypeDesc) *TypeDesc {
 //
 func AddFields(object *ObjectDesc, objtype *TypeDesc) {
     objtype.fields = AppendObject(object, objtype.fields);
+    objtype.form = FORM_STRUCT;
 }
 
 //
@@ -152,9 +151,9 @@ func NewObject(name string, class uint64) *ObjectDesc {
     var adr uint64 = Alloc(OBJECT_SIZE);
     var obj *ObjectDesc = Uint64ToObjectDescPtr(adr);
     obj.name = name; //TODO: Copy string?
+    obj.class = class;
     obj.objtype = nil;
     obj.ptrtype = 0;
-    obj.class = class;
     obj.next = nil;
     return obj;
 }
@@ -162,13 +161,19 @@ func NewObject(name string, class uint64) *ObjectDesc {
 //
 // Creates a new type
 //
-func NewType(name string, len uint64) *TypeDesc {
+func NewType(name string, len uint64, basetype *TypeDesc) *TypeDesc {
     var adr uint64 = Alloc(TYPE_SIZE);
     var objtype *TypeDesc = Uint64ToTypeDescPtr(adr);
     objtype.name = name; //TODO: Copy string?
+    if basetype != nil {
+        objtype.form = FORM_SIMPLE;
+    } else {
+        objtype.form = FORM_ARRAY;
+    }
     objtype.len = len;
     objtype.next = nil;
     objtype.fields = nil;
+    objtype.base = basetype;
     return objtype;
 }
 
@@ -181,6 +186,13 @@ func PrintObjects(list *ObjectDesc) {
         if o.objtype != nil {
             if o.ptrtype != 0 {
                 PrintString("pointer to ");
+            }
+            if o.objtype.base != nil {
+                PrintString("array of ");
+                PrintString(o.objtype.base.name);
+                PrintString(" of length ");
+                PrintNumber(o.objtype.len);
+                PrintString(", internally named ");
             }
             PrintString(o.objtype.name);
         } else {
@@ -209,6 +221,13 @@ func PrintTypes(list *TypeDesc) {
             if o.objtype != nil {
                 if o.ptrtype != 0 {
                     PrintString("pointer to ");
+                }
+                if o.objtype.base != nil {
+                    PrintString("array of ");
+                    PrintString(o.objtype.base.name);
+                    PrintString(" of length ");
+                    PrintNumber(o.objtype.len);
+                    PrintString(", internally named ");
                 }
                 PrintString(o.objtype.name);
             } else {

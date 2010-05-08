@@ -102,7 +102,7 @@ func ParseStructDecl() uint64 {
     GetNextTokenSafe();
     if tok.id == TOKEN_TYPE {
         AssertNextToken(TOKEN_IDENTIFIER);
-        CurrentType = libgogo.NewType(tok.strValue, 0);
+        CurrentType = libgogo.NewType(tok.strValue, 0, nil);
         // identifier of struct in tok.strValue
         AssertNextToken(TOKEN_STRUCT);
         AssertNextToken(TOKEN_LCBRAC);
@@ -161,12 +161,16 @@ func ParseStructVarDecl() uint64 {
 // heads and functions
 //
 func ParseType() {
+    var arraydim uint64 = 0;
+    var basetype *libgogo.TypeDesc;
+    var temptype *libgogo.TypeDesc;
     PrintDebugString("Entering ParseType()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_LSBRAC {   
         AssertNextToken(TOKEN_INTEGER);
         // value of integer in tok.intValue
-        AssertNextToken(TOKEN_RSBRAC);        
+        arraydim = tok.intValue;
+        AssertNextToken(TOKEN_RSBRAC);
     } else {
         tok.nextToken = tok.id;
     }
@@ -178,7 +182,13 @@ func ParseType() {
     }
     AssertNextToken(TOKEN_IDENTIFIER);
     // typename in tok.strValue
-    libgogo.SetObjType(CurrentObject, libgogo.GetType(tok.strValue, libgogo.Types)); //TODO: Take array (incl. dimensions) into consideration
+    basetype = libgogo.GetType(tok.strValue, libgogo.Types);
+    if arraydim == 0 { //No array
+        libgogo.SetObjType(CurrentObject, basetype);
+    } else { //Array
+        temptype = libgogo.NewType("ArrayPlaceholder", arraydim, basetype); //TODO: More meaningful and unique name
+        libgogo.SetObjType(CurrentObject, temptype);
+    }
     /*if CurrentObject.objtype == nil {
         //TODO: Type forward declaration
     }*/
