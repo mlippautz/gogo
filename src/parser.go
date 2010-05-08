@@ -14,7 +14,6 @@ var curDepth uint64 = 1;
 var CurrentType *libgogo.TypeDesc;
 
 var CurrentObject *libgogo.ObjectDesc;
-var InsideVarDecl uint64 = 0;
 
 //
 // Main parsing function. Corresponds to the EBNF main structure called 
@@ -239,9 +238,7 @@ func ParseVarDecl() uint64 {
         CurrentObject = libgogo.NewObject(tok.strValue, libgogo.CLASS_VAR);
         libgogo.GlobalObjects = libgogo.AppendObject(CurrentObject,libgogo.GlobalObjects);
         // variable name in tok.strValue
-        InsideVarDecl = 1;
         ParseType();
-        InsideVarDecl = 0;
 
         GetNextTokenSafe();
         if tok.id == TOKEN_ASSIGN {
