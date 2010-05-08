@@ -101,29 +101,40 @@ func AddFields(object *ObjectDesc, objtype *TypeDesc) {
 }
 
 //
-// Fetches an object with a specific identifier
+// Sets an object's type
 //
-func GetObject(name string, list *ObjectDesc) *ObjectDesc {
-    var tmpObject *ObjectDesc;
-    for tmpObject = list; tmpObject != nil; tmpObject = list.next {
-        if StringCompare(tmpObject.name,name) == 0 {
-            break;
-        }
-    }
-    return tmpObject;
+func SetObjType(object *ObjectDesc, objtype *TypeDesc) {
+    object.objtype = objtype;
 }
 
 //
-// Fetches a type with a given name
+// Fetches an object with a specific identifier or nil if it is not in the specified list
 //
-func GetType(name string, list *TypeDesc) *TypeDesc {
-    var tmpType *TypeDesc;
-    for tmpType = list; tmpType != nil; tmpType = list.next {
-        if StringCompare(tmpType.name,name) == 0 {
+func GetObject(name string, list *ObjectDesc) *ObjectDesc {
+    var tmpObject *ObjectDesc;
+    var retValue *ObjectDesc = nil;
+    for tmpObject = list; tmpObject != nil; tmpObject = tmpObject.next {
+        if StringCompare(tmpObject.name,name) == 0 {
+            retValue = tmpObject;
             break;
         }
     }
-    return tmpType;
+    return retValue;
+}
+
+//
+// Fetches a type with a given name or nil if it is not in the specified list
+//
+func GetType(name string, list *TypeDesc) *TypeDesc {
+    var tmpType *TypeDesc;
+    var retValue *TypeDesc = nil;
+    for tmpType = list; tmpType != nil; tmpType = tmpType.next {
+        if StringCompare(tmpType.name,name) == 0 {
+            retValue = tmpType;
+            break;
+        }
+    }
+    return retValue;
 }
 
 //
@@ -157,12 +168,13 @@ func PrintObjects(list *ObjectDesc) {
     for o = list; o != nil; o = o.next {
         PrintString("Object ");
         PrintString(o.name);
+        PrintString(" (type ");
         if o.objtype != nil {
-            PrintString(" (type ");
             PrintString(o.objtype.name);
-            PrintString(")");
+        } else {
+            PrintString("<unknown>");
         }
-        PrintString("\n");
+        PrintString(")\n");
     }
 }
 
@@ -181,8 +193,13 @@ func PrintTypes(list *TypeDesc) {
 				for o = t.fields; o != nil; o = o.next {
             PrintString("  ");
             PrintString(o.name);
-            //TODO: Type
-            PrintString("\n");
+            PrintString(" (type ");
+            if o.objtype != nil {
+                PrintString(o.objtype.name);
+            } else {
+                PrintString("<unknown>");
+            }
+            PrintString(")\n");
         }
     }
 }

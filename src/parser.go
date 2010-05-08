@@ -13,6 +13,9 @@ var curDepth uint64 = 1;
 
 var CurrentType *libgogo.TypeDesc;
 
+var CurrentObject *libgogo.ObjectDesc;
+var InsideVarDecl uint64 = 0;
+
 //
 // Main parsing function. Corresponds to the EBNF main structure called 
 // go_program.
@@ -136,12 +139,11 @@ func ParseStructVarDeclList() {
 //
 func ParseStructVarDecl() uint64 {
     var boolFlag uint64;
-    var ObjDesc *libgogo.ObjectDesc;
     PrintDebugString("Entering ParseStructVarDecl()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_IDENTIFIER {
-        ObjDesc = libgogo.NewObject(tok.strValue, libgogo.CLASS_FIELD);
-        libgogo.AddFields(ObjDesc, CurrentType);
+        CurrentObject = libgogo.NewObject(tok.strValue, libgogo.CLASS_FIELD);
+        libgogo.AddFields(CurrentObject, CurrentType);
         //TODO: Set type of ObjDesc (uint64, byte,...) inside ParseType
         ParseType();
         AssertNextToken(TOKEN_SEMICOLON);
@@ -170,12 +172,16 @@ func ParseType() {
         tok.nextToken = tok.id;
     }
     GetNextTokenSafe();
-    if tok.id != TOKEN_ARITH_MUL {
+    if tok.id != TOKEN_ARITH_MUL { //TODO: Consider pointer (*)
         tok.nextToken = tok.id;
     }
     AssertNextToken(TOKEN_IDENTIFIER);
-    ParseSelector();
     // typename in tok.strValue
+    libgogo.SetObjType(CurrentObject, libgogo.GetType(tok.strValue, libgogo.Types)); //TODO: Take array (incl. dimensions) into consideration
+    /*if CurrentObject.objtype == nil {
+        //TODO: Type forward declaration
+    }*/
+    ParseSelector(); //TODO: Take types with selector into consideration (p.e. libgogo.TypeDesc)
     PrintDebugString("Leaving ParseType()",1000);
 }
 
@@ -225,16 +231,17 @@ func ParseVarDeclList() {
 //
 func ParseVarDecl() uint64 {
     var boolFlag uint64;
-    var tmpObj *libgogo.ObjectDesc;
     PrintDebugString("Entering ParseVarDecl()",1000);
     boolFlag = LookAheadAndCheck(TOKEN_VAR);
     if boolFlag == 0 {
         AssertNextToken(TOKEN_VAR);
         AssertNextToken(TOKEN_IDENTIFIER);
-        tmpObj = libgogo.NewObject(tok.strValue, libgogo.CLASS_VAR);
-        libgogo.GlobalObjects = libgogo.AppendObject(tmpObj,libgogo.GlobalObjects);
+        CurrentObject = libgogo.NewObject(tok.strValue, libgogo.CLASS_VAR);
+        libgogo.GlobalObjects = libgogo.AppendObject(CurrentObject,libgogo.GlobalObjects);
         // variable name in tok.strValue
+        InsideVarDecl = 1;
         ParseType();
+        InsideVarDecl = 0;
 
         GetNextTokenSafe();
         if tok.id == TOKEN_ASSIGN {

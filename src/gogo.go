@@ -81,7 +81,7 @@ func main() {
     }
 
     //TEMP DEBUG: symbol table
-		/*libgogo.PrintTypes(libgogo.Types);
-		libgogo.PrintObjects(libgogo.GlobalObjects);*/
+    /*libgogo.PrintTypes(libgogo.Types);
+    libgogo.PrintObjects(libgogo.GlobalObjects);*/
     //---
 }
