@@ -145,7 +145,6 @@ func ParseStructVarDecl() uint64 {
     if tok.id == TOKEN_IDENTIFIER {
         CurrentObject = libgogo.NewObject(tok.strValue, libgogo.CLASS_FIELD);
         libgogo.AddFields(CurrentObject, CurrentType);
-        //TODO: Set type of ObjDesc (uint64, byte,...) inside ParseType
         ParseType();
         AssertNextToken(TOKEN_SEMICOLON);
         boolFlag = 0;
@@ -166,6 +165,8 @@ func ParseType() {
     var arraydim uint64 = 0;
     var basetype *libgogo.TypeDesc;
     var temptype *libgogo.TypeDesc;
+    var tempstr = "";
+
     PrintDebugString("Entering ParseType()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_LSBRAC {   
@@ -188,7 +189,12 @@ func ParseType() {
     if arraydim == 0 { //No array
         libgogo.SetObjType(CurrentObject, basetype);
     } else { //Array
-        temptype = libgogo.NewType("ArrayPlaceholder", arraydim, basetype); //TODO: More meaningful and unique name
+        if basetype != nil {
+            libgogo.StringAppend(&tempstr, libgogo.GetTypeName(basetype));
+        }
+        libgogo.StringAppend(&tempstr, "Array");
+        libgogo.StringAppend(&tempstr, libgogo.IntToString(arraydim));
+        temptype = libgogo.NewType(tempstr, arraydim, basetype);
         libgogo.SetObjType(CurrentObject, temptype);
     }
     /*if CurrentObject.objtype == nil {

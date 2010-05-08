@@ -115,6 +115,13 @@ func FlagObjectTypeAsPointer(object *ObjectDesc) {
 }
 
 //
+// Returns a type's name
+//
+func GetTypeName(objtype *TypeDesc) string {
+    return objtype.name;
+}
+
+//
 // Fetches an object with a specific identifier or nil if it is not in the specified list
 //
 func GetObject(name string, list *ObjectDesc) *ObjectDesc {
