@@ -17,6 +17,8 @@ var CurrentObject *libgogo.ObjectDesc;
 var InsideFunction uint64 = 0;
 var LocalObjects *libgogo.ObjectDesc = nil; //Function-local objects
 
+var CurrentPackage string = "<no package>";
+
 //
 // Main parsing function. Corresponds to the EBNF main structure called 
 // go_program.
@@ -44,6 +46,7 @@ func ParsePackageStatement() {
     AssertNextToken(TOKEN_PACKAGE);
     AssertNextToken(TOKEN_IDENTIFIER);
     // package ok, value in tok.strValue
+    CurrentPackage = tok.strValue;
     PrintDebugString("Leaving ParsePackageStatement()",1000);
 }
 
@@ -104,7 +107,7 @@ func ParseStructDecl() uint64 {
     GetNextTokenSafe();
     if tok.id == TOKEN_TYPE {
         AssertNextToken(TOKEN_IDENTIFIER);
-        CurrentType = libgogo.NewType(tok.strValue, 0, nil);
+        CurrentType = libgogo.NewType(tok.strValue, CurrentPackage, 0, nil);
         // identifier of struct in tok.strValue
         AssertNextToken(TOKEN_STRUCT);
         AssertNextToken(TOKEN_LCBRAC);
@@ -166,6 +169,7 @@ func ParseType() {
     var basetype *libgogo.TypeDesc;
     var temptype *libgogo.TypeDesc;
     var boolFlag uint64;
+    var packagename string = CurrentPackage;
     var tempstr string = "";
     var typename string;
 
@@ -190,11 +194,11 @@ func ParseType() {
     typename = tok.strValue;
     boolFlag = ParseSimpleSelector();
     if boolFlag == 0 { //Take selector into consideration if there is one
-        libgogo.CharAppend(&typename, '.');
-        libgogo.StringAppend(&typename, tok.strValue);
+        packagename = typename; //Previously read namespace is actually the namespace
+        typename = tok.strValue;
     }
 
-    basetype = libgogo.GetType(typename, libgogo.Types);
+    basetype = libgogo.GetType(typename, packagename, libgogo.Types);
     /*if CurrentObject.objtype == nil {
         //TODO: Type forward declaration
     }*/
@@ -206,7 +210,7 @@ func ParseType() {
         }
         libgogo.StringAppend(&tempstr, "Array");
         libgogo.StringAppend(&tempstr, libgogo.IntToString(arraydim));
-        temptype = libgogo.NewType(tempstr, arraydim, basetype);
+        temptype = libgogo.NewType(tempstr, packagename, arraydim, basetype);
         libgogo.SetObjType(CurrentObject, temptype);
     }
     PrintDebugString("Leaving ParseType()",1000);
@@ -631,7 +635,9 @@ func ParseFuncDecl() uint64 {
     if DEBUG_LEVEL >= 100 { //Function-local symbol table
         libgogo.PrintString("\nFunction-local symbol table until line ");
         libgogo.PrintNumber(fileInfo[curFileIndex].lineCounter);
-        libgogo.PrintString(":\n-------------------------------------------\n");
+        libgogo.PrintString(" of ");
+        libgogo.PrintString(fileInfo[curFileIndex].filename);
+        libgogo.PrintString(":\n----------------------------------------------------------------------------\n");
         libgogo.PrintObjects(LocalObjects);
     }
     LocalObjects = nil; //Delete local objects

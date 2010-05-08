@@ -51,18 +51,18 @@ func main() {
     }
 
     //Default data types
-    temptype = libgogo.NewType("uint64", 8, nil);
+    temptype = libgogo.NewType("uint64", "", 8, nil);
     libgogo.Types = libgogo.AppendType(temptype, libgogo.Types);
-    temptype = libgogo.NewType("byte", 1, nil);
+    temptype = libgogo.NewType("byte", "", 1, nil);
     libgogo.Types = libgogo.AppendType(temptype, libgogo.Types);
-    temptype = libgogo.NewType("string", 16, nil);
+    temptype = libgogo.NewType("string", "", 16, nil);
     libgogo.Types = libgogo.AppendType(temptype, libgogo.Types);
     //For debugging purposes only
-    /*temptype = libgogo.NewType("libgogo.TypeDesc", 16, nil);
+    /*temptype = libgogo.NewType("TypeDesc", "libgogo", 16, nil);
     libgogo.Types = libgogo.AppendType(temptype, libgogo.Types);*/
 
     //Default objects
-    tempobject = libgogo.NewObject("nil", 0);
+    tempobject = libgogo.NewObject("nil", libgogo.CLASS_VAR);
     libgogo.SetObjType(tempobject, nil);
     libgogo.FlagObjectTypeAsPointer(tempobject); //nil is a pointer to no specified type (universal)
     libgogo.GlobalObjects = libgogo.AppendObject(tempobject, libgogo.GlobalObjects);

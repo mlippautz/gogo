@@ -14,6 +14,7 @@ type ObjectDesc struct {
 
 type TypeDesc struct {
     name string;
+    packagename string;
     form uint64;
     len uint64;
     fields *ObjectDesc;
@@ -25,7 +26,7 @@ type TypeDesc struct {
 // Pseudo constants that specify the descriptor sizes 
 //
 var OBJECT_SIZE uint64 = 48; //6*8 bytes space for an object, extra 8 for the string length
-var TYPE_SIZE uint64 = 56;  //7*8 bytes space for a type, extra 8 for the string length
+var TYPE_SIZE uint64 = 72;  //9*8 bytes space for a type, extra 8 for the string length
 
 //
 // Classes for objects
@@ -139,11 +140,11 @@ func GetObject(name string, list *ObjectDesc) *ObjectDesc {
 //
 // Fetches a type with a given name or nil if it is not in the specified list
 //
-func GetType(name string, list *TypeDesc) *TypeDesc {
+func GetType(name string, packagename string, list *TypeDesc) *TypeDesc {
     var tmpType *TypeDesc;
     var retValue *TypeDesc = nil;
     for tmpType = list; tmpType != nil; tmpType = tmpType.next {
-        if StringCompare(tmpType.name,name) == 0 {
+        if (StringCompare(tmpType.name,name) == 0) && ((StringLength(tmpType.packagename) == 0) || (StringCompare(tmpType.packagename,packagename) == 0)) { //Empty package name indicates internal types
             retValue = tmpType;
             break;
         }
@@ -168,10 +169,11 @@ func NewObject(name string, class uint64) *ObjectDesc {
 //
 // Creates a new type
 //
-func NewType(name string, len uint64, basetype *TypeDesc) *TypeDesc {
+func NewType(name string, packagename string, len uint64, basetype *TypeDesc) *TypeDesc {
     var adr uint64 = Alloc(TYPE_SIZE);
     var objtype *TypeDesc = Uint64ToTypeDescPtr(adr);
     objtype.name = name; //TODO: Copy string?
+    objtype.packagename = packagename; //TODO: Copy string?
     if basetype != nil {
         objtype.form = FORM_SIMPLE;
     } else {
@@ -200,6 +202,10 @@ func PrintObjects(list *ObjectDesc) {
                 PrintString(" of length ");
                 PrintNumber(o.objtype.len);
                 PrintString(", internally named ");
+            }
+            if StringLength(o.objtype.packagename) != 0 {
+                PrintString(o.objtype.packagename);
+                PrintChar('.');
             }
             PrintString(o.objtype.name);
         } else {
@@ -235,6 +241,10 @@ func PrintTypes(list *TypeDesc) {
                     PrintString(" of length ");
                     PrintNumber(o.objtype.len);
                     PrintString(", internally named ");
+                }
+                if StringLength(o.objtype.packagename) != 0 {
+                    PrintString(o.objtype.packagename);
+                    PrintChar('.');
                 }
                 PrintString(o.objtype.name);
             } else {
