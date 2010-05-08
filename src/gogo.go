@@ -36,6 +36,7 @@ var DEBUG_LEVEL uint64 = 0;
 func main() {
     var errno uint64;
     var i uint64;
+    var temptype *libgogo.TypeDesc;
 
     libgogo.GetArgv();
 
@@ -46,6 +47,14 @@ func main() {
     if libgogo.Argc > 11 {
         libgogo.ExitError("Cannot compile more than 10 files at once",1);
     }
+
+    //Default data types
+    temptype = libgogo.NewType("uint64", 8);
+    libgogo.Types = libgogo.AppendType(temptype, libgogo.Types);
+    temptype = libgogo.NewType("byte", 1);
+    libgogo.Types = libgogo.AppendType(temptype, libgogo.Types);
+    temptype = libgogo.NewType("string", 16);
+    libgogo.Types = libgogo.AppendType(temptype, libgogo.Types);
 
     for i=1; i < libgogo.Argc ; i= i+1 {
         curFileIndex = i-1;

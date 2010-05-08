@@ -100,7 +100,7 @@ func ParseStructDecl() uint64 {
     GetNextTokenSafe();
     if tok.id == TOKEN_TYPE {
         AssertNextToken(TOKEN_IDENTIFIER);
-        CurrentType = libgogo.NewType(tok.strValue);
+        CurrentType = libgogo.NewType(tok.strValue, 0);
         // identifier of struct in tok.strValue
         AssertNextToken(TOKEN_STRUCT);
         AssertNextToken(TOKEN_LCBRAC);

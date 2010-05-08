@@ -23,8 +23,8 @@ type TypeDesc struct {
 //
 // Pseudo constants that specify the descriptor sizes 
 //
-var OBJECT_SIZE uint64 = 32+8; //4*8 bytes space for an object
-var TYPE_SIZE uint64 = 48+8;  //6*8 bytes space for a type
+var OBJECT_SIZE uint64 = 32+8; //4*8 bytes space for an object, extra 8 for the string length
+var TYPE_SIZE uint64 = 48+8;  //6*8 bytes space for a type, extra 8 for the string length
 
 //
 // Classes for objects
@@ -142,10 +142,11 @@ func NewObject(name string, class uint64) *ObjectDesc {
 //
 // Creates a new type
 //
-func NewType(name string) *TypeDesc {
+func NewType(name string, len uint64) *TypeDesc {
     var adr uint64 = Alloc(TYPE_SIZE);
     var objtype *TypeDesc = Uint64ToTypeDescPtr(adr);
     objtype.name = name; //TODO: Copy string?
+    objtype.len = len;
     objtype.next = nil;
     objtype.fields = nil;
     return objtype;
@@ -171,6 +172,11 @@ func PrintTypes(list *TypeDesc) {
     for t = list; t != nil; t = t.next {
         PrintString("Type ");
         PrintString(t.name);
+        if t.len != 0 {
+            PrintString(" (length: ");
+            PrintNumber(t.len);
+            PrintString(")");
+        }
         PrintString("\n");
 				for o = t.fields; o != nil; o = o.next {
             PrintString("  ");
