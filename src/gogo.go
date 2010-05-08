@@ -37,7 +37,7 @@ func main() {
     var errno uint64;
     var i uint64;
 
-    libgogo.GetArgv()
+    libgogo.GetArgv();
 
     if libgogo.Argc <= 1 {
         libgogo.ExitError("Usage: gogo file1.go [file2.go ...]",1);
