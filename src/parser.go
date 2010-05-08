@@ -658,6 +658,7 @@ func ParseStatement() uint64 {
         if boolFlag != 0 {
             tok.nextToken = tok.id;
             boolFlag = ParseFunctionCallStatement();
+            AssertNextToken(TOKEN_SEMICOLON);
         }        
         if boolFlag != 0 {
             es[0] = TOKEN_ASSIGN;
