@@ -12,8 +12,10 @@ var maxDepth uint64 = 10;
 var curDepth uint64 = 1;
 
 var CurrentType *libgogo.TypeDesc;
-
 var CurrentObject *libgogo.ObjectDesc;
+
+var InsideFunction uint64 = 0;
+var LocalObjects *libgogo.ObjectDesc = nil; //Function-local objects
 
 //
 // Main parsing function. Corresponds to the EBNF main structure called 
@@ -248,7 +250,11 @@ func ParseVarDecl() uint64 {
         AssertNextToken(TOKEN_VAR);
         AssertNextToken(TOKEN_IDENTIFIER);
         CurrentObject = libgogo.NewObject(tok.strValue, libgogo.CLASS_VAR);
-        libgogo.GlobalObjects = libgogo.AppendObject(CurrentObject,libgogo.GlobalObjects);
+        if InsideFunction == 0 { //Global objects
+            libgogo.GlobalObjects = libgogo.AppendObject(CurrentObject,libgogo.GlobalObjects);
+        } else { //Function-local objects
+            LocalObjects = libgogo.AppendObject(CurrentObject,LocalObjects);
+        }
         // variable name in tok.strValue
         ParseType();
 
@@ -575,6 +581,7 @@ func ParseFuncDeclRaw() uint64 {
 func ParseFuncDecl() uint64 {
     var boolFlag uint64;
     PrintDebugString("Entering ParseFuncDecl()",1000);
+    InsideFunction = 1;
     GetNextTokenSafe();
     if tok.id == TOKEN_LCBRAC {
         ParseVarDeclList();
@@ -592,6 +599,14 @@ func ParseFuncDecl() uint64 {
         tok.nextToken = tok.id;
         boolFlag = 1;
     }
+    InsideFunction = 0;
+    if DEBUG_LEVEL >= 100 { //Function-local symbol table
+        libgogo.PrintString("\nFunction-local symbol table until line ");
+        libgogo.PrintNumber(fileInfo[curFileIndex].lineCounter);
+        libgogo.PrintString(":\n-------------------------------------------\n");
+        libgogo.PrintObjects(LocalObjects);
+    }
+    LocalObjects = nil; //Delete local objects
     PrintDebugString("Leaving ParseFuncDecl()",1000);
     return boolFlag;
 }

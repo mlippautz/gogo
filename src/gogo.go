@@ -27,6 +27,7 @@ var curFileIndex uint64 = 0;
 //
 // A very basic debug flag
 // Set to 1000 to enable all parsing strings
+// Set to 100 to enable all symbol tables
 //
 var DEBUG_LEVEL uint64 = 0;
 
@@ -87,8 +88,10 @@ func main() {
         }
     }
 
-    //TEMP DEBUG: symbol table
-    /*libgogo.PrintTypes(libgogo.Types);
-    libgogo.PrintObjects(libgogo.GlobalObjects);*/
-    //---
+    if DEBUG_LEVEL >= 100 { //Global symbol table
+        libgogo.PrintString("\nGlobal symbol table:\n");
+        libgogo.PrintString("--------------------\n");
+        libgogo.PrintTypes(libgogo.Types);
+        libgogo.PrintObjects(libgogo.GlobalObjects);
+    }
 }
