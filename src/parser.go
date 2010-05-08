@@ -171,8 +171,10 @@ func ParseType() {
         tok.nextToken = tok.id;
     }
     GetNextTokenSafe();
-    if tok.id != TOKEN_ARITH_MUL { //TODO: Consider pointer (*)
+    if tok.id != TOKEN_ARITH_MUL {
         tok.nextToken = tok.id;
+    } else {
+        libgogo.FlagObjectTypeAsPointer(CurrentObject); //Type is pointer
     }
     AssertNextToken(TOKEN_IDENTIFIER);
     // typename in tok.strValue

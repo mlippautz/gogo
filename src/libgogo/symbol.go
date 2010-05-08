@@ -8,6 +8,7 @@ type ObjectDesc struct {
     name string;
     class uint64;
     objtype *TypeDesc;
+    ptrtype byte; //If 0, type objtype, otherwise type *objtype
     next *ObjectDesc;
 };
 
@@ -23,8 +24,8 @@ type TypeDesc struct {
 //
 // Pseudo constants that specify the descriptor sizes 
 //
-var OBJECT_SIZE uint64 = 32+8; //4*8 bytes space for an object, extra 8 for the string length
-var TYPE_SIZE uint64 = 48+8;  //6*8 bytes space for a type, extra 8 for the string length
+var OBJECT_SIZE uint64 = 48; //6*8 bytes space for an object, extra 8 for the string length
+var TYPE_SIZE uint64 = 56;  //7*8 bytes space for a type, extra 8 for the string length
 
 //
 // Classes for objects
@@ -108,6 +109,13 @@ func SetObjType(object *ObjectDesc, objtype *TypeDesc) {
 }
 
 //
+// Marks the type of the given object as pointer
+//
+func FlagObjectTypeAsPointer(object *ObjectDesc) {
+    object.ptrtype = 1;
+}
+
+//
 // Fetches an object with a specific identifier or nil if it is not in the specified list
 //
 func GetObject(name string, list *ObjectDesc) *ObjectDesc {
@@ -145,6 +153,7 @@ func NewObject(name string, class uint64) *ObjectDesc {
     var obj *ObjectDesc = Uint64ToObjectDescPtr(adr);
     obj.name = name; //TODO: Copy string?
     obj.objtype = nil;
+    obj.ptrtype = 0;
     obj.class = class;
     obj.next = nil;
     return obj;
@@ -168,8 +177,11 @@ func PrintObjects(list *ObjectDesc) {
     for o = list; o != nil; o = o.next {
         PrintString("Object ");
         PrintString(o.name);
-        PrintString(" (type ");
+        PrintString(" (type: ");
         if o.objtype != nil {
+            if o.ptrtype != 0 {
+                PrintString("pointer to ");
+            }
             PrintString(o.objtype.name);
         } else {
             PrintString("<unknown>");
@@ -193,8 +205,11 @@ func PrintTypes(list *TypeDesc) {
 				for o = t.fields; o != nil; o = o.next {
             PrintString("  ");
             PrintString(o.name);
-            PrintString(" (type ");
+            PrintString(" (type: ");
             if o.objtype != nil {
+                if o.ptrtype != 0 {
+                    PrintString("pointer to ");
+                }
                 PrintString(o.objtype.name);
             } else {
                 PrintString("<unknown>");
