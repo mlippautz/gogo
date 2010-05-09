@@ -17,16 +17,17 @@ func GetCharWrapped() byte {
     var singleChar byte;
     if tok.nextChar == 0 {       
         singleChar = libgogo.GetChar(fileInfo[curFileIndex].fd);
+        if (singleChar == 10) {
+            fileInfo[curFileIndex].charCounter = 1;
+            fileInfo[curFileIndex].lineCounter = fileInfo[curFileIndex].lineCounter + 1;
+        } else {
+            fileInfo[curFileIndex].charCounter = fileInfo[curFileIndex].charCounter + 1;
+        }
     } else {
         singleChar = tok.nextChar;
         tok.nextChar = 0;
     }
-    if (singleChar == 10) {
-        fileInfo[curFileIndex].charCounter = 1;
-        fileInfo[curFileIndex].lineCounter = fileInfo[curFileIndex].lineCounter + 1;
-    } else {
-        fileInfo[curFileIndex].charCounter = fileInfo[curFileIndex].charCounter + 1;
-    }
+
     return singleChar;
 }
 
