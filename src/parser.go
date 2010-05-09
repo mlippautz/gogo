@@ -129,8 +129,8 @@ func ParseStructDecl() uint64 {
         ParseStructVarDeclList();
         InsideStructDecl = 0;
         AssertNextToken(TOKEN_RCBRAC);
-        AssertNextToken(TOKEN_SEMICOLON);
-				GlobalTypes = libgogo.AppendType(CurrentType, GlobalTypes);
+        AssertNextTokenWeak(TOKEN_SEMICOLON);
+        GlobalTypes = libgogo.AppendType(CurrentType, GlobalTypes);
         boolFlag = 0;
     } else {
         boolFlag = 1;
@@ -165,7 +165,7 @@ func ParseStructVarDecl() uint64 {
         CurrentObject = libgogo.NewObject(tok.strValue, libgogo.CLASS_FIELD);
         libgogo.AddFields(CurrentObject, CurrentType);
         ParseType();
-        AssertNextToken(TOKEN_SEMICOLON);
+        AssertNextTokenWeak(TOKEN_SEMICOLON);
         boolFlag = 0;
     } else {
         boolFlag = 1;
@@ -320,7 +320,7 @@ func ParseVarDecl() uint64 {
             tok.nextToken = tok.id;
         } 
 
-        AssertNextToken(TOKEN_SEMICOLON);
+        AssertNextTokenWeak(TOKEN_SEMICOLON);
         boolFlag = 0;
     }
     PrintDebugString("Leaving ParseVarDecl()",1000);
@@ -501,7 +501,7 @@ func ParseFactor() uint64 {
     }
     if (doneFlag) == 1 && (tok.id == TOKEN_LBRAC) {
         ParseExpression();
-        AssertNextToken(TOKEN_RBRAC);
+        AssertNextTokenWeak(TOKEN_RBRAC);
         doneFlag = 0;
     }
     if (doneFlag == 1) && (tok.id == TOKEN_NOT) {
@@ -607,7 +607,7 @@ func ParseFuncDeclListSub() uint64 {
         if boolFlag != 0 {
             es[0] = TOKEN_SEMICOLON;
             es[1] = TOKEN_LCBRAC;
-            ParseError(tok.id,es,2);
+            ParseErrorFatal(tok.id,es,2);
         }
     }
     PrintDebugString("Leaving ParseFuncDeclListSub()",1000);
@@ -623,7 +623,7 @@ func ParseFuncDeclHead() uint64 {
         // function name in tok.strValue
         AssertNextToken(TOKEN_LBRAC);
         ParseIdentifierTypeList();
-        AssertNextToken(TOKEN_RBRAC);
+        AssertNextTokenWeak(TOKEN_RBRAC);
         ParseTypeOptional();
         boolFlag = 0;
     } else {    
@@ -658,7 +658,7 @@ func ParseFuncDecl() uint64 {
         GetNextTokenSafe();
         if tok.id == TOKEN_RETURN {
             ParseExpression();
-            AssertNextToken(TOKEN_SEMICOLON);
+            AssertNextTokenWeak(TOKEN_SEMICOLON);
         } else {
             tok.nextToken = tok.id;
         }
@@ -756,12 +756,12 @@ func ParseStatement() uint64 {
         if boolFlag != 0 {
             tok.nextToken = tok.id;
             boolFlag = ParseFunctionCallStatement();
-            AssertNextToken(TOKEN_SEMICOLON);
+            AssertNextTokenWeak(TOKEN_SEMICOLON);
         }        
         if boolFlag != 0 {
             es[0] = TOKEN_ASSIGN;
             es[1] = TOKEN_LBRAC;
-            ParseError(tok.id,es,0);
+            ParseErrorFatal(tok.id,es,0);
         }
         doneFlag = 0;
     }
@@ -810,7 +810,7 @@ func ParseAssignment() uint64 {
     GetNextTokenSafe();
     if tok.id == TOKEN_ASSIGN {
         ParseExpression();
-        AssertNextToken(TOKEN_SEMICOLON);
+        AssertNextTokenWeak(TOKEN_SEMICOLON);
         boolFlag = 0;
     } else {
         tok.nextToken = tok.id;
@@ -860,7 +860,7 @@ func ParseFunctionCall() {
     if tok.id != TOKEN_RBRAC {
         tok.nextToken = tok.id;
         ParseExpressionList();
-        AssertNextToken(TOKEN_RBRAC);     
+        AssertNextTokenWeak(TOKEN_RBRAC);     
     }     
     PrintDebugString("Leaving ParseFunctionCall()",1000);
 }
@@ -918,10 +918,11 @@ func ParseForStatement() {
             AssertNextToken(TOKEN_IDENTIFIER);
             // tok.strValue
             ParseSelector();
-            ParseAssignmentWithoutSC();
+            //ParseAssignmentWithoutSC();
+            ParseAssignment();
         }
         
-        AssertNextToken(TOKEN_SEMICOLON);
+        //AssertNextToken(TOKEN_SEMICOLON);
 
         GetNextTokenSafe();
         if tok.id == TOKEN_SEMICOLON {
@@ -930,8 +931,8 @@ func ParseForStatement() {
             tok.nextToken = tok.id;
             ParseExpression();
         }
-
-        AssertNextToken(TOKEN_SEMICOLON);
+        AssertNextTokenWeak(TOKEN_SEMICOLON);
+        //AssertNextToken(TOKEN_SEMICOLON);
 
         GetNextTokenSafe();
         if tok.id == TOKEN_LCBRAC {
@@ -963,7 +964,7 @@ func ParseIfStatement() {
     GetNextTokenSafe();
     if tok.id == TOKEN_IF {
         ParseExpression();
-        AssertNextToken(TOKEN_LCBRAC);
+        AssertNextTokenWeak(TOKEN_LCBRAC);
         ParseStatementSequence();
         AssertNextToken(TOKEN_RCBRAC);
 
@@ -986,7 +987,7 @@ func ParseIfStatement() {
 //
 func ParseElseStatement() {
     PrintDebugString("Entering ParseElseStatement()",1000);
-    AssertNextToken(TOKEN_LCBRAC);
+    AssertNextTokenWeak(TOKEN_LCBRAC);
     ParseStatementSequence();
     AssertNextToken(TOKEN_RCBRAC);
     PrintDebugString("Leaving ParseElseStatement()",1000);

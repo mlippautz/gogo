@@ -6,6 +6,9 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
+var maxErrors uint64 = 5;
+var errors uint64 = 0;
+
 func CheckDebugLevel(debugLevel uint64) uint64 {
     var retVal uint64 = 0;
     if debugLevel <= DEBUG_LEVEL {
@@ -60,16 +63,11 @@ func ScanErrorChar(char byte) {
     libgogo.Exit(2);
 }
 
-//
-// Function printing a parse error using only libgogo.
-// ue ... unexpected token
-// e .... array of expected tokens
-// eLen . actual length (items) of array
-//
-func ParseError(ue uint64, e [2]uint64, eLen uint64) {
+func ParseErrorWeak(ue uint64, e[2]uint64, eLen uint64) {
     var i uint64;
     var str string;
-
+    
+    errors = errors+1;
     PrintHead();
     libgogo.PrintString(": syntax error: unexpected token '");
     str = TokenToString(ue);
@@ -99,6 +97,22 @@ func ParseError(ue uint64, e [2]uint64, eLen uint64) {
         }
     } 
     libgogo.PrintString("\n");
+    if errors == maxErrors {
+        libgogo.PrintString("Maximum number of errors (");
+        libgogo.PrintNumber(maxErrors);
+        libgogo.PrintString(") reached. Exiting.\n");
+        libgogo.Exit(3);
+    }
+}
+
+//
+// Function printing a parse error using only libgogo.
+// ue ... unexpected token
+// e .... array of expected tokens
+// eLen . actual length (items) of array
+//
+func ParseErrorFatal(ue uint64, e [2]uint64, eLen uint64) {
+    ParseErrorWeak(ue,e,eLen);
     libgogo.Exit(3); 
 }
 
