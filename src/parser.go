@@ -220,9 +220,14 @@ func ParseType() {
                 } else {
                     SymbolTableError("A type cannot contain itself,", "", "type", typename);
                 }
+            } else {
+                ; //TODO: Type forward declaration
             }
         } else {
-            ; //TODO: Type forward declaration
+            libgogo.StringAppend(&tempstr, packagename);
+            libgogo.CharAppend(&tempstr, '.');
+            libgogo.StringAppend(&tempstr, typename);
+            SymbolTableError("Unknown", "", "type", tempstr);
         }
     }
     if arraydim == 0 { //No array
