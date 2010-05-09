@@ -42,12 +42,6 @@ var FORM_STRUCT uint64 = 2;
 var FORM_ARRAY uint64 = 3;
 
 //
-// List of global objects and declared types
-//
-var GlobalObjects *ObjectDesc = nil;
-var Types *TypeDesc = nil;
-
-//
 // Convert the uint64 value (returned from malloc) to a real object address
 //
 func Uint64ToObjectDescPtr(adr uint64) *ObjectDesc;

@@ -52,17 +52,17 @@ func main() {
 
     //Default data types
     temptype = libgogo.NewType("uint64", "", 8, nil);
-    libgogo.Types = libgogo.AppendType(temptype, libgogo.Types);
+    GlobalTypes = libgogo.AppendType(temptype, GlobalTypes);
     temptype = libgogo.NewType("byte", "", 1, nil);
-    libgogo.Types = libgogo.AppendType(temptype, libgogo.Types);
+    GlobalTypes = libgogo.AppendType(temptype, GlobalTypes);
     temptype = libgogo.NewType("string", "", 16, nil);
-    libgogo.Types = libgogo.AppendType(temptype, libgogo.Types);
+    GlobalTypes = libgogo.AppendType(temptype, GlobalTypes);
 
     //Default objects
     tempobject = libgogo.NewObject("nil", libgogo.CLASS_VAR);
     libgogo.SetObjType(tempobject, nil);
     libgogo.FlagObjectTypeAsPointer(tempobject); //nil is a pointer to no specified type (universal)
-    libgogo.GlobalObjects = libgogo.AppendObject(tempobject, libgogo.GlobalObjects);
+    GlobalObjects = libgogo.AppendObject(tempobject, GlobalObjects);
 
     for i=1; i < libgogo.Argc ; i= i+1 {
         curFileIndex = i-1;
@@ -88,10 +88,10 @@ func main() {
         }
     }
 
-    if DEBUG_LEVEL >= 100 { //Global symbol table
+    if CheckDebugLevel(100) == 1 { //Global symbol table
         libgogo.PrintString("\nGlobal symbol table:\n");
         libgogo.PrintString("--------------------\n");
-        libgogo.PrintTypes(libgogo.Types);
-        libgogo.PrintObjects(libgogo.GlobalObjects);
+        libgogo.PrintTypes(GlobalTypes);
+        libgogo.PrintObjects(GlobalObjects);
     }
 }

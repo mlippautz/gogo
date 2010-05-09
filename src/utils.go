@@ -6,8 +6,16 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
-func PrintDebugString(msg string, debugLevel uint64) {
+func CheckDebugLevel(debugLevel uint64) uint64 {
+    var retVal uint64 = 0;
     if debugLevel <= DEBUG_LEVEL {
+        retVal = 1;
+    }
+    return retVal;
+}
+
+func PrintDebugString(msg string, debugLevel uint64) {
+    if CheckDebugLevel(debugLevel) == 1 {
         PrintHead();   
         libgogo.PrintString(": DEBUG: ");
         libgogo.PrintString(msg);
@@ -16,7 +24,7 @@ func PrintDebugString(msg string, debugLevel uint64) {
 }
 
 func PrintDebugChar(char byte, debugLevel uint64) {
-    if debugLevel >= DEBUG_LEVEL {
+    if CheckDebugLevel(debugLevel) == 1 {
         PrintHead();   
         libgogo.PrintString(": DEBUG: ");
         libgogo.PrintChar(char);
@@ -92,5 +100,15 @@ func ParseError(ue uint64, e [2]uint64, eLen uint64) {
     } 
     libgogo.PrintString("\n");
     libgogo.Exit(3); 
+}
+
+func SymbolTableError(identifier string, position string) {
+    PrintHead();
+    libgogo.PrintString(": symbol table error: duplicate ");
+    libgogo.PrintString(position);
+    libgogo.PrintString(" identifier '");
+    libgogo.PrintString(identifier);
+    libgogo.PrintString("'\n");
+    libgogo.Exit(4);
 }
 

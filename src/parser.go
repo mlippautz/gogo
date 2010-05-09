@@ -11,11 +11,21 @@ var tok Token;
 var maxDepth uint64 = 10;
 var curDepth uint64 = 1;
 
+//
+// List of global objects and declared types
+//
+var GlobalObjects *libgogo.ObjectDesc = nil;
+var GlobalTypes *libgogo.TypeDesc = nil;
+
+//
+// List of function-local objects
+//
+var LocalObjects *libgogo.ObjectDesc = nil;
+
 var CurrentType *libgogo.TypeDesc;
 var CurrentObject *libgogo.ObjectDesc;
 
 var InsideFunction uint64 = 0;
-var LocalObjects *libgogo.ObjectDesc = nil; //Function-local objects
 
 var CurrentPackage string = "<no package>";
 
@@ -114,7 +124,7 @@ func ParseStructDecl() uint64 {
         ParseStructVarDeclList();
         AssertNextToken(TOKEN_RCBRAC);
         AssertNextToken(TOKEN_SEMICOLON);
-				libgogo.Types = libgogo.AppendType(CurrentType, libgogo.Types);
+				GlobalTypes = libgogo.AppendType(CurrentType, GlobalTypes);
         boolFlag = 0;
     } else {
         boolFlag = 1;
@@ -198,7 +208,7 @@ func ParseType() {
         typename = tok.strValue;
     }
 
-    basetype = libgogo.GetType(typename, packagename, libgogo.Types);
+    basetype = libgogo.GetType(typename, packagename, GlobalTypes);
     /*if CurrentObject.objtype == nil {
         //TODO: Type forward declaration
     }*/
@@ -269,9 +279,15 @@ func ParseVarDecl() uint64 {
         AssertNextToken(TOKEN_IDENTIFIER);
         CurrentObject = libgogo.NewObject(tok.strValue, libgogo.CLASS_VAR);
         if InsideFunction == 0 { //Global objects
-            libgogo.GlobalObjects = libgogo.AppendObject(CurrentObject,libgogo.GlobalObjects);
+            if libgogo.GetObject(tok.strValue, GlobalObjects) != nil {
+                SymbolTableError(tok.strValue, "global");
+            }
+            GlobalObjects = libgogo.AppendObject(CurrentObject, GlobalObjects);
         } else { //Function-local objects
-            LocalObjects = libgogo.AppendObject(CurrentObject,LocalObjects);
+            if libgogo.GetObject(tok.strValue, LocalObjects) != nil {
+                SymbolTableError(tok.strValue, "local");
+            }
+            LocalObjects = libgogo.AppendObject(CurrentObject, LocalObjects);
         }
         // variable name in tok.strValue
         ParseType();
@@ -632,7 +648,7 @@ func ParseFuncDecl() uint64 {
         boolFlag = 1;
     }
     InsideFunction = 0;
-    if DEBUG_LEVEL >= 100 { //Function-local symbol table
+    if CheckDebugLevel(100) == 1 { //Function-local symbol table
         libgogo.PrintString("\nFunction-local symbol table until line ");
         libgogo.PrintNumber(fileInfo[curFileIndex].lineCounter);
         libgogo.PrintString(" of ");
