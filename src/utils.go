@@ -6,7 +6,7 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
-var maxErrors uint64 = 5;
+var maxErrors uint64 = 10;
 var errors uint64 = 0;
 
 func CheckDebugLevel(debugLevel uint64) uint64 {

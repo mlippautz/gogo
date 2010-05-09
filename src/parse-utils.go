@@ -85,6 +85,7 @@ func AssertToken(tokenNumber uint64) {
     var expectedTokens [2]uint64;
     if tok.id != tokenNumber {
         expectedTokens[0] = tokenNumber;
-        ParseErrorFatal(tok.id, expectedTokens, 1);        
+        ParseErrorWeak(tok.id, expectedTokens, 1);
+        ParserSync();
     }
 }

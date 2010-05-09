@@ -1,4 +1,3 @@
-// Copyright 2010 The GoGo Authors. All rights reserved.
 // Use of this source code is governed by the MIT
 // license that can be found in the LICENSE file.
 
@@ -10,6 +9,7 @@ var tok Token;
 
 var maxDepth uint64 = 10;
 var curDepth uint64 = 1;
+var compile = 1;
 
 //
 // List of global objects and declared types
@@ -39,7 +39,7 @@ func Parse() {
     tok.nextChar = 0;
     tok.nextToken = 0;    
 
-    ParsePackageStatement();    
+    ParsePackageStatement(); 
     ParseImportStatementList();
     ParseStructDeclList();
     ParseVarDeclList();
@@ -54,8 +54,8 @@ func Parse() {
 //
 func ParsePackageStatement() {    
     PrintDebugString("Entering ParsePackageStatement()",1000);
-    AssertNextToken(TOKEN_PACKAGE);
-    AssertNextToken(TOKEN_IDENTIFIER);
+    AssertNextTokenWeak(TOKEN_PACKAGE);
+    AssertNextTokenWeak(TOKEN_IDENTIFIER);
     // package ok, value in tok.strValue
     CurrentPackage = tok.strValue;
     PrintDebugString("Leaving ParsePackageStatement()",1000);
@@ -128,7 +128,7 @@ func ParseStructDecl() uint64 {
         InsideStructDecl = 1;
         ParseStructVarDeclList();
         InsideStructDecl = 0;
-        AssertNextToken(TOKEN_RCBRAC);
+        AssertNextTokenWeak(TOKEN_RCBRAC);
         AssertNextTokenWeak(TOKEN_SEMICOLON);
         GlobalTypes = libgogo.AppendType(CurrentType, GlobalTypes);
         boolFlag = 0;
@@ -480,6 +480,7 @@ func ParseBinaryArithOp() uint64 {
 func ParseFactor() uint64 {
     var doneFlag uint64 = 1;
     var boolFlag uint64;
+    var es [2]uint64;
     PrintDebugString("Entering ParseFactor()",1000);
     GetNextTokenSafe();
     if (doneFlag == 1) && (tok.id == TOKEN_OP_ADR) {
@@ -512,6 +513,9 @@ func ParseFactor() uint64 {
     if doneFlag != 0 {
         boolFlag = 1;
         tok.nextToken = tok.id;
+        // Fix (?) empty factor, which should not be possible.
+        ParseErrorWeak(tok.id,es,0);
+        ParserSync();
     } else {
         boolFlag = 0;
     }
@@ -756,12 +760,16 @@ func ParseStatement() uint64 {
         if boolFlag != 0 {
             tok.nextToken = tok.id;
             boolFlag = ParseFunctionCallStatement();
-            AssertNextTokenWeak(TOKEN_SEMICOLON);
+            if boolFlag == 0 {
+                AssertNextTokenWeak(TOKEN_SEMICOLON);
+            }
         }        
         if boolFlag != 0 {
             es[0] = TOKEN_ASSIGN;
             es[1] = TOKEN_LBRAC;
-            ParseErrorFatal(tok.id,es,0);
+            ParseErrorWeak(tok.id, es, 2);
+            ParserSync();
+            //ParseErrorFatal(tok.id,es,0);
         }
         doneFlag = 0;
     }
@@ -991,4 +999,16 @@ func ParseElseStatement() {
     ParseStatementSequence();
     AssertNextToken(TOKEN_RCBRAC);
     PrintDebugString("Leaving ParseElseStatement()",1000);
+}
+
+func ParserSync() {
+    compile = 0; // stop producing code
+    for ;tok.id != TOKEN_FUNC && tok.id != TOKEN_EOS ; {
+        GetNextTokenSafe();
+    }
+    if tok.id == TOKEN_FUNC {
+        tok.nextToken = tok.id;
+        ParseFuncDeclList();       
+    }
+    libgogo.Exit(3); // Exit with an error
 }
