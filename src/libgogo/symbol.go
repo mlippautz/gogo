@@ -110,6 +110,13 @@ func FlagObjectTypeAsPointer(object *ObjectDesc) {
 }
 
 //
+// Returns whether an object's type is a pointer
+//
+func IsPointerType(object *ObjectDesc) byte {
+    return object.ptrtype;
+}
+
+//
 // Returns a type's name
 //
 func GetTypeName(objtype *TypeDesc) string {

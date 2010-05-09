@@ -26,6 +26,7 @@ var CurrentType *libgogo.TypeDesc;
 var CurrentObject *libgogo.ObjectDesc;
 
 var InsideFunction uint64 = 0;
+var InsideStructDecl uint64 = 0;
 
 var CurrentPackage string = "<no package>";
 
@@ -121,7 +122,9 @@ func ParseStructDecl() uint64 {
         // identifier of struct in tok.strValue
         AssertNextToken(TOKEN_STRUCT);
         AssertNextToken(TOKEN_LCBRAC);
+        InsideStructDecl = 1;
         ParseStructVarDeclList();
+        InsideStructDecl = 0;
         AssertNextToken(TOKEN_RCBRAC);
         AssertNextToken(TOKEN_SEMICOLON);
 				GlobalTypes = libgogo.AppendType(CurrentType, GlobalTypes);
@@ -209,9 +212,19 @@ func ParseType() {
     }
 
     basetype = libgogo.GetType(typename, packagename, GlobalTypes);
-    /*if CurrentObject.objtype == nil {
-        //TODO: Type forward declaration
-    }*/
+    if basetype == nil {
+        if InsideStructDecl == 1 {
+            if libgogo.StringCompare(typename, libgogo.GetTypeName(CurrentType)) == 0 {
+                if (libgogo.IsPointerType(CurrentObject) == 1) { //Allow pointer to own type
+                    basetype = CurrentType;
+                } else {
+                    SymbolTableError("A type cannot contain itself,", "", "type", typename);
+                }
+            }
+        } else {
+            ; //TODO: Type forward declaration
+        }
+    }
     if arraydim == 0 { //No array
         libgogo.SetObjType(CurrentObject, basetype);
     } else { //Array
@@ -280,12 +293,12 @@ func ParseVarDecl() uint64 {
         CurrentObject = libgogo.NewObject(tok.strValue, libgogo.CLASS_VAR);
         if InsideFunction == 0 { //Global objects
             if libgogo.GetObject(tok.strValue, GlobalObjects) != nil {
-                SymbolTableError(tok.strValue, "global");
+                SymbolTableError("duplicate", "global", "identifier", tok.strValue);
             }
             GlobalObjects = libgogo.AppendObject(CurrentObject, GlobalObjects);
         } else { //Function-local objects
             if libgogo.GetObject(tok.strValue, LocalObjects) != nil {
-                SymbolTableError(tok.strValue, "local");
+                SymbolTableError("duplicate", "local", "identifier", tok.strValue);
             }
             LocalObjects = libgogo.AppendObject(CurrentObject, LocalObjects);
         }

@@ -102,11 +102,17 @@ func ParseError(ue uint64, e [2]uint64, eLen uint64) {
     libgogo.Exit(3); 
 }
 
-func SymbolTableError(identifier string, position string) {
+func SymbolTableError(msg string, position string, msg2 string, identifier string) {
     PrintHead();
-    libgogo.PrintString(": symbol table error: duplicate ");
+    libgogo.PrintString(": symbol table error: ");
+    libgogo.PrintString(msg);
+    libgogo.PrintString(" ");
     libgogo.PrintString(position);
-    libgogo.PrintString(" identifier '");
+    if libgogo.StringLength(position) != 0 {
+        libgogo.PrintString(" ");
+    }
+    libgogo.PrintString(msg2);
+    libgogo.PrintString(" '");
     libgogo.PrintString(identifier);
     libgogo.PrintString("'\n");
     libgogo.Exit(4);
