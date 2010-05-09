@@ -118,6 +118,9 @@ func ParseStructDecl() uint64 {
     GetNextTokenSafe();
     if tok.id == TOKEN_TYPE {
         AssertNextToken(TOKEN_IDENTIFIER);
+        if libgogo.GetType(tok.strValue, CurrentPackage, GlobalTypes) != nil {
+            SymbolTableError("duplicate type", tok.strValue, "in package", CurrentPackage);
+        }
         CurrentType = libgogo.NewType(tok.strValue, CurrentPackage, 0, nil);
         // identifier of struct in tok.strValue
         AssertNextToken(TOKEN_STRUCT);
