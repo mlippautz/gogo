@@ -1004,7 +1004,7 @@ func ParseElseStatement() {
 
 func ParserSync() {
     compile = 0; // stop producing code
-    for ;tok.id != TOKEN_FUNC && tok.id != TOKEN_EOS ; {
+    for ;(tok.id != TOKEN_FUNC) && (tok.id != TOKEN_EOS); {
         GetNextTokenSafe();
     }
     if tok.id == TOKEN_FUNC {
