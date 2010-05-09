@@ -9,7 +9,7 @@ var tok Token;
 
 var maxDepth uint64 = 10;
 var curDepth uint64 = 1;
-var compile = 1;
+var compile uint64 = 1;
 
 //
 // List of global objects and declared types
@@ -919,6 +919,7 @@ func ParseForStatement() {
     GetNextTokenSafe();
     if tok.id == TOKEN_FOR {
         GetNextTokenSafe();
+
         if tok.id == TOKEN_SEMICOLON {
             tok.nextToken = tok.id;
         } else {
@@ -926,11 +927,11 @@ func ParseForStatement() {
             AssertNextToken(TOKEN_IDENTIFIER);
             // tok.strValue
             ParseSelector();
-            //ParseAssignmentWithoutSC();
-            ParseAssignment();
+            ParseAssignmentWithoutSC();
+            //ParseAssignment();
         }
         
-        //AssertNextToken(TOKEN_SEMICOLON);
+        AssertNextToken(TOKEN_SEMICOLON);
 
         GetNextTokenSafe();
         if tok.id == TOKEN_SEMICOLON {
@@ -939,8 +940,8 @@ func ParseForStatement() {
             tok.nextToken = tok.id;
             ParseExpression();
         }
-        AssertNextTokenWeak(TOKEN_SEMICOLON);
-        //AssertNextToken(TOKEN_SEMICOLON);
+        //AssertNextTokenWeak(TOKEN_SEMICOLON);
+        AssertNextToken(TOKEN_SEMICOLON);
 
         GetNextTokenSafe();
         if tok.id == TOKEN_LCBRAC {
@@ -972,7 +973,7 @@ func ParseIfStatement() {
     GetNextTokenSafe();
     if tok.id == TOKEN_IF {
         ParseExpression();
-        AssertNextTokenWeak(TOKEN_LCBRAC);
+        AssertNextToken(TOKEN_LCBRAC);
         ParseStatementSequence();
         AssertNextToken(TOKEN_RCBRAC);
 

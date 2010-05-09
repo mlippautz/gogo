@@ -65,7 +65,7 @@ func GetNextTokenRaw() {
     // Comments can either be single line with double slashes (//) or multiline
     // using C++ syntax /* */ 
     //
-    for ; spaceDone != 1; {
+    for ;spaceDone != 1; {
 
         // check whether a comment is starting
         if singleChar == '/' {
