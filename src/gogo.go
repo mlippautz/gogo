@@ -29,7 +29,7 @@ var curFileIndex uint64 = 0;
 // Set to 1000 to enable all parsing strings
 // Set to 100 to enable all symbol tables
 //
-var DEBUG_LEVEL uint64 = 100;
+var DEBUG_LEVEL uint64 = 0;
 
 //
 // Entry point of the compiler
