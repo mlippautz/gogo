@@ -29,7 +29,7 @@ var curFileIndex uint64 = 0;
 // Set to 1000 to enable all parsing strings
 // Set to 100 to enable all symbol tables
 //
-var DEBUG_LEVEL uint64 = 0;
+var DEBUG_LEVEL uint64 = 100;
 
 //
 // Entry point of the compiler
@@ -53,7 +53,7 @@ func main() {
     //Default data types
     temptype = libgogo.NewType("uint64", "", 8, nil);
     GlobalTypes = libgogo.AppendType(temptype, GlobalTypes);
-    temptype = libgogo.NewType("byte", "", 1, nil);
+    temptype = libgogo.NewType("byte", "", /*1*/ 8, nil); //Use size 8 as everything has to be 64-bit aligned anyways
     GlobalTypes = libgogo.AppendType(temptype, GlobalTypes);
     temptype = libgogo.NewType("string", "", 16, nil);
     GlobalTypes = libgogo.AppendType(temptype, GlobalTypes);

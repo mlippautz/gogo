@@ -27,6 +27,7 @@ var CurrentObject *libgogo.ObjectDesc;
 
 var InsideFunction uint64 = 0;
 var InsideStructDecl uint64 = 0;
+var InsideFunctionVarDecl uint64 = 0;
 
 var CurrentPackage string = "<no package>";
 
@@ -194,7 +195,9 @@ func ParseType() {
     if tok.id == TOKEN_LSBRAC {   
         AssertNextToken(TOKEN_INTEGER);
         // value of integer in tok.intValue
-        arraydim = tok.intValue;
+        if InsideFunctionVarDecl == 0 {
+            arraydim = tok.intValue;
+        }
         AssertNextToken(TOKEN_RSBRAC);
     } else {
         tok.nextToken = tok.id;
@@ -203,7 +206,9 @@ func ParseType() {
     if tok.id != TOKEN_ARITH_MUL {
         tok.nextToken = tok.id;
     } else {
-        libgogo.FlagObjectTypeAsPointer(CurrentObject); //Type is pointer
+        if InsideFunctionVarDecl == 0 {
+            libgogo.FlagObjectTypeAsPointer(CurrentObject); //Type is pointer
+        }
     }
     AssertNextToken(TOKEN_IDENTIFIER);
     // typename in tok.strValue
@@ -214,35 +219,37 @@ func ParseType() {
         typename = tok.strValue;
     }
 
-    basetype = libgogo.GetType(typename, packagename, GlobalTypes);
-    if basetype == nil {
-        if InsideStructDecl == 1 {
-            if libgogo.StringCompare(typename, libgogo.GetTypeName(CurrentType)) == 0 {
-                if (libgogo.IsPointerType(CurrentObject) == 1) { //Allow pointer to own type
-                    basetype = CurrentType;
+    if InsideFunctionVarDecl == 0 {
+        basetype = libgogo.GetType(typename, packagename, GlobalTypes);
+        if basetype == nil {
+            if InsideStructDecl == 1 {
+                if libgogo.StringCompare(typename, libgogo.GetTypeName(CurrentType)) == 0 {
+                    if (libgogo.IsPointerType(CurrentObject) == 1) { //Allow pointer to own type
+                        basetype = CurrentType;
+                    } else {
+                        SymbolTableError("A type cannot contain itself,", "", "type", typename);
+                    }
                 } else {
-                    SymbolTableError("A type cannot contain itself,", "", "type", typename);
+                    ; //TODO: Type forward declaration
                 }
             } else {
-                ; //TODO: Type forward declaration
+                libgogo.StringAppend(&tempstr, packagename);
+                libgogo.CharAppend(&tempstr, '.');
+                libgogo.StringAppend(&tempstr, typename);
+                SymbolTableError("Unknown", "", "type", tempstr);
             }
-        } else {
-            libgogo.StringAppend(&tempstr, packagename);
-            libgogo.CharAppend(&tempstr, '.');
-            libgogo.StringAppend(&tempstr, typename);
-            SymbolTableError("Unknown", "", "type", tempstr);
         }
-    }
-    if arraydim == 0 { //No array
-        libgogo.SetObjType(CurrentObject, basetype);
-    } else { //Array
-        if basetype != nil {
-            libgogo.StringAppend(&tempstr, libgogo.GetTypeName(basetype));
+        if arraydim == 0 { //No array
+            libgogo.SetObjType(CurrentObject, basetype);
+        } else { //Array
+            if basetype != nil {
+                libgogo.StringAppend(&tempstr, libgogo.GetTypeName(basetype));
+            }
+            libgogo.StringAppend(&tempstr, "Array");
+            libgogo.StringAppend(&tempstr, libgogo.IntToString(arraydim));
+            temptype = libgogo.NewType(tempstr, packagename, arraydim, basetype);
+            libgogo.SetObjType(CurrentObject, temptype);
         }
-        libgogo.StringAppend(&tempstr, "Array");
-        libgogo.StringAppend(&tempstr, libgogo.IntToString(arraydim));
-        temptype = libgogo.NewType(tempstr, packagename, arraydim, basetype);
-        libgogo.SetObjType(CurrentObject, temptype);
     }
     PrintDebugString("Leaving ParseType()",1000);
 }
@@ -726,7 +733,9 @@ func ParseIdentifierType() uint64 {
         } else {
             tok.nextToken = tok.id;
         }
+        InsideFunctionVarDecl = 1;
         ParseType();
+        InsideFunctionVarDecl = 0;
         boolFlag = 0;
     }
     PrintDebugString("Leaving ParseIdentifierType()",1000);

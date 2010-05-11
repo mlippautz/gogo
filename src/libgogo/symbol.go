@@ -91,8 +91,9 @@ func AppendType(objtype *TypeDesc, list *TypeDesc) *TypeDesc {
 // Add a field in form of an object descriptor to the type descriptor given
 //
 func AddFields(object *ObjectDesc, objtype *TypeDesc) {
-    objtype.fields = AppendObject(object, objtype.fields);
     objtype.form = FORM_STRUCT;
+    objtype.fields = AppendObject(object, objtype.fields);
+    objtype.len = objtype.len + GetTypeSize(objtype);
 }
 
 //
@@ -121,6 +122,42 @@ func IsPointerType(object *ObjectDesc) byte {
 //
 func GetTypeName(objtype *TypeDesc) string {
     return objtype.name;
+}
+
+//
+// Returns an object's name
+//
+func GetObjectName(obj *ObjectDesc) string {
+    return obj.name;
+}
+
+func GetTypeSize(objtype *TypeDesc) uint64 {
+    var size uint64 = 0;
+    var tempobj *ObjectDesc;
+    if objtype != nil {
+        if objtype.form == FORM_SIMPLE {
+            size = objtype.len;
+        }
+        if objtype.form == FORM_STRUCT {
+            for tempobj = objtype.fields; tempobj != nil; tempobj = tempobj.next { //Sum of all fields
+                size = size + GetObjectSize(tempobj); //Add size of each field
+            }
+        }
+        if objtype.form == FORM_ARRAY {
+            size = objtype.len * GetTypeSize(objtype.base); //Array length * size of one item
+        }
+    } //TODO: if objtype is nil => error!
+    return size;
+}
+
+func GetObjectSize(obj *ObjectDesc) uint64 {
+    var size uint64;
+    if obj.ptrtype == 1 { //Pointer only, not the whole type
+       size = 8;
+    } else { //Actual type
+       size = GetTypeSize(obj.objtype);
+    }
+    return size;
 }
 
 //
@@ -176,9 +213,9 @@ func NewType(name string, packagename string, len uint64, basetype *TypeDesc) *T
     objtype.name = name; //TODO: Copy string?
     objtype.packagename = packagename; //TODO: Copy string?
     if basetype != nil {
-        objtype.form = FORM_SIMPLE;
-    } else {
         objtype.form = FORM_ARRAY;
+    } else {
+        objtype.form = FORM_SIMPLE;
     }
     objtype.len = len;
     objtype.next = nil;
@@ -193,10 +230,10 @@ func PrintObjects(list *ObjectDesc) {
         PrintString("Object ");
         PrintString(o.name);
         PrintString(" (type: ");
+        if o.ptrtype != 0 {
+            PrintString("pointer to ");
+        }
         if o.objtype != nil {
-            if o.ptrtype != 0 {
-                PrintString("pointer to ");
-            }
             if o.objtype.base != nil {
                 PrintString("array of ");
                 PrintString(o.objtype.base.name);
@@ -212,6 +249,8 @@ func PrintObjects(list *ObjectDesc) {
         } else {
             PrintString("<unknown>");
         }
+        PrintString(", size: ");
+        PrintNumber(GetObjectSize(o));
         PrintString(")\n");
     }
 }
@@ -222,20 +261,17 @@ func PrintTypes(list *TypeDesc) {
     for t = list; t != nil; t = t.next {
         PrintString("Type ");
         PrintString(t.name);
-        if t.len != 0 {
-            PrintString(" (length: ");
-            PrintNumber(t.len);
-            PrintString(")");
-        }
-        PrintString("\n");
+        PrintString(" (size: ");
+        PrintNumber(GetTypeSize(t));
+        PrintString(")\n");
 				for o = t.fields; o != nil; o = o.next {
             PrintString("  ");
             PrintString(o.name);
             PrintString(" (type: ");
+            if o.ptrtype != 0 {
+                PrintString("pointer to ");
+            }
             if o.objtype != nil {
-                if o.ptrtype != 0 {
-                    PrintString("pointer to ");
-                }
                 if o.objtype.base != nil {
                     PrintString("array of ");
                     PrintString(o.objtype.base.name);
@@ -248,6 +284,8 @@ func PrintTypes(list *TypeDesc) {
                     PrintChar('.');
                 }
                 PrintString(o.objtype.name);
+                PrintString(", size: ");
+                PrintNumber(GetTypeSize(o.objtype));
             } else {
                 PrintString("<unknown>");
             }
