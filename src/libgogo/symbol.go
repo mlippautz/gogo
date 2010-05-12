@@ -97,6 +97,9 @@ func AddFields(object *ObjectDesc, objtype *TypeDesc) {
     objtype.fields = AppendObject(object, objtype.fields);
 }
 
+//
+// Returns 0 if the given (struct) type has a field with the given name, or 1 otherwise
+//
 func HasField(name string, objtype *TypeDesc) uint64 {
     var tmpObj *ObjectDesc;
     var retVal uint64 = 0;
@@ -142,14 +145,24 @@ func GetObjectName(obj *ObjectDesc) string {
     return obj.name;
 }
 
+//
+// Returns 0 if the given type if forward declared, or 1 if it is not
+//
 func IsForwardDecl(objtype *TypeDesc) byte {
     return objtype.forwarddecl;
 }
 
+//
+// Unsets the forward declaration flag of the given type, making it a "normal" type
+//
 func UnsetForwardDecl(objtype *TypeDesc) {
     objtype.forwarddecl = 0;
 }
 
+//
+// Returns the (memory) size of the given type in bytes which is required when hypothetically allocating one variable of this type
+// Same semantics as sizeof(objtype)
+//
 func GetTypeSize(objtype *TypeDesc) uint64 {
     var size uint64 = 0;
     var tempobj *ObjectDesc;
@@ -175,6 +188,10 @@ func GetTypeSize(objtype *TypeDesc) uint64 {
     return size;
 }
 
+//
+// Returns the (memory) size required by the object in bytes, considering whether or not the object is a pointer
+// Same semantics as sizeof(obj)
+//
 func GetObjectSize(obj *ObjectDesc) uint64 {
     var size uint64;
     if obj.ptrtype == 1 { //Pointer only, not the whole type
@@ -185,6 +202,9 @@ func GetObjectSize(obj *ObjectDesc) uint64 {
     return size;
 }
 
+//
+// Calculates the (memory) offset of a given field of the specified (struct) type in bytes
+//
 func GetObjectOffset(obj *ObjectDesc, list *ObjectDesc) uint64 {
     var offset uint64 = 0;
     var tmp *ObjectDesc;
@@ -233,6 +253,9 @@ func GetType(name string, packagename string, list *TypeDesc, includeforward byt
     return retValue;
 }
 
+//
+// Returns the first type from the list which is forward declared
+//
 func GetFirstForwardDeclType(list *TypeDesc) *TypeDesc {
     var retValue *TypeDesc;
     for retValue = list; retValue != nil; retValue = retValue.next {
@@ -279,6 +302,9 @@ func NewType(name string, packagename string, forwarddecl byte, len uint64, base
     return objtype;
 }
 
+//
+// Prints a formatted output of a given list of objects, including type, size etc.
+//
 func PrintObjects(list *ObjectDesc) {
     var o *ObjectDesc;
     for o = list; o != nil; o = o.next {
@@ -316,6 +342,9 @@ func PrintObjects(list *ObjectDesc) {
     }
 }
 
+//
+// Prints a formatted output of a given list of types, including form, size etc.
+//
 func PrintTypes(list *TypeDesc) {
     var t *TypeDesc;
     var o *ObjectDesc;
