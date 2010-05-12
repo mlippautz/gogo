@@ -160,6 +160,21 @@ func GetObjectSize(obj *ObjectDesc) uint64 {
     return size;
 }
 
+func GetObjectOffset(obj *ObjectDesc, list *ObjectDesc) uint64 {
+    var offset uint64 = 0;
+    var tmp *ObjectDesc;
+    for tmp = list; tmp != nil; tmp = tmp.next {
+        if tmp == obj {
+            break;
+        }
+        offset = offset + GetObjectSize(tmp);
+    }
+    if tmp == nil {
+        offset = 0; //TODO: Raise error as obj is appearently not within the list
+    }
+    return offset;
+}
+
 //
 // Fetches an object with a specific identifier or nil if it is not in the specified list
 //
@@ -251,6 +266,8 @@ func PrintObjects(list *ObjectDesc) {
         }
         PrintString(", size: ");
         PrintNumber(GetObjectSize(o));
+        PrintString(", offset: ");
+        PrintNumber(GetObjectOffset(o, list));
         PrintString(")\n");
     }
 }
@@ -284,11 +301,13 @@ func PrintTypes(list *TypeDesc) {
                     PrintChar('.');
                 }
                 PrintString(o.objtype.name);
-                PrintString(", size: ");
-                PrintNumber(GetTypeSize(o.objtype));
             } else {
                 PrintString("<unknown>");
             }
+            PrintString(", size: ");
+            PrintNumber(GetObjectSize(o));
+            PrintString(", offset: ");
+            PrintNumber(GetObjectOffset(o, t.fields));
             PrintString(")\n");
         }
     }
