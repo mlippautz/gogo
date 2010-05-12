@@ -64,6 +64,8 @@ func main() {
     libgogo.FlagObjectTypeAsPointer(tempobject); //nil is a pointer to no specified type (universal)
     GlobalObjects = libgogo.AppendObject(tempobject, GlobalObjects);
 
+    InitFreeRegisters(); //Init registers for code generation
+
     for i=1; i < libgogo.Argc ; i= i+1 {
         curFileIndex = i-1;
         fileInfo[curFileIndex].filename = libgogo.Argv[i];
