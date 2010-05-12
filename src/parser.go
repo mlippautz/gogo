@@ -115,14 +115,26 @@ func ParseStructDeclList() {
 //
 func ParseStructDecl() uint64 {
     var boolFlag uint64;
+    var tempType *libgogo.TypeDesc;
+    var dontAddType uint64 = 0;
     PrintDebugString("Entering ParseStructDecl()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_TYPE {
         AssertNextToken(TOKEN_IDENTIFIER);
-        if libgogo.GetType(tok.strValue, CurrentPackage, GlobalTypes) != nil {
-            SymbolTableError("duplicate type", tok.strValue, "in package", CurrentPackage);
+        tempType = libgogo.GetType(tok.strValue, CurrentPackage, GlobalTypes, 1);
+        if  tempType != nil { //Check for duplicates
+            if libgogo.IsForwardDecl(tempType) != 0 { //Separate handling of forward declarations => unset forward declaration flag
+                libgogo.UnsetForwardDecl(tempType);
+                CurrentType = tempType;
+                dontAddType = 1;
+            } else { //Real duplicate
+                SymbolTableError("duplicate type", tok.strValue, "in package", CurrentPackage);
+                CurrentType = tempType; //For stability/sanity of parser when continuing
+                dontAddType = 1; //For stability/sanity of parser when continuing
+            }
+        } else {
+            CurrentType = libgogo.NewType(tok.strValue, CurrentPackage, 0, 0, nil);
         }
-        CurrentType = libgogo.NewType(tok.strValue, CurrentPackage, 0, nil);
         // identifier of struct in tok.strValue
         AssertNextToken(TOKEN_STRUCT);
         AssertNextToken(TOKEN_LCBRAC);
@@ -131,7 +143,9 @@ func ParseStructDecl() uint64 {
         InsideStructDecl = 0;
         AssertNextTokenWeak(TOKEN_RCBRAC);
         AssertNextTokenWeak(TOKEN_SEMICOLON);
-        GlobalTypes = libgogo.AppendType(CurrentType, GlobalTypes);
+        if dontAddType == 0 {
+            GlobalTypes = libgogo.AppendType(CurrentType, GlobalTypes);
+        }
         boolFlag = 0;
     } else {
         boolFlag = 1;
@@ -163,8 +177,12 @@ func ParseStructVarDecl() uint64 {
     PrintDebugString("Entering ParseStructVarDecl()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_IDENTIFIER {
-        CurrentObject = libgogo.NewObject(tok.strValue, libgogo.CLASS_FIELD);
-        libgogo.AddFields(CurrentObject, CurrentType);
+        if libgogo.HasField(tok.strValue, CurrentType) != 0 {
+            SymbolTableError("duplicate", "", "field", tok.strValue);
+        } else {
+            CurrentObject = libgogo.NewObject(tok.strValue, "", libgogo.CLASS_FIELD); //A field has no package name
+            libgogo.AddFields(CurrentObject, CurrentType);
+        }
         ParseType();
         AssertNextTokenWeak(TOKEN_SEMICOLON);
         boolFlag = 0;
@@ -220,7 +238,7 @@ func ParseType() {
     }
 
     if InsideFunctionVarDecl == 0 {
-        basetype = libgogo.GetType(typename, packagename, GlobalTypes);
+        basetype = libgogo.GetType(typename, packagename, GlobalTypes, 0);
         if basetype == nil {
             if InsideStructDecl == 1 {
                 if libgogo.StringCompare(typename, libgogo.GetTypeName(CurrentType)) == 0 {
@@ -229,8 +247,9 @@ func ParseType() {
                     } else {
                         SymbolTableError("A type cannot contain itself,", "", "type", typename);
                     }
-                } else {
-                    ; //TODO: Type forward declaration
+                } else { //Forward declaration
+                    basetype = libgogo.NewType(typename, packagename, 1, 0, nil);
+                    GlobalTypes = libgogo.AppendType(basetype, GlobalTypes); //Add forward declared type to global list
                 }
             } else {
                 libgogo.StringAppend(&tempstr, packagename);
@@ -247,7 +266,7 @@ func ParseType() {
             }
             libgogo.StringAppend(&tempstr, "Array");
             libgogo.StringAppend(&tempstr, libgogo.IntToString(arraydim));
-            temptype = libgogo.NewType(tempstr, packagename, arraydim, basetype);
+            temptype = libgogo.NewType(tempstr, packagename, 0, arraydim, basetype);
             libgogo.SetObjType(CurrentObject, temptype);
         }
     }
@@ -305,14 +324,14 @@ func ParseVarDecl() uint64 {
     if boolFlag == 0 {
         AssertNextToken(TOKEN_VAR);
         AssertNextToken(TOKEN_IDENTIFIER);
-        CurrentObject = libgogo.NewObject(tok.strValue, libgogo.CLASS_VAR);
+        CurrentObject = libgogo.NewObject(tok.strValue, CurrentPackage, libgogo.CLASS_VAR);
         if InsideFunction == 0 { //Global objects
-            if libgogo.GetObject(tok.strValue, GlobalObjects) != nil {
+            if libgogo.GetObject(tok.strValue, CurrentPackage, GlobalObjects) != nil {
                 SymbolTableError("duplicate", "global", "identifier", tok.strValue);
             }
             GlobalObjects = libgogo.AppendObject(CurrentObject, GlobalObjects);
         } else { //Function-local objects
-            if libgogo.GetObject(tok.strValue, LocalObjects) != nil {
+            if libgogo.GetObject(tok.strValue, CurrentPackage, LocalObjects) != nil {
                 SymbolTableError("duplicate", "local", "identifier", tok.strValue);
             }
             LocalObjects = libgogo.AppendObject(CurrentObject, LocalObjects);

@@ -14,7 +14,7 @@ type FileInfo struct {
     lineCounter uint64;
     charCounter uint64;
     fd uint64;
-}; 
+};
 
 //
 // Fileinformation for all files that are compiled in this run
@@ -51,15 +51,15 @@ func main() {
     }
 
     //Default data types
-    temptype = libgogo.NewType("uint64", "", 8, nil);
+    temptype = libgogo.NewType("uint64", "", 0, 8, nil);
     GlobalTypes = libgogo.AppendType(temptype, GlobalTypes);
-    temptype = libgogo.NewType("byte", "", /*1*/ 8, nil); //Use size 8 as everything has to be 64-bit aligned anyways
+    temptype = libgogo.NewType("byte", "", 0, /*1*/ 8, nil); //Use size 8 as everything has to be 64-bit aligned anyways
     GlobalTypes = libgogo.AppendType(temptype, GlobalTypes);
-    temptype = libgogo.NewType("string", "", 16, nil);
+    temptype = libgogo.NewType("string", "", 0, 16, nil);
     GlobalTypes = libgogo.AppendType(temptype, GlobalTypes);
 
     //Default objects
-    tempobject = libgogo.NewObject("nil", libgogo.CLASS_VAR);
+    tempobject = libgogo.NewObject("nil", "", libgogo.CLASS_VAR);
     libgogo.SetObjType(tempobject, nil);
     libgogo.FlagObjectTypeAsPointer(tempobject); //nil is a pointer to no specified type (universal)
     GlobalObjects = libgogo.AppendObject(tempobject, GlobalObjects);
@@ -95,5 +95,11 @@ func main() {
         libgogo.PrintString("--------------------\n");
         libgogo.PrintTypes(GlobalTypes);
         libgogo.PrintObjects(GlobalObjects);
+    }
+
+    //Check for undefined types which were forward declared
+    temptype = libgogo.GetFirstForwardDeclType(GlobalTypes);
+    if temptype != nil {
+        SymbolTableError("undefined", "", "type", libgogo.GetTypeName(temptype));
     }
 }

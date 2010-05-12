@@ -6,6 +6,7 @@ package libgogo
 
 type ObjectDesc struct {
     name string;
+    packagename string;
     class uint64;
     objtype *TypeDesc;
     ptrtype byte; //If 0, type objtype, otherwise type *objtype
@@ -15,6 +16,7 @@ type ObjectDesc struct {
 type TypeDesc struct {
     name string;
     packagename string;
+    forwarddecl byte; //If 1, type is forward declared
     form uint64;
     len uint64;
     fields *ObjectDesc;
@@ -25,8 +27,8 @@ type TypeDesc struct {
 //
 // Pseudo constants that specify the descriptor sizes 
 //
-var OBJECT_SIZE uint64 = 48; //6*8 bytes space for an object, extra 8 for the string length
-var TYPE_SIZE uint64 = 72;  //9*8 bytes space for a type, extra 8 for the string length
+var OBJECT_SIZE uint64 = 64; //8*8 bytes space for an object
+var TYPE_SIZE uint64 = 80;  //10*8 bytes space for a type
 
 //
 // Classes for objects
@@ -93,7 +95,16 @@ func AppendType(objtype *TypeDesc, list *TypeDesc) *TypeDesc {
 func AddFields(object *ObjectDesc, objtype *TypeDesc) {
     objtype.form = FORM_STRUCT;
     objtype.fields = AppendObject(object, objtype.fields);
-    objtype.len = objtype.len + GetTypeSize(objtype);
+}
+
+func HasField(name string, objtype *TypeDesc) uint64 {
+    var tmpObj *ObjectDesc;
+    var retVal uint64 = 0;
+    tmpObj = GetObject(name, "", objtype.fields);
+    if tmpObj != nil {
+        retVal = 1;
+    }
+    return retVal;
 }
 
 //
@@ -131,22 +142,36 @@ func GetObjectName(obj *ObjectDesc) string {
     return obj.name;
 }
 
+func IsForwardDecl(objtype *TypeDesc) byte {
+    return objtype.forwarddecl;
+}
+
+func UnsetForwardDecl(objtype *TypeDesc) {
+    objtype.forwarddecl = 0;
+}
+
 func GetTypeSize(objtype *TypeDesc) uint64 {
     var size uint64 = 0;
     var tempobj *ObjectDesc;
     if objtype != nil {
-        if objtype.form == FORM_SIMPLE {
-            size = objtype.len;
-        }
-        if objtype.form == FORM_STRUCT {
-            for tempobj = objtype.fields; tempobj != nil; tempobj = tempobj.next { //Sum of all fields
-                size = size + GetObjectSize(tempobj); //Add size of each field
+        if objtype.forwarddecl == 0 {
+            if objtype.form == FORM_SIMPLE {
+                size = objtype.len;
             }
+            if objtype.form == FORM_STRUCT {
+                for tempobj = objtype.fields; tempobj != nil; tempobj = tempobj.next { //Sum of all fields
+                    size = size + GetObjectSize(tempobj); //Add size of each field
+                }
+            }
+            if objtype.form == FORM_ARRAY {
+                size = objtype.len * GetTypeSize(objtype.base); //Array length * size of one item
+            }
+        } else {
+            ; //TODO: if type is only forward declared => error!
         }
-        if objtype.form == FORM_ARRAY {
-            size = objtype.len * GetTypeSize(objtype.base); //Array length * size of one item
-        }
-    } //TODO: if objtype is nil => error!
+    } else {
+        ; //TODO: if objtype is nil => error!
+    }
     return size;
 }
 
@@ -178,11 +203,11 @@ func GetObjectOffset(obj *ObjectDesc, list *ObjectDesc) uint64 {
 //
 // Fetches an object with a specific identifier or nil if it is not in the specified list
 //
-func GetObject(name string, list *ObjectDesc) *ObjectDesc {
+func GetObject(name string, packagename string, list *ObjectDesc) *ObjectDesc {
     var tmpObject *ObjectDesc;
     var retValue *ObjectDesc = nil;
     for tmpObject = list; tmpObject != nil; tmpObject = tmpObject.next {
-        if StringCompare(tmpObject.name,name) == 0 {
+        if (StringCompare(tmpObject.name,name) == 0) && ((StringLength(tmpObject.packagename) == 0) || (StringCompare(tmpObject.packagename,packagename) == 0)) { //Empty package name indicates internal types
             retValue = tmpObject;
             break;
         }
@@ -192,13 +217,26 @@ func GetObject(name string, list *ObjectDesc) *ObjectDesc {
 
 //
 // Fetches a type with a given name or nil if it is not in the specified list
+// If includeforward is 0, no forward declared types will be returned; otherwise, forward declared types will also be returned
 //
-func GetType(name string, packagename string, list *TypeDesc) *TypeDesc {
+func GetType(name string, packagename string, list *TypeDesc, includeforward byte) *TypeDesc {
     var tmpType *TypeDesc;
     var retValue *TypeDesc = nil;
     for tmpType = list; tmpType != nil; tmpType = tmpType.next {
         if (StringCompare(tmpType.name,name) == 0) && ((StringLength(tmpType.packagename) == 0) || (StringCompare(tmpType.packagename,packagename) == 0)) { //Empty package name indicates internal types
-            retValue = tmpType;
+            if (includeforward == 1) || ((includeforward == 0) && (tmpType.forwarddecl == 0)) {
+                retValue = tmpType;
+                break;
+            }
+        }
+    }
+    return retValue;
+}
+
+func GetFirstForwardDeclType(list *TypeDesc) *TypeDesc {
+    var retValue *TypeDesc;
+    for retValue = list; retValue != nil; retValue = retValue.next {
+        if retValue.forwarddecl == 1 {
             break;
         }
     }
@@ -208,10 +246,11 @@ func GetType(name string, packagename string, list *TypeDesc) *TypeDesc {
 //
 // Creates a new object
 //
-func NewObject(name string, class uint64) *ObjectDesc {
+func NewObject(name string, packagename string, class uint64) *ObjectDesc {
     var adr uint64 = Alloc(OBJECT_SIZE);
     var obj *ObjectDesc = Uint64ToObjectDescPtr(adr);
     obj.name = name; //TODO: Copy string?
+    obj.packagename = packagename; //Copy string?
     obj.class = class;
     obj.objtype = nil;
     obj.ptrtype = 0;
@@ -222,10 +261,11 @@ func NewObject(name string, class uint64) *ObjectDesc {
 //
 // Creates a new type
 //
-func NewType(name string, packagename string, len uint64, basetype *TypeDesc) *TypeDesc {
+func NewType(name string, packagename string, forwarddecl byte, len uint64, basetype *TypeDesc) *TypeDesc {
     var adr uint64 = Alloc(TYPE_SIZE);
     var objtype *TypeDesc = Uint64ToTypeDescPtr(adr);
     objtype.name = name; //TODO: Copy string?
+    objtype.forwarddecl = forwarddecl;
     objtype.packagename = packagename; //TODO: Copy string?
     if basetype != nil {
         objtype.form = FORM_ARRAY;
@@ -243,6 +283,10 @@ func PrintObjects(list *ObjectDesc) {
     var o *ObjectDesc;
     for o = list; o != nil; o = o.next {
         PrintString("Object ");
+        if StringLength(o.packagename) != 0 {
+            PrintString(o.packagename);
+            PrintChar('.');
+        }
         PrintString(o.name);
         PrintString(" (type: ");
         if o.ptrtype != 0 {
@@ -277,6 +321,10 @@ func PrintTypes(list *TypeDesc) {
     var o *ObjectDesc;
     for t = list; t != nil; t = t.next {
         PrintString("Type ");
+        if StringLength(t.packagename) != 0 {
+            PrintString(t.packagename);
+            PrintChar('.');
+        }
         PrintString(t.name);
         PrintString(" (size: ");
         PrintNumber(GetTypeSize(t));
