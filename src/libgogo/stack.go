@@ -37,7 +37,8 @@ func Push(stack *Stack, value uint64) {
         stack.baseAddress = newAddress; //Set new address as base address
         stack.capacity = stack.capacity * 2; //Update (increase) capacity
     }
-    CopyMem(ToUint64FromUint64Ptr(&value), stack.baseAddress + 8 * stack.itemCount, 8); //Push the new value by copying its value into the memory of the corresponding stack item
+    newAddress = ToUint64FromUint64Ptr(&value);
+    CopyMem(newAddress, stack.baseAddress + 8 * stack.itemCount, 8); //Push the new value by copying its value into the memory of the corresponding stack item
     stack.itemCount = stack.itemCount + 1; //Update item count
 }
 
@@ -46,7 +47,8 @@ func Push(stack *Stack, value uint64) {
 // Note that this function call fails if there are no items on the stack, e.g. the stack is empty
 //
 func Pop(stack *Stack) uint64 {
-    var returnValue uint64 = Peek(stack); //Peek in order to get the last value from the stack
+    var returnValue uint64;
+    returnValue = Peek(stack); //Peek in order to get the last value from the stack
     stack.itemCount = stack.itemCount - 1; //Update (decrease) item count
     return returnValue; //Return value taken from stack
 }
@@ -57,10 +59,12 @@ func Pop(stack *Stack) uint64 {
 //
 func Peek(stack *Stack) uint64 {
     var returnValue uint64;
+    var temp uint64;
     if (stack.itemCount == 0) { //Check if there is an item on the stack
         ExitError("Tried to Peek() from an empty stack", 126);
     }
-    CopyMem(stack.baseAddress + (stack.itemCount - 1) * 8, ToUint64FromUint64Ptr(&returnValue), 8); //Copy the last value from the stack (e.g. its corresponding memory) into the return variable
+    temp = ToUint64FromUint64Ptr(&returnValue);
+    CopyMem(stack.baseAddress + (stack.itemCount - 1) * 8, temp, 8); //Copy the last value from the stack (e.g. its corresponding memory) into the return variable
     return returnValue; //Return peeked value
 }
 

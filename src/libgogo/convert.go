@@ -42,12 +42,15 @@ func GetStringFromAddress(addr uint64) *string;
 // Converts a string to a string to an unsigned 64-bit integer by intepreting it as valid a decimal number in form of ASCII characters
 //
 func StringToInt(str string) uint64 {
-    var n uint64 = StringLength(str);
+    var n uint64;
     var i uint64;
+    var temp uint64;
     var val uint64 = 0;
+    n = StringLength(str);
     for i = 0; i < n ; i = i + 1 { //Process digit by digit
         val = val * 10; //Next digit => Move old value one digit to the left
-        val = val + ToIntFromByte(str[i]) - 48; //Add the new digit as the last (rightmost) one (ASCII 48 = '0', 49 = '1' etc.)
+        temp = ToIntFromByte(str[i]);
+        val = val + temp - 48; //Add the new digit as the last (rightmost) one (ASCII 48 = '0', 49 = '1' etc.)
     }
     return val;
 }

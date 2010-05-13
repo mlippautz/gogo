@@ -18,9 +18,10 @@ type FileInfo struct {
 
 //
 // Fileinformation for all files that are compiled in this run
-// Is limited by 10 to reduce memory etc.
+// Is limited by 32 to reduce memory consumption, but to allow
+// self compilation via "./gogo libgogo/*.go *.go"
 //
-var fileInfo [10]FileInfo;
+var fileInfo [32]FileInfo;
 var fileInfoLen uint64 = 0;
 var curFileIndex uint64 = 0;
 
@@ -46,8 +47,8 @@ func main() {
         libgogo.ExitError("Usage: gogo file1.go [file2.go ...]",1);
     }
 
-    if libgogo.Argc > 11 {
-        libgogo.ExitError("Cannot compile more than 10 files at once",1);
+    if libgogo.Argc > 33 {
+        libgogo.ExitError("Cannot compile more than 32 files at once",1);
     }
 
     //Default data types

@@ -32,8 +32,10 @@ func GetStringAddress(str *string) uint64;
 func StringCompare(str1 string, str2 string) uint64 {
     var i uint64;
     var equal uint64 = 0; //Assume equality by default
-    var strlen1 uint64 = StringLength(str1);
-    var strlen2 uint64 = StringLength(str2);
+    var strlen1 uint64;
+    var strlen2 uint64;
+    strlen1 = StringLength(str1);
+    strlen2 = StringLength(str2);
     if strlen1 != strlen2 { //Return inequality if lengths are not equal
        equal = 1;
     } else {
@@ -58,13 +60,21 @@ func SetStringAddressAndLength(str *string, new_addr uint64, new_length uint64);
 //
 func CharAppend(str *string, char byte) {
     var nullByte byte = 0; //End of string constant
-    var strlen uint64 = StringLength2(str); //Get length of old string
-    var new_length uint64 = strlen + 1; //The length of the new string the length of the old string plus the length of the character to be appended (1)
-    var new_addr uint64 = Alloc(new_length + 1); //Allocate memory for the new string, including the space for the end of string constant
-    var old_addr uint64 = GetStringAddress(str);
+    var strlen uint64;
+    var new_length uint64;
+    var new_addr uint64;
+    var old_addr uint64;
+    var char_addr uint64;
+    var nullByte_addr uint64;
+    strlen = StringLength2(str); //Get length of old string
+    new_length = strlen + 1; //The length of the new string the length of the old string plus the length of the character to be appended (1)
+    new_addr = Alloc(new_length + 1); //Allocate memory for the new string, including the space for the end of string constant
+    old_addr = GetStringAddress(str);
     CopyMem(old_addr, new_addr, strlen); //Copy the content of the old string to the newly allocated memory
-    CopyMem(ToUint64FromBytePtr(&char), new_addr + strlen, 1); //Copy the additional character to its according position at the end of the new string
-    CopyMem(ToUint64FromBytePtr(&nullByte), new_addr+strlen + 1, 1); //Append the end of string constant
+    char_addr = ToUint64FromBytePtr(&char);
+    CopyMem(char_addr, new_addr + strlen, 1); //Copy the additional character to its according position at the end of the new string
+    nullByte_addr = ToUint64FromBytePtr(&nullByte);
+    CopyMem(nullByte_addr, new_addr+strlen + 1, 1); //Append the end of string constant
     SetStringAddressAndLength(str, new_addr, new_length); //Update the string in order to point to the new character sequence with the new length
 }
 
@@ -74,14 +84,22 @@ func CharAppend(str *string, char byte) {
 //
 func StringAppend(str *string, append_str string) {
     var nullByte byte = 0; //End of string constant
-    var strlen uint64 = StringLength2(str); //Get length of first string
-    var strappendlen uint64 = StringLength(append_str); //Get length of second string
-    var new_length uint64 = strlen + strappendlen; //The length of the new string is the length of the first plus the length of the second string
-    var new_addr uint64 = Alloc(new_length + 1); //Allocate memory for the new string, including the space for the end of string constant
-    var old_addr uint64 = GetStringAddress(str);
-    var append_addr uint64 = GetStringAddress(&append_str);
+    var strlen uint64;
+    var strappendlen uint64;
+    var new_length uint64;
+    var new_addr uint64;
+    var old_addr uint64;
+    var append_addr uint64;
+    var nullByte_addr uint64;
+    strlen = StringLength2(str); //Get length of first string
+    strappendlen = StringLength(append_str); //Get length of second string
+    new_length = strlen + strappendlen; //The length of the new string is the length of the first plus the length of the second string
+    new_addr = Alloc(new_length + 1); //Allocate memory for the new string, including the space for the end of string constant
+    old_addr = GetStringAddress(str);
+    append_addr = GetStringAddress(&append_str);
     CopyMem(old_addr, new_addr, strlen); //Copy the content of the first string to the newly allocated memory
     CopyMem(append_addr, new_addr + strlen, strappendlen); //Copy the second string to its according position at the end of the new string
-    CopyMem(ToUint64FromBytePtr(&nullByte), new_addr + strlen + strappendlen + 1, 1); //Append the end of string constant
+    nullByte_addr = ToUint64FromBytePtr(&nullByte);
+    CopyMem(nullByte_addr, new_addr + strlen + strappendlen + 1, 1); //Append the end of string constant
     SetStringAddressAndLength(str, new_addr, new_length); //Update the string in order to point to the new character sequence with the new length
 }

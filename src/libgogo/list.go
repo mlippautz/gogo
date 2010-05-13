@@ -37,7 +37,8 @@ func AddItem(list *List, value uint64) {
         list.baseAddress = newAddress; //Set new address as base address
         list.capacity = list.capacity * 2; //Update (increase) capacity
     }
-    CopyMem(ToUint64FromUint64Ptr(&value), list.baseAddress + 8 * list.itemCount, 8); //Append the new value by copying its value into the memory of the corresponding list item
+    newAddress = ToUint64FromUint64Ptr(&value);
+    CopyMem(newAddress, list.baseAddress + 8 * list.itemCount, 8); //Append the new value by copying its value into the memory of the corresponding list item
     list.itemCount = list.itemCount + 1; //Update item count
 }
 
@@ -46,8 +47,9 @@ func AddItem(list *List, value uint64) {
 // Note that this function call fails if there are less than i items in the list or if the list is empty
 //
 func RemoveItemAt(list *List, index uint64) uint64 {
-    var returnValue uint64 = GetItemAt(list, index); //Get the correspondig value value from the list
+    var returnValue uint64;
     var i uint64;
+    returnValue = GetItemAt(list, index); //Get the correspondig value value from the list
     for i = index; i < list.itemCount - 1; i = i + 1 { //Remove item by moving the following ones "backwards" in order to fill the gap caused by the deleted item
         CopyMem(list.baseAddress + (i + 1) * 8, list.baseAddress + 8 * i, 8); //Move item at position i + 1 to position i
     }
@@ -61,6 +63,7 @@ func RemoveItemAt(list *List, index uint64) uint64 {
 //
 func GetItemAt(list *List, index uint64) uint64 {
     var returnValue uint64;
+    var temp uint64;
     if (list.itemCount <= index) { //Check if there are enough items in the list
         PrintString("Tried to GetItemAt(");
         PrintNumber(index);
@@ -68,7 +71,8 @@ func GetItemAt(list *List, index uint64) uint64 {
         PrintNumber(list.itemCount);
         ExitError(" items - out of bounds error", 125);
     }
-    CopyMem(list.baseAddress + index * 8, ToUint64FromUint64Ptr(&returnValue), 8); //Copy the value on position i of the list (e.g. its corresponding memory) into the return variable
+    temp = ToUint64FromUint64Ptr(&returnValue);
+    CopyMem(list.baseAddress + index * 8, temp, 8); //Copy the value on position i of the list (e.g. its corresponding memory) into the return variable
     return returnValue;
 }
 
