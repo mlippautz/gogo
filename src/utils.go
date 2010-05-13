@@ -18,7 +18,9 @@ func CheckDebugLevel(debugLevel uint64) uint64 {
 }
 
 func PrintDebugString(msg string, debugLevel uint64) {
-    if CheckDebugLevel(debugLevel) == 1 {
+    var flag uint64;
+    flag = CheckDebugLevel(debugLevel);
+    if flag  == 1 {
         PrintHead();   
         libgogo.PrintString(": DEBUG: ");
         libgogo.PrintString(msg);
@@ -27,7 +29,9 @@ func PrintDebugString(msg string, debugLevel uint64) {
 }
 
 func PrintDebugChar(char byte, debugLevel uint64) {
-    if CheckDebugLevel(debugLevel) == 1 {
+    var flag uint64;
+    flag = CheckDebugLevel(debugLevel);
+    if flag  == 1 {
         PrintHead();   
         libgogo.PrintString(": DEBUG: ");
         libgogo.PrintChar(char);
@@ -117,12 +121,14 @@ func ParseErrorFatal(ue uint64, e [2]uint64, eLen uint64) {
 }
 
 func SymbolTableError(msg string, position string, msg2 string, identifier string) {
+    var strLen uint64;
     PrintHead();
     libgogo.PrintString(": symbol table error: ");
     libgogo.PrintString(msg);
     libgogo.PrintString(" ");
     libgogo.PrintString(position);
-    if libgogo.StringLength(position) != 0 {
+    strLen = libgogo.StringLength(position);
+    if strLen != 0 {
         libgogo.PrintString(" ");
     }
     libgogo.PrintString(msg2);

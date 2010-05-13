@@ -19,6 +19,11 @@ TOKEN_STRING or TOKEN_IDENTIFIER */
     nextChar byte;      /* Sometime the next char is already read. It is stored 
 here to be re-assigned in the next GetNextToken() round [used by the scanner] */
     nextToken uint64;   // look-ahead (LL1) token [used by the parser]
+
+    nextTokenId[4] uint64;
+    nextTokenValStr[4] string;
+    llCnt uint64;
+    toRead uint64;
 };
 
 //

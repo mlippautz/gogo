@@ -348,47 +348,61 @@ func GetNextTokenRaw() {
 // keywords.
 //
 func GetNextToken() {
+    var cmpValue uint64;
     GetNextTokenRaw();
 
     // Convert identifier to keyworded tokens
     if tok.id == TOKEN_IDENTIFIER {
-        if libgogo.StringCompare("if",tok.strValue) == 0 {
+        cmpValue = libgogo.StringCompare("if",tok.strValue);
+        if cmpValue == 0 {
             tok.id = TOKEN_IF;
         }
-        if libgogo.StringCompare("else",tok.strValue) == 0 {
+        cmpValue = libgogo.StringCompare("else",tok.strValue);
+        if cmpValue == 0 {
             tok.id = TOKEN_ELSE;
         }
-        if libgogo.StringCompare("for",tok.strValue) == 0 {
+        cmpValue = libgogo.StringCompare("for",tok.strValue);
+        if cmpValue == 0 {
             tok.id = TOKEN_FOR;
         }
-        if libgogo.StringCompare("type",tok.strValue) == 0 {
+        cmpValue = libgogo.StringCompare("type",tok.strValue);
+        if cmpValue == 0 {
             tok.id = TOKEN_TYPE;
         }
-        if libgogo.StringCompare("const",tok.strValue) == 0 {
+        cmpValue = libgogo.StringCompare("const",tok.strValue);
+        if cmpValue == 0 {
             tok.id = TOKEN_CONST;
         }
-        if libgogo.StringCompare("var",tok.strValue) == 0 {
+        cmpValue = libgogo.StringCompare("var",tok.strValue);
+        if cmpValue == 0 {
             tok.id = TOKEN_VAR;
         }
-        if libgogo.StringCompare("struct", tok.strValue) == 0 {
+        cmpValue = libgogo.StringCompare("struct", tok.strValue);
+        if cmpValue == 0 {
             tok.id = TOKEN_STRUCT;
         }
-        if libgogo.StringCompare("return", tok.strValue) == 0 {
+        cmpValue = libgogo.StringCompare("return", tok.strValue);
+        if cmpValue == 0 {
             tok.id = TOKEN_RETURN;
         }
-        if libgogo.StringCompare("func", tok.strValue) == 0 {
+        cmpValue = libgogo.StringCompare("func", tok.strValue);
+        if cmpValue == 0 {
             tok.id = TOKEN_FUNC;
         }
-        if libgogo.StringCompare("import", tok.strValue) == 0 {
+        cmpValue = libgogo.StringCompare("import", tok.strValue);
+        if cmpValue == 0 {
             tok.id = TOKEN_IMPORT;
         }
-        if libgogo.StringCompare("package", tok.strValue) == 0 {
+        cmpValue = libgogo.StringCompare("package", tok.strValue);
+        if cmpValue == 0 {
             tok.id = TOKEN_PACKAGE;
         }
-        if libgogo.StringCompare("break", tok.strValue) == 0 {
+        cmpValue = libgogo.StringCompare("break", tok.strValue);
+        if cmpValue == 0 {
             tok.id = TOKEN_BREAK;
         }
-        if libgogo.StringCompare("continue", tok.strValue) == 0 {
+        cmpValue = libgogo.StringCompare("continue", tok.strValue);
+        if cmpValue == 0 {
             tok.id = TOKEN_CONTINUE;
         }
     }

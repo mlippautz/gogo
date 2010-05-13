@@ -50,13 +50,23 @@ func LookAheadAndCheck(tokenNumber uint64) uint64 {
 //
 func GetNextTokenSafe() {
     var tokenString string;
+    var index uint64;
+
     if tok.nextToken != 0 {
         tok.id = tok.nextToken;      
         tok.nextToken = 0;  
     } else {
-        GetNextToken();
-        tokenString = TokenToString(tok.id);
-        PrintDebugString(tokenString, 1000);
+        if tok.llCnt > 0 {
+            index = tok.toRead;
+            tok.id = tok.nextTokenId[index];
+            tok.strValue = tok.nextTokenValStr[index];
+            tok.llCnt = tok.llCnt-1;
+            tok.toRead = index+1;
+        } else {
+            GetNextToken();
+            tokenString = TokenToString(tok.id);
+            PrintDebugString(tokenString, 1000);
+        }
     }
 }
 
@@ -86,6 +96,7 @@ func AssertToken(tokenNumber uint64) {
     if tok.id != tokenNumber {
         expectedTokens[0] = tokenNumber;
         ParseErrorWeak(tok.id, expectedTokens, 1);
+        //tok.nextToken = tok.id;
         ParserSync();
     }
 }

@@ -1,3 +1,4 @@
+// Copyright 2010 The GoGo Authors. All rights reserved.
 // Use of this source code is governed by the MIT
 // license that can be found in the LICENSE file.
 
@@ -38,7 +39,8 @@ var CurrentPackage string = "<no package>";
 func Parse() {
     tok.id = 0;
     tok.nextChar = 0;
-    tok.nextToken = 0;    
+    tok.nextToken = 0;   
+    tok.llCnt = 0; 
 
     ParsePackageStatement(); 
     ParseImportStatementList();
@@ -507,17 +509,15 @@ func ParseFactor() uint64 {
     var doneFlag uint64 = 1;
     var boolFlag uint64;
     var es [2]uint64;
-    PrintDebugString("Entering ParseFactor()",1000);
+
     GetNextTokenSafe();
     if (doneFlag == 1) && (tok.id == TOKEN_OP_ADR) {
         AssertNextToken(TOKEN_IDENTIFIER);
         ParseSelector();
-        ParseFunctionCallOptional();
         doneFlag = 0;
     }
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
         ParseSelector();
-        ParseFunctionCallOptional();
         doneFlag = 0;
     } 
     if (doneFlag == 1) && (tok.id == TOKEN_INTEGER) {
@@ -773,31 +773,17 @@ func ParseStatementSequence() {
 func ParseStatement() uint64 {
     var boolFlag uint64;
     var doneFlag uint64;
-    var es [2]uint64; 
+    var funcIndicator uint64;
     PrintDebugString("Entering ParseStatement()",1000);
     doneFlag = 1;
 
     GetNextTokenSafe();
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
-        // Could be assignment or a function call.
-        // Cannnot be resolved until selectors are all parsed
-        // To be improved!
-        ParseSelector();
-        tok.nextToken = tok.id;
-        boolFlag = ParseAssignment();
-        if boolFlag != 0 {
-            tok.nextToken = tok.id;
-            boolFlag = ParseFunctionCallStatement();
-            if boolFlag == 0 {
-                AssertNextTokenWeak(TOKEN_SEMICOLON);
-            }
-        }        
-        if boolFlag != 0 {
-            es[0] = TOKEN_ASSIGN;
-            es[1] = TOKEN_LBRAC;
-            ParseErrorWeak(tok.id, es, 2);
-            ParserSync();
-            //ParseErrorFatal(tok.id,es,0);
+        funcIndicator = IsFunction();
+        if funcIndicator == 1 {
+            ParseFunctionCallStatement();
+        } else {
+            ParseAssignment();
         }
         doneFlag = 0;
     }
@@ -840,12 +826,69 @@ func ParseStatement() uint64 {
     return boolFlag;
 }
 
+//
+// This function checks whether an identifier (and its selectors)
+// is part of a function call or an assignment.
+// Due to Go's library hierachy and syntax this has to be done using LL3
+// A '.' + <identifier> + <deciding token>
+//
+func IsFunction() uint64 {
+    var returnValue uint64 = 0;
+    var cnt uint64 = 1;
+    PrintDebugString("Entering IsFunction()",1000);
+    // Current token HAS to be an identifier
+    tok.nextTokenId[0] = tok.id;
+    tok.nextTokenValStr[0] = tok.strValue;
+    tok.toRead = 0;
+
+    GetNextTokenSafe();
+    if tok.id == TOKEN_PT { // LL1, but we need another look-ahead
+        tok.nextTokenId[1] = tok.id;
+        cnt = 2;
+
+        GetNextTokenSafe();
+        if tok.id == TOKEN_IDENTIFIER { // LL2, need more
+            tok.nextTokenId[2] = tok.id;
+            tok.nextTokenValStr[2] = tok.strValue;
+            cnt = 3;
+
+            GetNextTokenSafe();
+            if tok.id == TOKEN_LBRAC { // LL3, finally can decide it
+                returnValue = 1;
+            }
+        } 
+    } else  { // Still LL1 here, so no additional handling needed
+        if tok.id == TOKEN_LBRAC { // LL1
+            returnValue = 1;
+        }
+    }
+    tok.nextTokenId[cnt] = tok.id;
+    tok.nextTokenValStr[cnt]  = tok.strValue;
+    tok.llCnt = cnt + 1;
+    PrintDebugString("Leaving IsFunction()",1000);
+    return returnValue;
+}
+
 func ParseAssignment() uint64 {
     var boolFlag uint64;
+    var funcIndicator uint64;
     PrintDebugString("Entering ParseAssignment()",1000);
+    AssertNextToken(TOKEN_IDENTIFIER);
+    ParseSelector();
     GetNextTokenSafe();
     if tok.id == TOKEN_ASSIGN {
-        ParseExpression();
+        GetNextTokenSafe();
+        if tok.id == TOKEN_IDENTIFIER {
+            funcIndicator = IsFunction();
+            if funcIndicator == 1 {
+                ParseFunctionCallStatement();
+            } else {
+                ParseExpression();
+            }
+        } else {
+            tok.nextToken = tok.id;
+            ParseExpression();
+        }
         AssertNextTokenWeak(TOKEN_SEMICOLON);
         boolFlag = 0;
     } else {
@@ -858,10 +901,24 @@ func ParseAssignment() uint64 {
 
 func ParseAssignmentWithoutSC() uint64 {
     var boolFlag uint64;
+    var funcIndicator uint64;
     PrintDebugString("Entering ParseAssignmentWithoutSC()",1000);
+    AssertNextToken(TOKEN_IDENTIFIER);
+    ParseSelector();
     GetNextTokenSafe();
-    if tok.id == TOKEN_ASSIGN {      
-        ParseExpression();
+    if tok.id == TOKEN_ASSIGN {
+        GetNextTokenSafe();
+        if tok.id == TOKEN_IDENTIFIER {
+            funcIndicator = IsFunction();
+            if funcIndicator == 1 {
+                ParseFunctionCallStatement();
+            } else {
+                ParseExpression();
+            }
+        } else {
+            tok.nextToken = tok.id;
+            ParseExpression();
+        }
         boolFlag = 0;
     } else {
         tok.nextToken = tok.id;
@@ -926,20 +983,12 @@ func ParseExpressionListSub() uint64 {
     return boolFlag;   
 }
 
-func ParseFunctionCallStatement() uint64 {
-    var boolFlag uint64;
+func ParseFunctionCallStatement() {
     PrintDebugString("Entering ParseFunctionCallStatement()",1000);
-    GetNextTokenSafe();
-    if tok.id == TOKEN_LBRAC {
-        tok.nextToken = tok.id;
-        ParseFunctionCall();                
-        boolFlag = 0;
-    } else {
-        tok.nextToken = tok.id;
-        boolFlag = 1;
-    }
+    AssertNextToken(TOKEN_IDENTIFIER);
+    ParseSelector();    
+    ParseFunctionCall();                
     PrintDebugString("Leaving ParseFunctionCallStatement()",1000);
-    return boolFlag;
 }
 
 func ParseForStatement() {
@@ -952,11 +1001,7 @@ func ParseForStatement() {
             tok.nextToken = tok.id;
         } else {
             tok.nextToken = tok.id;
-            AssertNextToken(TOKEN_IDENTIFIER);
-            // tok.strValue
-            ParseSelector();
             ParseAssignmentWithoutSC();
-            //ParseAssignment();
         }
         
         AssertNextToken(TOKEN_SEMICOLON);
@@ -968,7 +1013,7 @@ func ParseForStatement() {
             tok.nextToken = tok.id;
             ParseExpression();
         }
-        //AssertNextTokenWeak(TOKEN_SEMICOLON);
+
         AssertNextToken(TOKEN_SEMICOLON);
 
         GetNextTokenSafe();
@@ -976,9 +1021,6 @@ func ParseForStatement() {
             tok.nextToken = tok.id;
         } else {
             tok.nextToken = tok.id;
-            AssertNextToken(TOKEN_IDENTIFIER);
-            // tok.strValue
-            ParseSelector();
             ParseAssignmentWithoutSC();
         }
 
