@@ -287,8 +287,10 @@ func GetFirstForwardDeclType(list *TypeDesc) *TypeDesc {
 // Creates a new object
 //
 func NewObject(name string, packagename string, class uint64) *ObjectDesc {
-    var adr uint64 = Alloc(OBJECT_SIZE);
-    var obj *ObjectDesc = Uint64ToObjectDescPtr(adr);
+    var adr uint64;
+    var obj *ObjectDesc;
+    adr = Alloc(OBJECT_SIZE);
+    obj = Uint64ToObjectDescPtr(adr);
     obj.name = name; //TODO: Copy string?
     obj.packagename = packagename; //Copy string?
     obj.class = class;
@@ -302,8 +304,10 @@ func NewObject(name string, packagename string, class uint64) *ObjectDesc {
 // Creates a new type
 //
 func NewType(name string, packagename string, forwarddecl byte, len uint64, basetype *TypeDesc) *TypeDesc {
-    var adr uint64 = Alloc(TYPE_SIZE);
-    var objtype *TypeDesc = Uint64ToTypeDescPtr(adr);
+    var adr uint64;
+    var objtype *TypeDesc;
+    adr = Alloc(TYPE_SIZE);
+    objtype = Uint64ToTypeDescPtr(adr);
     objtype.name = name; //TODO: Copy string?
     objtype.forwarddecl = forwarddecl;
     objtype.packagename = packagename; //TODO: Copy string?
@@ -324,9 +328,12 @@ func NewType(name string, packagename string, forwarddecl byte, len uint64, base
 //
 func PrintObjects(list *ObjectDesc) {
     var o *ObjectDesc;
+    var strLen uint64;
+    var tmp uint64;
     for o = list; o != nil; o = o.next {
         PrintString("Object ");
-        if StringLength(o.packagename) != 0 {
+        strLen = StringLength(o.packagename);
+        if strLen != 0 {
             PrintString(o.packagename);
             PrintChar('.');
         }
@@ -343,7 +350,8 @@ func PrintObjects(list *ObjectDesc) {
                 PrintNumber(o.objtype.len);
                 PrintString(", internally named ");
             }
-            if StringLength(o.objtype.packagename) != 0 {
+            strLen = StringLength(o.objtype.packagename);
+            if strLen != 0 {
                 PrintString(o.objtype.packagename);
                 PrintChar('.');
             }
@@ -352,9 +360,11 @@ func PrintObjects(list *ObjectDesc) {
             PrintString("<unknown>");
         }
         PrintString(", size: ");
-        PrintNumber(GetObjectSize(o));
+        tmp = GetObjectSize(o);
+        PrintNumber(tmp);
         PrintString(", offset: ");
-        PrintNumber(GetObjectOffset(o, list));
+        tmp = GetObjectOffset(o, list);
+        PrintNumber(tmp);
         PrintString(")\n");
     }
 }
@@ -365,15 +375,19 @@ func PrintObjects(list *ObjectDesc) {
 func PrintTypes(list *TypeDesc) {
     var t *TypeDesc;
     var o *ObjectDesc;
+    var strLen uint64;
+    var tmp uint64;
     for t = list; t != nil; t = t.next {
         PrintString("Type ");
-        if StringLength(t.packagename) != 0 {
+        strLen = StringLength(t.packagename);
+        if strLen != 0 {
             PrintString(t.packagename);
             PrintChar('.');
         }
         PrintString(t.name);
         PrintString(" (size: ");
-        PrintNumber(GetTypeSize(t));
+        tmp = GetTypeSize(t);
+        PrintNumber(tmp);
         PrintString(")\n");
 				for o = t.fields; o != nil; o = o.next {
             PrintString("  ");
@@ -390,7 +404,8 @@ func PrintTypes(list *TypeDesc) {
                     PrintNumber(o.objtype.len);
                     PrintString(", internally named ");
                 }
-                if StringLength(o.objtype.packagename) != 0 {
+                strLen = StringLength(o.objtype.packagename);
+                if strLen != 0 {
                     PrintString(o.objtype.packagename);
                     PrintChar('.');
                 }
@@ -399,9 +414,11 @@ func PrintTypes(list *TypeDesc) {
                 PrintString("<unknown>");
             }
             PrintString(", size: ");
-            PrintNumber(GetObjectSize(o));
+            tmp = GetObjectSize(o);
+            PrintNumber(tmp);
             PrintString(", offset: ");
-            PrintNumber(GetObjectOffset(o, t.fields));
+            tmp = GetObjectOffset(o, t.fields);
+            PrintNumber(tmp);
             PrintString(")\n");
         }
     }
