@@ -166,6 +166,7 @@ func UnsetForwardDecl(objtype *TypeDesc) {
 func GetTypeSize(objtype *TypeDesc) uint64 {
     var size uint64 = 0;
     var tempobj *ObjectDesc;
+    var tmpSize uint64;
     if objtype != nil {
         if objtype.forwarddecl == 0 {
             if objtype.form == FORM_SIMPLE {
@@ -173,11 +174,13 @@ func GetTypeSize(objtype *TypeDesc) uint64 {
             }
             if objtype.form == FORM_STRUCT {
                 for tempobj = objtype.fields; tempobj != nil; tempobj = tempobj.next { //Sum of all fields
-                    size = size + GetObjectSize(tempobj); //Add size of each field
+                    tmpSize = GetObjectSize(tempobj);
+                    size = size + tmpSize; //Add size of each field
                 }
             }
             if objtype.form == FORM_ARRAY {
-                size = objtype.len * GetTypeSize(objtype.base); //Array length * size of one item
+                tmpSize = GetTypeSize(objtype.base);
+                size = objtype.len * tmpSize; //Array length * size of one item
             }
         } else {
             ; //TODO: if type is only forward declared => error!
@@ -208,11 +211,13 @@ func GetObjectSize(obj *ObjectDesc) uint64 {
 func GetObjectOffset(obj *ObjectDesc, list *ObjectDesc) uint64 {
     var offset uint64 = 0;
     var tmp *ObjectDesc;
+    var tmpSize uint64;
     for tmp = list; tmp != nil; tmp = tmp.next {
         if tmp == obj {
             break;
         }
-        offset = offset + GetObjectSize(tmp);
+        tmpSize = GetObjectSize(tmp);
+        offset = offset + tmpSize;
     }
     if tmp == nil {
         offset = 0; //TODO: Raise error as obj is appearently not within the list
@@ -226,8 +231,14 @@ func GetObjectOffset(obj *ObjectDesc, list *ObjectDesc) uint64 {
 func GetObject(name string, packagename string, list *ObjectDesc) *ObjectDesc {
     var tmpObject *ObjectDesc;
     var retValue *ObjectDesc = nil;
+    var nameCompare uint64;
+    var strLen uint64;
+    var packageNameCompare uint64;
     for tmpObject = list; tmpObject != nil; tmpObject = tmpObject.next {
-        if (StringCompare(tmpObject.name,name) == 0) && ((StringLength(tmpObject.packagename) == 0) || (StringCompare(tmpObject.packagename,packagename) == 0)) { //Empty package name indicates internal types
+        nameCompare = StringCompare(tmpObject.name,name);
+        strLen = StringLength(tmpObject.packagename);
+        packageNameCompare = StringCompare(tmpObject.packagename,packagename);
+        if (nameCompare == 0) && ((strLen == 0) || (packageNameCompare == 0)) { //Empty package name indicates internal types
             retValue = tmpObject;
             break;
         }
@@ -242,8 +253,14 @@ func GetObject(name string, packagename string, list *ObjectDesc) *ObjectDesc {
 func GetType(name string, packagename string, list *TypeDesc, includeforward byte) *TypeDesc {
     var tmpType *TypeDesc;
     var retValue *TypeDesc = nil;
+    var nameCompare uint64;
+    var strLen uint64;
+    var packageNameCompare uint64;
     for tmpType = list; tmpType != nil; tmpType = tmpType.next {
-        if (StringCompare(tmpType.name,name) == 0) && ((StringLength(tmpType.packagename) == 0) || (StringCompare(tmpType.packagename,packagename) == 0)) { //Empty package name indicates internal types
+        nameCompare = StringCompare(tmpType.name,name);
+        strLen = StringLength(tmpType.packagename);
+        packageNameCompare = StringCompare(tmpType.packagename,packagename);
+        if (nameCompare == 0) && ((strLen == 0) || (packageNameCompare == 0)) { //Empty package name indicates internal types
             if (includeforward == 1) || ((includeforward == 0) && (tmpType.forwarddecl == 0)) {
                 retValue = tmpType;
                 break;

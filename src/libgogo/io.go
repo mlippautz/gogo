@@ -19,7 +19,9 @@ func Write(fd uint64, text string, length uint64) uint64;
 // Writes the specified string to the (console) standard output
 //
 func PrintString(msg string) {
-    Write(1, msg, StringLength(msg)); //1 = standard output
+    var strLen uint64;
+    strLen = StringLength(msg);
+    Write(1, msg, strLen); //1 = standard output
 }
 
 //
@@ -33,7 +35,9 @@ func PrintChar(char byte);
 // This function simplified string handling as the conversion is wrapped and has not to be done every time outside the library
 //
 func PrintNumber(num uint64) {
-    PrintString(IntToString(num));
+    var str string;
+    str = IntToString(num);
+    PrintString(str);
 }
 
 //
