@@ -21,7 +21,7 @@ expression_list = expression { "," expression }.
 function_call = "(" [expression_list] ")".
 function_call_stmt = identifier selector function_call.
 
-factor = [ "&" ] identifier selector [function_call] | integer | char | string | "(" expression ")" | "!" factor.
+factor = [ "&" ] identifier selector | integer | char | string | "(" expression ")" | "!" factor.
 term = factor { (binary_arith_op | "&&") factor}.
 simple_expression = [ unary_arith_op ] term { (unary_arith_op | "||") term }.
 expression = simple_expression [ cmp_op simple_expression ].
