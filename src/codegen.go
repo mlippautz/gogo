@@ -6,8 +6,8 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
-var NumRegisters uint64 = 16;
-var FreeRegisters [16]byte;
+var NumRegisters uint64 = 8;
+var FreeRegisters [8]byte;
 
 func InitFreeRegisters() {
     var i uint64;
