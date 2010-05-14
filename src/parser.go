@@ -244,7 +244,11 @@ func ParseType() {
     }
 
     if InsideFunctionVarDecl == 0 {
-        basetype = libgogo.GetType(typename, packagename, GlobalTypes, 0);
+        if InsideStructDecl == 1 { //Allow types in struct declarations which are already forward declared
+            basetype = libgogo.GetType(typename, packagename, GlobalTypes, 1);
+        } else {
+            basetype = libgogo.GetType(typename, packagename, GlobalTypes, 0);
+        }
         if basetype == nil {
             if InsideStructDecl == 1 {
                 CurrentTypeName = libgogo.GetTypeName(CurrentType);
