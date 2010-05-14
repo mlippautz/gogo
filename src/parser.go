@@ -10,24 +10,13 @@ var maxDepth uint64 = 10;
 var curDepth uint64 = 1;
 var compile uint64 = 1;
 
-//
-// List of global objects and declared types
-//
-var GlobalObjects *libgogo.ObjectDesc = nil;
-var GlobalTypes *libgogo.TypeDesc = nil;
-
-//
-// List of function-local objects
-//
-var LocalObjects *libgogo.ObjectDesc = nil;
-
-var CurrentType *libgogo.TypeDesc;
-var CurrentObject *libgogo.ObjectDesc;
-
 var InsideFunction uint64 = 0;
 var InsideStructDecl uint64 = 0;
 var InsideFunctionVarDecl uint64 = 0;
 
+//
+// Package name of currently processed file
+//
 var CurrentPackage string = "<no package>";
 
 //
@@ -115,29 +104,13 @@ func ParseStructDeclList() {
 //
 func ParseStructDecl() uint64 {
     var boolFlag uint64;
-    var tempType *libgogo.TypeDesc;
-    var dontAddType uint64 = 0;
-    var temp byte;
+    var dontAddType uint64;
     PrintDebugString("Entering ParseStructDecl()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_TYPE {
         AssertNextToken(TOKEN_IDENTIFIER);
-        tempType = libgogo.GetType(tok.strValue, CurrentPackage, GlobalTypes, 1);
-        if  tempType != nil { //Check for duplicates
-            temp = libgogo.IsForwardDecl(tempType);
-            if temp != 0 { //Separate handling of forward declarations => unset forward declaration flag
-                libgogo.UnsetForwardDecl(tempType);
-                CurrentType = tempType;
-                dontAddType = 1;
-            } else { //Real duplicate
-                SymbolTableError("duplicate type", tok.strValue, "in package", CurrentPackage);
-                CurrentType = tempType; //For stability/sanity of parser when continuing
-                dontAddType = 1; //For stability/sanity of parser when continuing
-            }
-        } else {
-            CurrentType = libgogo.NewType(tok.strValue, CurrentPackage, 0, 0, nil);
-        }
         // identifier of struct in tok.strValue
+        dontAddType = NewType(tok.strValue); //Create type
         AssertNextToken(TOKEN_STRUCT);
         AssertNextToken(TOKEN_LCBRAC);
         InsideStructDecl = 1;
@@ -145,9 +118,7 @@ func ParseStructDecl() uint64 {
         InsideStructDecl = 0;
         AssertNextTokenWeak(TOKEN_RCBRAC);
         AssertNextTokenWeak(TOKEN_SEMICOLON);
-        if dontAddType == 0 {
-            GlobalTypes = libgogo.AppendType(CurrentType, GlobalTypes);
-        }
+        AddType(dontAddType); //Add type
         boolFlag = 0;
     } else {
         boolFlag = 1;
@@ -176,17 +147,10 @@ func ParseStructVarDeclList() {
 //
 func ParseStructVarDecl() uint64 {
     var boolFlag uint64;
-    var temp uint64;
     PrintDebugString("Entering ParseStructVarDecl()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_IDENTIFIER {
-        temp = libgogo.HasField(tok.strValue, CurrentType);
-        if temp != 0 {
-            SymbolTableError("duplicate", "", "field", tok.strValue);
-        } else {
-            CurrentObject = libgogo.NewObject(tok.strValue, "", libgogo.CLASS_FIELD); //A field has no package name
-            libgogo.AddFields(CurrentObject, CurrentType);
-        }
+        AddStructField(tok.strValue); //Add field to struct
         ParseType();
         AssertNextTokenWeak(TOKEN_SEMICOLON);
         boolFlag = 0;
@@ -205,14 +169,9 @@ func ParseStructVarDecl() uint64 {
 //
 func ParseType() {
     var arraydim uint64 = 0;
-    var basetype *libgogo.TypeDesc;
-    var temptype *libgogo.TypeDesc;
     var boolFlag uint64;
     var packagename string = CurrentPackage;
-    var tempstr string = "";
     var typename string;
-    var CurrentTypeName string;
-    var temp byte;
 
     PrintDebugString("Entering ParseType()",1000);
     GetNextTokenSafe();
@@ -231,7 +190,7 @@ func ParseType() {
         tok.nextToken = tok.id;
     } else {
         if InsideFunctionVarDecl == 0 {
-            libgogo.FlagObjectTypeAsPointer(CurrentObject); //Type is pointer
+            SetCurrentObjectTypeToPointer(); //Pointer type (indicated by *)
         }
     }
     AssertNextToken(TOKEN_IDENTIFIER);
@@ -242,49 +201,7 @@ func ParseType() {
         packagename = typename; //Previously read namespace is actually the namespace
         typename = tok.strValue;
     }
-
-    if InsideFunctionVarDecl == 0 {
-        if InsideStructDecl == 1 { //Allow types in struct declarations which are already forward declared
-            basetype = libgogo.GetType(typename, packagename, GlobalTypes, 1);
-        } else {
-            basetype = libgogo.GetType(typename, packagename, GlobalTypes, 0);
-        }
-        if basetype == nil {
-            if InsideStructDecl == 1 {
-                CurrentTypeName = libgogo.GetTypeName(CurrentType);
-                boolFlag = libgogo.StringCompare(typename, CurrentTypeName);
-                if boolFlag == 0 {
-                    temp = libgogo.IsPointerType(CurrentObject);
-                    if temp == 1 { //Allow pointer to own type
-                        basetype = CurrentType;
-                    } else {
-                        SymbolTableError("A type cannot contain itself,", "", "type", typename);
-                    }
-                } else { //Forward declaration
-                    basetype = libgogo.NewType(typename, packagename, 1, 0, nil);
-                    GlobalTypes = libgogo.AppendType(basetype, GlobalTypes); //Add forward declared type to global list
-                }
-            } else {
-                libgogo.StringAppend(&tempstr, packagename);
-                libgogo.CharAppend(&tempstr, '.');
-                libgogo.StringAppend(&tempstr, typename);
-                SymbolTableError("Unknown", "", "type", tempstr);
-            }
-        }
-        if arraydim == 0 { //No array
-            libgogo.SetObjType(CurrentObject, basetype);
-        } else { //Array
-            if basetype != nil {
-                CurrentTypeName = libgogo.GetTypeName(basetype);
-                libgogo.StringAppend(&tempstr, CurrentTypeName);
-            }
-            libgogo.StringAppend(&tempstr, "Array");
-            CurrentTypeName = libgogo.IntToString(arraydim); //Reuse CurrentTypeName as string representation of arraydim
-            libgogo.StringAppend(&tempstr, CurrentTypeName);
-            temptype = libgogo.NewType(tempstr, packagename, 0, arraydim, basetype);
-            libgogo.SetObjType(CurrentObject, temptype);
-        }
-    }
+    SetCurrentObjectType(typename, packagename, arraydim);
     PrintDebugString("Leaving ParseType()",1000);
 }
 
@@ -334,26 +251,12 @@ func ParseVarDeclList() {
 //
 func ParseVarDecl() uint64 {
     var boolFlag uint64;
-    var TempObject *libgogo.ObjectDesc;
     PrintDebugString("Entering ParseVarDecl()",1000);
     boolFlag = LookAheadAndCheck(TOKEN_VAR);
     if boolFlag == 0 {
         AssertNextToken(TOKEN_VAR);
         AssertNextToken(TOKEN_IDENTIFIER);
-        CurrentObject = libgogo.NewObject(tok.strValue, CurrentPackage, libgogo.CLASS_VAR);
-        if InsideFunction == 0 { //Global objects
-            TempObject = libgogo.GetObject(tok.strValue, CurrentPackage, GlobalObjects);
-            if TempObject != nil {
-                SymbolTableError("duplicate", "global", "identifier", tok.strValue);
-            }
-            GlobalObjects = libgogo.AppendObject(CurrentObject, GlobalObjects);
-        } else { //Function-local objects
-            TempObject = libgogo.GetObject(tok.strValue, CurrentPackage, LocalObjects);
-            if TempObject != nil {
-                SymbolTableError("duplicate", "local", "identifier", tok.strValue);
-            }
-            LocalObjects = libgogo.AppendObject(CurrentObject, LocalObjects);
-        }
+        NewVariable(tok.strValue); //New object
         // variable name in tok.strValue
         ParseType();
 
@@ -695,7 +598,6 @@ func ParseFuncDeclRaw() uint64 {
 
 func ParseFuncDecl() uint64 {
     var boolFlag uint64;
-    var temp uint64;
     PrintDebugString("Entering ParseFuncDecl()",1000);
     InsideFunction = 1;
     GetNextTokenSafe();
@@ -716,16 +618,7 @@ func ParseFuncDecl() uint64 {
         boolFlag = 1;
     }
     InsideFunction = 0;
-    temp = CheckDebugLevel(100);
-    if temp == 1 { //Function-local symbol table
-        libgogo.PrintString("\nFunction-local symbol table until line ");
-        libgogo.PrintNumber(fileInfo[curFileIndex].lineCounter);
-        libgogo.PrintString(" of ");
-        libgogo.PrintString(fileInfo[curFileIndex].filename);
-        libgogo.PrintString(":\n----------------------------------------------------------------------------\n");
-        libgogo.PrintObjects(LocalObjects);
-    }
-    LocalObjects = nil; //Delete local objects
+    EndOfFunction(); //Delete local variables etc.
     PrintDebugString("Leaving ParseFuncDecl()",1000);
     return boolFlag;
 }
