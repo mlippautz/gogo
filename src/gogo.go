@@ -38,9 +38,6 @@ var DEBUG_LEVEL uint64 = 0;
 func main() {
     var errno uint64;
     var i uint64;
-    var temptype *libgogo.TypeDesc;
-    var tempobject *libgogo.ObjectDesc;
-    var tempstring string;
 
     libgogo.GetArgv();
 
@@ -52,20 +49,7 @@ func main() {
         libgogo.ExitError("Cannot compile more than 32 files at once",1);
     }
 
-    //Default data types
-    temptype = libgogo.NewType("uint64", "", 0, 8, nil);
-    GlobalTypes = libgogo.AppendType(temptype, GlobalTypes);
-    temptype = libgogo.NewType("byte", "", 0, /*1*/ 8, nil); //Use size 8 as everything has to be 64-bit aligned anyways
-    GlobalTypes = libgogo.AppendType(temptype, GlobalTypes);
-    temptype = libgogo.NewType("string", "", 0, 16, nil);
-    GlobalTypes = libgogo.AppendType(temptype, GlobalTypes);
-
-    //Default objects
-    tempobject = libgogo.NewObject("nil", "", libgogo.CLASS_VAR);
-    libgogo.SetObjType(tempobject, nil);
-    libgogo.FlagObjectTypeAsPointer(tempobject); //nil is a pointer to no specified type (universal)
-    GlobalObjects = libgogo.AppendObject(tempobject, GlobalObjects);
-
+    InitSymbolTable(); //Initialize symbol table
     InitFreeRegisters(); //Init registers for code generation
 
     for i=1; i < libgogo.Argc ; i= i+1 {
@@ -92,18 +76,6 @@ func main() {
         }
     }
 
-    errno = CheckDebugLevel(100);
-    if  errno == 1 { //Global symbol table
-        libgogo.PrintString("\nGlobal symbol table:\n");
-        libgogo.PrintString("--------------------\n");
-        libgogo.PrintTypes(GlobalTypes);
-        libgogo.PrintObjects(GlobalObjects);
-    }
-
-    //Check for undefined types which were forward declared
-    temptype = libgogo.GetFirstForwardDeclType(GlobalTypes);
-    if temptype != nil {
-        tempstring = libgogo.GetTypeName(temptype);
-        SymbolTableError("undefined", "", "type", tempstring);
-    }
+    PrintGlobalSymbolTable();
+    UndefinedForwardDeclaredTypeCheck();
 }
