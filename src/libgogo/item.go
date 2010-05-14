@@ -29,6 +29,11 @@ var MODE_REG uint64 = 3;
 func Uint64ToItemPtr(adr uint64) *Item;
 
 //
+// Convert the item to a uint64 value
+//
+func ItemPtrToUint64(item *Item) uint64;
+
+//
 // Creates a new item
 //
 func NewItem(mode uint64, itemtype *TypeDesc, a uint64, r uint64) *Item {
@@ -40,5 +45,25 @@ func NewItem(mode uint64, itemtype *TypeDesc, a uint64, r uint64) *Item {
     item.itemtype = itemtype;
     item.a = a;
     item.r = r;
+    return item;
+}
+
+//
+// Pushes the specified item to the given stack
+//
+func PushItem(item *Item, stack *Stack) {
+    var itemPtr uint64;
+    itemPtr = ItemPtrToUint64(item);
+    Push(stack, itemPtr);
+}
+
+//
+// Pops an item from the given stack
+//
+func PopItem(stack *Stack) *Item {
+    var itemPtr uint64;
+    var item *Item;
+    itemPtr = Pop(stack);
+    item = Uint64ToItemPtr(itemPtr);
     return item;
 }
