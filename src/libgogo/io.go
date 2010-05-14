@@ -16,12 +16,19 @@ package libgogo
 func Write(fd uint64, text string, length uint64) uint64;
 
 //
+// Writes the specified string to the given file descriptor
+//
+func WriteString(fd uint64, msg string) {
+    var strLen uint64;
+    strLen = StringLength(msg);
+    Write(fd, msg, strLen);
+}
+
+//
 // Writes the specified string to the (console) standard output
 //
 func PrintString(msg string) {
-    var strLen uint64;
-    strLen = StringLength(msg);
-    Write(1, msg, strLen); //1 = standard output
+    WriteString(1, msg); //1 = standard output
 }
 
 //
