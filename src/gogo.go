@@ -40,6 +40,7 @@ func main() {
     var i uint64;
     var temptype *libgogo.TypeDesc;
     var tempobject *libgogo.ObjectDesc;
+    var tempstring string;
 
     libgogo.GetArgv();
 
@@ -91,7 +92,8 @@ func main() {
         }
     }
 
-    if CheckDebugLevel(100) == 1 { //Global symbol table
+    errno = CheckDebugLevel(100);
+    if  errno == 1 { //Global symbol table
         libgogo.PrintString("\nGlobal symbol table:\n");
         libgogo.PrintString("--------------------\n");
         libgogo.PrintTypes(GlobalTypes);
@@ -101,6 +103,7 @@ func main() {
     //Check for undefined types which were forward declared
     temptype = libgogo.GetFirstForwardDeclType(GlobalTypes);
     if temptype != nil {
-        SymbolTableError("undefined", "", "type", libgogo.GetTypeName(temptype));
+        tempstring = libgogo.GetTypeName(temptype);
+        SymbolTableError("undefined", "", "type", tempstring);
     }
 }
