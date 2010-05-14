@@ -6,7 +6,7 @@ package main
 
 import "os"
 import "fmt"
-import "./_obj/libgogo"
+import "../_obj/libgogo"
 
 func main() {
 	if len(os.Args) != 2 {
