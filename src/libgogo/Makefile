@@ -13,13 +13,15 @@ GOFILES=\
         memmgr.go \
         stack.go \
         list.go \
-        symbol.go
+        symbol.go \
+        item.go
 OFILES=\
         libgogo_$(GOARCH).$O \
         convert_$(GOARCH).$O \
         io_$(GOARCH).$O \
         string_$(GOARCH).$O \
         memmgr_$(GOARCH).$O \
-        symbol_$(GOARCH).$O
+        symbol_$(GOARCH).$O \
+        item_$(GOARCH).$O
 
 include $(GOROOT)/src/Make.pkg
