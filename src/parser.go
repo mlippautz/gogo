@@ -6,8 +6,6 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
-var tok Token;
-
 var maxDepth uint64 = 10;
 var curDepth uint64 = 1;
 var compile uint64 = 1;

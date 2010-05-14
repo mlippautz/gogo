@@ -27,6 +27,11 @@ here to be re-assigned in the next GetNextToken() round [used by the scanner] */
 };
 
 //
+// Global token (current token processed)
+//
+var tok Token;
+
+//
 // Set of recognized tokens 
 //
 var TOKEN_IDENTIFIER uint64 = 1;  // Identifier
