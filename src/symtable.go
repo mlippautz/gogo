@@ -23,6 +23,12 @@ var LocalObjects *libgogo.ObjectDesc = nil;
 var CurrentType *libgogo.TypeDesc;
 var CurrentObject *libgogo.ObjectDesc;
 
+//
+// Creates a new type with the specified name to the symbol table
+// The newly created type is not added to the global symbol table,
+// but a flag is returned whether this has to be done later when
+// the whole type is specified using AddType
+//
 func NewType(name string) uint64 {
     var dontAddType uint64 = 0;
     var tempType *libgogo.TypeDesc;
@@ -45,12 +51,21 @@ func NewType(name string) uint64 {
     return dontAddType;
 }
 
+//
+// Adds a newly created type built by NewType when all of its fields
+// have been added. The parameter dontAddType specifies whether the
+// the type actually needs to be added to the global symbol tables
+//
 func AddType(dontAddType uint64) {
     if dontAddType == 0 {
         GlobalTypes = libgogo.AppendType(CurrentType, GlobalTypes);
     }
 }
 
+//
+// Adds a fields with the speicified name to a new type created by
+// NewType. The field's type has to be set using SetCurrentObjectType
+//
 func AddStructField(fieldname string) {
     var temp uint64;
     temp = libgogo.HasField(fieldname, CurrentType);
@@ -62,10 +77,20 @@ func AddStructField(fieldname string) {
     }
 }
 
+//
+// Flags the type the current object or field to be a pointer and
+// not the type itself
+//
 func SetCurrentObjectTypeToPointer() {
     libgogo.FlagObjectTypeAsPointer(CurrentObject); //Type is pointer
 }
 
+//
+// Sets the type of the current object or field using type
+// [arraydim]packagename.typename where arraydim and packagename
+// are optional. In case of arraydim != 0, a new type is created
+// to represent an array type of the specified size
+//
 func SetCurrentObjectType(typename string, packagename string, arraydim uint64) {
     var basetype *libgogo.TypeDesc;
     var temptype *libgogo.TypeDesc;
@@ -118,6 +143,10 @@ func SetCurrentObjectType(typename string, packagename string, arraydim uint64) 
     }
 }
 
+//
+// Adds a new variable to the global symbol table with the specified
+// name. The variable type has to be set using SetCurrentObjectType
+//
 func NewVariable(name string) {
     var TempObject *libgogo.ObjectDesc;
     CurrentObject = libgogo.NewObject(name, CurrentPackage, libgogo.CLASS_VAR);
@@ -136,6 +165,11 @@ func NewVariable(name string) {
     }
 }
 
+//
+// When called when the reaching the end of a function during parsing, the
+// local symbol table is purged and optional debug information about the
+// symbol table before purging are printed
+//
 func EndOfFunction() {
     var temp uint64;
     temp = CheckDebugLevel(100);
