@@ -161,7 +161,7 @@ func UnsetForwardDecl(objtype *TypeDesc) {
 
 //
 // Returns the (memory) size of the given type in bytes which is required when hypothetically allocating one variable of this type
-// Same semantics as sizeof(objtype)
+// Same semantics as sizeof(objtype). Note that the calculated size of structs is always 64 bit aligned
 //
 func GetTypeSize(objtype *TypeDesc) uint64 {
     var size uint64 = 0;
@@ -176,6 +176,7 @@ func GetTypeSize(objtype *TypeDesc) uint64 {
                 for tempobj = objtype.fields; tempobj != nil; tempobj = tempobj.next { //Sum of all fields
                     tmpSize = GetObjectSize(tempobj);
                     size = size + tmpSize; //Add size of each field
+                    size = ((size + 7) / 8) * 8; //Force 64 bit alignment
                 }
             }
             if objtype.form == FORM_ARRAY {
@@ -197,7 +198,7 @@ func GetTypeSize(objtype *TypeDesc) uint64 {
 //
 func GetObjectSize(obj *ObjectDesc) uint64 {
     var size uint64;
-    if obj.ptrtype == 1 { //Pointer only, not the whole type
+    if obj.ptrtype == 1 {
        size = 8;
     } else { //Actual type
        size = GetTypeSize(obj.objtype);
@@ -207,6 +208,7 @@ func GetObjectSize(obj *ObjectDesc) uint64 {
 
 //
 // Calculates the (memory) offset of a given field of the specified (struct) type in bytes
+// Note that the calculated size always 64 bit aligned
 //
 func GetObjectOffset(obj *ObjectDesc, list *ObjectDesc) uint64 {
     var offset uint64 = 0;
@@ -217,10 +219,11 @@ func GetObjectOffset(obj *ObjectDesc, list *ObjectDesc) uint64 {
             break;
         }
         tmpSize = GetObjectSize(tmp);
-        offset = offset + tmpSize;
+        offset = offset + tmpSize; //Add field size
+        offset = ((offset + 7) / 8) * 8; //Force 64 bit alignment
     }
     if tmp == nil {
-        offset = 0; //TODO: Raise error as obj is appearently not within the list
+        offset = 0; //TODO: Raise error as obj is appearently not in the list
     }
     return offset;
 }

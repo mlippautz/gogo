@@ -42,7 +42,7 @@ func InitSymbolTable() {
     //Default data types
     uint64_t = libgogo.NewType("uint64", "", 0, 8, nil);
     GlobalTypes = libgogo.AppendType(uint64_t, GlobalTypes);
-    byte_t = libgogo.NewType("byte", "", 0, /*1*/ 8, nil); //Use size 8 as everything has to be 64-bit aligned anyways
+    byte_t = libgogo.NewType("byte", "", 0, 1, nil);
     GlobalTypes = libgogo.AppendType(byte_t, GlobalTypes);
     string_t = libgogo.NewType("string", "", 0, 16, nil);
     GlobalTypes = libgogo.AppendType(string_t, GlobalTypes);
