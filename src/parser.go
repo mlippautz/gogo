@@ -266,7 +266,7 @@ func ParseVarDecl() uint64 {
 
         GetNextTokenSafe();
         if tok.id == TOKEN_ASSIGN {
-            ParseExpression();        
+            ParseExpression(nil); //TODO
         } else {
             tok.nextToken = tok.id;
         } 
@@ -281,11 +281,23 @@ func ParseVarDecl() uint64 {
 //
 //
 //
-func ParseExpression() {
+func ParseExpression(item *libgogo.Item) {
+		var boolFlag uint64;
+    var op uint64;
+    var tempItem2 *libgogo.Item;
     PrintDebugString("Entering ParseExpression()",1000);
     IncAndCheckDepth();
-    ParseSimpleExpression();    
-    ParseCmpOp();
+		if item == nil {
+		    item = libgogo.NewItem();
+		}
+    ParseSimpleExpression(item);
+		boolFlag = ParseCmpOp();
+		if boolFlag == 0 {
+        tempItem2 = libgogo.NewItem();
+		  	ParseSimpleExpression(tempItem2);
+			  op = libgogo.Pop(&Operators);
+			  op = op + 1; //TODO instead: GenerateExpression(item, tempItem2, op);
+		}
     DecDepth();
     PrintDebugString("Leaving ParseExpression()",1000);
 }
@@ -293,37 +305,39 @@ func ParseExpression() {
 //
 //
 //
-func ParseCmpOp() {
+func ParseCmpOp() uint64 {
+		var boolFlag uint64;
     PrintDebugString("Entering ParseCmpOp()",1000);
     GetNextTokenSafe();
     if (tok.id == TOKEN_EQUALS) || (tok.id == TOKEN_NOTEQUAL) || 
         (tok.id == TOKEN_REL_LT) || (tok.id == TOKEN_REL_LTOE) || 
         (tok.id == TOKEN_REL_GT) || (tok.id == TOKEN_REL_GTOE) {
-        ParseSimpleExpression();
+        libgogo.Push(&Operators, tok.id);
+				boolFlag = 0;
     } else {
         tok.nextToken = tok.id;
+				boolFlag = 1;
     }
     PrintDebugString("Leaving ParseCmpOp()",1000);
+		return boolFlag;
 }
 
 //
 //
 //
-func ParseSimpleExpression() {
+func ParseSimpleExpression(item *libgogo.Item) {
     var boolFlag uint64;
-    var tempItem *libgogo.Item;
     var tempItem2 *libgogo.Item;
     var op uint64;
     PrintDebugString("Entering ParseSimpleExpression()",1000);
     ParseUnaryArithOp();
-    tempItem = libgogo.NewItem();
     tempItem2 = libgogo.NewItem();
-    ParseTerm(tempItem);
+    ParseTerm(item);
     for boolFlag = ParseSimpleExpressionOp(tempItem2);
         boolFlag == 0;
         boolFlag = ParseSimpleExpressionOp(tempItem2) {
         op = libgogo.Pop(&Operators);
-        GenerateSimpleExpression(tempItem, tempItem2, op);
+        GenerateSimpleExpression(item, tempItem2, op);
     }
     PrintDebugString("Leaving ParseSimpleExpression()",1000);
 }
@@ -452,10 +466,10 @@ func ParseFactor(item *libgogo.Item) uint64 {
     var doneFlag uint64 = 1;
     var boolFlag uint64;
     var es [2]uint64;
-    /*var tempObject *libgogo.ObjectDesc;
+    var tempObject *libgogo.ObjectDesc;
     var tempType *libgogo.TypeDesc;
     var tempAddr uint64;
-    var tempList *libgogo.ObjectDesc;*/
+    var tempList *libgogo.ObjectDesc;
 
     GetNextTokenSafe();
     if (doneFlag == 1) && (tok.id == TOKEN_OP_ADR) {
@@ -464,22 +478,24 @@ func ParseFactor(item *libgogo.Item) uint64 {
         doneFlag = 0;
     }
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
-        /*tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, LocalObjects); //TODO: Consider package name
-        tempList = LocalObjects;
-        if tempObject == nil {
-            tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, GlobalObjects); //TODO: Consider package name
-            tempList = GlobalObjects;
+        if Compile != 0 {
+				    tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, LocalObjects); //TODO: Consider package name
+				    tempList = LocalObjects;
+				    if tempObject == nil {
+				        tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, GlobalObjects); //TODO: Consider package name
+				        tempList = GlobalObjects;
+				    }
+				    if tempObject == nil {
+				        SymbolTableError("Undefined", "", "variable", tok.strValue);
+				    }
+				    tempType = libgogo.GetObjType(tempObject);
+				    tempAddr = libgogo.GetObjectOffset(tempObject, tempList);
+				    if tempList == LocalObjects { //Global
+				        libgogo.SetItem(item, libgogo.MODE_VAR, tempType, tempAddr, 0, 0); //Varible item
+				    } else { //Local
+				        libgogo.SetItem(item, libgogo.MODE_VAR, tempType, tempAddr, 0, 1); //Varible item
+				    }
         }
-        if tempObject == nil {
-            SymbolTableError("Undefined", "", "variable", tok.strValue);
-        }
-        tempType = libgogo.GetObjType(tempObject);
-        tempAddr = libgogo.GetObjectOffset(tempObject, tempList);
-        if tempList == LocalObjects { //Global
-            libgogo.SetItem(item, libgogo.MODE_VAR, tempType, tempAddr, 0, 0); //Varible item
-        } else { //Local
-            libgogo.SetItem(item, libgogo.MODE_VAR, tempType, tempAddr, 0, 1); //Varible item
-        }*/
         ParseSelector(); //TODO
         doneFlag = 0;
     } 
@@ -491,7 +507,7 @@ func ParseFactor(item *libgogo.Item) uint64 {
         doneFlag = 0;
     }
     if (doneFlag) == 1 && (tok.id == TOKEN_LBRAC) {
-        ParseExpression();
+        ParseExpression(item);
         AssertNextTokenWeak(TOKEN_RBRAC);
         doneFlag = 0;
     }
@@ -653,7 +669,7 @@ func ParseFuncDecl() uint64 {
         ParseStatementSequence();
         GetNextTokenSafe();
         if tok.id == TOKEN_RETURN {
-            ParseExpression();
+            ParseExpression(nil); //TODO
             AssertNextTokenWeak(TOKEN_SEMICOLON);
         } else {
             tok.nextToken = tok.id;
@@ -841,11 +857,11 @@ func ParseAssignment() uint64 {
             if funcIndicator == 1 {
                 ParseFunctionCallStatement();
             } else {
-                ParseExpression();
+                ParseExpression(nil); //TODO
             }
         } else {
             tok.nextToken = tok.id;
-            ParseExpression();
+            ParseExpression(nil); //TODO
         }
         AssertNextTokenWeak(TOKEN_SEMICOLON);
         boolFlag = 0;
@@ -871,11 +887,11 @@ func ParseAssignmentWithoutSC() uint64 {
             if funcIndicator == 1 {
                 ParseFunctionCallStatement();
             } else {
-                ParseExpression();
+                ParseExpression(nil); //TODO
             }
         } else {
             tok.nextToken = tok.id;
-            ParseExpression();
+            ParseExpression(nil); //TODO
         }
         boolFlag = 0;
     } else {
@@ -919,7 +935,7 @@ func ParseFunctionCall() {
 func ParseExpressionList() {
     var boolFlag uint64;
     PrintDebugString("Entering ParseExpressionList()",1000);
-    ParseExpression();
+    ParseExpression(nil); //TODO
     for boolFlag = ParseExpressionListSub();
         boolFlag == 0;
         boolFlag = ParseExpressionListSub() { }   
@@ -931,7 +947,7 @@ func ParseExpressionListSub() uint64 {
     PrintDebugString("Entering ParseExpressionListSub()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_COLON {
-        ParseExpression();
+        ParseExpression(nil); //TODO
         boolFlag = 0;
     } else {
         tok.nextToken = tok.id;
@@ -969,7 +985,7 @@ func ParseForStatement() {
             tok.nextToken = tok.id;
         } else {
             tok.nextToken = tok.id;
-            ParseExpression();
+            ParseExpression(nil); //TODO
         }
 
         AssertNextToken(TOKEN_SEMICOLON);
@@ -1000,7 +1016,7 @@ func ParseIfStatement() {
     PrintDebugString("Entering ParseIfStatement()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_IF {
-        ParseExpression();
+        ParseExpression(nil); //TODO
         AssertNextToken(TOKEN_LCBRAC);
         ParseStatementSequence();
         AssertNextToken(TOKEN_RCBRAC);

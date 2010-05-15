@@ -78,4 +78,5 @@ func main() {
 
     PrintGlobalSymbolTable();
     UndefinedForwardDeclaredTypeCheck();
+    PrintFreeRegisters();
 }

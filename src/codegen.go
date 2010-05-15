@@ -35,6 +35,19 @@ func FreeRegister(index uint64) {
     FreeRegisters[index] = 1;
 }
 
+func PrintFreeRegisters() {
+    /*var i uint64;
+    libgogo.PrintString("Free registers: ");
+    for i = 0; i < NumRegisters; i++ {
+        if FreeRegisters[i] == 1 {
+            libgogo.PrintString("R");
+            libgogo.PrintNumber(i);
+            libgogo.PrintString(",");
+        }
+    }
+    libgogo.PrintString("\b\n");*/
+}
+
 func ItemToRegister(item *libgogo.Item) {
     if item.Mode == libgogo.MODE_CONST {
         item.R = GetFreeRegister();
