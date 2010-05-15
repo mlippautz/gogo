@@ -1,0 +1,289 @@
+#!/bin/bash
+
+# Copyright 2009 The GoGo Authors. All rights reserved.
+# Use of this source code is governed by the MIT
+# license that can be found in the LICENSE file.
+
+#
+# This tool can test against predefined source files by comparing various
+# compiled results. New valid sets can be generated and need to be 
+# acknowlegded before code can be tested against.
+#
+
+# change to this directory for easier handling of paths
+SELF="testsuite"
+BASEDIR=`dirname $0`
+cd $BASEDIR
+
+# tools that are used
+SHA256SUM=/usr/bin/sha256sum
+
+# configuration
+TESTDIR="tests"
+TMPDIR="tmp"
+GOGODIR=../src
+GOGO=$GOGODIR/gogo
+
+# Performs internal checks to make sure everything is set up.
+function do_checks() {
+    echo ""
+    echo ">>> Performing internal checks"
+    echo ""
+
+    echo -n "Checking for sha256sum tool... "
+    if [ -e $SHA256SUM ]; then
+        echo "ok"
+    else
+        echo "failed"
+        exit 1
+    fi
+
+    echo -n "Checking for gogo compiler... "
+    if [ -e $GOGO ]; then
+        echo "ok"
+    else
+        echo "failed"
+        exit 1
+    fi  
+
+    echo -n "Checking for $TESTDIR... "
+    if [ -d $TESTDIR ]; then
+        echo "ok"
+    else
+        echo "failed"
+        exit 1
+    fi  
+}
+
+# Generates new results that can be marked as valid
+function new_valids() {
+    do_checks
+
+    echo ""
+    echo ">>> Checking whether there exists an acknowledged resultset"
+    if [ -e checksums ]; then
+        echo ""
+        echo "* Found an already acknowledged resultset."
+        echo "* To create a new one run 'fullclean' first."
+        exit 1
+    fi
+
+    echo ""
+    echo ">>> Generating new resultset"
+    echo ""
+
+    echo -n "Checking for $TMPDIR... "
+    if [ -d $TMPDIR ]; then
+        echo "ok"
+    else
+        echo "creating it"
+        mkdir $TMPDIR
+    fi
+
+    for filename in $( ls $TESTDIR )
+    do
+        $GOGO $TESTDIR/$filename > $TMPDIR/$filename
+    done
+    echo ""
+    echo "* Generated testsuite results in $TMPDIR"
+    echo "* Please check if these results are expected"
+    echo "* The suite may then be acknowledged using the 'ackvalids' action"
+}
+
+# Acknowledges the previously generated results
+function ack_valids() {
+    do_checks
+
+    echo ""
+    echo ">>> Checking for already acknowledged resultset"
+    echo ""
+    if [ -e checksums ]; then
+        echo "* Found an already acknowledged resultset."
+        echo "* To create a new one run 'fullclean' and 'newvalids'."
+        exit 1
+    fi
+
+    echo ">>> Checking for a new resultset"
+    echo ""
+    echo -n "Checking for $TMPDIR... "
+    if [ -d $TMPDIR ]; then
+        echo "ok"
+    else
+        echo "failed"
+        exit 1
+    fi
+
+    echo ""
+    echo ">>> Acknowledging the generated results"
+    echo ""
+
+    for filename in $( ls $TMPDIR )
+    do
+        result=$($SHA256SUM $TMPDIR/$filename)
+        echo "$result"
+        echo "$result" >> checksums
+    done
+
+    echo ""
+    echo ">>> Preparing resultset"
+    echo ""
+
+    echo -n "Renaming $TMPDIR to results... "
+    mv $TMPDIR results
+    if [ "$?" -eq 0 ]; then
+        echo "ok"
+    else
+        exit 1
+    fi
+
+}
+
+# Performs a checksum comparison against the previously acked results
+function do_tests() {
+    do_checks
+
+    echo ""
+    echo ">>> Checking whether an acknowledged resultset exists"
+    echo ""
+    if [ ! -e checksums ]; then
+        echo "* No acknowledged resultset found"
+        exit 1
+    fi
+
+    echo ">>> Generating tests"
+    echo ""
+    echo -n "Checking for $TMPDIR... "
+    if [ -d $TMPDIR ]; then
+        echo "ok"
+    else
+        echo "creating it"
+        mkdir $TMPDIR
+    fi
+
+    rm -f test-diffs
+
+    for filename in $( ls $TESTDIR )
+    do
+        $GOGO $TESTDIR/$filename > $TMPDIR/$filename
+    done
+    
+    echo ""
+    echo ">>> Performing quick check"
+    echo ""
+    $SHA256SUM --quiet -c checksums
+
+    if [ "$?" -eq 0 ]; then
+        echo "* Checksums matched. Everything seems fine"
+    else
+        echo ""
+        echo ">>> Checksums didn't match. Printing failed diffs"
+        echo ""
+        while read line
+        do
+            IFS=" "
+            arr=($line)
+            csum=($($SHA256SUM ${arr[1]}))
+            if [ ${csum[0]} != ${arr[0]} ]; then
+                IFS="/"
+                path=(${arr[1]})
+                diff -u "results/${path[1]}" "${arr[1]}"
+                echo $(diff -u "results/${path[1]}" "${arr[1]}") >> test-diffs
+                echo ""
+            fi
+        done < checksums
+    fi
+}
+
+function do_clean() {
+
+    echo ""
+    echo ">>> Cleaning test results"
+    echo ""
+
+    echo -n "Removing $TMPDIR... "
+    if [ -d $TMPDIR ]; then
+        rm -r $TMPDIR
+        echo "ok"
+    else
+        echo "not needed"
+    fi 
+
+    echo -n "Removing test-diffs... "
+    if [ -e test-diffs ]; then
+        rm test-diffs
+        echo "ok"
+    else
+        echo "not needed"
+    fi 
+}
+
+function do_fullclean() {
+
+    echo ""
+    echo ">>> Cleaning"
+    echo ""
+
+    echo -n "Removing $TMPDIR... "
+    if [ -d $TMPDIR ]; then
+        rm -r $TMPDIR
+        echo "ok"
+    else
+        echo "not needed"
+    fi 
+
+    if [ -e checksums ]; then
+        echo -n "Removing checksums file... "
+        rm checksums
+        if [ "$?" -eq 0 ]; then
+            echo "ok"
+        else
+            exit 1
+        fi
+    fi
+
+    echo -n "Removing results... "
+    if [ -d results ]; then
+        rm -r results
+        echo "ok"
+    else
+        echo "not needed"
+    fi
+}
+
+function do_help() {
+    echo ""
+    echo ">>> GoGo testsuite"
+    echo ""
+    echo "* newvalids ... generate a new valid resultset (requires fullclean)"
+    echo "* ackvalids ... validate a freshley generated resultset"
+    echo "* fullclean ... clean generated and/or acknowledged results"
+    echo "* test ........ perform tests against an acknowlegded resultset"
+    echo "* clean ....... clean the temporary generated results"
+    echo "* help ........ display this help"
+}
+
+case $1 in
+    newvalids)
+        new_valids
+        ;;
+    ackvalids)
+        ack_valids
+        ;;
+    test)
+        do_tests
+        ;;
+    fullclean)
+        do_fullclean
+        ;;
+    clean)
+        do_clean
+        ;;
+    help)
+        do_help
+        ;;
+    *)
+	    echo "Usage: $SELF {newvalids|ackvalids|fullclean|test|clean|help}" >&2
+        ;;
+esac
+exit 0
+        
