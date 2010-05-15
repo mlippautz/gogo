@@ -34,3 +34,116 @@ func OccupyRegister(index uint64) {
 func FreeRegister(index uint64) {
     FreeRegisters[index] = 1;
 }
+
+func ItemToRegister(item *libgogo.Item) {
+    if item.Mode == libgogo.MODE_CONST {
+        item.R = GetFreeRegister();
+        OccupyRegister(item.R);
+        item.Mode = libgogo.MODE_REG;
+        libgogo.PrintString("MOVQ $");
+        libgogo.PrintNumber(item.A);
+        libgogo.PrintString(", R");
+        libgogo.PrintNumber(item.R);
+        libgogo.PrintString("\n");
+    }
+    if item.Mode == libgogo.MODE_VAR {
+        item.R = GetFreeRegister();
+        OccupyRegister(item.R);
+        item.Mode = libgogo.MODE_REG;
+        libgogo.PrintString("MOVQ ");
+        if item.Global == 1 { //Global
+            libgogo.PrintNumber(item.A);
+            libgogo.PrintString("(SB)");
+        } else { //Local
+            libgogo.PrintString("-");
+            libgogo.PrintNumber(item.A + 8); //SP = return address, start at address SP-8, decreasing
+            libgogo.PrintString("(SP)");
+        }
+        libgogo.PrintString(", R");
+        libgogo.PrintNumber(item.R);
+        libgogo.PrintString("\n");
+    }
+    if item.Mode == libgogo.MODE_REG {
+				;
+    }
+}
+
+func GenerateTerm(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
+    var str string;
+    if Compile != 0 {
+				if (item1.Mode == libgogo.MODE_CONST) && (item2.Mode == libgogo.MODE_CONST) {
+						str = TokenToString(op);
+				    libgogo.PrintString(str);
+				    libgogo.PrintString("(");
+				    libgogo.PrintNumber(item1.A);
+				    libgogo.PrintString(",");
+				    libgogo.PrintNumber(item2.A);
+				    libgogo.PrintString(")\n");
+				    if op == TOKEN_ARITH_MUL {
+				        item1.A = item1.A * item2.A;
+				    }
+				    if op == TOKEN_ARITH_DIV {
+				        item1.A = item1.A / item2.A;
+				    }
+				} else {
+				    ItemToRegister(item1);
+				    libgogo.PrintString("MOVQ R");
+				    libgogo.PrintNumber(item1.R);
+				    libgogo.PrintString(", AX\n");
+				    ItemToRegister(item2);
+				    libgogo.PrintString("MOVQ R");
+				    libgogo.PrintNumber(item2.R);
+				    libgogo.PrintString(", BX\n");
+				    if op == TOKEN_ARITH_MUL {
+				        libgogo.PrintString("MULQ BX\n");
+				    }
+				    if op == TOKEN_ARITH_DIV {
+				        libgogo.PrintString("DIVQ BX\n");
+				    }
+				    libgogo.PrintString("MOVQ AX, R");
+				    libgogo.PrintNumber(item1.R);
+				    libgogo.PrintString("\n");
+				    FreeRegister(item2.R);
+				}
+    }
+}
+
+func GenerateSimpleExpression(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
+		var str string;
+    if Compile != 0 {
+				if (item1.Mode == libgogo.MODE_CONST) && (item2.Mode == libgogo.MODE_CONST) {
+						str = TokenToString(op);
+				    libgogo.PrintString(str);
+				    libgogo.PrintString("(");
+				    libgogo.PrintNumber(item1.A);
+				    libgogo.PrintString(",");
+				    libgogo.PrintNumber(item2.A);
+				    libgogo.PrintString(")\n");
+				    if op == TOKEN_ARITH_PLUS {
+				        item1.A = item1.A + item2.A;
+				    }
+				    if op == TOKEN_ARITH_MINUS {
+				        item1.A = item1.A - item2.A;
+				    }
+				} else {
+				    ItemToRegister(item1);
+				    libgogo.PrintString("MOVQ R");
+				    libgogo.PrintNumber(item1.R);
+				    libgogo.PrintString(", AX\n");
+				    ItemToRegister(item2);
+				    libgogo.PrintString("MOVQ R");
+            libgogo.PrintNumber(item2.R);
+            libgogo.PrintString(", BX\n");
+            if op == TOKEN_ARITH_PLUS {
+                libgogo.PrintString("ADDQ AX, BX\n");
+            }
+            if op == TOKEN_ARITH_MINUS {
+                libgogo.PrintString("SUBQ AX, BX\n");
+            }
+                libgogo.PrintString("MOVQ AX, R");
+            libgogo.PrintNumber(item1.R);
+            libgogo.PrintString("\n");
+            FreeRegister(item2.R);
+        }
+    }
+}

@@ -8,7 +8,9 @@ import "./libgogo/_obj/libgogo"
 
 var maxDepth uint64 = 10;
 var curDepth uint64 = 1;
-var compile uint64 = 1;
+var Compile uint64 = 0;
+
+var Operators libgogo.Stack;
 
 var InsideFunction uint64 = 0;
 var InsideStructDecl uint64 = 0;
@@ -28,6 +30,8 @@ func Parse() {
     tok.nextChar = 0;
     tok.nextToken = 0;   
     tok.llCnt = 0; 
+
+    libgogo.InitializeStack(&Operators);
 
     ParsePackageStatement(); 
     ParseImportStatementList();
@@ -307,19 +311,27 @@ func ParseCmpOp() {
 //
 func ParseSimpleExpression() {
     var boolFlag uint64;
+    var tempItem *libgogo.Item;
+    var tempItem2 *libgogo.Item;
+    var op uint64;
     PrintDebugString("Entering ParseSimpleExpression()",1000);
     ParseUnaryArithOp();
-    ParseTerm();
-    for boolFlag = ParseSimpleExpressionOp();
+    tempItem = libgogo.NewItem();
+    tempItem2 = libgogo.NewItem();
+    ParseTerm(tempItem);
+    for boolFlag = ParseSimpleExpressionOp(tempItem2);
         boolFlag == 0;
-        boolFlag = ParseSimpleExpressionOp() { }
+        boolFlag = ParseSimpleExpressionOp(tempItem2) {
+        op = libgogo.Pop(&Operators);
+        GenerateSimpleExpression(tempItem, tempItem2, op);
+    }
     PrintDebugString("Leaving ParseSimpleExpression()",1000);
 }
 
 //
 //
 //
-func ParseSimpleExpressionOp() uint64 {
+func ParseSimpleExpressionOp(item *libgogo.Item) uint64 {
     var boolFlag uint64 = 1;
     PrintDebugString("Entering ParseSimpleExpressionOp()",1000);
     boolFlag = ParseUnaryArithOp(); // +,-
@@ -327,11 +339,12 @@ func ParseSimpleExpressionOp() uint64 {
         GetNextTokenSafe();
         if tok.id == TOKEN_REL_OR {
             // ||
+            libgogo.Push(&Operators, TOKEN_REL_OR);
             boolFlag = 0;
         } 
     }
     if boolFlag == 0 {
-        ParseTerm();
+        ParseTerm(item);
     } else {
         tok.nextToken = tok.id;
     }
@@ -349,10 +362,12 @@ func ParseUnaryArithOp() uint64 {
     GetNextTokenSafe();
     if tok.id == TOKEN_ARITH_PLUS {
         // +
+        libgogo.Push(&Operators, TOKEN_ARITH_PLUS);
         boolFlag = 0;
     }
     if tok.id == TOKEN_ARITH_MINUS {
         // -
+        libgogo.Push(&Operators, TOKEN_ARITH_MINUS);
         boolFlag = 0;
     }
     if boolFlag != 0 {
@@ -365,20 +380,26 @@ func ParseUnaryArithOp() uint64 {
 //
 //
 //
-func ParseTerm() {
+func ParseTerm(item *libgogo.Item) {
     var boolFlag uint64;
+    var tempItem2 *libgogo.Item;
+    var op uint64;
     PrintDebugString("Entering ParseTerm()",1000);
-    ParseFactor();
-    for boolFlag = ParseTermOp();
+    ParseFactor(item);
+    tempItem2 = libgogo.NewItem();
+    for boolFlag = ParseTermOp(tempItem2);
         boolFlag == 0;
-        boolFlag = ParseTermOp() { }      
+        boolFlag = ParseTermOp(tempItem2) {
+        op = libgogo.Pop(&Operators);
+        GenerateTerm(item, tempItem2, op);
+    }      
     PrintDebugString("Leaving ParseTerm()",1000);
 }
 
 //
 //
 //
-func ParseTermOp() uint64 {
+func ParseTermOp(item *libgogo.Item) uint64 {
     var boolFlag uint64;
     PrintDebugString("Entering ParseTermOp()",1000);
     boolFlag = ParseBinaryArithOp(); // *,/
@@ -386,11 +407,12 @@ func ParseTermOp() uint64 {
         GetNextTokenSafe();
         if tok.id == TOKEN_REL_AND {
             // &&
+            libgogo.Push(&Operators, TOKEN_REL_AND);
             boolFlag = 0;
         }
     }
     if boolFlag == 0 {
-        ParseFactor();
+        ParseFactor(item);
     } else {
         tok.nextToken = tok.id;
     }
@@ -408,10 +430,12 @@ func ParseBinaryArithOp() uint64 {
     GetNextTokenSafe();
     if tok.id == TOKEN_ARITH_MUL {
         // *
+        libgogo.Push(&Operators, TOKEN_ARITH_MUL);
         boolFlag = 0;
     }
     if tok.id == TOKEN_ARITH_DIV {
         // /
+        libgogo.Push(&Operators, TOKEN_ARITH_DIV);
         boolFlag = 0;
     }
     if boolFlag != 0 {
@@ -424,10 +448,14 @@ func ParseBinaryArithOp() uint64 {
 //
 //
 //
-func ParseFactor() uint64 {
+func ParseFactor(item *libgogo.Item) uint64 {
     var doneFlag uint64 = 1;
     var boolFlag uint64;
     var es [2]uint64;
+    /*var tempObject *libgogo.ObjectDesc;
+    var tempType *libgogo.TypeDesc;
+    var tempAddr uint64;
+    var tempList *libgogo.ObjectDesc;*/
 
     GetNextTokenSafe();
     if (doneFlag == 1) && (tok.id == TOKEN_OP_ADR) {
@@ -436,10 +464,27 @@ func ParseFactor() uint64 {
         doneFlag = 0;
     }
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
-        ParseSelector();
+        /*tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, LocalObjects); //TODO: Consider package name
+        tempList = LocalObjects;
+        if tempObject == nil {
+            tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, GlobalObjects); //TODO: Consider package name
+            tempList = GlobalObjects;
+        }
+        if tempObject == nil {
+            SymbolTableError("Undefined", "", "variable", tok.strValue);
+        }
+        tempType = libgogo.GetObjType(tempObject);
+        tempAddr = libgogo.GetObjectOffset(tempObject, tempList);
+        if tempList == LocalObjects { //Global
+            libgogo.SetItem(item, libgogo.MODE_VAR, tempType, tempAddr, 0, 0); //Varible item
+        } else { //Local
+            libgogo.SetItem(item, libgogo.MODE_VAR, tempType, tempAddr, 0, 1); //Varible item
+        }*/
+        ParseSelector(); //TODO
         doneFlag = 0;
     } 
     if (doneFlag == 1) && (tok.id == TOKEN_INTEGER) {
+        libgogo.SetItem(item, libgogo.MODE_CONST, uint64_t, tok.intValue, 0, 0); //Constant item
         doneFlag = 0;
     }
     if (doneFlag) == 1 && (tok.id == TOKEN_STRING) {
@@ -451,7 +496,9 @@ func ParseFactor() uint64 {
         doneFlag = 0;
     }
     if (doneFlag == 1) && (tok.id == TOKEN_NOT) {
-        ParseFactor();
+        //libgogo.Push(&Operators, TOKEN_NOT);
+        ParseFactor(item);
+        //TODO: Generate code
         doneFlag = 0;
     }
 
@@ -984,7 +1031,7 @@ func ParseElseStatement() {
 }
 
 func ParserSync() {
-    compile = 0; // stop producing code
+    Compile = 0; // stop producing code
     for ;(tok.id != TOKEN_FUNC) && (tok.id != TOKEN_EOS); {
         GetNextTokenSafe();
     }

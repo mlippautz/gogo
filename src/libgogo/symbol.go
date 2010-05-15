@@ -111,6 +111,13 @@ func HasField(name string, objtype *TypeDesc) uint64 {
 }
 
 //
+// Gets an object's type
+//
+func GetObjType(object *ObjectDesc) *TypeDesc {
+    return object.objtype;
+}
+
+//
 // Sets an object's type
 //
 func SetObjType(object *ObjectDesc, objtype *TypeDesc) {

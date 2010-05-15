@@ -5,16 +5,17 @@
 package libgogo
 
 type Item struct {
-    mode uint64;
-    itemtype *TypeDesc;
-    a uint64;
-    r uint64;
+    Mode uint64;
+    Itemtype *TypeDesc;
+    A uint64;
+    R uint64;
+    Global uint64; //If 1, the variable is global, otherwise it is local
 };
 
 //
 // Pseudo constants that specify the descriptor sizes 
 //
-var ITEM_SIZE uint64 = 32; //4*8 bytes space for an object
+var ITEM_SIZE uint64 = 40; //5*8 bytes space for an object
 
 //
 // Modes for items
@@ -34,18 +35,25 @@ func Uint64ToItemPtr(adr uint64) *Item;
 func ItemPtrToUint64(item *Item) uint64;
 
 //
-// Creates a new item
+// Creates a new, uninitialized item
 //
-func NewItem(mode uint64, itemtype *TypeDesc, a uint64, r uint64) *Item {
+func NewItem() *Item {
     var adr uint64;
     var item *Item;
     adr = Alloc(ITEM_SIZE);
     item = Uint64ToItemPtr(adr);
-    item.mode = mode;
-    item.itemtype = itemtype;
-    item.a = a;
-    item.r = r;
     return item;
+}
+
+//
+// Sets the given item's properties
+//
+func SetItem(item *Item, mode uint64, itemtype *TypeDesc, a uint64, r uint64, global uint64) {
+    item.Mode = mode;
+    item.Itemtype = itemtype;
+    item.A = a;
+    item.R = r;
+    item.Global = global;
 }
 
 //
