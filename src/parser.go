@@ -470,7 +470,7 @@ func ParseFactor(item *libgogo.Item) uint64 {
     GetNextTokenSafe();
     if (doneFlag == 1) && (tok.id == TOKEN_OP_ADR) {
         AssertNextToken(TOKEN_IDENTIFIER);
-        ParseSelector(item, CurrentPackage, 1); //Load address! //TODO
+        FindIdentifierAndParseSelector(item, 1); //Load address
         doneFlag = 0;
     }
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
@@ -920,7 +920,7 @@ func ParseAssignment() uint64 {
     PrintDebugString("Entering ParseAssignment()",1000);
     AssertNextToken(TOKEN_IDENTIFIER);
     LHSItem = libgogo.NewItem();
-    FindIdentifierAndParseSelector(LHSItem, 1); //Parse LHS
+    FindIdentifierAndParseSelector(LHSItem, 1); //Parse LHS and load address
     GetNextTokenSafe();
     if tok.id == TOKEN_ASSIGN {
         GetNextTokenSafe();
