@@ -540,6 +540,16 @@ func ParseSelector(item *libgogo.Item, packagename string, loadAddressInsteadOfV
     PrintDebugString("Leaving ParseSelector()",1000);
 }
 
+func ParseSelector_FunctionCall() {
+   var boolFlag uint64;
+   PrintDebugString("Entering ParseSelector_FunctionCall()",1000);
+    for boolFlag = ParseSelectorSub_FunctionCall();
+        boolFlag == 0; 
+        boolFlag = ParseSelectorSub_FunctionCall() {
+    }
+    PrintDebugString("Leaving ParseSelector_FunctionCall()",1000);
+}
+
 //
 //
 //
@@ -629,6 +639,21 @@ func ParseSelectorSub(item *libgogo.Item, packagename string, loadAddressInstead
         }
     }
     PrintDebugString("Leaving ParseSelectorSub()",1000);
+    return boolFlag;
+}
+
+func ParseSelectorSub_FunctionCall() uint64 {
+    var boolFlag uint64;
+    PrintDebugString("Entering ParseSelectorSub_FunctionCall()",1000);
+    GetNextTokenSafe();
+    if tok.id == TOKEN_PT {
+        AssertNextToken(TOKEN_IDENTIFIER);
+        boolFlag = 0;
+    } else {
+        tok.nextToken = tok.id;
+        boolFlag = 1;
+    }
+    PrintDebugString("Leaving ParseSelectorSub_FunctionCall()",1000);
     return boolFlag;
 }
 
@@ -960,7 +985,7 @@ func ParseFunctionCallOptional() {
         } else {
             tok.nextToken = tok.id;
             ParseExpressionList();
-            AssertNextToken(TOKEN_RBRAC);    
+            AssertNextToken(TOKEN_RBRAC);
         }
     } else {
         tok.nextToken = tok.id;
@@ -1008,8 +1033,8 @@ func ParseExpressionListSub() uint64 {
 func ParseFunctionCallStatement() {
     PrintDebugString("Entering ParseFunctionCallStatement()",1000);
     AssertNextToken(TOKEN_IDENTIFIER); //TODO
-    ParseSelector(nil, CurrentPackage, 0); //TODO
-    ParseFunctionCall();                
+    ParseSelector_FunctionCall(); //TODO
+    ParseFunctionCall();
     PrintDebugString("Leaving ParseFunctionCallStatement()",1000);
 }
 
