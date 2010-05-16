@@ -647,8 +647,7 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
             GetNextTokenSafe();
             if tok.id == TOKEN_INTEGER {
                 if Compile != 0 {
-                    boolFlag = libgogo.GetTypeSize(item.Itemtype.Base); //Get array base type size
-                    boolFlag = ((boolFlag + 7) / 8) * 8; //Assure 64 bit alignment
+                    boolFlag = libgogo.GetTypeSizeAligned(item.Itemtype.Base); //Get array base type size
                     GenerateFieldAccess(item, boolFlag * tok.intValue, 0); //Direct field access to field offset tok.intValue times base size tok.intValue
                     item.Itemtype = item.Itemtype.Base; //Set item type to array base type
                 }

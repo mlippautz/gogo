@@ -163,7 +163,7 @@ func GenerateSimpleExpression(item1 *libgogo.Item, item2 *libgogo.Item, op uint6
 
 func GenerateFieldAccess(item *libgogo.Item, offset uint64, indirect uint64) {
     if Compile != 0 {
-        if indirect != 0 || offset != 0 { //If offset 0 on direct access => no change
+        if (indirect != 0) || (offset != 0) { //If offset 0 on direct access => no change
 				    ItemToRegister(item);
 						libgogo.PrintString("MOVQ R");
 						libgogo.PrintNumber(item.R);

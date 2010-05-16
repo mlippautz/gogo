@@ -121,7 +121,7 @@ func GetField(name string, objtype *TypeDesc) *ObjectDesc {
 
 //
 // Returns the (memory) size of the given type in bytes which is required when hypothetically allocating one variable of this type
-// Same semantics as sizeof(objtype). Note that the calculated size of structs is always 64 bit aligned
+// Same semantics as sizeof(objtype)
 //
 func GetTypeSize(objtype *TypeDesc) uint64 {
     var size uint64 = 0;
@@ -134,14 +134,12 @@ func GetTypeSize(objtype *TypeDesc) uint64 {
             }
             if objtype.Form == FORM_STRUCT {
                 for tempobj = objtype.Fields; tempobj != nil; tempobj = tempobj.Next { //Sum of all fields
-                    tmpSize = GetObjectSize(tempobj);
+                    tmpSize = GetObjectSizeAligned(tempobj);
                     size = size + tmpSize; //Add size of each field
-                    size = ((size + 7) / 8) * 8; //Force 64 bit alignment
                 }
             }
             if objtype.Form == FORM_ARRAY {
-                tmpSize = GetTypeSize(objtype.Base);
-                tmpSize = ((tmpSize + 7) / 8) * 8; //Force 64 bit alignment
+                tmpSize = GetTypeSizeAligned(objtype.Base);
                 size = objtype.Len * tmpSize; //Array length * size of one item
             }
         } else {
@@ -151,6 +149,15 @@ func GetTypeSize(objtype *TypeDesc) uint64 {
         ; //TODO: if objtype is nil => error!
     }
     return size;
+}
+
+//
+// Returns the aligned (memory) size of the given type in bytes
+//
+func GetTypeSizeAligned(objtype *TypeDesc) uint64 {
+    var size uint64;
+    size = GetTypeSize(objtype);
+    return ((size + 7) / 8) * 8; //64 bit alignment
 }
 
 //
@@ -168,6 +175,15 @@ func GetObjectSize(obj *ObjectDesc) uint64 {
 }
 
 //
+// Returns the aligned size required by the object in bytes, considering whether or not the object is a pointer
+//
+func GetObjectSizeAligned(obj *ObjectDesc) uint64 {
+    var size uint64;
+    size = GetObjectSize(obj);
+    return ((size + 7) / 8) * 8; //64 bit alignment
+}
+
+//
 // Calculates the (memory) offset of a given field of the specified (struct) type in bytes
 // Note that the calculated size always 64 bit aligned
 //
@@ -179,9 +195,8 @@ func GetObjectOffset(obj *ObjectDesc, list *ObjectDesc) uint64 {
         if tmp == obj {
             break;
         }
-        tmpSize = GetObjectSize(tmp);
+        tmpSize = GetObjectSizeAligned(tmp);
         offset = offset + tmpSize; //Add field size
-        offset = ((offset + 7) / 8) * 8; //Force 64 bit alignment
     }
     if tmp == nil {
         offset = 0; //TODO: Raise error as obj is appearently not in the list
