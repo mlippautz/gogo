@@ -81,6 +81,29 @@ func ItemToRegister(item *libgogo.Item) {
     }
 }
 
+func ItemAddressToRegister(item *libgogo.Item) {
+    if item.Mode == libgogo.MODE_VAR {
+        item.R = GetFreeRegister();
+        OccupyRegister(item.R);
+        item.Mode = libgogo.MODE_REG;
+        libgogo.PrintString("LEAQ ");
+        if item.Global == 1 { //Global
+            libgogo.PrintNumber(item.A);
+            libgogo.PrintString("(SB)");
+        } else { //Local
+            libgogo.PrintString("-");
+            libgogo.PrintNumber(item.A + 8); //SP = return address, start at address SP-8, decreasing
+            libgogo.PrintString("(SP)");
+        }
+        libgogo.PrintString(", R");
+        libgogo.PrintNumber(item.R);
+        libgogo.PrintString("\n");
+    }
+    if item.Mode == libgogo.MODE_REG {
+				; //Don't do anything - item is already a register
+    }
+}
+
 func GenerateTerm(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     var str string;
     if Compile != 0 {
@@ -161,10 +184,14 @@ func GenerateSimpleExpression(item1 *libgogo.Item, item2 *libgogo.Item, op uint6
     }
 }
 
-func GenerateFieldAccess(item *libgogo.Item, offset uint64, indirect uint64) {
+func GenerateFieldAccess(item *libgogo.Item, offset uint64, indirect uint64, loadAddressInsteadOfValue uint64) {
     if Compile != 0 {
         if (indirect != 0) || (offset != 0) { //If offset 0 on direct access => no change
-				    ItemToRegister(item);
+            if loadAddressInsteadOfValue != 0 { //Load item address
+    				    ItemAddressToRegister(item);
+            } else { //Load item value
+    				    ItemToRegister(item);
+            }
 						libgogo.PrintString("MOVQ R");
 						libgogo.PrintNumber(item.R);
 						libgogo.PrintString(", AX\n");
@@ -180,5 +207,20 @@ func GenerateFieldAccess(item *libgogo.Item, offset uint64, indirect uint64) {
 				    libgogo.PrintNumber(item.R);
 				    libgogo.PrintString("\n");
         }
+    }
+}
+
+func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
+    if Compile != 0 {
+        ItemToRegister(RHSItem);
+        ItemAddressToRegister(LHSItem);
+				libgogo.PrintString("MOVQ R");
+				libgogo.PrintNumber(RHSItem.R);
+		    libgogo.PrintString(", (R");
+				libgogo.PrintNumber(LHSItem.R);
+		    libgogo.PrintString(")"); //Move content of RHS (in register RHS.R) to address of LHS (referred to by register LHS.R)
+		    libgogo.PrintString("\n");
+        FreeRegister(RHSItem.R);
+        FreeRegister(LHSItem.R);
     }
 }
