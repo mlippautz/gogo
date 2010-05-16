@@ -488,7 +488,7 @@ func ParseFactor(item *libgogo.Item) uint64 {
 				    if tempObject == nil {
 				        SymbolTableError("Undefined", "", "variable", tok.strValue);
 				    }
-				    tempType = libgogo.GetObjType(tempObject);
+				    tempType = tempObject.ObjType;
 				    tempAddr = libgogo.GetObjectOffset(tempObject, tempList);
 				    if tempList == LocalObjects { //Global
 				        libgogo.SetItem(item, libgogo.MODE_VAR, tempType, tempAddr, 0, 0); //Varible item

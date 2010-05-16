@@ -5,23 +5,23 @@
 package libgogo
 
 type ObjectDesc struct {
-    name string;
-    packagename string;
-    class uint64;
-    objtype *TypeDesc;
-    ptrtype byte; //If 0, type objtype, otherwise type *objtype
-    next *ObjectDesc;
+    Name string;
+    PackageName string;
+    Class uint64;
+    ObjType *TypeDesc;
+    PtrType uint64; //If 0, type objtype, otherwise type *objtype
+    Next *ObjectDesc;
 };
 
 type TypeDesc struct {
-    name string;
-    packagename string;
-    forwarddecl byte; //If 1, type is forward declared
-    form uint64;
-    len uint64;
-    fields *ObjectDesc;
-    base *TypeDesc;
-    next *TypeDesc;
+    Name string;
+    PackageName string;
+    ForwardDecl uint64; //If 1, type is forward declared
+    Form uint64;
+    Len uint64;
+    Fields *ObjectDesc;
+    Base *TypeDesc;
+    Next *TypeDesc;
 };
 
 //
@@ -60,15 +60,15 @@ func Uint64ToTypeDescPtr(adr uint64) *TypeDesc;
 func AppendObject(object *ObjectDesc, list *ObjectDesc) *ObjectDesc {
     var tmpObj *ObjectDesc = object;
     if list != nil {
-        for tmpObj = list; tmpObj.next != nil; tmpObj = tmpObj.next {
+        for tmpObj = list; tmpObj.Next != nil; tmpObj = tmpObj.Next {
         }
-        tmpObj.next = object;
+        tmpObj.Next = object;
         tmpObj = list;
     }
     return tmpObj;    
 
 		//Alternate version: PrependObject:
-		/*object.next = list;
+		/*object.Next = list;
     return object;*/
 }
 
@@ -78,14 +78,14 @@ func AppendObject(object *ObjectDesc, list *ObjectDesc) *ObjectDesc {
 func AppendType(objtype *TypeDesc, list *TypeDesc) *TypeDesc {
     var tmpObjType *TypeDesc = objtype;
     if list != nil {
-        for tmpObjType = list; tmpObjType.next != nil; tmpObjType = tmpObjType.next { }
-        tmpObjType.next = objtype;
+        for tmpObjType = list; tmpObjType.Next != nil; tmpObjType = tmpObjType.Next { }
+        tmpObjType.Next = objtype;
         tmpObjType = list;
     }
     return tmpObjType;
 
     //Alternate version: PrependType:
-    /*objtype.next = list;
+    /*objtype.Next = list;
     return objtype;*/
 }
 
@@ -93,8 +93,8 @@ func AppendType(objtype *TypeDesc, list *TypeDesc) *TypeDesc {
 // Add a field in form of an object descriptor to the type descriptor given
 //
 func AddFields(object *ObjectDesc, objtype *TypeDesc) {
-    objtype.form = FORM_STRUCT;
-    objtype.fields = AppendObject(object, objtype.fields);
+    objtype.Form = FORM_STRUCT;
+    objtype.Fields = AppendObject(object, objtype.Fields);
 }
 
 //
@@ -103,67 +103,11 @@ func AddFields(object *ObjectDesc, objtype *TypeDesc) {
 func HasField(name string, objtype *TypeDesc) uint64 {
     var tmpObj *ObjectDesc;
     var retVal uint64 = 0;
-    tmpObj = GetObject(name, "", objtype.fields);
+    tmpObj = GetObject(name, "", objtype.Fields);
     if tmpObj != nil {
         retVal = 1;
     }
     return retVal;
-}
-
-//
-// Gets an object's type
-//
-func GetObjType(object *ObjectDesc) *TypeDesc {
-    return object.objtype;
-}
-
-//
-// Sets an object's type
-//
-func SetObjType(object *ObjectDesc, objtype *TypeDesc) {
-    object.objtype = objtype;
-}
-
-//
-// Marks the type of the given object as pointer
-//
-func FlagObjectTypeAsPointer(object *ObjectDesc) {
-    object.ptrtype = 1;
-}
-
-//
-// Returns whether an object's type is a pointer
-//
-func IsPointerType(object *ObjectDesc) byte {
-    return object.ptrtype;
-}
-
-//
-// Returns a type's name
-//
-func GetTypeName(objtype *TypeDesc) string {
-    return objtype.name;
-}
-
-//
-// Returns an object's name
-//
-func GetObjectName(obj *ObjectDesc) string {
-    return obj.name;
-}
-
-//
-// Returns 0 if the given type if forward declared, or 1 if it is not
-//
-func IsForwardDecl(objtype *TypeDesc) byte {
-    return objtype.forwarddecl;
-}
-
-//
-// Unsets the forward declaration flag of the given type, making it a "normal" type
-//
-func UnsetForwardDecl(objtype *TypeDesc) {
-    objtype.forwarddecl = 0;
 }
 
 //
@@ -175,20 +119,21 @@ func GetTypeSize(objtype *TypeDesc) uint64 {
     var tempobj *ObjectDesc;
     var tmpSize uint64;
     if objtype != nil {
-        if objtype.forwarddecl == 0 {
-            if objtype.form == FORM_SIMPLE {
-                size = objtype.len;
+        if objtype.ForwardDecl == 0 {
+            if objtype.Form == FORM_SIMPLE {
+                size = objtype.Len;
             }
-            if objtype.form == FORM_STRUCT {
-                for tempobj = objtype.fields; tempobj != nil; tempobj = tempobj.next { //Sum of all fields
+            if objtype.Form == FORM_STRUCT {
+                for tempobj = objtype.Fields; tempobj != nil; tempobj = tempobj.Next { //Sum of all fields
                     tmpSize = GetObjectSize(tempobj);
                     size = size + tmpSize; //Add size of each field
                     size = ((size + 7) / 8) * 8; //Force 64 bit alignment
                 }
             }
-            if objtype.form == FORM_ARRAY {
-                tmpSize = GetTypeSize(objtype.base);
-                size = objtype.len * tmpSize; //Array length * size of one item
+            if objtype.Form == FORM_ARRAY {
+                tmpSize = GetTypeSize(objtype.Base);
+                tmpSize = ((tmpSize + 7) / 8) * 8; //Force 64 bit alignment
+                size = objtype.Len * tmpSize; //Array length * size of one item
             }
         } else {
             ; //TODO: if type is only forward declared => error!
@@ -205,10 +150,10 @@ func GetTypeSize(objtype *TypeDesc) uint64 {
 //
 func GetObjectSize(obj *ObjectDesc) uint64 {
     var size uint64;
-    if obj.ptrtype == 1 {
+    if obj.PtrType == 1 {
        size = 8;
     } else { //Actual type
-       size = GetTypeSize(obj.objtype);
+       size = GetTypeSize(obj.ObjType);
     }
     return size;
 }
@@ -221,7 +166,7 @@ func GetObjectOffset(obj *ObjectDesc, list *ObjectDesc) uint64 {
     var offset uint64 = 0;
     var tmp *ObjectDesc;
     var tmpSize uint64;
-    for tmp = list; tmp != nil; tmp = tmp.next {
+    for tmp = list; tmp != nil; tmp = tmp.Next {
         if tmp == obj {
             break;
         }
@@ -244,10 +189,10 @@ func GetObject(name string, packagename string, list *ObjectDesc) *ObjectDesc {
     var nameCompare uint64;
     var strLen uint64;
     var packageNameCompare uint64;
-    for tmpObject = list; tmpObject != nil; tmpObject = tmpObject.next {
-        nameCompare = StringCompare(tmpObject.name,name);
-        strLen = StringLength(tmpObject.packagename);
-        packageNameCompare = StringCompare(tmpObject.packagename,packagename);
+    for tmpObject = list; tmpObject != nil; tmpObject = tmpObject.Next {
+        nameCompare = StringCompare(tmpObject.Name,name);
+        strLen = StringLength(tmpObject.PackageName);
+        packageNameCompare = StringCompare(tmpObject.PackageName,packagename);
         if (nameCompare == 0) && ((strLen == 0) || (packageNameCompare == 0)) { //Empty package name indicates internal types
             retValue = tmpObject;
             break;
@@ -260,18 +205,18 @@ func GetObject(name string, packagename string, list *ObjectDesc) *ObjectDesc {
 // Fetches a type with a given name or nil if it is not in the specified list
 // If includeforward is 0, no forward declared types will be returned; otherwise, forward declared types will also be returned
 //
-func GetType(name string, packagename string, list *TypeDesc, includeforward byte) *TypeDesc {
+func GetType(name string, packagename string, list *TypeDesc, includeforward uint64) *TypeDesc {
     var tmpType *TypeDesc;
     var retValue *TypeDesc = nil;
     var nameCompare uint64;
     var strLen uint64;
     var packageNameCompare uint64;
-    for tmpType = list; tmpType != nil; tmpType = tmpType.next {
-        nameCompare = StringCompare(tmpType.name,name);
-        strLen = StringLength(tmpType.packagename);
-        packageNameCompare = StringCompare(tmpType.packagename,packagename);
+    for tmpType = list; tmpType != nil; tmpType = tmpType.Next {
+        nameCompare = StringCompare(tmpType.Name,name);
+        strLen = StringLength(tmpType.PackageName);
+        packageNameCompare = StringCompare(tmpType.PackageName,packagename);
         if (nameCompare == 0) && ((strLen == 0) || (packageNameCompare == 0)) { //Empty package name indicates internal types
-            if (includeforward == 1) || ((includeforward == 0) && (tmpType.forwarddecl == 0)) {
+            if (includeforward == 1) || ((includeforward == 0) && (tmpType.ForwardDecl == 0)) {
                 retValue = tmpType;
                 break;
             }
@@ -285,8 +230,8 @@ func GetType(name string, packagename string, list *TypeDesc, includeforward byt
 //
 func GetFirstForwardDeclType(list *TypeDesc) *TypeDesc {
     var retValue *TypeDesc;
-    for retValue = list; retValue != nil; retValue = retValue.next {
-        if retValue.forwarddecl == 1 {
+    for retValue = list; retValue != nil; retValue = retValue.Next {
+        if retValue.ForwardDecl == 1 {
             break;
         }
     }
@@ -301,35 +246,35 @@ func NewObject(name string, packagename string, class uint64) *ObjectDesc {
     var obj *ObjectDesc;
     adr = Alloc(OBJECT_SIZE);
     obj = Uint64ToObjectDescPtr(adr);
-    obj.name = name; //TODO: Copy string?
-    obj.packagename = packagename; //Copy string?
-    obj.class = class;
-    obj.objtype = nil;
-    obj.ptrtype = 0;
-    obj.next = nil;
+    obj.Name = name; //TODO: Copy string?
+    obj.PackageName = packagename; //Copy string?
+    obj.Class = class;
+    obj.ObjType = nil;
+    obj.PtrType = 0;
+    obj.Next = nil;
     return obj;
 }
 
 //
 // Creates a new type
 //
-func NewType(name string, packagename string, forwarddecl byte, len uint64, basetype *TypeDesc) *TypeDesc {
+func NewType(name string, packagename string, forwarddecl uint64, len uint64, basetype *TypeDesc) *TypeDesc {
     var adr uint64;
     var objtype *TypeDesc;
     adr = Alloc(TYPE_SIZE);
     objtype = Uint64ToTypeDescPtr(adr);
-    objtype.name = name; //TODO: Copy string?
-    objtype.forwarddecl = forwarddecl;
-    objtype.packagename = packagename; //TODO: Copy string?
+    objtype.Name = name; //TODO: Copy string?
+    objtype.ForwardDecl = forwarddecl;
+    objtype.PackageName = packagename; //TODO: Copy string?
     if basetype != nil {
-        objtype.form = FORM_ARRAY;
+        objtype.Form = FORM_ARRAY;
     } else {
-        objtype.form = FORM_SIMPLE;
+        objtype.Form = FORM_SIMPLE;
     }
-    objtype.len = len;
-    objtype.next = nil;
-    objtype.fields = nil;
-    objtype.base = basetype;
+    objtype.Len = len;
+    objtype.Next = nil;
+    objtype.Fields = nil;
+    objtype.Base = basetype;
     return objtype;
 }
 
@@ -340,32 +285,32 @@ func PrintObjects(list *ObjectDesc) {
     var o *ObjectDesc;
     var strLen uint64;
     var tmp uint64;
-    for o = list; o != nil; o = o.next {
+    for o = list; o != nil; o = o.Next {
         PrintString("Object ");
-        strLen = StringLength(o.packagename);
+        strLen = StringLength(o.PackageName);
         if strLen != 0 {
-            PrintString(o.packagename);
+            PrintString(o.PackageName);
             PrintChar('.');
         }
-        PrintString(o.name);
+        PrintString(o.Name);
         PrintString(" (type: ");
-        if o.ptrtype != 0 {
+        if o.PtrType != 0 {
             PrintString("pointer to ");
         }
-        if o.objtype != nil {
-            if o.objtype.base != nil {
+        if o.ObjType != nil {
+            if o.ObjType.Base != nil {
                 PrintString("array of ");
-                PrintString(o.objtype.base.name);
+                PrintString(o.ObjType.Base.Name);
                 PrintString(" of length ");
-                PrintNumber(o.objtype.len);
+                PrintNumber(o.ObjType.Len);
                 PrintString(", internally named ");
             }
-            strLen = StringLength(o.objtype.packagename);
+            strLen = StringLength(o.ObjType.PackageName);
             if strLen != 0 {
-                PrintString(o.objtype.packagename);
+                PrintString(o.ObjType.PackageName);
                 PrintChar('.');
             }
-            PrintString(o.objtype.name);
+            PrintString(o.ObjType.Name);
         } else {
             PrintString("<unknown>");
         }
@@ -387,39 +332,39 @@ func PrintTypes(list *TypeDesc) {
     var o *ObjectDesc;
     var strLen uint64;
     var tmp uint64;
-    for t = list; t != nil; t = t.next {
+    for t = list; t != nil; t = t.Next {
         PrintString("Type ");
-        strLen = StringLength(t.packagename);
+        strLen = StringLength(t.PackageName);
         if strLen != 0 {
-            PrintString(t.packagename);
+            PrintString(t.PackageName);
             PrintChar('.');
         }
-        PrintString(t.name);
+        PrintString(t.Name);
         PrintString(" (size: ");
         tmp = GetTypeSize(t);
         PrintNumber(tmp);
         PrintString(")\n");
-				for o = t.fields; o != nil; o = o.next {
+				for o = t.Fields; o != nil; o = o.Next {
             PrintString("  ");
-            PrintString(o.name);
+            PrintString(o.Name);
             PrintString(" (type: ");
-            if o.ptrtype != 0 {
+            if o.PtrType != 0 {
                 PrintString("pointer to ");
             }
-            if o.objtype != nil {
-                if o.objtype.base != nil {
+            if o.ObjType != nil {
+                if o.ObjType.Base != nil {
                     PrintString("array of ");
-                    PrintString(o.objtype.base.name);
+                    PrintString(o.ObjType.Base.Name);
                     PrintString(" of length ");
-                    PrintNumber(o.objtype.len);
+                    PrintNumber(o.ObjType.Len);
                     PrintString(", internally named ");
                 }
-                strLen = StringLength(o.objtype.packagename);
+                strLen = StringLength(o.ObjType.PackageName);
                 if strLen != 0 {
-                    PrintString(o.objtype.packagename);
+                    PrintString(o.ObjType.PackageName);
                     PrintChar('.');
                 }
-                PrintString(o.objtype.name);
+                PrintString(o.ObjType.Name);
             } else {
                 PrintString("<unknown>");
             }
@@ -427,7 +372,7 @@ func PrintTypes(list *TypeDesc) {
             tmp = GetObjectSize(o);
             PrintNumber(tmp);
             PrintString(", offset: ");
-            tmp = GetObjectOffset(o, t.fields);
+            tmp = GetObjectOffset(o, t.Fields);
             PrintNumber(tmp);
             PrintString(")\n");
         }

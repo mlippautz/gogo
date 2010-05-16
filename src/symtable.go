@@ -49,8 +49,8 @@ func InitSymbolTable() {
 
     //Default objects
     nilPtr = libgogo.NewObject("nil", "", libgogo.CLASS_VAR);
-    libgogo.SetObjType(nilPtr, nil);
-    libgogo.FlagObjectTypeAsPointer(nilPtr); //nil is a pointer to no specified type (universal)
+    nilPtr.ObjType = nil;
+    nilPtr.PtrType = 1; //nil is a pointer to no specified type (universal)
     GlobalObjects = libgogo.AppendObject(nilPtr, GlobalObjects);
 }
 
@@ -103,11 +103,9 @@ func IsBasicDataType(t *libgogo.TypeDesc) uint64 {
 //
 func UndefinedForwardDeclaredTypeCheck() {
     var temptype *libgogo.TypeDesc;
-    var tempstring string;
     temptype = libgogo.GetFirstForwardDeclType(GlobalTypes);
     if temptype != nil {
-        tempstring = libgogo.GetTypeName(temptype);
-        SymbolTableError("undefined", "", "type", tempstring);
+        SymbolTableError("undefined", "", "type", temptype.Name);
     }
 }
 
@@ -120,12 +118,10 @@ func UndefinedForwardDeclaredTypeCheck() {
 func NewType(name string) uint64 {
     var dontAddType uint64 = 0;
     var tempType *libgogo.TypeDesc;
-    var temp byte;
     tempType = libgogo.GetType(name, CurrentPackage, GlobalTypes, 1);
     if  tempType != nil { //Check for duplicates
-        temp = libgogo.IsForwardDecl(tempType);
-        if temp != 0 { //Separate handling of forward declarations => unset forward declaration flag
-            libgogo.UnsetForwardDecl(tempType);
+        if tempType.ForwardDecl != 0 { //Separate handling of forward declarations => unset forward declaration flag
+            tempType.ForwardDecl = 0;
             CurrentType = tempType;
             dontAddType = 1;
         } else { //Real duplicate
@@ -170,7 +166,7 @@ func AddStructField(fieldname string) {
 // not the type itself
 //
 func SetCurrentObjectTypeToPointer() {
-    libgogo.FlagObjectTypeAsPointer(CurrentObject); //Type is pointer
+    CurrentObject.PtrType = 1; //Type is pointer
 }
 
 //
@@ -182,9 +178,8 @@ func SetCurrentObjectTypeToPointer() {
 func SetCurrentObjectType(typename string, packagename string, arraydim uint64) {
     var basetype *libgogo.TypeDesc;
     var temptype *libgogo.TypeDesc;
-    var CurrentTypeName string;
     var tempstr string = "";
-    var temp byte;
+    var tempstr2 string;
     var boolFlag uint64;
 
     if InsideFunctionVarDecl == 0 {
@@ -195,11 +190,9 @@ func SetCurrentObjectType(typename string, packagename string, arraydim uint64) 
         }
         if basetype == nil {
             if InsideStructDecl == 1 {
-                CurrentTypeName = libgogo.GetTypeName(CurrentType);
-                boolFlag = libgogo.StringCompare(typename, CurrentTypeName);
+                boolFlag = libgogo.StringCompare(typename, CurrentType.Name);
                 if boolFlag == 0 {
-                    temp = libgogo.IsPointerType(CurrentObject);
-                    if temp == 1 { //Allow pointer to own type
+                    if CurrentObject.PtrType == 1 { //Allow pointer to own type
                         basetype = CurrentType;
                     } else {
                         SymbolTableError("A type cannot contain itself,", "", "type", typename);
@@ -216,17 +209,16 @@ func SetCurrentObjectType(typename string, packagename string, arraydim uint64) 
             }
         }
         if arraydim == 0 { //No array
-            libgogo.SetObjType(CurrentObject, basetype);
+            CurrentObject.ObjType = basetype;
         } else { //Array
             if basetype != nil {
-                CurrentTypeName = libgogo.GetTypeName(basetype);
-                libgogo.StringAppend(&tempstr, CurrentTypeName);
+                libgogo.StringAppend(&tempstr, basetype.Name);
             }
             libgogo.StringAppend(&tempstr, "Array");
-            CurrentTypeName = libgogo.IntToString(arraydim); //Reuse CurrentTypeName as string representation of arraydim
-            libgogo.StringAppend(&tempstr, CurrentTypeName);
+            tempstr2 = libgogo.IntToString(arraydim);
+            libgogo.StringAppend(&tempstr, tempstr2);
             temptype = libgogo.NewType(tempstr, packagename, 0, arraydim, basetype);
-            libgogo.SetObjType(CurrentObject, temptype); //Don't add array type to global list to avoid duplicate type name errors
+            CurrentObject.ObjType = temptype; //Don't add array type to global list to avoid duplicate type name errors
         }
     }
 }
