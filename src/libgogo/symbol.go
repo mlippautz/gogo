@@ -98,16 +98,25 @@ func AddFields(object *ObjectDesc, objtype *TypeDesc) {
 }
 
 //
-// Returns 0 if the given (struct) type has a field with the given name, or 1 otherwise
+// Returns 1 if the given (struct) type has a field with the given name, or 0 otherwise
 //
 func HasField(name string, objtype *TypeDesc) uint64 {
     var tmpObj *ObjectDesc;
     var retVal uint64 = 0;
-    tmpObj = GetObject(name, "", objtype.Fields);
+    tmpObj = GetField(name, objtype);
     if tmpObj != nil {
         retVal = 1;
     }
     return retVal;
+}
+
+//
+// Returns the given struct's field with the name given, or nil if a field with that name does not exist
+//
+func GetField(name string, objtype *TypeDesc) *ObjectDesc {
+    var tmpObj *ObjectDesc;
+    tmpObj = GetObject(name, "", objtype.Fields);
+    return tmpObj;
 }
 
 //
@@ -181,6 +190,16 @@ func GetObjectOffset(obj *ObjectDesc, list *ObjectDesc) uint64 {
 }
 
 //
+// Calculates the (memory) offset of a given field of the specified struct type in bytes
+// Note that the calculated size always 64 bit aligned
+//
+func GetFieldOffset(obj *ObjectDesc, objtype *TypeDesc) uint64 {
+    var offset uint64;
+    offset = GetObjectOffset(obj, objtype.Fields);
+    return offset;
+}
+
+//
 // Fetches an object with a specific identifier or nil if it is not in the specified list
 //
 func GetObject(name string, packagename string, list *ObjectDesc) *ObjectDesc {
@@ -223,6 +242,24 @@ func GetType(name string, packagename string, list *TypeDesc, includeforward uin
         }
     }
     return retValue;
+}
+
+//
+// Tries to find the given package name in one of the objects of the given list
+// Returns 1 if an object has been found, or 0 otherwise
+//
+func FindPackageName(packagename string, list *ObjectDesc) uint64 {
+    var retVal uint64 = 0;
+    var tmpObj *ObjectDesc;
+    var packageNameCompare uint64;
+    for tmpObj = list; tmpObj != nil; tmpObj = tmpObj.Next {
+        packageNameCompare = StringCompare(tmpObj.PackageName, packagename);
+        if packageNameCompare == 0 {
+            retVal = 1;
+            break;
+        }
+    }
+    return retVal;
 }
 
 //

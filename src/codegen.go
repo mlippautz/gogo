@@ -77,7 +77,7 @@ func ItemToRegister(item *libgogo.Item) {
         libgogo.PrintString("\n");
     }
     if item.Mode == libgogo.MODE_REG {
-				;
+				; //Don't do anything - item is already a register
     }
 }
 
@@ -153,10 +153,32 @@ func GenerateSimpleExpression(item1 *libgogo.Item, item2 *libgogo.Item, op uint6
             if op == TOKEN_ARITH_MINUS {
                 libgogo.PrintString("SUBQ AX, BX\n");
             }
-                libgogo.PrintString("MOVQ AX, R");
+            libgogo.PrintString("MOVQ AX, R");
             libgogo.PrintNumber(item1.R);
             libgogo.PrintString("\n");
             FreeRegister(item2.R);
+        }
+    }
+}
+
+func GenerateFieldAccess(item *libgogo.Item, offset uint64, indirect uint64) {
+    if Compile != 0 {
+        if indirect != 0 || offset != 0 { //If offset 0 on direct access => no change
+				    ItemToRegister(item);
+						libgogo.PrintString("MOVQ R");
+						libgogo.PrintNumber(item.R);
+						libgogo.PrintString(", AX\n");
+				    if offset != 0 {
+				        libgogo.PrintString("ADDQ AX, $");
+						    libgogo.PrintNumber(offset); //Add offset
+				        libgogo.PrintString("\n");
+				    }
+				    if indirect != 0 { //Indirect access
+				        libgogo.PrintString("MOVQ (AX), AX\n");
+				    }
+				    libgogo.PrintString("MOVQ AX, R");
+				    libgogo.PrintNumber(item.R);
+				    libgogo.PrintString("\n");
         }
     }
 }
