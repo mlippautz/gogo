@@ -533,9 +533,12 @@ func ParseSelector(item *libgogo.Item, packagename string, loadAddressInsteadOfV
         libgogo.SetItem(item, 0, nil, 0, 0, 0); //Mark item as not being set
     }
     PrintDebugString("Entering ParseSelector()",1000);
-    for boolFlag = ParseSelectorSub(item, packagename, loadAddressInsteadOfValue);
+    for boolFlag = ParseSelectorSub(item, packagename);
         boolFlag == 0; 
-        boolFlag = ParseSelectorSub(item, packagename, loadAddressInsteadOfValue) {
+        boolFlag = ParseSelectorSub(item, packagename) {
+    }
+    if loadAddressInsteadOfValue == 0 { //Access value instead of address
+        GenerateFieldAccess(item, 0, 1); //Value access = indirect access at offset 0
     }
     PrintDebugString("Leaving ParseSelector()",1000);
 }
@@ -553,7 +556,7 @@ func ParseSelector_FunctionCall() {
 //
 //
 //
-func ParseSelectorSub(item *libgogo.Item, packagename string, loadAddressInsteadOfValue uint64) uint64 {
+func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
     var boolFlag uint64;
     var tempObject *libgogo.ObjectDesc;
     var tempAddr uint64;
@@ -595,9 +598,9 @@ func ParseSelectorSub(item *libgogo.Item, packagename string, loadAddressInstead
                             tempObject = libgogo.GetField(tok.strValue, item.Itemtype);
                             boolFlag = libgogo.GetFieldOffset(tempObject, item.Itemtype); //Calculate offset
                             if tempObject.PtrType == 1 { //Pointer field access
-                                GenerateFieldAccess(item, boolFlag, 1, loadAddressInsteadOfValue); //Indirect field access to field offset boolFlag
+                                GenerateFieldAccess(item, boolFlag, 1); //Indirect field access to field offset boolFlag
                             } else { //Regular field access
-                                GenerateFieldAccess(item, boolFlag, 0, loadAddressInsteadOfValue); //Direct field access to field offset boolFlag
+                                GenerateFieldAccess(item, boolFlag, 0); //Direct field access to field offset boolFlag
                             }
                             item.Itemtype = tempObject.ObjType; //Set item type to field type
                         }
@@ -621,12 +624,12 @@ func ParseSelectorSub(item *libgogo.Item, packagename string, loadAddressInstead
             if tok.id == TOKEN_INTEGER {
                 if Compile != 0 {
                     boolFlag = libgogo.GetTypeSizeAligned(item.Itemtype.Base); //Get array base type size
-                    GenerateFieldAccess(item, boolFlag * tok.intValue, 0, loadAddressInsteadOfValue); //Direct field access to field offset tok.intValue times base size tok.intValue
+                    GenerateFieldAccess(item, boolFlag * tok.intValue, 0); //Direct field access to field offset tok.intValue times base size tok.intValue
                     item.Itemtype = item.Itemtype.Base; //Set item type to array base type
                 }
             } else {
                 if tok.id == TOKEN_IDENTIFIER {
-                    ParseSelector(item, packagename, loadAddressInsteadOfValue); //TODO: Find identifier, parse selectors and access array at according position
+                    ParseSelector(item, packagename, 0); //Access value //TODO: Find identifier, parse selectors and access array at according position
                     //TODO: Array access
                 }
             } 

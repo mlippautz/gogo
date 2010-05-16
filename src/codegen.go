@@ -108,19 +108,22 @@ func GenerateTerm(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     var str string;
     if Compile != 0 {
 				if (item1.Mode == libgogo.MODE_CONST) && (item2.Mode == libgogo.MODE_CONST) {
+				    libgogo.PrintString(";Constant folding: ");
 						str = TokenToString(op);
 				    libgogo.PrintString(str);
 				    libgogo.PrintString("(");
 				    libgogo.PrintNumber(item1.A);
 				    libgogo.PrintString(",");
 				    libgogo.PrintNumber(item2.A);
-				    libgogo.PrintString(")\n");
 				    if op == TOKEN_ARITH_MUL {
 				        item1.A = item1.A * item2.A;
 				    }
 				    if op == TOKEN_ARITH_DIV {
 				        item1.A = item1.A / item2.A;
 				    }
+				    libgogo.PrintString(")=");
+				    libgogo.PrintNumber(item1.A);
+				    libgogo.PrintString("\n");
 				} else {
 				    ItemToRegister(item1);
 				    libgogo.PrintString("MOVQ R");
@@ -149,18 +152,21 @@ func GenerateSimpleExpression(item1 *libgogo.Item, item2 *libgogo.Item, op uint6
     if Compile != 0 {
 				if (item1.Mode == libgogo.MODE_CONST) && (item2.Mode == libgogo.MODE_CONST) {
 						str = TokenToString(op);
+				    libgogo.PrintString(";Constant folding: ");
 				    libgogo.PrintString(str);
 				    libgogo.PrintString("(");
 				    libgogo.PrintNumber(item1.A);
 				    libgogo.PrintString(",");
 				    libgogo.PrintNumber(item2.A);
-				    libgogo.PrintString(")\n");
+				    libgogo.PrintString(")=");
 				    if op == TOKEN_ARITH_PLUS {
 				        item1.A = item1.A + item2.A;
 				    }
 				    if op == TOKEN_ARITH_MINUS {
 				        item1.A = item1.A - item2.A;
 				    }
+				    libgogo.PrintNumber(item1.A);
+				    libgogo.PrintString("\n");
 				} else {
 				    ItemToRegister(item1);
 				    libgogo.PrintString("MOVQ R");
@@ -184,14 +190,10 @@ func GenerateSimpleExpression(item1 *libgogo.Item, item2 *libgogo.Item, op uint6
     }
 }
 
-func GenerateFieldAccess(item *libgogo.Item, offset uint64, indirect uint64, loadAddressInsteadOfValue uint64) {
+func GenerateFieldAccess(item *libgogo.Item, offset uint64, indirect uint64) {
     if Compile != 0 {
         if (indirect != 0) || (offset != 0) { //If offset 0 on direct access => no change
-            if loadAddressInsteadOfValue != 0 { //Load item address
-    				    ItemAddressToRegister(item);
-            } else { //Load item value
-    				    ItemToRegister(item);
-            }
+				    ItemAddressToRegister(item);
 						libgogo.PrintString("MOVQ R");
 						libgogo.PrintNumber(item.R);
 						libgogo.PrintString(", AX\n");
