@@ -7,8 +7,8 @@ package libgogo
 type Item struct {
     Mode uint64;
     Itemtype *TypeDesc;
-    A uint64;
-    R uint64;
+    A uint64; //Mode = MODE_VAR: variable address; Mode = MODE_CONST: const value; Mode = MODE_REG: 0 = register contains value, 1 = register contains address
+    R uint64; //Mode = MODE_REGISTER: register number
     Global uint64; //If 1, the variable is global, otherwise it is local
 };
 

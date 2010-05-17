@@ -470,11 +470,11 @@ func ParseFactor(item *libgogo.Item) uint64 {
     GetNextTokenSafe();
     if (doneFlag == 1) && (tok.id == TOKEN_OP_ADR) {
         AssertNextToken(TOKEN_IDENTIFIER);
-        FindIdentifierAndParseSelector(item, 1); //Load address
+        FindIdentifierAndParseSelector(item); //TODO: Use address value here instead of value
         doneFlag = 0;
     }
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
-        FindIdentifierAndParseSelector(item, 0); //Load value
+        FindIdentifierAndParseSelector(item);
         doneFlag = 0;
     } 
     if (doneFlag == 1) && (tok.id == TOKEN_INTEGER) {
@@ -526,7 +526,7 @@ func ParseSimpleSelector() uint64 {
 //
 //
 //
-func ParseSelector(item *libgogo.Item, packagename string, loadAddressInsteadOfValue uint64) {
+func ParseSelector(item *libgogo.Item, packagename string) {
     var boolFlag uint64;
     if item == nil { //TODO: Remove. This is only temporary until all calls to ParseSelector are fully implemented and correct
         item = libgogo.NewItem();
@@ -536,9 +536,6 @@ func ParseSelector(item *libgogo.Item, packagename string, loadAddressInsteadOfV
     for boolFlag = ParseSelectorSub(item, packagename);
         boolFlag == 0; 
         boolFlag = ParseSelectorSub(item, packagename) {
-    }
-    if loadAddressInsteadOfValue == 0 { //Access value instead of address
-        GenerateFieldAccess(item, 0, 1); //Value access = indirect access at offset 0
     }
     PrintDebugString("Leaving ParseSelector()",1000);
 }
@@ -629,7 +626,7 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
                 }
             } else {
                 if tok.id == TOKEN_IDENTIFIER {
-                    ParseSelector(item, packagename, 0); //Access value //TODO: Find identifier, parse selectors and access array at according position
+                    ParseSelector(item, packagename); //TODO: Find identifier, parse selectors (value!) and access array at according position
                     //TODO: Array access
                 }
             } 
@@ -920,7 +917,7 @@ func ParseAssignment() uint64 {
     PrintDebugString("Entering ParseAssignment()",1000);
     AssertNextToken(TOKEN_IDENTIFIER);
     LHSItem = libgogo.NewItem();
-    FindIdentifierAndParseSelector(LHSItem, 1); //Parse LHS and load address
+    FindIdentifierAndParseSelector(LHSItem); //Parse LHS //TODO: Load address, not value
     GetNextTokenSafe();
     if tok.id == TOKEN_ASSIGN {
         GetNextTokenSafe();
@@ -954,7 +951,7 @@ func ParseAssignmentWithoutSC() uint64 {
     var funcIndicator uint64;
     PrintDebugString("Entering ParseAssignmentWithoutSC()",1000);
     AssertNextToken(TOKEN_IDENTIFIER); //TODO
-    ParseSelector(nil, CurrentPackage, 1); //Load address
+    ParseSelector(nil, CurrentPackage); //TODO: Load address, not value
     GetNextTokenSafe();
     if tok.id == TOKEN_ASSIGN {
         GetNextTokenSafe();
@@ -1134,7 +1131,7 @@ func ParserSync() {
     libgogo.Exit(3); // Exit with an error
 }
 
-func FindIdentifierAndParseSelector(item *libgogo.Item, loadAddressInsteadOfValue uint64) {
+func FindIdentifierAndParseSelector(item *libgogo.Item) {
     var boolFlag uint64;
     var tempObject *libgogo.ObjectDesc;
     var tempAddr uint64;
@@ -1162,16 +1159,16 @@ func FindIdentifierAndParseSelector(item *libgogo.Item, loadAddressInsteadOfValu
 						} else { //Global
 								libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 1); //Varible item
 						}
-				    ParseSelector(item, CurrentPackage, loadAddressInsteadOfValue); //Parse selectors for an object in the current package
+				    ParseSelector(item, CurrentPackage); //Parse selectors for an object in the current package
 				} else { //Token is package name
 				    libgogo.SetItem(item, 0, nil, 0, 0, 0); //Mark item as not being set
 				    packagename = tok.strValue; //Save package name
-				    ParseSelector(item, tok.strValue, loadAddressInsteadOfValue); //Parse selectors for an undefined object in the given package
+				    ParseSelector(item, tok.strValue); //Parse selectors for an undefined object in the given package
 				    if (item.Itemtype == nil) && (item.A == 0) && (item.R == 0) {
 				        SymbolTableError("Cannot use package", "", "as a variable:", packagename);
 				    }
 				}
     } else {
-        ParseSelector(item, CurrentPackage, loadAddressInsteadOfValue);
+        ParseSelector(item, CurrentPackage);
     }
 }
