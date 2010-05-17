@@ -13,6 +13,7 @@ GOFILES=\
     parse-utils.go\
     utils.go\
     symtable.go\
+    asm_out.go\
     codegen.go
 
 include $(GOROOT)/src/Make.cmd
