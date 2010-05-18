@@ -32,11 +32,18 @@ func ResetCode() {
 \n\
 ");
     InspectorGadget();
+
     libgogo.StringAppend(&Code,"\n\
+\n\
 TEXT    main·init(SB),0,$0-0\n\
+  // unused\n\
   RET\n\
 ");
 
+    libgogo.StringAppend(&Code,"\n\
+TEXT    main·main(SB),0,$0-24\n\
+  RET\n\
+");
 }
 
 //
