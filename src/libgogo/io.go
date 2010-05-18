@@ -68,6 +68,13 @@ func GetChar(fd uint64) byte;
 func FileOpen(filename string, flags uint64) uint64;
 
 //
+// Same as libgogo.FileOpen, but also allows the third parameter to be set.
+// See 'man open' for relevance.
+// Implemented in assembler (see corresponding .s file)
+//
+func FileOpen2(filename string, flags uint64, mode uint64) uint64;
+
+//
 // Closes the specified file descriptor and returns errno
 // Implemented in assembler (see corresponding .s file)
 //

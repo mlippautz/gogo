@@ -73,6 +73,24 @@ FILEOPEN_SUCCESS:
   MOVQ AX, 32(SP) //First return value of syscall is in AX (return value after three parameters => SP+4*64bit)
   RET
 
+TEXT ·FileOpen2(SB),$0-40 //FileOpen2: 3 parameters (4), 1 return value
+  MOVQ $2, AX //sys_open (3 parameters)
+  MOVQ 8(SP), DI //filename (first parameter => SP+64bit)
+  MOVQ 24(SP), SI //flags (second parameter => SP+3*64bit)
+  //MOVQ $0, DX //not used
+  MOVQ 32(SP), DX //filemode (third parameter => SP+4*64bit)
+  SYSCALL //Linux syscall
+  CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
+  JLS FILEOPEN_TWO_SUCCESS //Return result if successful
+FILEOPEN_TWO_ERROR:
+  //NEGQ AX
+  //MOVQ AX, 40(SP)  
+  MOVQ $0, 40(SP) //Return 0 to indicate that an error occured (return value after three parameters => SP+5*64bit)
+  RET
+FILEOPEN_TWO_SUCCESS:
+  MOVQ AX, 40(SP) //First return value of syscall is in AX (return value after three parameters => SP+5*64bit)
+  RET
+
 TEXT ·FileClose(SB),$0-16 //FileClose: 1 parameter, 1 return value
   MOVQ $3, AX //sys_close (3 parameters)
   MOVQ 8(SP), DI //filename (first parameter => SP+64bit)
