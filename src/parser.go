@@ -8,7 +8,8 @@ import "./libgogo/_obj/libgogo"
 
 var maxDepth uint64 = 10;
 var curDepth uint64 = 1;
-var Compile uint64 = 0;
+
+var Compile uint64 = 1;
 
 var Operators libgogo.Stack;
 
@@ -306,20 +307,20 @@ func ParseExpression(item *libgogo.Item) {
 //
 //
 func ParseCmpOp() uint64 {
-		var boolFlag uint64;
+    var boolFlag uint64;
     PrintDebugString("Entering ParseCmpOp()",1000);
     GetNextTokenSafe();
     if (tok.id == TOKEN_EQUALS) || (tok.id == TOKEN_NOTEQUAL) || 
         (tok.id == TOKEN_REL_LT) || (tok.id == TOKEN_REL_LTOE) || 
         (tok.id == TOKEN_REL_GT) || (tok.id == TOKEN_REL_GTOE) {
         libgogo.Push(&Operators, tok.id);
-				boolFlag = 0;
+        boolFlag = 0;
     } else {
         tok.nextToken = tok.id;
-				boolFlag = 1;
+        boolFlag = 1;
     }
     PrintDebugString("Leaving ParseCmpOp()",1000);
-		return boolFlag;
+    return boolFlag;
 }
 
 //
