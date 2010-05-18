@@ -29,14 +29,14 @@ func GetFreeRegister() uint64 {
 
 func OccupyRegister(index uint64) {
     var realIndex uint64;
-    realIndex = index+8;
+    realIndex = index-8;
     FreeRegisters[realIndex] = 0;
 }
 
 func FreeRegister(index uint64) {
     var realIndex uint64;
-    realIndex = index+8;
-    FreeRegisters[index] = 1;
+    realIndex = index-8;
+    FreeRegisters[realIndex] = 1;
 }
 
 func PrintFreeRegisters() {
