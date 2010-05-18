@@ -147,21 +147,6 @@ func GenerateTerm(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     }
 }
 
-func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
-    if Compile != 0 {
-        /*ItemToRegister(RHSItem);
-        ItemAddressToRegister(LHSItem);
-				libgogo.PrintString("MOVQ R");
-				libgogo.PrintNumber(RHSItem.R);
-		    libgogo.PrintString(", (R");
-				libgogo.PrintNumber(LHSItem.R);
-		    libgogo.PrintString(")"); //Move content of RHS (in register RHS.R) to address of LHS (referred to by register LHS.R)
-		    libgogo.PrintString("\n");
-        FreeRegister(RHSItem.R);
-        FreeRegister(LHSItem.R);*/
-    }
-}
-
 //-----------------------------------------------------------------------
 
 //
@@ -190,6 +175,55 @@ func GenerateSimpleExpression(item1 *libgogo.Item, item2 *libgogo.Item, op uint6
         } else { //Subtract
             TwoOperandInstruction("SUBQ", item1, item2, item1.A - item2.A, 0);
         }
+    }
+}
+
+func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
+    var done uint64 = 0;
+    if Compile != 0 {
+        if LHSItem.Mode == libgogo.MODE_VAR { //Variable on LHS
+            if (done == 0) && (RHSItem.Mode == libgogo.MODE_CONST) { //Const RHS
+                PrintInstruction_Imm_Var("MOVQ", RHSItem.A, LHSItem); //MOVQ $RHSItem.A, LHSItem.A(SB)
+                done = 1;
+            }
+            if (done == 0) && (RHSItem.Mode == libgogo.MODE_VAR) { //Var RHS
+                done = GetFreeRegister();
+                OccupyRegister(done);
+                PrintInstruction_Var_Reg("MOVQ", RHSItem, "R", done); //MOVQ RHSItem.A(SB), Rdone (soon to be RHSItem.R)
+                RHSItem.Mode = libgogo.MODE_REG;
+                RHSItem.R = done; //RHS is now a register
+                RHSItem.A = 0; //Register now contains RHS value
+                PrintInstruction_Reg_Var("MOVQ", "R", RHSItem.R, LHSItem); //MOVQ RHSItem.R, LHSItem.A(SB)
+                done = 1;
+            }
+            if (done == 0) && (RHSItem.Mode == libgogo.MODE_REG) { //Reg RHS
+                DereferRegisterIfNecessary(RHSItem); //Make sure to work with the value, not the address
+                PrintInstruction_Reg_Var("MOVQ", "R", RHSItem.R, LHSItem); //MOVQ RHSItem.R, LHSItem.A(SB)
+                done = 1;
+            }
+        } else { //Register with address of variable on LGS; assertion: Register contains address and global/local flag is set correctly
+            if (done == 0) && (RHSItem.Mode == libgogo.MODE_CONST) { //Const RHS
+                PrintInstruction_Imm_Reg("MOVQ", RHSItem.A, "R", LHSItem.R, 1, 0, 0); //MOVQ $RHSItem.A, (LHSItem.R)
+                done = 1;
+            }
+            if (done == 0) && (RHSItem.Mode == libgogo.MODE_VAR) { //Var RHS
+                done = GetFreeRegister();
+                OccupyRegister(done);
+                PrintInstruction_Var_Reg("MOVQ", RHSItem, "R", done); //MOVQ RHSItem.A(SB), Rdone (soon to be RHSItem.R)
+                RHSItem.Mode = libgogo.MODE_REG;
+                RHSItem.R = done; //RHS is now a register
+                RHSItem.A = 0; //Register now contains RHS value
+                PrintInstruction_Reg_Reg("MOVQ", "R", RHSItem.R, 0, 0, 0, "R", LHSItem.R, 1, 0, 0); //MOVQ RHSItem.R, (LHSItem.R)
+                done = 1;
+            }
+            if (done == 0) && (RHSItem.Mode == libgogo.MODE_REG) { //Reg RHS
+                DereferRegisterIfNecessary(RHSItem); //Make sure to work with the value, not the address
+                PrintInstruction_Reg_Reg("MOVQ", "R", RHSItem.R, 0, 0, 0, "R", LHSItem.R, 1, 0, 0); //MOVQ RHSItem.R, (LHSItem.R)
+                done = 1;
+            }
+        }        
+        FreeRegisterIfRequired(LHSItem);
+        FreeRegisterIfRequired(RHSItem);
     }
 }
 

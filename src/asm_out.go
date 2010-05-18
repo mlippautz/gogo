@@ -81,16 +81,16 @@ func PrintInstruction_Imm_Var(op string, value uint64, variable *libgogo.Item) {
 
 func PrintInstruction_Reg_Var(op string, regname string, regnumber uint64, variable *libgogo.Item) {
     if variable.Global == 1 { //Global
-        PrintInstruction_Reg_Reg(op, regname, regnumber, 0, 0, 0, "SB", 0, 1, variable.A, 0); //OP regnumber, variable.A(SB)
+        PrintInstruction_Reg_Reg(op, regname, regnumber, 0, 0, 0, "SB", 0, 1, variable.A, 0); //OP regname_regnumber, variable.A(SB)
     } else { //Local
-        PrintInstruction_Reg_Reg(op, regname, regnumber, 0, 0, 0, "SP", 0, 1, variable.A + 8, 1); //OP regnumber, -[variable.A+8](SP)
+        PrintInstruction_Reg_Reg(op, regname, regnumber, 0, 0, 0, "SP", 0, 1, variable.A + 8, 1); //OP regname_regnumber, -[variable.A+8](SP)
     }
 }
 
 func PrintInstruction_Var_Reg(op string, variable *libgogo.Item, regname string, regnumber uint64) {
     if variable.Global == 1 { //Global
-        PrintInstruction_Reg_Reg(op, "SB", 0, 1, variable.A, 0, regname, regnumber, 0, 0, 0); //OP variable.A(SB), regnumber
+        PrintInstruction_Reg_Reg(op, "SB", 0, 1, variable.A, 0, regname, regnumber, 0, 0, 0); //OP variable.A(SB), regname_regnumber
     } else { //Local
-        PrintInstruction_Reg_Reg(op, "SP", 0, 1, variable.A + 8, 1, regname, regnumber, 0, 0, 0); //OP -[variable.A+8](SP), regnumber
+        PrintInstruction_Reg_Reg(op, "SP", 0, 1, variable.A + 8, 1, regname, regnumber, 0, 0, 0); //OP -[variable.A+8](SP), regname_regnumber
     }
 }
