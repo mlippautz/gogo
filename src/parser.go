@@ -287,22 +287,22 @@ func ParseVarDecl() uint64 {
 //
 //
 func ParseExpression(item *libgogo.Item) {
-		var boolFlag uint64;
+    var boolFlag uint64;
     var op uint64;
     var tempItem2 *libgogo.Item;
     PrintDebugString("Entering ParseExpression()",1000);
     IncAndCheckDepth();
-		if item == nil {
-		    item = libgogo.NewItem();
-		}
+    if item == nil {
+        item = libgogo.NewItem();
+    }
     ParseSimpleExpression(item);
-		boolFlag = ParseCmpOp();
-		if boolFlag == 0 {
+    boolFlag = ParseCmpOp();
+    if boolFlag == 0 {
         tempItem2 = libgogo.NewItem();
-		  	ParseSimpleExpression(tempItem2);
-			  op = libgogo.Pop(&Operators);
-			  op = op + 1; //TODO instead: GenerateExpression(item, tempItem2, op);
-		}
+        ParseSimpleExpression(tempItem2);
+        op = libgogo.Pop(&Operators);
+        op = op + 1; //TODO instead: GenerateExpression(item, tempItem2, op);
+	}
     DecDepth();
     PrintDebugString("Leaving ParseExpression()",1000);
 }

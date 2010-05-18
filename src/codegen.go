@@ -43,65 +43,6 @@ func FreeRegister(index uint64) {
     FreeRegisters[realIndex] = 1;
 }
 
-/*func ItemToRegister(item *libgogo.Item) {
-    if item.Mode == libgogo.MODE_CONST {
-        item.R = GetFreeRegister();
-        OccupyRegister(item.R);
-        item.Mode = libgogo.MODE_REG;
-        libgogo.PrintString("MOVQ $");
-        libgogo.PrintNumber(item.A);
-        libgogo.PrintString(", R");
-        libgogo.PrintNumber(item.R);
-        libgogo.PrintString("\n");
-    }
-    if item.Mode == libgogo.MODE_VAR {
-        item.R = GetFreeRegister();
-        OccupyRegister(item.R);
-        item.Mode = libgogo.MODE_REG;
-        libgogo.PrintString("MOVQ ");
-        if item.Global == 1 { //Global
-            libgogo.PrintNumber(item.A);
-            libgogo.PrintString("(SB)");
-        } else { //Local
-            libgogo.PrintString("-");
-            libgogo.PrintNumber(item.A + 8); //SP = return address, start at address SP-8, decreasing
-            libgogo.PrintString("(SP)");
-        }
-        libgogo.PrintString(", R");
-        libgogo.PrintNumber(item.R);
-        libgogo.PrintString("\n");
-    }
-    if item.Mode == libgogo.MODE_REG {
-				; //Don't do anything - item is already a register
-    }
-}
-
-func ItemAddressToRegister(item *libgogo.Item) {
-    if item.Mode == libgogo.MODE_VAR {
-        item.R = GetFreeRegister();
-        OccupyRegister(item.R);
-        item.Mode = libgogo.MODE_REG;
-        libgogo.PrintString("LEAQ ");
-        if item.Global == 1 { //Global
-            libgogo.PrintNumber(item.A);
-            libgogo.PrintString("(SB)");
-        } else { //Local
-            libgogo.PrintString("-");
-            libgogo.PrintNumber(item.A + 8); //SP = return address, start at address SP-8, decreasing
-            libgogo.PrintString("(SP)");
-        }
-        libgogo.PrintString(", R");
-        libgogo.PrintNumber(item.R);
-        libgogo.PrintString("\n");
-    }
-    if item.Mode == libgogo.MODE_REG {
-				; //Don't do anything - item is already a register
-    }
-}*/
-
-
-//-----------------------------------------------------------------------
-
 //
 // Frees the register occupied by the given item if applicable
 //
