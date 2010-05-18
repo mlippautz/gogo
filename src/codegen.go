@@ -103,6 +103,7 @@ func TwoOperandInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, 
         item1.A = constvalue; //item1 = item1 OP item2 (constvalue)
         done = 1;
     }
+
     if (done == 0) && (item1.Mode != libgogo.MODE_REG) { //item1 is not a register => make it a register
         done = GetFreeRegister();
         OccupyRegister(done);
@@ -118,26 +119,28 @@ func TwoOperandInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, 
         item1.Mode = libgogo.MODE_REG;
         item1.R = done; //item1 is now a register; don't set done to 1 as the actual calculation has yet to be done
         item1.A = calculatewithaddresses; //item1 now contains a value if calculatewithaddresses is 0, or an address if calculatewithaddress is 1
+        done = 0;
     }
+
     if done == 0 { //item1 is now (or has even already been) a register => use it
-		    if calculatewithaddresses == 0 { //Calculate with values
+        if calculatewithaddresses == 0 { //Calculate with values
             DereferRegisterIfNecessary(item1); //Calculate with values
         }
-				if (done == 0) && (item2.Mode == libgogo.MODE_CONST) {
-				    PrintInstruction_Imm_Reg(op, item2.A, "R", item1.R, 0, 0, 0); //OP $item2.A, item1.R
-				    done = 1;
-				}
-				if (done == 0) && (item2.Mode == libgogo.MODE_VAR) {
-				    PrintInstruction_Var_Reg(op, item2, "R", item1.R); //OP item2.A(SB), item1.R
-				    done = 1;
-				}
-				if (done == 0) && (item2.Mode == libgogo.MODE_REG) {
-				    if calculatewithaddresses == 0 { //Calculate with values
-				        DereferRegisterIfNecessary(item2);
-				    }
-				    PrintInstruction_Reg_Reg("ADDQ", "R", item2.R, 0, 0, 0, "R", item1.R, 0, 0, 0); //OP item2.R, item1.R
-				    done = 1;
-				}
+        if (done == 0) && (item2.Mode == libgogo.MODE_CONST) {
+            PrintInstruction_Imm_Reg(op, item2.A, "R", item1.R, 0, 0, 0); //OP $item2.A, item1.R
+            done = 1;
+        }
+        if (done == 0) && (item2.Mode == libgogo.MODE_VAR) {
+            PrintInstruction_Var_Reg(op, item2, "R", item1.R); //OP item2.A(SB), item1.R
+            done = 1;
+        }
+        if (done == 0) && (item2.Mode == libgogo.MODE_REG) {
+            if calculatewithaddresses == 0 { //Calculate with values
+                DereferRegisterIfNecessary(item2);
+            }
+            PrintInstruction_Reg_Reg(op, "R", item2.R, 0, 0, 0, "R", item1.R, 0, 0, 0); //OP item2.R, item1.R
+            done = 1;
+        }
     }
     FreeRegisterIfRequired(item2);
 }

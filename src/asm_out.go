@@ -42,7 +42,6 @@ TEXT    main·init(SB),0,$0-0\n\
 
     libgogo.StringAppend(&Code,"\n\
 TEXT    main·main(SB),0,$0-24\n\
-  RET\n\
 ");
 }
 
@@ -58,6 +57,11 @@ func PrintFile() {
     // flags: O_WRONLY | O_CREAT | O_TRUNC => 577
     // mode: S_IWUSR | S_IRUSR | S_IRGRP => 416
     fd = libgogo.FileOpen2(outfile,577,416);
+
+    libgogo.StringAppend(&Code,"\n\
+  RET\n\
+");
+
     libgogo.WriteString(fd,Code);
     libgogo.FileClose(fd);
 }
@@ -99,6 +103,7 @@ func PrintImmediate(value uint64) {
 }
 
 func PrintInstructionStart(op string) {
+    PrintOutput("  ");
     PrintOutput(op);
     PrintOutput(" ");
 }
