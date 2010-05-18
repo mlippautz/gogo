@@ -2,6 +2,10 @@
 // Use of this source code is governed by the MIT
 // license that can be found in the LICENSE file.
 
+//
+// Expression related code generation
+//
+
 package main
 
 import "./libgogo/_obj/libgogo"
@@ -19,6 +23,9 @@ func GenerateSimpleExpression(item1 *libgogo.Item, item2 *libgogo.Item, op uint6
     }
 }
 
+//
+// Called by parser (ParseTerm)
+//
 func GenerateTerm(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     /*var str string;*/
     if Compile != 0 {

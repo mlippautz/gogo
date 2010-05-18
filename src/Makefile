@@ -16,6 +16,7 @@ GOFILES=\
     asm_out.go\
     codegen.go\
     gen-expr.go\
+    gen-assign.go\
     inspector.go
 
 include $(GOROOT)/src/Make.cmd
