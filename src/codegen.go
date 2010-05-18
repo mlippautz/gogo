@@ -104,48 +104,6 @@ func ItemAddressToRegister(item *libgogo.Item) {
     }
 }*/
 
-func GenerateTerm(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
-    /*var str string;*/
-    if Compile != 0 {
-				/*if (item1.Mode == libgogo.MODE_CONST) && (item2.Mode == libgogo.MODE_CONST) {
-				    libgogo.PrintString(";Constant folding: ");
-						str = TokenToString(op);
-				    libgogo.PrintString(str);
-				    libgogo.PrintString("(");
-				    libgogo.PrintNumber(item1.A);
-				    libgogo.PrintString(",");
-				    libgogo.PrintNumber(item2.A);
-				    if op == TOKEN_ARITH_MUL {
-				        item1.A = item1.A * item2.A;
-				    }
-				    if op == TOKEN_ARITH_DIV {
-				        item1.A = item1.A / item2.A;
-				    }
-				    libgogo.PrintString(")=");
-				    libgogo.PrintNumber(item1.A);
-				    libgogo.PrintString("\n");
-				} else {
-				    ItemToRegister(item1);
-				    libgogo.PrintString("MOVQ R");
-				    libgogo.PrintNumber(item1.R);
-				    libgogo.PrintString(", AX\n");
-				    ItemToRegister(item2);
-				    libgogo.PrintString("MOVQ R");
-				    libgogo.PrintNumber(item2.R);
-				    libgogo.PrintString(", BX\n");
-				    if op == TOKEN_ARITH_MUL {
-				        libgogo.PrintString("MULQ BX\n");
-				    }
-				    if op == TOKEN_ARITH_DIV {
-				        libgogo.PrintString("DIVQ BX\n");
-				    }
-				    libgogo.PrintString("MOVQ AX, R");
-				    libgogo.PrintNumber(item1.R);
-				    libgogo.PrintString("\n");
-				    FreeRegister(item2.R);
-				}*/
-    }
-}
 
 //-----------------------------------------------------------------------
 
@@ -165,16 +123,6 @@ func DereferRegisterIfNecessary(item *libgogo.Item) {
     if (item.Mode == libgogo.MODE_REG) && (item.A != 0) { //Derefer register if it contains an address
         PrintInstruction_Reg_Reg("MOVQ", "R", item.R, 1, 0, 0, "R", item.R, 0, 0, 0); //MOVQ (item.R), item.R
         item.A = 0; //Register now contains a value
-    }
-}
-
-func GenerateSimpleExpression(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
-    if Compile != 0 {
-        if op == TOKEN_ARITH_PLUS { //Add
-            TwoOperandInstruction("ADDQ", item1, item2, item1.A + item2.A, 0);
-        } else { //Subtract
-            TwoOperandInstruction("SUBQ", item1, item2, item1.A - item2.A, 0);
-        }
     }
 }
 

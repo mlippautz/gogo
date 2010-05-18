@@ -6,8 +6,57 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
+//
+// Variable holding the compiled code
+//
+var Code string;
+
+//
+// Reseting the code before a new compile round starts
+//
+func ResetCode() {
+    Code = "\
+//\n\
+// --------------------\n\
+// GoGo compiler output\n\
+// --------------------\n\
+//\n\
+// File: \
+"
+    libgogo.StringAppend(&Code, fileInfo[curFileIndex].filename);
+    libgogo.StringAppend(&Code,"\n\
+// Syntax: Plan-9 assembler\n\
+//\n\
+// This code is automatically generated. DO NOT EDIT IT!\n\
+//\n\
+\n\
+");
+    InspectorGadget();
+    libgogo.StringAppend(&Code,"\n\
+TEXT    main·init(SB),0,$0-0\n\
+  RET\n\
+");
+
+}
+
+//
+// Function printing the generated code (stored in Code) to a file called the
+// same name as the input file + '.sog' extension
+//
+func PrintFile() {
+    var fd uint64;    
+    var outfile string = fileInfo[curFileIndex].filename;
+    libgogo.StringAppend(&outfile,".sog");
+    // The following line creates a new file for the assembler code
+    // flags: O_WRONLY | O_CREAT | O_TRUNC => 577
+    // mode: S_IWUSR | S_IRUSR | S_IRGRP => 416
+    fd = libgogo.FileOpen2(outfile,577,416);
+    libgogo.WriteString(fd,Code);
+    libgogo.FileClose(fd);
+}
+
 func PrintOutput(output string) {
-    libgogo.PrintString(output); //TODO: Output to file
+    libgogo.StringAppend(&Code,output);
 }
 
 func PrintOutputValue(value uint64) {

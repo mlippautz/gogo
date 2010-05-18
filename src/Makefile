@@ -14,6 +14,8 @@ GOFILES=\
     utils.go\
     symtable.go\
     asm_out.go\
-    codegen.go
+    codegen.go\
+    gen-expr.go\
+    inspector.go
 
 include $(GOROOT)/src/Make.cmd
