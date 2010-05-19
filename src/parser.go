@@ -573,20 +573,20 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
         if Compile != 0 {
             if (item.Itemtype == nil) && (item.A == 0) && (item.R == 0) { //Item undefined, only package known => Find object
                 tempObject = libgogo.GetObject(tok.strValue, packagename, LocalObjects); //Check local objects
-								tempList = LocalObjects;
-								if tempObject == nil {
-								    tempObject = libgogo.GetObject(tok.strValue, packagename, GlobalObjects); //Check global objects
-								    tempList = GlobalObjects;
-								}
-								if tempObject == nil {
-								    SymbolTableError("Package", packagename, "has no variable named", tok.strValue);
-								}
-								tempAddr = libgogo.GetObjectOffset(tempObject, tempList);
-								if tempList == LocalObjects { //Local
-								    libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 0); //Varible item
-								} else { //Global
-								    libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 1); //Varible item
-				  	    }
+			    tempList = LocalObjects;
+			    if tempObject == nil {
+			        tempObject = libgogo.GetObject(tok.strValue, packagename, GlobalObjects); //Check global objects
+			        tempList = GlobalObjects;
+			    }
+			    if tempObject == nil {
+			        SymbolTableError("Package", packagename, "has no variable named", tok.strValue);
+			    }
+			    tempAddr = libgogo.GetObjectOffset(tempObject, tempList);
+			    if tempList == LocalObjects { //Local
+			        libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 0); //Varible item
+			    } else { //Global
+			        libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 1); //Varible item
+		  	    }
             } else { //Field access
                 if Compile != 0 {
                     if item.Itemtype == nil {
@@ -633,14 +633,18 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
                 }
             } else {
                 if tok.id == TOKEN_IDENTIFIER {
-                    tempItem = libgogo.NewItem();
-                    FindIdentifierAndParseSelector(tempItem); //Load identifier's value
-                    tempItem2 = libgogo.NewItem();
-                    boolFlag = libgogo.GetTypeSizeAligned(item.Itemtype.Base); //Get array base type size
-                    libgogo.SetItem(tempItem2, libgogo.MODE_CONST, uint64_t, boolFlag, 0, 0); //Constant item
-                    DivMulInstruction("MULQ", tempItem, tempItem2, 0, 1); //Multiply identifier value by array base type size => tempItem now constains the field offset
-                    AddSubInstruction("ADDQ", item, tempItem, 0, 1); //Add calculated offset to base address
-                    item.Itemtype = item.Itemtype.Base; //Set item type to array base type
+                    if Compile != 0 {
+                        tempItem = libgogo.NewItem();
+                        FindIdentifierAndParseSelector(tempItem); //Load identifier's value
+                        tempItem2 = libgogo.NewItem();
+                        boolFlag = libgogo.GetTypeSizeAligned(item.Itemtype.Base); //Get array base type size
+                        libgogo.SetItem(tempItem2, libgogo.MODE_CONST, uint64_t, boolFlag, 0, 0); //Constant item
+                        DivMulInstruction("MULQ", tempItem, tempItem2, 0, 1); //Multiply identifier value by array base type size => tempItem now constains the field offset
+                        AddSubInstruction("ADDQ", item, tempItem, 0, 1); //Add calculated offset to base address
+                        item.Itemtype = item.Itemtype.Base; //Set item type to array base type
+                    } else {
+                        ParseSelector(item, CurrentPackage);
+                    }
                 }
             } 
 
@@ -1155,36 +1159,36 @@ func FindIdentifierAndParseSelector(item *libgogo.Item) {
     var tempList *libgogo.ObjectDesc;
     var packagename string;
     if Compile != 0 {
-				//Token can be package name
-				boolFlag = libgogo.FindPackageName(tok.strValue, GlobalObjects); //Check global objects
-				if boolFlag == 0 {
-				    boolFlag = libgogo.FindPackageName(tok.strValue, LocalObjects); //Check local objects
-				}
-				if boolFlag == 0 { //Token is not package name, but identifier
-						tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, LocalObjects); //Check local objects
-						tempList = LocalObjects;
-						if tempObject == nil {
-								tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, GlobalObjects); //Check global objects
-								tempList = GlobalObjects;
-						}
-						if tempObject == nil {
-								SymbolTableError("Undefined", "", "variable", tok.strValue);
-						}
-						tempAddr = libgogo.GetObjectOffset(tempObject, tempList);
-						if tempList == LocalObjects { //Local
-								libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 0); //Varible item
-						} else { //Global
-								libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 1); //Varible item
-						}
-				    ParseSelector(item, CurrentPackage); //Parse selectors for an object in the current package
-				} else { //Token is package name
-				    libgogo.SetItem(item, 0, nil, 0, 0, 0); //Mark item as not being set
-				    packagename = tok.strValue; //Save package name
-				    ParseSelector(item, tok.strValue); //Parse selectors for an undefined object in the given package
-				    if (item.Itemtype == nil) && (item.A == 0) && (item.R == 0) {
-				        SymbolTableError("Cannot use package", "", "as a variable:", packagename);
-				    }
-				}
+		//Token can be package name
+		boolFlag = libgogo.FindPackageName(tok.strValue, GlobalObjects); //Check global objects
+		if boolFlag == 0 {
+		    boolFlag = libgogo.FindPackageName(tok.strValue, LocalObjects); //Check local objects
+		}
+		if boolFlag == 0 { //Token is not package name, but identifier
+			tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, LocalObjects); //Check local objects
+			tempList = LocalObjects;
+			if tempObject == nil {
+				tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, GlobalObjects); //Check global objects
+				tempList = GlobalObjects;
+			}
+			if tempObject == nil {
+				SymbolTableError("Undefined", "", "variable", tok.strValue);
+			}
+			tempAddr = libgogo.GetObjectOffset(tempObject, tempList);
+			if tempList == LocalObjects { //Local
+				libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 0); //Varible item
+			} else { //Global
+				libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 1); //Varible item
+			}
+		    ParseSelector(item, CurrentPackage); //Parse selectors for an object in the current package
+		} else { //Token is package name
+		    libgogo.SetItem(item, 0, nil, 0, 0, 0); //Mark item as not being set
+		    packagename = tok.strValue; //Save package name
+		    ParseSelector(item, tok.strValue); //Parse selectors for an undefined object in the given package
+		    if (item.Itemtype == nil) && (item.A == 0) && (item.R == 0) {
+		        SymbolTableError("Cannot use package", "", "as a variable:", packagename);
+		    }
+		}
     } else {
         ParseSelector(item, CurrentPackage);
     }
