@@ -9,7 +9,7 @@ import "./libgogo/_obj/libgogo"
 var maxDepth uint64 = 10;
 var curDepth uint64 = 1;
 
-var Compile uint64 = 1;
+var Compile uint64 = 0;
 
 var Operators libgogo.Stack;
 
@@ -563,6 +563,8 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
     var tempObject *libgogo.ObjectDesc;
     var tempAddr uint64;
     var tempList *libgogo.ObjectDesc;
+    var tempItem *libgogo.Item;
+    var tempItem2 *libgogo.Item;
     PrintDebugString("Entering ParseSelectorSub()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_PT {
@@ -631,8 +633,14 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
                 }
             } else {
                 if tok.id == TOKEN_IDENTIFIER {
-                    ParseSelector(item, packagename); //TODO: Find identifier, parse selectors (value!) and access array at according position
-                    //TODO: Array access
+                    tempItem = libgogo.NewItem();
+                    FindIdentifierAndParseSelector(tempItem); //Load identifier's value
+                    tempItem2 = libgogo.NewItem();
+                    boolFlag = libgogo.GetTypeSizeAligned(item.Itemtype.Base); //Get array base type size
+                    libgogo.SetItem(tempItem2, libgogo.MODE_CONST, uint64_t, boolFlag, 0, 0); //Constant item
+                    DivMulInstruction("MULQ", tempItem, tempItem2, 0, 1); //Multiply identifier value by array base type size => tempItem now constains the field offset
+                    AddSubInstruction("ADDQ", item, tempItem, 0, 1); //Add calculated offset to base address
+                    item.Itemtype = item.Itemtype.Base; //Set item type to array base type
                 }
             } 
 
