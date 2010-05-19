@@ -9,7 +9,7 @@ import "./libgogo/_obj/libgogo"
 var maxDepth uint64 = 10;
 var curDepth uint64 = 1;
 
-var Compile uint64 = 1;
+var Compile uint64 = 0;
 
 var Operators libgogo.Stack;
 
@@ -379,17 +379,10 @@ func ParseUnaryArithOp() uint64 {
     var boolFlag uint64 = 1;
     PrintDebugString("Entering ParseUnaryArithOp()",1000);
     GetNextTokenSafe();
-    if tok.id == TOKEN_ARITH_PLUS {
-        // +
-        libgogo.Push(&Operators, TOKEN_ARITH_PLUS);
+    if (tok.id == TOKEN_ARITH_PLUS) || (tok.id == TOKEN_ARITH_MINUS) {
+        libgogo.Push(&Operators, tok.id);
         boolFlag = 0;
-    }
-    if tok.id == TOKEN_ARITH_MINUS {
-        // -
-        libgogo.Push(&Operators, TOKEN_ARITH_MINUS);
-        boolFlag = 0;
-    }
-    if boolFlag != 0 {
+    } else {
         tok.nextToken = tok.id;
     }
     PrintDebugString("Leaving ParseUnaryArithOp()",1000);
@@ -447,17 +440,10 @@ func ParseBinaryArithOp() uint64 {
     var boolFlag uint64 = 1;
     PrintDebugString("Entering ParseBinaryArithOp()",1000);
     GetNextTokenSafe();
-    if tok.id == TOKEN_ARITH_MUL {
-        // *
-        libgogo.Push(&Operators, TOKEN_ARITH_MUL);
+    if (tok.id == TOKEN_ARITH_MUL) || (tok.id == TOKEN_ARITH_DIV) {
+        libgogo.Push(&Operators, tok.id);
         boolFlag = 0;
-    }
-    if tok.id == TOKEN_ARITH_DIV {
-        // /
-        libgogo.Push(&Operators, TOKEN_ARITH_DIV);
-        boolFlag = 0;
-    }
-    if boolFlag != 0 {
+    } else {
         tok.nextToken = tok.id;
     }
     PrintDebugString("Leaving ParseBinaryArithOp()",1000);
@@ -475,7 +461,7 @@ func ParseFactor(item *libgogo.Item) uint64 {
     GetNextTokenSafe();
     if (doneFlag == 1) && (tok.id == TOKEN_OP_ADR) {
         AssertNextToken(TOKEN_IDENTIFIER);
-        FindIdentifierAndParseSelector(item); //TODO: Use address value here instead of value
+        FindIdentifierAndParseSelector(item); //TODO: Keep address and use it in assignment
         doneFlag = 0;
     }
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
@@ -935,20 +921,20 @@ func ParseAssignment() uint64 {
     GenerateComment("Assignment-Start");
     AssertNextToken(TOKEN_IDENTIFIER);
     LHSItem = libgogo.NewItem();
-    FindIdentifierAndParseSelector(LHSItem); //Parse LHS //TODO: Load address, not value
+    FindIdentifierAndParseSelector(LHSItem); //Parse LHS
     GetNextTokenSafe();
     if tok.id == TOKEN_ASSIGN {
         GetNextTokenSafe();
         if tok.id == TOKEN_IDENTIFIER {
             funcIndicator = IsFunction();
-            if funcIndicator == 1 {
+            if funcIndicator == 1 { //Function call
                 ParseFunctionCallStatement();
-            } else {
+            } else { //Expression starting with an identifier
                 RHSItem = libgogo.NewItem();
                 ParseExpression(RHSItem); //Parse RHS
                 GenerateAssignment(LHSItem, RHSItem); //LHS = RHS
             }
-        } else {
+        } else { //Expression
             tok.nextToken = tok.id;
             RHSItem = libgogo.NewItem();
             ParseExpression(RHSItem); //Parse RHS
@@ -968,23 +954,30 @@ func ParseAssignment() uint64 {
 func ParseAssignmentWithoutSC() uint64 {
     var boolFlag uint64;
     var funcIndicator uint64;
+    var LHSItem *libgogo.Item;
+    var RHSItem *libgogo.Item;
     PrintDebugString("Entering ParseAssignmentWithoutSC()",1000);
     GenerateComment("Assignment-Start");
-    AssertNextToken(TOKEN_IDENTIFIER); //TODO
-    ParseSelector(nil, CurrentPackage); //TODO: Load address, not value
+    AssertNextToken(TOKEN_IDENTIFIER);
+    LHSItem = libgogo.NewItem();
+    FindIdentifierAndParseSelector(LHSItem); //Parse LHS
     GetNextTokenSafe();
     if tok.id == TOKEN_ASSIGN {
         GetNextTokenSafe();
         if tok.id == TOKEN_IDENTIFIER {
             funcIndicator = IsFunction();
-            if funcIndicator == 1 {
+            if funcIndicator == 1 { //Function call
                 ParseFunctionCallStatement();
-            } else {
-                ParseExpression(nil); //TODO
+            } else { //Expression starting with an identifier
+                RHSItem = libgogo.NewItem();
+                ParseExpression(RHSItem); //Parse RHS
+                GenerateAssignment(LHSItem, RHSItem); //LHS = RHS
             }
-        } else {
+        } else { //Expression
             tok.nextToken = tok.id;
-            ParseExpression(nil); //TODO
+            RHSItem = libgogo.NewItem();
+            ParseExpression(RHSItem); //Parse RHS
+            GenerateAssignment(LHSItem, RHSItem); //LHS = RHS
         }
         boolFlag = 0;
     } else {
