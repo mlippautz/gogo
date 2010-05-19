@@ -31,6 +31,36 @@ func GetCharWrapped() byte {
     return singleChar;
 }
 
+func GetEscapedCharWrapped() byte {
+    var singleChar byte;
+    var nextChar byte;
+    var returnChar byte;
+    singleChar = GetCharWrapped();
+    if singleChar == '\\' { //Escaped character
+        nextChar = GetCharWrapped();
+        if nextChar == 'n' { //n => \n
+            returnChar = '\n';
+        } else {
+            if nextChar == '\n' { //Line break in string
+                returnChar = GetCharWrapped(); //Return character after line break
+            } else {
+                if nextChar == '\\' { //\ => \ (single \)
+                    returnChar = '\\';
+                } else {
+                     if nextChar == 'b' { //b => \b
+                         returnChar = '\b';
+                    } else {
+                        ScanErrorString("Unknown escape sequence.");
+                    }
+                }
+            }
+        }
+    } else { //Normal character
+        returnChar = singleChar;
+    }
+    return returnChar;
+}
+
 func GetNextTokenRaw() {
     var singleChar byte; // Byte holding the last read value
     // Flag indicating whether we are in a comment.
@@ -151,7 +181,7 @@ func GetNextTokenRaw() {
     // string "..."
     if (done != 1) && (singleChar == '"') {
         tok.id = TOKEN_STRING;        
-        for singleChar = GetCharWrapped(); (singleChar != '"') && (singleChar > 31) && (singleChar < 127);singleChar = GetCharWrapped() {
+        for singleChar = GetCharWrapped(); singleChar != '"';singleChar = GetEscapedCharWrapped() {
             tmp_TokAppendStr(singleChar);
         }
         if singleChar != '"' {
@@ -162,8 +192,8 @@ func GetNextTokenRaw() {
 
     // Single Quoted Character
     if (done != 1) && singleChar == 39 {
-        singleChar = GetCharWrapped();
-        if (singleChar != 39) && (singleChar > 31) && (singleChar < 127) {
+        singleChar = GetEscapedCharWrapped();
+        if singleChar != 39 {
             tok.id = TOKEN_INTEGER;
             tok.intValue = libgogo.ToIntFromByte(singleChar);
         } else {
