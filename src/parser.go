@@ -920,6 +920,7 @@ func ParseAssignment() uint64 {
     var LHSItem *libgogo.Item;
     var RHSItem *libgogo.Item;
     PrintDebugString("Entering ParseAssignment()",1000);
+    GenerateComment("Assignment-Start");
     AssertNextToken(TOKEN_IDENTIFIER);
     LHSItem = libgogo.NewItem();
     FindIdentifierAndParseSelector(LHSItem); //Parse LHS //TODO: Load address, not value
@@ -947,6 +948,7 @@ func ParseAssignment() uint64 {
         tok.nextToken = tok.id;
         boolFlag = 1;
     }
+    GenerateComment("Assignment-End");
     PrintDebugString("Leaving ParseAssignment()",1000);
     return boolFlag;
 }
@@ -955,6 +957,7 @@ func ParseAssignmentWithoutSC() uint64 {
     var boolFlag uint64;
     var funcIndicator uint64;
     PrintDebugString("Entering ParseAssignmentWithoutSC()",1000);
+    GenerateComment("Assignment-Start");
     AssertNextToken(TOKEN_IDENTIFIER); //TODO
     ParseSelector(nil, CurrentPackage); //TODO: Load address, not value
     GetNextTokenSafe();
@@ -976,6 +979,7 @@ func ParseAssignmentWithoutSC() uint64 {
         tok.nextToken = tok.id;
         boolFlag = 1;
     }
+    GenerateComment("Finished Assignment");
     PrintDebugString("Leaving ParseAssignmentWithoutSC()",1000);
     return boolFlag;
 }

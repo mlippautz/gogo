@@ -62,6 +62,15 @@ func DereferRegisterIfNecessary(item *libgogo.Item) {
     }
 }
 
+//
+// Simple wrapper to asm_out printing
+//
+func GenerateComment(msg string) {
+    var str string = "  // >>> ";
+    libgogo.StringAppend(&str, msg);
+    libgogo.StringAppend(&str,"\n");
+    PrintOutput(str);
+}
 
 
 func GenerateFieldAccess(item *libgogo.Item, offset uint64, indirect uint64) {
@@ -144,3 +153,4 @@ func TwoOperandInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, 
     }
     FreeRegisterIfRequired(item2);
 }
+
