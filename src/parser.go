@@ -826,7 +826,7 @@ func ParseStatement() uint64 {
         if funcIndicator == 1 {
             ParseFunctionCallStatement();
         } else {
-            ParseAssignment();
+            ParseAssignment(1); //Trailing semicolon
         }
         doneFlag = 0;
     }
@@ -912,7 +912,7 @@ func IsFunction() uint64 {
     return returnValue;
 }
 
-func ParseAssignment() uint64 {
+func ParseAssignment(semicolon uint64) uint64 {
     var boolFlag uint64;
     var funcIndicator uint64;
     var LHSItem *libgogo.Item;
@@ -940,7 +940,9 @@ func ParseAssignment() uint64 {
             ParseExpression(RHSItem); //Parse RHS
             GenerateAssignment(LHSItem, RHSItem); //LHS = RHS
         }
-        AssertNextTokenWeak(TOKEN_SEMICOLON);
+        if semicolon != 0 {
+            AssertNextTokenWeak(TOKEN_SEMICOLON);
+        }
         boolFlag = 0;
     } else {
         tok.nextToken = tok.id;
@@ -948,44 +950,6 @@ func ParseAssignment() uint64 {
     }
     GenerateComment("Assignment-End");
     PrintDebugString("Leaving ParseAssignment()",1000);
-    return boolFlag;
-}
-
-func ParseAssignmentWithoutSC() uint64 {
-    var boolFlag uint64;
-    var funcIndicator uint64;
-    var LHSItem *libgogo.Item;
-    var RHSItem *libgogo.Item;
-    PrintDebugString("Entering ParseAssignmentWithoutSC()",1000);
-    GenerateComment("Assignment-Start");
-    AssertNextToken(TOKEN_IDENTIFIER);
-    LHSItem = libgogo.NewItem();
-    FindIdentifierAndParseSelector(LHSItem); //Parse LHS
-    GetNextTokenSafe();
-    if tok.id == TOKEN_ASSIGN {
-        GetNextTokenSafe();
-        if tok.id == TOKEN_IDENTIFIER {
-            funcIndicator = IsFunction();
-            if funcIndicator == 1 { //Function call
-                ParseFunctionCallStatement();
-            } else { //Expression starting with an identifier
-                RHSItem = libgogo.NewItem();
-                ParseExpression(RHSItem); //Parse RHS
-                GenerateAssignment(LHSItem, RHSItem); //LHS = RHS
-            }
-        } else { //Expression
-            tok.nextToken = tok.id;
-            RHSItem = libgogo.NewItem();
-            ParseExpression(RHSItem); //Parse RHS
-            GenerateAssignment(LHSItem, RHSItem); //LHS = RHS
-        }
-        boolFlag = 0;
-    } else {
-        tok.nextToken = tok.id;
-        boolFlag = 1;
-    }
-    GenerateComment("Finished Assignment");
-    PrintDebugString("Leaving ParseAssignmentWithoutSC()",1000);
     return boolFlag;
 }
 
@@ -1062,7 +1026,7 @@ func ParseForStatement() {
             tok.nextToken = tok.id;
         } else {
             tok.nextToken = tok.id;
-            ParseAssignmentWithoutSC();
+            ParseAssignment(0); //No semicolon
         }
         
         AssertNextToken(TOKEN_SEMICOLON);
@@ -1082,7 +1046,7 @@ func ParseForStatement() {
             tok.nextToken = tok.id;
         } else {
             tok.nextToken = tok.id;
-            ParseAssignmentWithoutSC();
+            ParseAssignment(0); //No semicolon
         }
 
         AssertNextToken(TOKEN_LCBRAC);        
