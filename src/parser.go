@@ -9,7 +9,7 @@ import "./libgogo/_obj/libgogo"
 var maxDepth uint64 = 10;
 var curDepth uint64 = 1;
 
-var Compile uint64 = 0;
+var Compile uint64 = 1;
 
 var Operators libgogo.Stack;
 
