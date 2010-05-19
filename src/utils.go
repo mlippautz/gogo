@@ -120,6 +120,18 @@ func ParseErrorFatal(ue uint64, e [2]uint64, eLen uint64) {
     libgogo.Exit(3); 
 }
 
+//
+// Print an error, stop compilation and parse rest.
+//
+func GenErrorWeak(msg string) {
+    PrintHead();
+    libgogo.PrintString(": generation error: ");
+    libgogo.PrintString(msg);
+    libgogo.PrintString("\n");
+    Compile = 0;
+    ParserSync();
+}
+
 func SymbolTableError(msg string, position string, msg2 string, identifier string) {
     var strLen uint64;
     PrintHead();

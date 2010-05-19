@@ -22,7 +22,7 @@ func ResetCode() {
 // --------------------\n\
 //\n\
 // File: \
-"
+";
     libgogo.StringAppend(&Code, fileInfo[curFileIndex].filename);
     libgogo.StringAppend(&Code,"\n\
 // Syntax: Plan-9 assembler\n\
