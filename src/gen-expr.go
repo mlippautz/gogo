@@ -34,7 +34,7 @@ func GenerateTerm(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
                     GenErrorWeak("Division by zero.");
                 }
             }
-            if item2.A != 0 {
+            if item2.A != 0 { //Avoid division by zero for constvalue parameter
                 DivMulInstruction("DIVQ", item1, item2, item1.A / item2.A, 0);
             } else {
                 DivMulInstruction("DIVQ", item1, item2, 0, 0);

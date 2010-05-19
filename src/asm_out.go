@@ -116,6 +116,12 @@ func PrintInstructionEnd() {
     PrintOutput("\n");
 }
 
+func PrintInstruction_Reg(op string, name string, number uint64, indirect uint64, offset uint64, offsetnegative uint64) {
+    PrintInstructionStart(op);
+    PrintRegister(name, number, indirect, offset, offsetnegative);
+    PrintInstructionEnd();
+}
+
 func PrintInstruction_Reg_Reg(op string, reg1name string, reg1number uint64, reg1indirect uint64, reg1offset uint64, reg1offsetnegative uint64, reg2name string, reg2number uint64, reg2indirect uint64, reg2offset uint64, reg2offsetnegative uint64) {
     PrintInstructionStart(op);
     PrintRegister(reg1name, reg1number, reg1indirect, reg1offset, reg1offsetnegative);

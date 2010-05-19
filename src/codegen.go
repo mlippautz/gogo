@@ -187,7 +187,7 @@ func AddSubInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
 
 //
 // item1 = item1 OP item2, or constvalue if both item1 and item2 are constants
-// Difference here is that it uses a one operand assembly instruction
+// Difference here is that it uses a one operand assembly instruction which operates on AX as first operand
 //
 func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, constvalue uint64, calculatewithaddresses uint64) {
     var done uint64 = 0;
@@ -218,12 +218,10 @@ func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
             DereferRegisterIfNecessary(item2);
         }
         done = libgogo.StringCompare(op,"DIVQ");
-        if done == 0 {
-            PrintInstruction_Reg_Reg("XORQ", "DX", 0, 0, 0, 0, "DX", 0, 0, 0, 0);
+        if done == 0 { //Set DX to zero to avoid 128 bit division as DX is "high" part of DX:AX 128 bit register
+            PrintInstruction_Reg_Reg("XORQ", "DX", 0, 0, 0, 0, "DX", 0, 0, 0, 0); //XORQ DX, DX is equal to MOVQ $0, DX
         }
-        PrintInstructionStart(op);
-        PrintRegister("R", item2.R, 0, 0, 0);
-        PrintInstructionEnd();
+        PrintInstruction_Reg(op, "R", item2.R, 0, 0, 0); //op item2.R
         PrintInstruction_Reg_Reg("MOVQ", "AX", 0, 0, 0, 0, "R", item2.R, 0, 0, 0) // move AX into item2.R
     }
 
