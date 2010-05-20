@@ -293,7 +293,7 @@ func ParseExpression(item *libgogo.Item) {
         tempItem2 = libgogo.NewItem();
         ParseSimpleExpression(tempItem2);
         op = libgogo.Pop(&Operators);
-        op = op + 1; //TODO instead: GenerateExpression(item, tempItem2, op);
+        GenerateRelation(item, tempItem2, op);
 	}
     DecDepth();
     PrintDebugString("Leaving ParseExpression()",1000);

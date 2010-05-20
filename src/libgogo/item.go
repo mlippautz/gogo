@@ -30,12 +30,12 @@ var MODE_COND uint64 = 4;
 // Relation mappings
 // The oppositve value can be found by ++ or --
 //
-var REL_EQ = 0;
-var REL_NEQ = 1;
-var REL_LT = 2;
-var REL_GTEQ = 3;
-var REL_LTEQ = 4;
-var REL_GT = 5;
+var REL_EQ uint64 = 0;
+var REL_NEQ uint64 = 1;
+var REL_LT uint64 = 2;
+var REL_GTEQ uint64 = 3;
+var REL_LTEQ uint64 = 4;
+var REL_GT uint64 = 5;
 
 //
 // Convert the uint64 value (returned from malloc) to a real item address

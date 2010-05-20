@@ -45,3 +45,40 @@ func GenerateTerm(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
         }
     }
 }
+
+//
+// Called by parser (ParseExpression)
+//
+func GenerateRelation(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
+    // type checking for uint64 values
+    if (item1.Itemtype != uint64_t) || (item2.Itemtype != uint64_t) {
+        GenErrorWeak("Bad types");
+    }
+
+    // TODO: Generate CMP statements depending on items
+
+    if op == TOKEN_EQUALS {
+        item1.C = libgogo.REL_EQ;
+    }
+    if op == TOKEN_NOTEQUAL {
+        item1.C = libgogo.REL_NEQ;
+    }
+    if op == TOKEN_REL_GT {
+        item1.C = libgogo.REL_GT;
+    }
+    if op == TOKEN_REL_GTOE {
+        item1.C = libgogo.REL_GTEQ;
+    }
+    if op == TOKEN_REL_LT {
+        item1.C = libgogo.REL_LT;
+    }
+    if op == TOKEN_REL_LTOE {
+        item1.C = libgogo.REL_LTEQ;
+    }
+
+    item1.Mode = libgogo.MODE_COND;
+    item1.Itemtype = bool_t;
+
+    FreeRegisterIfRequired(item1);
+    FreeRegisterIfRequired(item2);    
+}
