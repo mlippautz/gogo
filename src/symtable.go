@@ -16,6 +16,7 @@ var GlobalTypes *libgogo.TypeDesc = nil;
 // List of function-local objects
 //
 var LocalObjects *libgogo.ObjectDesc = nil;
+var LocalParameters *libgogo.ObjectDesc = nil;
 
 //
 // List of currently processed objects and types
@@ -82,6 +83,7 @@ func PrintLocalSymbolTable() {
         libgogo.PrintString(" of ");
         libgogo.PrintString(fileInfo[curFileIndex].filename);
         libgogo.PrintString(":\n----------------------------------------------------------------------------\n");
+        libgogo.PrintObjects(LocalParameters);
         libgogo.PrintObjects(LocalObjects);
     }
 }
@@ -104,10 +106,10 @@ func IsBasicDataType(t *libgogo.TypeDesc) uint64 {
 func UndefinedForwardDeclaredTypeCheck() {
     var temptype *libgogo.TypeDesc;
     if Compile != 0 {
-				temptype = libgogo.GetFirstForwardDeclType(GlobalTypes);
-				if temptype != nil {
-				    SymbolTableError("undefined", "", "type", temptype.Name);
-				}
+		temptype = libgogo.GetFirstForwardDeclType(GlobalTypes);
+		if temptype != nil {
+		    SymbolTableError("undefined", "", "type", temptype.Name);
+		}
     }
 }
 
@@ -121,18 +123,18 @@ func NewType(name string) uint64 {
     var dontAddType uint64 = 0;
     var tempType *libgogo.TypeDesc;
     if Compile != 0 {
-				tempType = libgogo.GetType(name, CurrentPackage, GlobalTypes, 1);
-				if  tempType != nil { //Check for duplicates
-				    if tempType.ForwardDecl != 0 { //Separate handling of forward declarations => unset forward declaration flag
-				        tempType.ForwardDecl = 0;
-				        CurrentType = tempType;
-				        dontAddType = 1;
-				    } else { //Real duplicate
-				        SymbolTableError("duplicate type", name, "in package", CurrentPackage);
-				    }
-				} else {
-				    CurrentType = libgogo.NewType(name, CurrentPackage, 0, 0, nil);
-				}
+		tempType = libgogo.GetType(name, CurrentPackage, GlobalTypes, 1);
+		if  tempType != nil { //Check for duplicates
+		    if tempType.ForwardDecl != 0 { //Separate handling of forward declarations => unset forward declaration flag
+		        tempType.ForwardDecl = 0;
+		        CurrentType = tempType;
+		        dontAddType = 1;
+		    } else { //Real duplicate
+		        SymbolTableError("duplicate type", name, "in package", CurrentPackage);
+		    }
+		} else {
+		    CurrentType = libgogo.NewType(name, CurrentPackage, 0, 0, nil);
+		}
     }
     return dontAddType;
 }
@@ -155,13 +157,13 @@ func AddType(dontAddType uint64) {
 func AddStructField(fieldname string) {
     var temp uint64;
     if Compile != 0 {
-				temp = libgogo.HasField(fieldname, CurrentType);
-				if temp != 0 {
-				    SymbolTableError("duplicate", "", "field", fieldname);
-				} else {
-				    CurrentObject = libgogo.NewObject(fieldname, "", libgogo.CLASS_FIELD); //A field has no package name
-				    libgogo.AddFields(CurrentObject, CurrentType);
-				}
+		temp = libgogo.HasField(fieldname, CurrentType);
+		if temp != 0 {
+		    SymbolTableError("duplicate", "", "field", fieldname);
+		} else {
+		    CurrentObject = libgogo.NewObject(fieldname, "", libgogo.CLASS_FIELD); //A field has no package name
+		    libgogo.AddFields(CurrentObject, CurrentType);
+		}
     }
 }
 
@@ -189,45 +191,43 @@ func SetCurrentObjectType(typename string, packagename string, arraydim uint64) 
     var boolFlag uint64;
 
     if Compile != 0 {
-				if InsideFunctionVarDecl == 0 {
-				    if InsideStructDecl == 1 { //Allow types in struct declarations which are already forward declared
-				        basetype = libgogo.GetType(typename, packagename, GlobalTypes, 1);
-				    } else {
-				        basetype = libgogo.GetType(typename, packagename, GlobalTypes, 0);
-				    }
-				    if basetype == nil {
-				        if InsideStructDecl == 1 {
-				            boolFlag = libgogo.StringCompare(typename, CurrentType.Name);
-				            if boolFlag == 0 {
-				                if CurrentObject.PtrType == 1 { //Allow pointer to own type
-				                    basetype = CurrentType;
-				                } else {
-				                    SymbolTableError("A type cannot contain itself,", "", "type", typename);
-				                }
-				            } else { //Forward declaration
-				                basetype = libgogo.NewType(typename, packagename, 1, 0, nil);
-				                GlobalTypes = libgogo.AppendType(basetype, GlobalTypes); //Add forward declared type to global list
-				            }
-				        } else {
-				            libgogo.StringAppend(&tempstr, packagename);
-				            libgogo.CharAppend(&tempstr, '.');
-				            libgogo.StringAppend(&tempstr, typename);
-				            SymbolTableError("Unknown", "", "type", tempstr);
-				        }
-				    }
-				    if arraydim == 0 { //No array
-				        CurrentObject.ObjType = basetype;
-				    } else { //Array
-				        if basetype != nil {
-				            libgogo.StringAppend(&tempstr, basetype.Name);
-				        }
-				        libgogo.StringAppend(&tempstr, "Array");
-				        tempstr2 = libgogo.IntToString(arraydim);
-				        libgogo.StringAppend(&tempstr, tempstr2);
-				        temptype = libgogo.NewType(tempstr, packagename, 0, arraydim, basetype);
-				        CurrentObject.ObjType = temptype; //Don't add array type to global list to avoid duplicate type name errors
-				    }
-				}
+	    if InsideStructDecl == 1 { //Allow types in struct declarations which are already forward declared
+	        basetype = libgogo.GetType(typename, packagename, GlobalTypes, 1);
+	    } else {
+	        basetype = libgogo.GetType(typename, packagename, GlobalTypes, 0);
+	    }
+	    if basetype == nil {
+	        if InsideStructDecl == 1 {
+	            boolFlag = libgogo.StringCompare(typename, CurrentType.Name);
+	            if boolFlag == 0 {
+	                if CurrentObject.PtrType == 1 { //Allow pointer to own type
+	                    basetype = CurrentType;
+	                } else {
+	                    SymbolTableError("A type cannot contain itself,", "", "type", typename);
+	                }
+	            } else { //Forward declaration
+	                basetype = libgogo.NewType(typename, packagename, 1, 0, nil);
+	                GlobalTypes = libgogo.AppendType(basetype, GlobalTypes); //Add forward declared type to global list
+	            }
+	        } else {
+	            libgogo.StringAppend(&tempstr, packagename);
+	            libgogo.CharAppend(&tempstr, '.');
+	            libgogo.StringAppend(&tempstr, typename);
+	            SymbolTableError("Unknown", "", "type", tempstr);
+	        }
+	    }
+	    if arraydim == 0 { //No array
+	        CurrentObject.ObjType = basetype;
+	    } else { //Array
+	        if basetype != nil {
+	            libgogo.StringAppend(&tempstr, basetype.Name);
+	        }
+	        libgogo.StringAppend(&tempstr, "Array");
+	        tempstr2 = libgogo.IntToString(arraydim);
+	        libgogo.StringAppend(&tempstr, tempstr2);
+	        temptype = libgogo.NewType(tempstr, packagename, 0, arraydim, basetype);
+	        CurrentObject.ObjType = temptype; //Don't add array type to global list to avoid duplicate type name errors
+	    }
     }
 }
 
@@ -238,20 +238,32 @@ func SetCurrentObjectType(typename string, packagename string, arraydim uint64) 
 func NewVariable(name string) {
     var TempObject *libgogo.ObjectDesc;
     if Compile != 0 {
-				CurrentObject = libgogo.NewObject(name, CurrentPackage, libgogo.CLASS_VAR);
-				if InsideFunction == 0 { //Global objects
-				    TempObject = libgogo.GetObject(name, CurrentPackage, GlobalObjects);
-				    if TempObject != nil {
-				        SymbolTableError("duplicate", "global", "identifier", name);
-				    }
-				    GlobalObjects = libgogo.AppendObject(CurrentObject, GlobalObjects);
-				} else { //Function-local objects
-				    TempObject = libgogo.GetObject(name, CurrentPackage, LocalObjects);
-				    if TempObject != nil {
-				        SymbolTableError("duplicate", "local", "identifier", name);
-				    }
-				    LocalObjects = libgogo.AppendObject(CurrentObject, LocalObjects);
-				}
+		CurrentObject = libgogo.NewObject(name, CurrentPackage, libgogo.CLASS_VAR);
+		if InsideFunction == 0 { //Global objects or function parameters
+		    if InsideFunctionVarDecl == 0 { //Global objects
+		        TempObject = libgogo.GetObject(name, CurrentPackage, GlobalObjects);
+		        if TempObject != nil {
+		            SymbolTableError("duplicate", "global", "identifier", name);
+		        }
+		        GlobalObjects = libgogo.AppendObject(CurrentObject, GlobalObjects);
+		    } else { //Function parameters
+   		        TempObject = libgogo.GetObject(name, CurrentPackage, LocalParameters);
+		        if TempObject != nil {
+		            SymbolTableError("duplicate", "", "parameter name", name);
+		        }
+		        LocalParameters = libgogo.AppendObject(CurrentObject, LocalParameters);
+		    }
+		} else { //Function-local objects
+	        TempObject = libgogo.GetObject(name, CurrentPackage, LocalObjects);
+	        if TempObject != nil {
+	            SymbolTableError("duplicate", "local", "identifier", name);
+	        }
+	        TempObject = libgogo.GetObject(name, CurrentPackage, LocalParameters);
+	        if TempObject != nil {
+	            SymbolTableError("There is already a parameter", "", "named", name);
+	        }
+	        LocalObjects = libgogo.AppendObject(CurrentObject, LocalObjects);
+		}
     }
 }
 
@@ -264,5 +276,6 @@ func EndOfFunction() {
     if Compile != 0 {
         PrintLocalSymbolTable(); //Print local symbol table
         LocalObjects = nil; //Delete local objects
+        LocalParameters = nil; //Delete local parameters
     }
 }

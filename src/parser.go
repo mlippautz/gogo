@@ -183,9 +183,7 @@ func ParseType() {
     if tok.id == TOKEN_LSBRAC {   
         AssertNextToken(TOKEN_INTEGER);
         // value of integer in tok.intValue
-        if InsideFunctionVarDecl == 0 {
-            arraydim = tok.intValue;
-        }
+        arraydim = tok.intValue;
         AssertNextToken(TOKEN_RSBRAC);
     } else {
         tok.nextToken = tok.id;
@@ -194,9 +192,7 @@ func ParseType() {
     if tok.id != TOKEN_ARITH_MUL {
         tok.nextToken = tok.id;
     } else {
-        if InsideFunctionVarDecl == 0 {
-            SetCurrentObjectTypeToPointer(); //Pointer type (indicated by *)
-        }
+        SetCurrentObjectTypeToPointer(); //Pointer type (indicated by *)
     }
     AssertNextToken(TOKEN_IDENTIFIER);
     // typename in tok.strValue
@@ -716,6 +712,7 @@ func ParseFuncDeclRaw() uint64 {
     PrintDebugString("Entering ParseFuncDeclRaw()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_SEMICOLON {
+        EndOfFunction(); //Delete local variables etc.
         boolFlag = 0;
     } else {
         tok.nextToken = tok.id;
@@ -727,9 +724,9 @@ func ParseFuncDeclRaw() uint64 {
 func ParseFuncDecl() uint64 {
     var boolFlag uint64;
     PrintDebugString("Entering ParseFuncDecl()",1000);
-    InsideFunction = 1;
     GetNextTokenSafe();
     if tok.id == TOKEN_LCBRAC {
+        InsideFunction = 1;
         ParseVarDeclList();
         ParseStatementSequence();
         GetNextTokenSafe();
@@ -740,14 +737,14 @@ func ParseFuncDecl() uint64 {
             tok.nextToken = tok.id;
         }
         AssertNextToken(TOKEN_RCBRAC);
+        InsideFunction = 0;
+        EndOfFunction(); //Delete local variables etc.
+        PrintDebugString("Leaving ParseFuncDecl()",1000);
         boolFlag = 0;
     } else {
         tok.nextToken = tok.id;
         boolFlag = 1;
     }
-    InsideFunction = 0;
-    EndOfFunction(); //Delete local variables etc.
-    PrintDebugString("Leaving ParseFuncDecl()",1000);
     return boolFlag;
 }
 
@@ -785,13 +782,14 @@ func ParseIdentifierType() uint64 {
         tok.nextToken = tok.id;
         boolFlag = 1;        
     } else {
+        InsideFunctionVarDecl = 1;
+        NewVariable(tok.strValue);
         GetNextTokenSafe();
         if tok.id == TOKEN_ARITH_MUL {
-
+            SetCurrentObjectTypeToPointer();
         } else {
             tok.nextToken = tok.id;
         }
-        InsideFunctionVarDecl = 1;
         ParseType();
         InsideFunctionVarDecl = 0;
         boolFlag = 0;
@@ -1117,12 +1115,19 @@ func FindIdentifierAndParseSelector(item *libgogo.Item) {
 		if boolFlag == 0 {
 		    boolFlag = libgogo.FindPackageName(tok.strValue, LocalObjects); //Check local objects
 		}
+		if boolFlag == 0 {
+		    boolFlag = libgogo.FindPackageName(tok.strValue, LocalParameters); //Check local parameters
+		}
 		if boolFlag == 0 { //Token is not package name, but identifier
 			tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, LocalObjects); //Check local objects
 			tempList = LocalObjects;
 			if tempObject == nil {
-				tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, GlobalObjects); //Check global objects
-				tempList = GlobalObjects;
+       			tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, LocalParameters); //Check local parameters
+    			tempList = LocalParameters;
+    			if tempObject == nil {
+    				tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, GlobalObjects); //Check global objects
+	    			tempList = GlobalObjects;
+	    		}
 			}
 			if tempObject == nil {
 				SymbolTableError("Undefined", "", "variable", tok.strValue);
@@ -1130,8 +1135,12 @@ func FindIdentifierAndParseSelector(item *libgogo.Item) {
 			tempAddr = libgogo.GetObjectOffset(tempObject, tempList);
 			if tempList == LocalObjects { //Local
 				libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 0); //Varible item
-			} else { //Global
-				libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 1); //Varible item
+			} else { //Global or parameter
+			    if tempList == GlobalObjects { //Global
+    				libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 1); //Varible item
+    			} else { //Parameter
+    				libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 2); //Varible item
+    	        }
 			}
 		    ParseSelector(item, CurrentPackage); //Parse selectors for an object in the current package
 		} else { //Token is package name

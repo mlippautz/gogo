@@ -15,14 +15,15 @@ type test struct {
 var fooArrInst [10]foo;
 var testInst test;
 
-func test() {
+func test(bla uint64, blub string) {
     var a uint64;
+    var b uint64;
+    bla = blub + b;
     //a = a + 1;
-    //var b uint64;
     //a = testInst.bazz[1];
     //a = testInst.bazz[a];
     //a = testInst.barPtr.bar2;
     //a = fooArrInst[5].bar3;
-    a = fooArrInst[a].bar3;
+    //a = fooArrInst[a].bar3;
     //testInst.bazz[2] = fooArrInst[5].bar3;
 }
