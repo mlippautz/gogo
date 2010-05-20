@@ -51,8 +51,7 @@ TEXT    main·main(SB),0,$0-24\n\
 //
 func PrintFile() {
     var fd uint64;    
-    var outfile string = fileInfo[curFileIndex].filename;
-    libgogo.StringAppend(&outfile,".sog");
+    var outfile string = "_gogo_.sog"
     // The following line creates a new file for the assembler code
     // flags: O_WRONLY | O_CREAT | O_TRUNC => 577
     // mode: S_IWUSR | S_IRUSR | S_IRGRP => 416

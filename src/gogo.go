@@ -41,19 +41,19 @@ func main() {
 
     libgogo.GetArgv();
 
-    if libgogo.Argc <= 1 {
-        libgogo.ExitError("Usage: gogo file1.go [file2.go ...]",1);
-    }
+    ParseOption();
 
-    if libgogo.Argc > 33 {
+    if libgogo.Argc > 34 {
         libgogo.ExitError("Cannot compile more than 32 files at once",1);
     }
 
     InitSymbolTable(); //Initialize symbol table
     InitFreeRegisters(); //Init registers for code generation
 
-    for i=1; i < libgogo.Argc ; i= i+1 {
-        curFileIndex = i-1;
+    ResetCode();
+
+    for i=2; i < libgogo.Argc ; i= i+1 {
+        curFileIndex = i-2;
         fileInfo[curFileIndex].filename = libgogo.Argv[i];
         fileInfo[curFileIndex].lineCounter = 1;
         fileInfo[curFileIndex].charCounter = 1;
@@ -63,7 +63,7 @@ func main() {
             GlobalError("Cannot open file.");
         }
     }
-    fileInfoLen = i-1;
+    fileInfoLen = i-2;
 
     for curFileIndex=0;curFileIndex<fileInfoLen;curFileIndex=curFileIndex+1 {
         Parse();
@@ -78,4 +78,50 @@ func main() {
 
     PrintGlobalSymbolTable();
     UndefinedForwardDeclaredTypeCheck();
+
+    if Compile == 1 {
+        PrintFile();
+    }
+}
+
+func ParseOption() {
+    var strIndicator uint64;
+    var done uint64 = 0;
+
+    // handle -h and --help    
+    strIndicator = libgogo.StringCompare("--help", libgogo.Argv[1]);
+    if strIndicator != 0 {
+        strIndicator = libgogo.StringCompare("-h", libgogo.Argv[1]);
+    }
+
+    if strIndicator == 0 {
+        libgogo.PrintString("Usage: gogo option file1.go [file2.go ...]\n\n");
+        libgogo.PrintString("GoGo - A go compiler\n\n");
+        libgogo.PrintString("Options:\n");
+        libgogo.PrintString("-h, --help     show this help message and exit\n");
+        libgogo.PrintString("-p,            parser mode\n");
+        libgogo.PrintString("-c             compiler mode\n");
+        libgogo.PrintString("-l             linker mode\n");
+        libgogo.Exit(1);
+    }
+
+    strIndicator = libgogo.StringCompare("-c", libgogo.Argv[1]);
+    if (done == 0) && (strIndicator == 0) {
+        Compile = 1;
+        done = 1;
+    }
+
+    strIndicator = libgogo.StringCompare("-p", libgogo.Argv[1]);
+    if (done == 0) && (strIndicator == 0) {
+        Compile = 0;
+        done = 1;
+    }
+    
+    if done == 0 {
+        libgogo.ExitError("Usage: gogo option file1.go [file2.go ...]",1);
+    }
+
+    if libgogo.Argc <= 2 {
+        libgogo.ExitError("Usage: gogo option file1.go [file2.go ...]",1);
+    }
 }

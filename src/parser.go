@@ -34,8 +34,6 @@ func Parse() {
 
     libgogo.InitializeStack(&Operators);
 
-    ResetCode();
-
     ParsePackageStatement(); 
     ParseImportStatementList();
     ParseStructDeclList();
@@ -43,8 +41,6 @@ func Parse() {
     ParseFuncDeclList();
 
     AssertNextToken(TOKEN_EOS);
-
-    PrintFile();
 }
 
 //
