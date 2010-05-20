@@ -4,15 +4,20 @@
 
 //
 // General code generation functions (registers, instructions, ...)
+// Heavily depends on asm_out.go which represents the Plan9 assembly language
 //
 
 package main
 
 import "./libgogo/_obj/libgogo"
 
+// Currently register from R8-R15 are available for usage
 var NumRegisters uint64 = 8;
 var FreeRegisters [8]byte;
 
+//
+// Initialize the register to free-state.
+//
 func InitFreeRegisters() {
     var i uint64;
     for i = 0; i < NumRegisters; i = i + 1 {
@@ -20,6 +25,9 @@ func InitFreeRegisters() {
     }
 }
 
+//
+// Function returns a free register, BUT is not set to occupied.
+//
 func GetFreeRegister() uint64 {
     var i uint64;
     for i = 0; FreeRegisters[i] == 0; {
@@ -31,12 +39,18 @@ func GetFreeRegister() uint64 {
     return i+8;
 }
 
+//
+// Occupy a given register.
+//
 func OccupyRegister(index uint64) {
     var realIndex uint64;
     realIndex = index-8;
     FreeRegisters[realIndex] = 0;
 }
 
+//
+// Free a given register.
+//
 func FreeRegister(index uint64) {
     var realIndex uint64;
     realIndex = index-8;
@@ -44,7 +58,8 @@ func FreeRegister(index uint64) {
 }
 
 //
-// Frees the register occupied by the given item if applicable
+// Frees the register occupied by the given item if applicable.
+// Freeing is only possible if the mode is registered.
 //
 func FreeRegisterIfRequired(item *libgogo.Item) {
     if item.Mode == libgogo.MODE_REG {
@@ -101,28 +116,36 @@ func GenerateFieldAccess(item *libgogo.Item, offset uint64, indirect uint64) {
     }
 }
 
+//
+// Function converts a given item to registered mode if it is not already 
+// a register.
+//
 func MakeRegistered(item *libgogo.Item, calculatewithaddresses uint64) {
     var reg uint64;
     if item.Mode != libgogo.MODE_REG {
         reg = GetFreeRegister();
         OccupyRegister(reg);
 
-        if item.Mode == libgogo.MODE_CONST { // item is constant
-            PrintInstruction_Imm_Reg("MOVQ", item.A, "R", reg, 0, 0, 0); //MOVQ $item.A, Rdone (soon to be item.R)
-        } else { // item is var
+        if item.Mode == libgogo.MODE_CONST { // const item
+            PrintInstruction_Imm_Reg("MOVQ", item.A, "R", reg, 0, 0, 0); // MOVQ $item.A, Rdone (soon to be item.R)
+        } else { // var item
             if calculatewithaddresses == 0 {
-                PrintInstruction_Var_Reg("MOVQ", item, "R", reg); //MOVQ item.A(SB), Rdone (soon to be item.R)
+                PrintInstruction_Var_Reg("MOVQ", item, "R", reg); // MOVQ item.A(SB), Rdone (soon to be item.R)
             } else {
-                PrintInstruction_Var_Reg("LEAQ", item, "R", reg); //LEAQ item.A(SB), Rdone (soon to be item.R)
+                PrintInstruction_Var_Reg("LEAQ", item, "R", reg); // LEAQ item.A(SB), Rdone (soon to be item.R)
             }
         }
 
         item.Mode = libgogo.MODE_REG;
-        item.R = reg; // item is now a register; don't set done to 1 as the actual calculation has yet to be done
+        item.R = reg; // item is now a register
         item.A = calculatewithaddresses; // item now contains a value if calculatewithaddresses is 0, or an address if calculatewithaddress is 1
     }
 }
 
+//
+// Constant folding function. If both items are constants the operation can be
+// done in the compiler.
+//
 func ConstFolding(item1 *libgogo.Item, item2 *libgogo.Item, constvalue uint64) uint64 {
     var boolFlag uint64 = 0;
     if (item1.Mode == libgogo.MODE_CONST) && (item2.Mode == libgogo.MODE_CONST) {
@@ -135,31 +158,16 @@ func ConstFolding(item1 *libgogo.Item, item2 *libgogo.Item, constvalue uint64) u
 //
 // item1 = item1 OP item2, or constvalue if both item1 and item2 are constants
 // Side effect: The register item2 occupies is freed if applicable
-// If calculatewithaddresses is 0, it is assumed that registers contain values, otherwise it is assumed that they contain addresses
+// If calculatewithaddresses is 0, it is assumed that registers contain values, 
+// otherwise it is assumed that they contain addresses
 //
 func AddSubInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, constvalue uint64, calculatewithaddresses uint64) {
     var done uint64 = 0;
-    if (done == 0) && (item1.Mode == libgogo.MODE_CONST) && (item2.Mode == libgogo.MODE_CONST) { //Constant folding
-        item1.A = constvalue; //item1 = item1 OP item2 (constvalue)
-        done = 1;
-    }
+
+    done = ConstFolding(item1, item2, constvalue);
 
     if (done == 0) && (item1.Mode != libgogo.MODE_REG) { //item1 is not a register => make it a register
-        done = GetFreeRegister();
-        OccupyRegister(done);
-        if item1.Mode == libgogo.MODE_CONST { //item1 is const
-            PrintInstruction_Imm_Reg("MOVQ", item1.A, "R", done, 0, 0, 0); //MOVQ $item1.A, Rdone (soon to be item1.R)
-        } else { //item1 is var
-            if calculatewithaddresses == 0 {
-                PrintInstruction_Var_Reg("MOVQ", item1, "R", done); //MOVQ item1.A(SB), Rdone (soon to be item1.R)
-            } else {
-                PrintInstruction_Var_Reg("LEAQ", item1, "R", done); //LEAQ item1.A(SB), Rdone (soon to be item1.R)
-            }
-        }
-        item1.Mode = libgogo.MODE_REG;
-        item1.R = done; //item1 is now a register; don't set done to 1 as the actual calculation has yet to be done
-        item1.A = calculatewithaddresses; //item1 now contains a value if calculatewithaddresses is 0, or an address if calculatewithaddress is 1
-        done = 0;
+        MakeRegistered(item1, calulatewithaddresses);
     }
 
     if done == 0 { //item1 is now (or has even already been) a register => use it
@@ -175,19 +183,21 @@ func AddSubInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
             done = 1;
         }
         if (done == 0) && (item2.Mode == libgogo.MODE_REG) {
-            if calculatewithaddresses == 0 { //Calculate with values
+            if calculatewithaddresses == 0 { // Calculate with values
                 DereferRegisterIfNecessary(item2);
             }
             PrintInstruction_Reg_Reg(op, "R", item2.R, 0, 0, 0, "R", item1.R, 0, 0, 0); //OP item2.R, item1.R
             done = 1;
         }
     }
-    FreeRegisterIfRequired(item2);
+
+    FreeRegisterIfRequired(item2); // item2 should be useless by now
 }
 
 //
 // item1 = item1 OP item2, or constvalue if both item1 and item2 are constants
-// Difference here is that it uses a one operand assembly instruction which operates on AX as first operand
+// Difference here is that it uses a one operand assembly instruction which 
+// operates on AX as first operand
 //
 func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, constvalue uint64, calculatewithaddresses uint64) {
     var done uint64 = 0;
@@ -209,12 +219,14 @@ func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
             PrintInstruction_Reg_Reg("MOVQ", "R", item1.R, 0, 0, 0, "AX", 0, 0, 0, 0) // move item1.R into AX
         }
 
-        if item2.Mode != libgogo.MODE_REG { // we need item2 to be registered
+        if item2.Mode != libgogo.MODE_REG {
+            // item2 needs to be registered as the second operand of a DIV/MUL
+            // instruction always needs to be a register
             MakeRegistered(item2, calculatewithaddresses);
         }
 
         // OP item2.R
-        if calculatewithaddresses == 0 { //Calculate with values
+        if calculatewithaddresses == 0 { // Calculate with values
             DereferRegisterIfNecessary(item2);
         }
         done = libgogo.StringCompare(op,"DIVQ");
