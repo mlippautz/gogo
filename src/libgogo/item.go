@@ -8,6 +8,7 @@ type Item struct {
     Mode uint64;
     Itemtype *TypeDesc;
     A uint64; //Mode = MODE_VAR: variable address; Mode = MODE_CONST: const value; Mode = MODE_REG: 0 = register contains value, 1 = register contains address
+    C uint64; // Mode = MODE_COND: relation value
     R uint64; //Mode = MODE_REGISTER: register number
     Global uint64; //If 1, the variable is global, 0 if it is function-local, 2 if it is a function parameter
 };
@@ -23,6 +24,18 @@ var ITEM_SIZE uint64 = 40; //5*8 bytes space for an object
 var MODE_VAR uint64 = 1;
 var MODE_CONST uint64 = 2;
 var MODE_REG uint64 = 3;
+var MODE_COND uint64 = 4;
+
+//
+// Relation mappings
+// The oppositve value can be found by ++ or --
+//
+var REL_EQ = 0;
+var REL_NEQ = 1;
+var REL_LT = 2;
+var REL_GTEQ = 3;
+var REL_LTEQ = 4;
+var REL_GT = 5;
 
 //
 // Convert the uint64 value (returned from malloc) to a real item address
