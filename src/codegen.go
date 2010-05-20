@@ -167,7 +167,7 @@ func AddSubInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
     done = ConstFolding(item1, item2, constvalue);
 
     if (done == 0) && (item1.Mode != libgogo.MODE_REG) { //item1 is not a register => make it a register
-        MakeRegistered(item1, calulatewithaddresses);
+        MakeRegistered(item1, calculatewithaddresses);
     }
 
     if done == 0 { //item1 is now (or has even already been) a register => use it
