@@ -82,7 +82,7 @@ function new_valids() {
 
     for filename in $( ls $TESTDIR )
     do
-        $GOGO $TESTDIR/$filename > $TMPDIR/$filename
+        $GOGO -p $TESTDIR/$filename > $TMPDIR/$filename
     done
     echo ""
     echo "* Generated testsuite results in $TMPDIR"
@@ -164,7 +164,7 @@ function do_tests() {
 
     for filename in $( ls $TESTDIR )
     do
-        $GOGO $TESTDIR/$filename > $TMPDIR/$filename
+        $GOGO -p $TESTDIR/$filename > $TMPDIR/$filename
     done
     
     echo ""

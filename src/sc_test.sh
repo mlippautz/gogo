@@ -1,1 +1,1 @@
-(make > /dev/null) && (./gogo libgogo/*.go *.go)
+(make > /dev/null) && (./gogo -p libgogo/*.go *.go)
