@@ -129,6 +129,14 @@ func PrintInstruction_Reg_Reg(op string, reg1name string, reg1number uint64, reg
     PrintInstructionEnd();
 }
 
+func PrintInstruction_Reg_Imm(op string, regname string, regnumber uint64, regindirect uint64, regoffset uint64, regoffsetnegative uint64, value uint64) {
+    PrintInstructionStart(op);
+    PrintRegister(regname, regnumber, regindirect, regoffset, regoffsetnegative);
+    PrintInstructionOperandSeparator();
+    PrintImmediate(value);
+    PrintInstructionEnd();
+}
+
 func PrintInstruction_Imm_Reg(op string, value uint64, regname string, regnumber uint64, regindirect uint64, regoffset uint64, regoffsetnegative uint64) {
     PrintInstructionStart(op);
     PrintImmediate(value);
@@ -145,6 +153,18 @@ func PrintInstruction_Imm_Var(op string, value uint64, variable *libgogo.Item) {
             PrintInstruction_Imm_Reg(op, value, "SP", 0, 1, variable.A + 8, 0); //OP $value, [variable.A+8](SP)
         } else { //Local
             PrintInstruction_Imm_Reg(op, value, "SP", 0, 1, variable.A + 8, 1); //OP $value, -[variable.A+8](SP)
+        }
+    }
+}
+
+func PrintInstruction_Var_Imm(op string, variable *libgogo.Item, value uint64) {
+    if variable.Global == 1 { //Global
+        PrintInstruction_Reg_Imm(op, "SB", 0, 1, variable.A, 0, value); // OP variable.A(SB), $value
+    } else { //Local
+        if variable.Global == 2 { //Parameter
+            PrintInstruction_Reg_Imm(op, "SP", 0, 1, variable.A + 8, 0, value); // OP [variable.A+8](SP), $value
+        } else { //Local
+            PrintInstruction_Reg_Imm(op, "SP", 0, 1, variable.A + 8, 1, value); // OP -[variable.A+8](SP), $value
         }
     }
 }

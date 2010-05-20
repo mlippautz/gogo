@@ -55,30 +55,92 @@ func GenerateRelation(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
         GenErrorWeak("Bad types");
     }
 
-    // TODO: Generate CMP statements depending on items
+    // Generate CMP statements depending on items
+    if item1.Mode == libgogo.MODE_CONST {
+        if item2.Mode == libgogo.MODE_CONST {
+            item1.Itemtype = bool_t;
+            item1.A = GetConditionalBool(op, item1.A, item2.A);
+        } else {
+            MakeRegistered(item1, 0);
+            if item2.Mode == libgogo.MODE_REG {
+                PrintInstruction_Reg_Reg("CMPQ", "R", item1.R, 0, 0, 0, "R", item2.R, 0, 0, 0);
+            }
+            if item2.Mode == libgogo.MODE_VAR {
+                PrintInstruction_Reg_Var("CMPQ", "R", item1.R, item2)
+            }
+        }
+    }
+    if item1.Mode == libgogo.MODE_REG {
+        if item2.Mode == libgogo.MODE_CONST {
+            PrintInstruction_Reg_Imm("CMPQ", "R", item1.R, 0, 0, 0, item2.A);
+        }
+        if item2.Mode == libgogo.MODE_REG {
+            PrintInstruction_Reg_Reg("CMPQ", "R", item1.R, 0, 0, 0, "R", item2.R, 0, 0, 0);
+        }
+        if item2.Mode == libgogo.MODE_VAR {
+            PrintInstruction_Reg_Var("CMPQ", "R", item1.R, item2)
+        }
+    }
+    if item1.Mode == libgogo.MODE_VAR {
+        if item2.Mode == libgogo.MODE_CONST {
+            PrintInstruction_Var_Imm("CMPQ", item1, item2.A) 
+        }
+        if item2.Mode == libgogo.MODE_REG {
+            PrintInstruction_Var_Reg("CMPQ", item1, "R", item2.R)
+        }
+        if item2.Mode == libgogo.MODE_VAR {
+            MakeRegistered(item2, 0);
+            PrintInstruction_Var_Reg("CMPQ", item1, "R", item2.R)
+        }
+    }
 
+    item1.Itemtype = bool_t;
+    FreeRegisterIfRequired(item2);    
+}
+
+func GetConditionalBool(op uint64, val1 uint64, val2 uint64) uint64 {
+    var ret uint64;    
     if op == TOKEN_EQUALS {
-        item1.C = libgogo.REL_EQ;
+        if val1 == val2 {
+            ret = 1;
+        } else {
+            ret = 0;
+        }
     }
     if op == TOKEN_NOTEQUAL {
-        item1.C = libgogo.REL_NEQ;
-    }
-    if op == TOKEN_REL_GT {
-        item1.C = libgogo.REL_GT;
+        if val1 == val2 {
+            ret = 0;
+        } else {
+            ret = 1;
+        }
     }
     if op == TOKEN_REL_GTOE {
-        item1.C = libgogo.REL_GTEQ;
-    }
-    if op == TOKEN_REL_LT {
-        item1.C = libgogo.REL_LT;
+        if val1 >= val2 {
+            ret = 1;
+        } else {
+            ret = 0;
+        }
     }
     if op == TOKEN_REL_LTOE {
-        item1.C = libgogo.REL_LTEQ;
+        if val1 <= val2 {
+            ret = 1;
+        } else {
+            ret = 0;
+        }
     }
-
-    item1.Mode = libgogo.MODE_COND;
-    item1.Itemtype = bool_t;
-
-    FreeRegisterIfRequired(item1);
-    FreeRegisterIfRequired(item2);    
+    if op == TOKEN_REL_GT {
+        if val1 > val2 {
+            ret = 1;
+        } else {
+            ret = 0;
+        }
+    }
+    if op < TOKEN_REL_LT {
+        if val1 == val2 {
+            ret = 1;
+        } else {
+            ret = 0;
+        }
+    }
+    return ret;
 }
