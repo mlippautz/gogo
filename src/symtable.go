@@ -30,6 +30,7 @@ var CurrentObject *libgogo.ObjectDesc;
 var uint64_t *libgogo.TypeDesc = nil;
 var byte_t *libgogo.TypeDesc = nil;
 var string_t *libgogo.TypeDesc = nil;
+var bool_t *libgogo.TypeDesc = nil;
 
 //
 // Nil pointer for reference
@@ -47,6 +48,8 @@ func InitSymbolTable() {
     GlobalTypes = libgogo.AppendType(byte_t, GlobalTypes);
     string_t = libgogo.NewType("string", "", 0, 16, nil);
     GlobalTypes = libgogo.AppendType(string_t, GlobalTypes);
+    bool_t = libgogo.NewType("bool", "", 0, 8, nil);
+    GlobalTypes = libgogo.AppendType(bool_t, GlobalTypes);
 
     //Default objects
     nilPtr = libgogo.NewObject("nil", "", libgogo.CLASS_VAR);
