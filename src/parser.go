@@ -603,6 +603,7 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
                 //TODO: Pointer check => no array access to pointers
             }
             GetNextTokenSafe();
+            //TODO: Derefer items of type string type so that their actual characters are accessed
             if tok.id == TOKEN_INTEGER {
                 if Compile != 0 {
                     boolFlag = libgogo.GetTypeSize(item.Itemtype.Base); //Get unaligned array base type size
