@@ -139,8 +139,9 @@ func GetTypeSize(objtype *TypeDesc) uint64 {
                 }
             }
             if objtype.Form == FORM_ARRAY {
-                tmpSize = GetTypeSizeAligned(objtype.Base);
+                tmpSize = GetTypeSize(objtype.Base); //Get unaligned size of base type
                 size = objtype.Len * tmpSize; //Array length * size of one item
+                size = AlignTo64Bit(size); //Align to 64 bit
             }
         } else {
             ; //TODO: if type is only forward declared => error!
@@ -152,12 +153,20 @@ func GetTypeSize(objtype *TypeDesc) uint64 {
 }
 
 //
+// Returns a 64 bit aligned address of the given one
+//
+func AlignTo64Bit(adr uint64) uint64 {
+    return ((adr + 7) / 8) * 8;
+}
+
+//
 // Returns the aligned (memory) size of the given type in bytes
 //
 func GetTypeSizeAligned(objtype *TypeDesc) uint64 {
     var size uint64;
     size = GetTypeSize(objtype);
-    return ((size + 7) / 8) * 8; //64 bit alignment
+    size = AlignTo64Bit(size); //64 bit alignment
+    return size;
 }
 
 //
@@ -180,7 +189,8 @@ func GetObjectSize(obj *ObjectDesc) uint64 {
 func GetObjectSizeAligned(obj *ObjectDesc) uint64 {
     var size uint64;
     size = GetObjectSize(obj);
-    return ((size + 7) / 8) * 8; //64 bit alignment
+    size = AlignTo64Bit(size); //64 bit alignment
+    return size;
 }
 
 //

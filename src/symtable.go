@@ -46,7 +46,7 @@ func InitSymbolTable() {
     GlobalTypes = libgogo.AppendType(uint64_t, GlobalTypes);
     byte_t = libgogo.NewType("byte", "", 0, 1, nil);
     GlobalTypes = libgogo.AppendType(byte_t, GlobalTypes);
-    string_t = libgogo.NewType("string", "", 0, 16, nil);
+    string_t = libgogo.NewType("string", "", 0, 16, byte_t); //Hybrid string type: 16 bit value on the one hand, byte array on the other in order to allow item/char access
     GlobalTypes = libgogo.AppendType(string_t, GlobalTypes);
     bool_t = libgogo.NewType("bool", "", 0, 8, nil);
     GlobalTypes = libgogo.AppendType(bool_t, GlobalTypes);
@@ -87,20 +87,9 @@ func PrintLocalSymbolTable() {
         libgogo.PrintString(fileInfo[curFileIndex].filename);
         libgogo.PrintString(":\n----------------------------------------------------------------------------\n");
         libgogo.PrintObjects(LocalParameters);
+        libgogo.PrintString("--- End of parameters, begin of local variables ---\n");
         libgogo.PrintObjects(LocalObjects);
     }
-}
-
-//
-// Determines whether a type is a basic type (uint64, byte, string)
-// Returns 1 if t is a basic type, or 0 if not
-//
-func IsBasicDataType(t *libgogo.TypeDesc) uint64 {
-    var retVal uint64 = 0;
-    if (t == uint64_t) || (t == byte_t) || (t == string_t) {
-        retVal = 1;
-    }
-    return retVal;
 }
 
 //

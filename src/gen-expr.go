@@ -51,9 +51,9 @@ func GenerateTerm(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
 //
 func GenerateRelation(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     // type checking for uint64 values
-    if (item1.Itemtype != uint64_t) || (item2.Itemtype != uint64_t) {
+    /*if (item1.Itemtype != uint64_t) || (item2.Itemtype != uint64_t) { //Removed temporarily due to inexplicable SIGSEVs
         GenErrorWeak("Bad types");
-    }
+    }*/
 
     // Generate CMP statements depending on items
     if item1.Mode == libgogo.MODE_CONST {

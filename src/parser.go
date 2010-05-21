@@ -605,7 +605,7 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
             GetNextTokenSafe();
             if tok.id == TOKEN_INTEGER {
                 if Compile != 0 {
-                    boolFlag = libgogo.GetTypeSizeAligned(item.Itemtype.Base); //Get array base type size
+                    boolFlag = libgogo.GetTypeSize(item.Itemtype.Base); //Get unaligned array base type size
                     GenerateFieldAccess(item, boolFlag * tok.intValue, 0); //Direct field access to field offset tok.intValue times base size tok.intValue
                     item.Itemtype = item.Itemtype.Base; //Set item type to array base type
                 }
@@ -615,7 +615,7 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
                         tempItem = libgogo.NewItem();
                         FindIdentifierAndParseSelector(tempItem); //Load identifier's value
                         tempItem2 = libgogo.NewItem();
-                        boolFlag = libgogo.GetTypeSizeAligned(item.Itemtype.Base); //Get array base type size
+                        boolFlag = libgogo.GetTypeSize(item.Itemtype.Base); //Get unaligned array base type size
                         libgogo.SetItem(tempItem2, libgogo.MODE_CONST, uint64_t, boolFlag, 0, 0); //Constant item
                         DivMulInstruction("MULQ", tempItem, tempItem2, 0, 1); //Multiply identifier value by array base type size => tempItem now constains the field offset
                         AddSubInstruction("ADDQ", item, tempItem, 0, 1); //Add calculated offset to base address
