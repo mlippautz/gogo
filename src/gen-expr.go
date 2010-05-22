@@ -135,8 +135,8 @@ func GetConditionalBool(op uint64, val1 uint64, val2 uint64) uint64 {
             ret = 0;
         }
     }
-    if op < TOKEN_REL_LT {
-        if val1 == val2 {
+    if op == TOKEN_REL_LT {
+        if val1 < val2 {
             ret = 1;
         } else {
             ret = 0;
