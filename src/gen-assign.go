@@ -13,9 +13,24 @@ import "./libgogo/_obj/libgogo"
 func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
     var done uint64 = 0;
     if Compile != 0 {
-        //TODO: Don't derefer if both LHSItem's and RHSItem's type is a pointer => pointer assignment
-        DereferItemIfNecessary(LHSItem); //Derefer address if item is a pointer
-        DereferItemIfNecessary(RHSItem); //Derefer address if item is a pointer
+        if LHSItem.PtrType == 1 { //Pointer assignment
+            if RHSItem.PtrType != 1 {
+                SymbolTableError("Cannot assign a value type to a pointer", "", "type:", RHSItem.Itemtype.Name);
+            }
+            DereferItemIfNecessary(LHSItem); //Derefer address if item is a pointer
+            DereferItemIfNecessary(RHSItem); //Derefer address if item is a pointer
+        } else { //Value assignment
+            if RHSItem.PtrType == 1 {
+                SymbolTableError("Cannot assign a pointer type to a value", "", "type:", RHSItem.Itemtype.Name);
+            }
+            if LHSItem.Itemtype != RHSItem.Itemtype {
+                SymbolTableError("Incompatible types:", LHSItem.Itemtype.Name, "and", RHSItem.Itemtype.Name);
+            }
+            if (LHSItem.Itemtype != byte_t) && (LHSItem.Itemtype != uint64_t) && (LHSItem.Itemtype != string_t) {
+                SymbolTableError("Cannot assign to", "", "type", LHSItem.Itemtype.Name);
+            }
+            //TODO: Type-dependent op code sizes (MOVB, MOVQ, 2xMOVQ etc.)
+        }
         if LHSItem.Mode == libgogo.MODE_VAR { //Variable on LHS
             if (done == 0) && (RHSItem.Mode == libgogo.MODE_CONST) { //Const RHS
                 PrintInstruction_Imm_Var("MOVQ", RHSItem.A, LHSItem); //MOVQ $RHSItem.A, LHSItem.A(SB)

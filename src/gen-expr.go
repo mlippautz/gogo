@@ -15,6 +15,14 @@ import "./libgogo/_obj/libgogo"
 //
 func GenerateSimpleExpression(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     if Compile != 0 {
+        if (item1.Itemtype != byte_t) && (item1.Itemtype != uint64_t) {
+            SymbolTableError("Invalid left operand type for", "", "addition/subtraction:", item1.Itemtype.Name);
+        }
+        if (item2.Itemtype != byte_t) && (item2.Itemtype != uint64_t) {
+            SymbolTableError("Invalid right operand type for", "", "addition/subtraction:", item2.Itemtype.Name);
+        }
+        //TODO: Consider special cases with byte_t requring ADDB and MOVB op codes
+        
         if op == TOKEN_ARITH_PLUS { //Add
             AddSubInstruction("ADDQ", item1, item2, item1.A + item2.A, 0);
         } else { //Subtract
@@ -28,6 +36,14 @@ func GenerateSimpleExpression(item1 *libgogo.Item, item2 *libgogo.Item, op uint6
 //
 func GenerateTerm(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     if Compile != 0 {
+        if (item1.Itemtype != byte_t) && (item1.Itemtype != uint64_t) {
+            SymbolTableError("Invalid left operand type for", "", "multiplication/division:", item1.Itemtype.Name);
+        }
+        if (item2.Itemtype != byte_t) && (item2.Itemtype != uint64_t) {
+            SymbolTableError("Invalid right operand type for", "", "multiplication/division:", item2.Itemtype.Name);
+        }
+        //TODO: Consider special cases with byte_t requring ADDB and MOVB op codes
+        
         if op == TOKEN_ARITH_DIV { // Division
             if item2.Mode == libgogo.MODE_CONST {
                 if item2.A == 0 {
@@ -51,13 +67,13 @@ func GenerateTerm(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
 //
 func GenerateRelation(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     if Compile != 0 {   
-        // type checking for uint64 values
-        /*if (item1.Itemtype != uint64_t) || (item2.Itemtype != uint64_t) { //Removed temporarily due to inexplicable SIGSEVs
-            GenErrorWeak("Bad types");
-        }*/
+        if (item1.Itemtype != uint64_t) || (item2.Itemtype != uint64_t) {
+            SymbolTableError("Cannot compare types", "", "other than", uint64_t.Name);
+        }
+        //TODO: Consider byte_t
     
-        DereferItemIfNecessary(item1); //Derefer address if item is a pointer
-        DereferItemIfNecessary(item2); //Derefer address if item is a pointer
+        DereferItemIfNecessary(item1); //Derefer address if item is a pointer (should not be necessary here)
+        DereferItemIfNecessary(item2); //Derefer address if item is a pointer (should not be necessary here)
 
         // Generate CMP statements depending on items
         if item1.Mode == libgogo.MODE_CONST {

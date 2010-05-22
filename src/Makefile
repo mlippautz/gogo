@@ -17,6 +17,7 @@ GOFILES=\
     codegen.go\
     gen-expr.go\
     gen-assign.go\
+    gen-arith.go\
     inspector.go
 
 include $(GOROOT)/src/Make.cmd
