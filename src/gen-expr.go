@@ -66,7 +66,7 @@ func GenerateRelation(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
                 PrintInstruction_Reg_Reg("CMPQ", "R", item1.R, 0, 0, 0, "R", item2.R, 0, 0, 0);
             }
             if item2.Mode == libgogo.MODE_VAR {
-                PrintInstruction_Reg_Var("CMPQ", "R", item1.R, item2)
+                PrintInstruction_Reg_Var("CMPQ", "R", item1.R, item2);
             }
         }
     }
@@ -78,19 +78,19 @@ func GenerateRelation(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
             PrintInstruction_Reg_Reg("CMPQ", "R", item1.R, 0, 0, 0, "R", item2.R, 0, 0, 0);
         }
         if item2.Mode == libgogo.MODE_VAR {
-            PrintInstruction_Reg_Var("CMPQ", "R", item1.R, item2)
+            PrintInstruction_Reg_Var("CMPQ", "R", item1.R, item2);
         }
     }
     if item1.Mode == libgogo.MODE_VAR {
         if item2.Mode == libgogo.MODE_CONST {
-            PrintInstruction_Var_Imm("CMPQ", item1, item2.A) 
+            PrintInstruction_Var_Imm("CMPQ", item1, item2.A);
         }
         if item2.Mode == libgogo.MODE_REG {
-            PrintInstruction_Var_Reg("CMPQ", item1, "R", item2.R)
+            PrintInstruction_Var_Reg("CMPQ", item1, "R", item2.R);
         }
         if item2.Mode == libgogo.MODE_VAR {
             MakeRegistered(item2, 0);
-            PrintInstruction_Var_Reg("CMPQ", item1, "R", item2.R)
+            PrintInstruction_Var_Reg("CMPQ", item1, "R", item2.R);
         }
     }
 
