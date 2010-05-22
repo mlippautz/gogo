@@ -39,12 +39,23 @@ func PrintDebugChar(char byte, debugLevel uint64) {
     }
 }
 
+func BuildHead() string {
+    var text string = "";
+    var temp string;
+    libgogo.StringAppend(&text, fileInfo[curFileIndex].filename);
+    libgogo.StringAppend(&text, ":");
+    temp = libgogo.IntToString(fileInfo[curFileIndex].lineCounter);
+    libgogo.StringAppend(&text, temp);
+    libgogo.StringAppend(&text, ":");
+    temp = libgogo.IntToString(fileInfo[curFileIndex].charCounter);
+    libgogo.StringAppend(&text, temp);
+    return text;
+}
+
 func PrintHead() {
-    libgogo.PrintString(fileInfo[curFileIndex].filename);
-    libgogo.PrintString(":");
-    libgogo.PrintNumber(fileInfo[curFileIndex].lineCounter);
-    libgogo.PrintString(":");
-    libgogo.PrintNumber(fileInfo[curFileIndex].charCounter);   
+    var head string;
+    head = BuildHead();
+    libgogo.PrintString(head);
 }
 
 func GlobalError(msg string) {

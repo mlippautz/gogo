@@ -542,7 +542,6 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
     var tempAddr uint64;
     var tempList *libgogo.ObjectDesc;
     var tempItem *libgogo.Item;
-    var tempItem2 *libgogo.Item;
     PrintDebugString("Entering ParseSelectorSub()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_PT {
@@ -617,11 +616,8 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
                     if Compile != 0 {
                         tempItem = libgogo.NewItem();
                         FindIdentifierAndParseSelector(tempItem); //Load identifier's value
-                        tempItem2 = libgogo.NewItem();
                         boolFlag = libgogo.GetTypeSize(item.Itemtype.Base); //Get unaligned array base type size
-                        libgogo.SetItem(tempItem2, libgogo.MODE_CONST, uint64_t, boolFlag, 0, 0); //Constant item
-                        DivMulInstruction("MULQ", tempItem, tempItem2, 0, 1); //Multiply identifier value by array base type size => tempItem now constains the field offset
-                        AddSubInstruction("ADDQ", item, tempItem, 0, 1); //Add calculated offset to base address
+                        GenerateVariableFieldAccess(item, tempItem, boolFlag); //Direct field access to field offset identifier value * boolflag (base type size)
                         item.Itemtype = item.Itemtype.Base; //Set item type to array base type
                     } else {
                         ParseSelector(item, CurrentPackage);
@@ -915,10 +911,12 @@ func ParseAssignment(semicolon uint64) uint64 {
     var LHSItem *libgogo.Item;
     var RHSItem *libgogo.Item;
     PrintDebugString("Entering ParseAssignment()",1000);
-    GenerateComment("Assignment-Start");
+    GenerateComment("Assignment start");
     AssertNextToken(TOKEN_IDENTIFIER);
     LHSItem = libgogo.NewItem();
+    GenerateComment("Assignment LHS load start");
     FindIdentifierAndParseSelector(LHSItem); //Parse LHS
+    GenerateComment("Assignment LHS load end");
     GetNextTokenSafe();
     if tok.id == TOKEN_ASSIGN {
         GetNextTokenSafe();
@@ -928,13 +926,17 @@ func ParseAssignment(semicolon uint64) uint64 {
                 ParseFunctionCallStatement();
             } else { //Expression starting with an identifier
                 RHSItem = libgogo.NewItem();
+                GenerateComment("Assignment RHS load start");
                 ParseExpression(RHSItem); //Parse RHS
+                GenerateComment("Assignment RHS load end");
                 GenerateAssignment(LHSItem, RHSItem); //LHS = RHS
             }
         } else { //Expression
             tok.nextToken = tok.id;
             RHSItem = libgogo.NewItem();
+            GenerateComment("Assignment RHS load start");
             ParseExpression(RHSItem); //Parse RHS
+            GenerateComment("Assignment RHS load end");
             GenerateAssignment(LHSItem, RHSItem); //LHS = RHS
         }
         if semicolon != 0 {
@@ -945,7 +947,7 @@ func ParseAssignment(semicolon uint64) uint64 {
         tok.nextToken = tok.id;
         boolFlag = 1;
     }
-    GenerateComment("Assignment-End");
+    GenerateComment("Assignment end");
     PrintDebugString("Leaving ParseAssignment()",1000);
     return boolFlag;
 }

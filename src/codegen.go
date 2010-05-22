@@ -81,9 +81,13 @@ func DereferRegisterIfNecessary(item *libgogo.Item) {
 // Simple wrapper to asm_out printing
 //
 func GenerateComment(msg string) {
-    var str string = "  // >>> ";
+    var str string = "  //--- ";
+    var temp string;
     libgogo.StringAppend(&str, msg);
-    libgogo.StringAppend(&str,"\n");
+    libgogo.StringAppend(&str, " at ");
+    temp = BuildHead();
+    libgogo.StringAppend(&str, temp);
+    libgogo.StringAppend(&str, "\n");
     PrintOutput(str);
 }
 
@@ -113,6 +117,16 @@ func GenerateFieldAccess(item *libgogo.Item, offset uint64, indirect uint64) {
                 item.A = 1; //Register still contains address
             }
         }
+    }
+}
+
+func GenerateVariableFieldAccess(item *libgogo.Item, offsetItem *libgogo.Item, baseTypeSize uint64) {
+    var sizeItem *libgogo.Item;
+    if Compile != 0 {
+        sizeItem = libgogo.NewItem();
+        libgogo.SetItem(sizeItem, libgogo.MODE_CONST, uint64_t, baseTypeSize, 0, 0); //Constant item
+        DivMulInstruction("MULQ", offsetItem, sizeItem, 0, 1); //Multiply identifier value by array base type size => offsetItem now constains the field offset
+        AddSubInstruction("ADDQ", item, offsetItem, 0, 1); //Add calculated offset to base address
     }
 }
 

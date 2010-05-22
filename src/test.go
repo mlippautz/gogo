@@ -18,12 +18,12 @@ var testInst test;
 func test(bla uint64, blub string) {
     var a uint64;
     var b uint64;
-    bla = blub + b;
+    //bla = blub + b;
     //a = a + 1;
     //a = testInst.bazz[1];
     //a = testInst.bazz[a];
     //a = testInst.barPtr.bar2;
     //a = fooArrInst[5].bar3;
-    //a = fooArrInst[a].bar3;
+    a = fooArrInst[a].bar1;
     //testInst.bazz[2] = fooArrInst[5].bar3;
 }
