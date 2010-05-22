@@ -15,9 +15,11 @@ var INC_SIZE uint64 = 1024; //Default 1 KB
 
 //
 // Pointers used for memory management
+// Start pointer: Pointer to first address of memory manager in memory
 // Bump pointer: Pointer to next free address in memory
 // End pointer: Pointer to the end of the free memory available for use through the memory manager
 //
+var start_ptr uint64 = 0;
 var bump_ptr uint64 = 0;
 var end_ptr uint64 = 0;
 
@@ -46,11 +48,13 @@ func TestMem(address uint64) uint64;
 // Initializes the memory manager by setting the end and bump pointer 
 //
 func InitMemoryManager() {
-    end_ptr = GetBrk(); //Get current end of data segment
-    if end_ptr == 0 { //Error check
+    start_ptr = GetBrk(); //Get current end of data segment
+    if start_ptr == 0 { //Error check
         ExitError("GetBrk failed\n", 127);
     }
-    bump_ptr = end_ptr + 1; //First useable address in new memory (will be allocated in next line)
+    start_ptr = start_ptr + 1; //First useable address in new memory (will be allocated below)
+    end_ptr = start_ptr; //No free memory yet (will be allocated below)
+    bump_ptr = end_ptr;
     MoreMemory(); //Allocate memory for the memory manager to work with
 }
 

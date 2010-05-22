@@ -55,6 +55,25 @@ func StringCompare(str1 string, str2 string) uint64 {
 func SetStringAddressAndLength(str *string, new_addr uint64, new_length uint64);
 
 //
+// Rounds length to the next power of two
+//
+func GetMaxStringLength(length uint64) uint64 {
+    var i uint64;
+    var j uint64;
+    for i = 0; length != 0; i = i + 1 { //Calculate number of divisions by 2 required to reach 0 => log2(length), rounded towards +inf
+        length = length / 2;
+    }
+    length = 1; //Restart with length of 1
+    for j = 0; j < i; j = j + 1 { //Multiply by 2 as many times as divided previously => 2^i
+        length = length * 2;
+    }
+    if length == 1 { //Special case length = 1 => still return 1
+        length = 2;
+    }
+    return length - 1;
+}
+
+//
 // Appends a single character to a string.
 // This functions creates a new string by copying the old one and then appending the character
 //
@@ -62,15 +81,24 @@ func CharAppend(str *string, char byte) {
     var nullByte byte = 0; //End of string constant
     var strlen uint64;
     var new_length uint64;
+    var max_length uint64;
     var new_addr uint64;
     var old_addr uint64;
     var char_addr uint64;
     var nullByte_addr uint64;
     strlen = StringLength2(str); //Get length of old string
     new_length = strlen + 1; //The length of the new string the length of the old string plus the length of the character to be appended (1)
-    new_addr = Alloc(new_length + 1); //Allocate memory for the new string, including the space for the end of string constant
+    max_length = GetMaxStringLength(strlen + 1); //Get maximum capacity of old string, considering its trailing '\0'
     old_addr = GetStringAddress(str);
-    CopyMem(old_addr, new_addr, strlen); //Copy the content of the old string to the newly allocated memory
+    if (old_addr < start_ptr) || ((new_length + 1) > max_length) { //If using non-managed address or the old string's capacity doesn't suffice => allocate more memory
+        max_length = GetMaxStringLength(new_length + 1); //Consider trailing '\0'
+        new_addr = Alloc(max_length); //Allocate memory for the new string, including the space for the end of string constant
+        if strlen > 0 { //Only copy old content if there is content to copy
+            CopyMem(old_addr, new_addr, strlen); //Copy the content of the old string to the newly allocated memory
+        }
+    } else { //Re-use old address as capacity suffices; no copy operation necessary
+        new_addr = old_addr;
+    }
     char_addr = ToUint64FromBytePtr(&char);
     CopyMem(char_addr, new_addr + strlen, 1); //Copy the additional character to its according position at the end of the new string
     nullByte_addr = ToUint64FromBytePtr(&nullByte);
@@ -87,17 +115,26 @@ func StringAppend(str *string, append_str string) {
     var strlen uint64;
     var strappendlen uint64;
     var new_length uint64;
+    var max_length uint64;
     var new_addr uint64;
     var old_addr uint64;
     var append_addr uint64;
     var nullByte_addr uint64;
     strlen = StringLength2(str); //Get length of first string
+    max_length = GetMaxStringLength(strlen + 1); //Get maximum capacity of old string, considering its trailing '\0'
     strappendlen = StringLength(append_str); //Get length of second string
     new_length = strlen + strappendlen; //The length of the new string is the length of the first plus the length of the second string
-    new_addr = Alloc(new_length + 1); //Allocate memory for the new string, including the space for the end of string constant
     old_addr = GetStringAddress(str);
+    if (old_addr < start_ptr) || ((new_length + 1) > max_length) { //If using non-managed address or the old string's capacity doesn't suffice => allocate more memory
+        max_length = GetMaxStringLength(new_length + 1); //Consider trailing '\0'
+        new_addr = Alloc(max_length); //Allocate memory for the new string, including the space for the end of string constant
+        if strlen > 0 { //Only copy old content if there is content to copy
+            CopyMem(old_addr, new_addr, strlen); //Copy the content of the old string to the newly allocated memory
+        }
+    } else { //Re-use old address as capacity suffices; no copy operation necessary
+        new_addr = old_addr;
+    }
     append_addr = GetStringAddress(&append_str);
-    CopyMem(old_addr, new_addr, strlen); //Copy the content of the first string to the newly allocated memory
     CopyMem(append_addr, new_addr + strlen, strappendlen); //Copy the second string to its according position at the end of the new string
     nullByte_addr = ToUint64FromBytePtr(&nullByte);
     CopyMem(nullByte_addr, new_addr + strlen + strappendlen + 1, 1); //Append the end of string constant
