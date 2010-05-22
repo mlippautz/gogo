@@ -13,6 +13,9 @@ import "./libgogo/_obj/libgogo"
 func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
     var done uint64 = 0;
     if Compile != 0 {
+        //TODO: Don't derefer if both LHSItem's and RHSItem's type is a pointer => pointer assignment
+        DereferItemIfNecessary(LHSItem); //Derefer address if item is a pointer
+        DereferItemIfNecessary(RHSItem); //Derefer address if item is a pointer
         if LHSItem.Mode == libgogo.MODE_VAR { //Variable on LHS
             if (done == 0) && (RHSItem.Mode == libgogo.MODE_CONST) { //Const RHS
                 PrintInstruction_Imm_Var("MOVQ", RHSItem.A, LHSItem); //MOVQ $RHSItem.A, LHSItem.A(SB)

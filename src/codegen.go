@@ -78,6 +78,23 @@ func DereferRegisterIfNecessary(item *libgogo.Item) {
 }
 
 //
+// Derefers the item given if its type is a pointer
+//
+func DereferItemIfNecessary(item *libgogo.Item) {
+    var oldA uint64;
+    if item.PtrType == 1 {
+        if item.Mode == libgogo.MODE_REG { //Item is already in a register => derefer register
+            PrintInstruction_Reg_Reg("MOVQ", "R", item.R, 1, 0, 0, "R", item.R, 0, 0, 0); //MOVQ (item.R), item.R
+        } else { //Item is not a register yet => make it a register by loading its value
+            oldA = item.A; //Save value of A
+            MakeRegistered(item, 0); //Don't load address as loading the value automatically derefers the item
+            item.A = oldA; //Restore old value of A
+        }
+        item.PtrType = 0; //Item type is no longer a pointer
+    }
+}
+
+//
 // Simple wrapper to asm_out printing
 //
 func GenerateComment(msg string) {
@@ -92,30 +109,16 @@ func GenerateComment(msg string) {
 }
 
 
-func GenerateFieldAccess(item *libgogo.Item, offset uint64, indirect uint64) {
+func GenerateFieldAccess(item *libgogo.Item, offset uint64) {
     var offsetItem *libgogo.Item;
-    var temp uint64;
     if Compile != 0 {
+        DereferItemIfNecessary(item); //Derefer address if item is a pointer
         if item.Mode == libgogo.MODE_VAR { //Variable
             item.A = item.A + offset; //Direct and indirect offset calculation
-            if indirect != 0 { //Indirect
-                temp = GetFreeRegister();
-                OccupyRegister(temp);
-                PrintInstruction_Var_Reg("LEAQ", item, "R", temp); //LEAQ item.A(SB), Rtemp (soon to be item.R)
-                item.Mode = libgogo.MODE_REG;
-                item.R = temp;
-                item.A = 1; //Register contains address
-                DereferRegisterIfNecessary(item); //Indirection
-                item.A = 1; //Register still contains address
-            }
         } else { //Register
             offsetItem = libgogo.NewItem(); //For direct and indirect offset calculation
-            libgogo.SetItem(offsetItem, libgogo.MODE_CONST, uint64_t, offset, 0, 0); //Constant item for offset
+            libgogo.SetItem(offsetItem, libgogo.MODE_CONST, uint64_t, 0, offset, 0, 0); //Constant item for offset
             AddSubInstruction("ADDQ", item, offsetItem, 0, 1); //Add constant item (offset), calculating with addresses
-            if indirect != 0 { //Indirect
-                DereferRegisterIfNecessary(item); //Indirection
-                item.A = 1; //Register still contains address
-            }
         }
     }
 }
@@ -123,8 +126,10 @@ func GenerateFieldAccess(item *libgogo.Item, offset uint64, indirect uint64) {
 func GenerateVariableFieldAccess(item *libgogo.Item, offsetItem *libgogo.Item, baseTypeSize uint64) {
     var sizeItem *libgogo.Item;
     if Compile != 0 {
+        DereferItemIfNecessary(item); //Derefer address if item is a pointer
+        DereferItemIfNecessary(offsetItem); //Derefer address if item is a pointer (should never be necessary here, but just to make sure it is present here)
         sizeItem = libgogo.NewItem();
-        libgogo.SetItem(sizeItem, libgogo.MODE_CONST, uint64_t, baseTypeSize, 0, 0); //Constant item
+        libgogo.SetItem(sizeItem, libgogo.MODE_CONST, uint64_t, 0, baseTypeSize, 0, 0); //Constant item
         DivMulInstruction("MULQ", offsetItem, sizeItem, 0, 1); //Multiply identifier value by array base type size => offsetItem now constains the field offset
         AddSubInstruction("ADDQ", item, offsetItem, 0, 1); //Add calculated offset to base address
     }
@@ -132,7 +137,7 @@ func GenerateVariableFieldAccess(item *libgogo.Item, offsetItem *libgogo.Item, b
 
 //
 // Function converts a given item to registered mode if it is not already 
-// a register.
+// a register. This function does not check whether the item is a pointer type!
 //
 func MakeRegistered(item *libgogo.Item, calculatewithaddresses uint64) {
     var reg uint64;
@@ -179,6 +184,11 @@ func AddSubInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
     var done uint64 = 0;
 
     done = ConstFolding(item1, item2, constvalue);
+    
+    if done == 0 {
+        DereferItemIfNecessary(item1); //Derefer address if item is a pointer
+        DereferItemIfNecessary(item2); //Derefer address if item is a pointer
+    }
 
     if (done == 0) && (item1.Mode != libgogo.MODE_REG) { //item1 is not a register => make it a register
         MakeRegistered(item1, calculatewithaddresses);
@@ -217,6 +227,11 @@ func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
     var done uint64 = 0;
 
     done = ConstFolding(item1, item2, constvalue);
+    
+    if done == 0 {
+        DereferItemIfNecessary(item1); //Derefer address if item is a pointer
+        DereferItemIfNecessary(item2); //Derefer address if item is a pointer
+    }
 
     if done == 0 { // item1 is now (or has even already been) a register => use it
         if calculatewithaddresses == 0 { // Calculate with values
@@ -258,5 +273,6 @@ func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
     item1.R = item2.R;
     item1.A = item2.A;
     item1.Itemtype = item2.Itemtype;
+    item1.PtrType = item2.PtrType; //Should always be 0
     item1.Global = item2.Global;
 }

@@ -461,7 +461,7 @@ func ParseFactor(item *libgogo.Item) uint64 {
         doneFlag = 0;
     } 
     if (doneFlag == 1) && (tok.id == TOKEN_INTEGER) {
-        libgogo.SetItem(item, libgogo.MODE_CONST, uint64_t, tok.intValue, 0, 0); //Constant item
+        libgogo.SetItem(item, libgogo.MODE_CONST, uint64_t, 0, tok.intValue, 0, 0); //Constant item
         doneFlag = 0;
     }
     if (doneFlag) == 1 && (tok.id == TOKEN_STRING) {
@@ -513,7 +513,7 @@ func ParseSelector(item *libgogo.Item, packagename string) {
     var boolFlag uint64;
     if item == nil { //TODO: Remove. This is only temporary until all calls to ParseSelector are fully implemented and correct
         item = libgogo.NewItem();
-        libgogo.SetItem(item, 0, nil, 0, 0, 0); //Mark item as not being set
+        libgogo.SetItem(item, 0, nil, 0, 0, 0, 0); //Mark item as not being set
     }
     PrintDebugString("Entering ParseSelector()",1000);
     for boolFlag = ParseSelectorSub(item, packagename);
@@ -560,9 +560,9 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
 			    }
 			    tempAddr = libgogo.GetObjectOffset(tempObject, tempList);
 			    if tempList == LocalObjects { //Local
-			        libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 0); //Varible item
+			        libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempObject.PtrType, tempAddr, 0, 0); //Varible item
 			    } else { //Global
-			        libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 1); //Varible item
+			        libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempObject.PtrType, tempAddr, 0, 1); //Varible item
 		  	    }
             } else { //Field access
                 if Compile != 0 {
@@ -578,12 +578,9 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
                         } else {
                             tempObject = libgogo.GetField(tok.strValue, item.Itemtype);
                             boolFlag = libgogo.GetFieldOffset(tempObject, item.Itemtype); //Calculate offset
-                            if tempObject.PtrType == 1 { //Pointer field access
-                                GenerateFieldAccess(item, boolFlag, 1); //Indirect field access to field offset boolFlag
-                            } else { //Regular field access
-                                GenerateFieldAccess(item, boolFlag, 0); //Direct field access to field offset boolFlag
-                            }
+                            GenerateFieldAccess(item, boolFlag);
                             item.Itemtype = tempObject.ObjType; //Set item type to field type
+                            item.PtrType = tempObject.PtrType;
                         }
                     }
                 }
@@ -599,17 +596,20 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
                 if item.Itemtype.Form != libgogo.FORM_ARRAY { //Array check
                     SymbolTableError("Type is", "not an", "array:", item.Itemtype.Name);
                 }
-                //TODO: Pointer check => no array access to pointers
             }
             GetNextTokenSafe();
             if (Compile != 0) && (item.Itemtype == string_t) { //Derefer string address at offset 0 to access actual byte array of characters
-                GenerateFieldAccess(item, 0, 1); //Indirect access at offset 0
+                boolFlag = item.PtrType; //Save old value of PtrType
+                item.PtrType = 1; //Force deref.
+                DereferItemIfNecessary(item); //Actual deref.
+                item.PtrType = boolFlag; //Restore old value of PtrType
             }
             if tok.id == TOKEN_INTEGER {
                 if Compile != 0 {
                     boolFlag = libgogo.GetTypeSize(item.Itemtype.Base); //Get unaligned array base type size
-                    GenerateFieldAccess(item, boolFlag * tok.intValue, 0); //Direct field access to field offset tok.intValue times base size tok.intValue
+                    GenerateFieldAccess(item, boolFlag * tok.intValue); //Direct field access to field offset tok.intValue times base size tok.intValue
                     item.Itemtype = item.Itemtype.Base; //Set item type to array base type
+                    item.PtrType = 0; //No pointers to array allowed by EBNF
                 }
             } else {
                 if tok.id == TOKEN_IDENTIFIER {
@@ -619,6 +619,7 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
                         boolFlag = libgogo.GetTypeSize(item.Itemtype.Base); //Get unaligned array base type size
                         GenerateVariableFieldAccess(item, tempItem, boolFlag); //Direct field access to field offset identifier value * boolflag (base type size)
                         item.Itemtype = item.Itemtype.Base; //Set item type to array base type
+                        item.PtrType = 0; //No pointers to array allowed by EBNF
                     } else {
                         ParseSelector(item, CurrentPackage);
                     }
@@ -1139,17 +1140,17 @@ func FindIdentifierAndParseSelector(item *libgogo.Item) {
 			}
 			tempAddr = libgogo.GetObjectOffset(tempObject, tempList);
 			if tempList == LocalObjects { //Local
-				libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 0); //Varible item
+				libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempObject.PtrType, tempAddr, 0, 0); //Varible item
 			} else { //Global or parameter
 			    if tempList == GlobalObjects { //Global
-    				libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 1); //Varible item
+    				libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempObject.PtrType, tempAddr, 0, 1); //Varible item
     			} else { //Parameter
-    				libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempAddr, 0, 2); //Varible item
+    				libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempObject.PtrType, tempAddr, 0, 2); //Varible item
     	        }
 			}
 		    ParseSelector(item, CurrentPackage); //Parse selectors for an object in the current package
 		} else { //Token is package name
-		    libgogo.SetItem(item, 0, nil, 0, 0, 0); //Mark item as not being set
+		    libgogo.SetItem(item, 0, nil, 0, 0, 0, 0); //Mark item as not being set
 		    packagename = tok.strValue; //Save package name
 		    ParseSelector(item, tok.strValue); //Parse selectors for an undefined object in the given package
 		    if (item.Itemtype == nil) && (item.A == 0) && (item.R == 0) {

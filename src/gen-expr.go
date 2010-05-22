@@ -50,18 +50,34 @@ func GenerateTerm(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
 // Called by parser (ParseExpression)
 //
 func GenerateRelation(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
-    // type checking for uint64 values
-    /*if (item1.Itemtype != uint64_t) || (item2.Itemtype != uint64_t) { //Removed temporarily due to inexplicable SIGSEVs
-        GenErrorWeak("Bad types");
-    }*/
+    if Compile != 0 {   
+        // type checking for uint64 values
+        /*if (item1.Itemtype != uint64_t) || (item2.Itemtype != uint64_t) { //Removed temporarily due to inexplicable SIGSEVs
+            GenErrorWeak("Bad types");
+        }*/
+    
+        DereferItemIfNecessary(item1); //Derefer address if item is a pointer
+        DereferItemIfNecessary(item2); //Derefer address if item is a pointer
 
-    // Generate CMP statements depending on items
-    if item1.Mode == libgogo.MODE_CONST {
-        if item2.Mode == libgogo.MODE_CONST {
-            item1.Itemtype = bool_t;
-            item1.A = GetConditionalBool(op, item1.A, item2.A);
-        } else {
-            MakeRegistered(item1, 0);
+        // Generate CMP statements depending on items
+        if item1.Mode == libgogo.MODE_CONST {
+            if item2.Mode == libgogo.MODE_CONST {
+                item1.Itemtype = bool_t;
+                item1.A = GetConditionalBool(op, item1.A, item2.A);
+            } else {
+                MakeRegistered(item1, 0);
+                if item2.Mode == libgogo.MODE_REG {
+                    PrintInstruction_Reg_Reg("CMPQ", "R", item1.R, 0, 0, 0, "R", item2.R, 0, 0, 0);
+                }
+                if item2.Mode == libgogo.MODE_VAR {
+                    PrintInstruction_Reg_Var("CMPQ", "R", item1.R, item2);
+                }
+            }
+        }
+        if item1.Mode == libgogo.MODE_REG {
+            if item2.Mode == libgogo.MODE_CONST {
+                PrintInstruction_Reg_Imm("CMPQ", "R", item1.R, 0, 0, 0, item2.A);
+            }
             if item2.Mode == libgogo.MODE_REG {
                 PrintInstruction_Reg_Reg("CMPQ", "R", item1.R, 0, 0, 0, "R", item2.R, 0, 0, 0);
             }
@@ -69,33 +85,22 @@ func GenerateRelation(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
                 PrintInstruction_Reg_Var("CMPQ", "R", item1.R, item2);
             }
         }
-    }
-    if item1.Mode == libgogo.MODE_REG {
-        if item2.Mode == libgogo.MODE_CONST {
-            PrintInstruction_Reg_Imm("CMPQ", "R", item1.R, 0, 0, 0, item2.A);
+        if item1.Mode == libgogo.MODE_VAR {
+            if item2.Mode == libgogo.MODE_CONST {
+                PrintInstruction_Var_Imm("CMPQ", item1, item2.A);
+            }
+            if item2.Mode == libgogo.MODE_REG {
+                PrintInstruction_Var_Reg("CMPQ", item1, "R", item2.R);
+            }
+            if item2.Mode == libgogo.MODE_VAR {
+                MakeRegistered(item2, 0);
+                PrintInstruction_Var_Reg("CMPQ", item1, "R", item2.R);
+            }
         }
-        if item2.Mode == libgogo.MODE_REG {
-            PrintInstruction_Reg_Reg("CMPQ", "R", item1.R, 0, 0, 0, "R", item2.R, 0, 0, 0);
-        }
-        if item2.Mode == libgogo.MODE_VAR {
-            PrintInstruction_Reg_Var("CMPQ", "R", item1.R, item2);
-        }
-    }
-    if item1.Mode == libgogo.MODE_VAR {
-        if item2.Mode == libgogo.MODE_CONST {
-            PrintInstruction_Var_Imm("CMPQ", item1, item2.A);
-        }
-        if item2.Mode == libgogo.MODE_REG {
-            PrintInstruction_Var_Reg("CMPQ", item1, "R", item2.R);
-        }
-        if item2.Mode == libgogo.MODE_VAR {
-            MakeRegistered(item2, 0);
-            PrintInstruction_Var_Reg("CMPQ", item1, "R", item2.R);
-        }
-    }
 
-    item1.Itemtype = bool_t;
-    FreeRegisterIfRequired(item2);    
+        item1.Itemtype = bool_t;
+        FreeRegisterIfRequired(item2);    
+    }
 }
 
 func GetConditionalBool(op uint64, val1 uint64, val2 uint64) uint64 {

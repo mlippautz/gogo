@@ -14,16 +14,16 @@ type test struct {
 
 var fooArrInst [10]foo;
 var testInst test;
+var testPtr *test;
 
 func test(bla uint64, blub string) {
-    var a uint64;
-    var b uint64;
-    //bla = blub + b;
-    //a = a + 1;
-    //a = testInst.bazz[1];
-    //a = testInst.bazz[a];
-    //a = testInst.barPtr.bar2;
-    //a = fooArrInst[5].bar3;
-    a = fooArrInst[a].bar1;
-    //testInst.bazz[2] = fooArrInst[5].bar3;
+    var a uint64 = 5;
+    var b uint64 = 1;
+    var c string = "Test";
+    var d *string = "Hello";
+    //a = 1 + b * c;
+    //c = fooArrInst[a].bar2;
+    //c[1] = testPtr.barPtr.bar2[1];
+    //d[2] = 'x';
+    a = fooArrInst[b].bar1 + testInst.barPtr.bar1;
 }
