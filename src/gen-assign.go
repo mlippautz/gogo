@@ -17,6 +17,9 @@ func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
             if RHSItem.PtrType != 1 {
                 SymbolTableError("Cannot assign a value type to a pointer", "", "type:", RHSItem.Itemtype.Name);
             }
+            if LHSItem.Itemtype != RHSItem.Itemtype {
+                SymbolTableError("Incompatible pointer types:", LHSItem.Itemtype.Name, "and", RHSItem.Itemtype.Name);
+            }
             DereferItemIfNecessary(LHSItem); //Derefer address if item is a pointer
             DereferItemIfNecessary(RHSItem); //Derefer address if item is a pointer
         } else { //Value assignment

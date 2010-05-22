@@ -461,7 +461,11 @@ func ParseFactor(item *libgogo.Item) uint64 {
         doneFlag = 0;
     } 
     if (doneFlag == 1) && (tok.id == TOKEN_INTEGER) {
-        libgogo.SetItem(item, libgogo.MODE_CONST, uint64_t, 0, tok.intValue, 0, 0); //Constant item
+        if (tok.intValue <= 255) { //Value fits into byte_t
+            libgogo.SetItem(item, libgogo.MODE_CONST, byte_t, 0, tok.intValue, 0, 0); //Constant item
+        } else { //Value does not fit into byte_t
+            libgogo.SetItem(item, libgogo.MODE_CONST, uint64_t, 0, tok.intValue, 0, 0); //Constant item
+        }
         doneFlag = 0;
     }
     if (doneFlag) == 1 && (tok.id == TOKEN_STRING) {
