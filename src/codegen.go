@@ -71,8 +71,10 @@ func FreeRegisterIfRequired(item *libgogo.Item) {
 // Moves the value of the address a register is currently pointing to into the register itself
 //
 func DereferRegisterIfNecessary(item *libgogo.Item) {
+    var opsize uint64;
+    opsize = GetOpSize(item);
     if (item.Mode == libgogo.MODE_REG) && (item.A != 0) { //Derefer register if it contains an address
-        PrintInstruction_Reg_Reg("MOVQ", "R", item.R, 1, 0, 0, "R", item.R, 0, 0, 0); //MOVQ (item.R), item.R
+        PrintInstruction_Reg_Reg("MOV", opsize, "R", item.R, 1, 0, 0, "R", item.R, 0, 0, 0); //MOV (item.R), item.R
         item.A = 0; //Register now contains a value
     }
 }
@@ -82,9 +84,11 @@ func DereferRegisterIfNecessary(item *libgogo.Item) {
 //
 func DereferItemIfNecessary(item *libgogo.Item) {
     var oldA uint64;
+    var opsize uint64;
+    opsize = GetOpSize(item);
     if item.PtrType == 1 {
         if item.Mode == libgogo.MODE_REG { //Item is already in a register => derefer register
-            PrintInstruction_Reg_Reg("MOVQ", "R", item.R, 1, 0, 0, "R", item.R, 0, 0, 0); //MOVQ (item.R), item.R
+            PrintInstruction_Reg_Reg("MOV", opsize, "R", item.R, 1, 0, 0, "R", item.R, 0, 0, 0); //MOV (item.R), item.R
         } else { //Item is not a register yet => make it a register by loading its value
             oldA = item.A; //Save value of A
             MakeRegistered(item, 0); //Don't load address as loading the value automatically derefers the item
@@ -118,7 +122,7 @@ func GenerateFieldAccess(item *libgogo.Item, offset uint64) {
         } else { //Register
             offsetItem = libgogo.NewItem(); //For direct and indirect offset calculation
             libgogo.SetItem(offsetItem, libgogo.MODE_CONST, uint64_t, 0, offset, 0, 0); //Constant item for offset
-            AddSubInstruction("ADDQ", item, offsetItem, 0, 1); //Add constant item (offset), calculating with addresses
+            AddSubInstruction("ADD", item, offsetItem, 0, 1); //Add constant item (offset), calculating with addresses
         }
     }
 }
@@ -130,12 +134,10 @@ func GenerateVariableFieldAccess(item *libgogo.Item, offsetItem *libgogo.Item, b
         if (offsetItem.Itemtype != byte_t) && (offsetItem.Itemtype != uint64_t) {
             SymbolTableError("Invalid index type for", "", "array access:", offsetItem.Itemtype.Name);
         }
-        //TODO: Consider special cases with byte_t offset (MOVB instead of MOVQ, but still MULQ due to the second, 64 bit operand)
-
         sizeItem = libgogo.NewItem();
         libgogo.SetItem(sizeItem, libgogo.MODE_CONST, uint64_t, 0, baseTypeSize, 0, 0); //Constant item
-        DivMulInstruction("MULQ", offsetItem, sizeItem, 0, 1); //Multiply identifier value by array base type size => offsetItem now constains the field offset
-        AddSubInstruction("ADDQ", item, offsetItem, 0, 1); //Add calculated offset to base address
+        DivMulInstruction("MUL", offsetItem, sizeItem, 0, 1); //Multiply identifier value by array base type size => offsetItem now constains the field offset
+        AddSubInstruction("ADD", item, offsetItem, 0, 1); //Add calculated offset to base address
     }
 }
 
@@ -145,17 +147,19 @@ func GenerateVariableFieldAccess(item *libgogo.Item, offsetItem *libgogo.Item, b
 //
 func MakeRegistered(item *libgogo.Item, calculatewithaddresses uint64) {
     var reg uint64;
+    var opsize uint64;
+    opsize = GetOpSize(item);
     if item.Mode != libgogo.MODE_REG {
         reg = GetFreeRegister();
         OccupyRegister(reg);
 
         if item.Mode == libgogo.MODE_CONST { // const item
-            PrintInstruction_Imm_Reg("MOVQ", item.A, "R", reg, 0, 0, 0); // MOVQ $item.A, Rdone (soon to be item.R)
+            PrintInstruction_Imm_Reg("MOV", opsize, item.A, "R", reg, 0, 0, 0); // MOV $item.A, Rdone (soon to be item.R)
         } else { // var item
             if calculatewithaddresses == 0 {
-                PrintInstruction_Var_Reg("MOVQ", item, "R", reg); // MOVQ item.A(SB), Rdone (soon to be item.R)
+                PrintInstruction_Var_Reg("MOV", item, "R", reg); // MOV item.A(SB), Rdone (soon to be item.R)
             } else {
-                PrintInstruction_Var_Reg("LEAQ", item, "R", reg); // LEAQ item.A(SB), Rdone (soon to be item.R)
+                PrintInstruction_Var_Reg("LEA", item, "R", reg); // LEA item.A(SB), Rdone (soon to be item.R)
             }
         }
 

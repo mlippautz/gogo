@@ -21,7 +21,10 @@ func test(bla uint64, blub string) {
     var b uint64 = 1;
     var c string = "Test";
     var d *string = "Hello";
-    //a = 1 + b * a; //Type error due to incorrectly recognized type of right operand of addition on RHS
+    var e byte;
+    var f byte;
+    b = e + f + 1 - a;
+    a = 1 + b * a; //Type error due to incorrectly recognized type of right operand of addition on RHS
     c = fooArrInst[a].bar2;
     c[1] = testPtr.barPtr.bar2[1];
     d[2] = 'x';
