@@ -148,15 +148,15 @@ func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
         
         PrintInstruction_Reg(op, opsize2, "R", item2.R, 0, 0, 0); //op item2.R
         PrintInstruction_Reg_Reg("MOV", opsize2, "AX", 0, 0, 0, 0, "R", item2.R, 0, 0, 0) // move AX into item2.R
+        
+        // Since item2 already had to be converted to a register, we now assign 
+        // item2 to item1 after freeing item1 first (if necessary)
+        FreeRegisterIfRequired(item1);
+        item1.Mode = item2.Mode;
+        item1.R = item2.R;
+        item1.A = item2.A;
+        item1.Itemtype = item2.Itemtype;
+        item1.PtrType = item2.PtrType; //Should always be 0
+        item1.Global = item2.Global;
     }
-
-    // Since item2 already had to be converted to a register, we now assign 
-    // item2 to item1 after freeing item1 first (if necessary)
-    FreeRegisterIfRequired(item1);
-    item1.Mode = item2.Mode;
-    item1.R = item2.R;
-    item1.A = item2.A;
-    item1.Itemtype = item2.Itemtype;
-    item1.PtrType = item2.PtrType; //Should always be 0
-    item1.Global = item2.Global;
 }

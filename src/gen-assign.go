@@ -27,6 +27,12 @@ func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
             if RHSItem.PtrType == 1 {
                 SymbolTableError("Cannot assign a pointer type to a value", "", "type:", RHSItem.Itemtype.Name);
             }
+            
+            //Allow assigning a byte to a uint64
+            if (LHSItem.Itemtype == uint64_t) && (RHSItem.Itemtype == byte_t) {
+                RHSItem.Itemtype = uint64_t;
+            } //TODO: Perform real conversion (setting the unused bits to zero etc.)
+            
             if LHSItem.Itemtype != RHSItem.Itemtype {
                 SymbolTableError("Incompatible types:", LHSItem.Itemtype.Name, "and", RHSItem.Itemtype.Name);
             }
@@ -34,6 +40,7 @@ func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
                 SymbolTableError("Cannot assign to", "", "type", LHSItem.Itemtype.Name);
             }
         }
+        
         if LHSItem.Mode == libgogo.MODE_VAR { //Variable on LHS
             if (done == 0) && (RHSItem.Mode == libgogo.MODE_CONST) { //Const RHS
                 PrintInstruction_Imm_Var("MOV", RHSItem.A, LHSItem); //MOV $RHSItem.A, LHSItem.A(SB)

@@ -252,6 +252,9 @@ func ParseVarDeclList() {
 //
 func ParseVarDecl() uint64 {
     var boolFlag uint64;
+    var tempAddr uint64;
+    var LHSItem *libgogo.Item;
+    var RHSItem *libgogo.Item;
     PrintDebugString("Entering ParseVarDecl()",1000);
     boolFlag = LookAheadAndCheck(TOKEN_VAR);
     if boolFlag == 0 {
@@ -263,7 +266,31 @@ func ParseVarDecl() uint64 {
 
         GetNextTokenSafe();
         if tok.id == TOKEN_ASSIGN {
-            ParseExpression(nil); //TODO
+            if Compile != 0 {
+                LHSItem = libgogo.NewItem();
+                if InsideFunction != 0 { //Local variable
+    			    tempAddr = libgogo.GetObjectOffset(CurrentObject, LocalObjects);
+            		libgogo.SetItem(LHSItem, libgogo.MODE_VAR, CurrentObject.ObjType, CurrentObject.PtrType, tempAddr, 0, 0); //Varible item
+    			} else { //Global variable
+            	    tempAddr = libgogo.GetObjectOffset(CurrentObject, GlobalObjects);
+            		libgogo.SetItem(LHSItem, libgogo.MODE_VAR, CurrentObject.ObjType, CurrentObject.PtrType, tempAddr, 0, 1); //Varible item
+    			}
+                RHSItem = libgogo.NewItem();
+                if InsideFunction != 0 { //Local variable
+                   GenerateComment("Local variable assignment RHS load start");
+                } else { //Global variable
+                   GenerateComment("Global variable assignment RHS load start");
+                }
+                ParseExpression(RHSItem); //Parse RHS
+                if InsideFunction != 0 { //Local variable
+                   GenerateComment("Local variable assignment RHS load end");
+                } else { //Global variable
+                   GenerateComment("Global variable assignment RHS load end");
+                }
+                GenerateAssignment(LHSItem, RHSItem); //LHS = RHS
+            } else {
+                ParseExpression(nil);
+            }
         } else {
             tok.nextToken = tok.id;
         } 
@@ -469,6 +496,8 @@ func ParseFactor(item *libgogo.Item) uint64 {
         doneFlag = 0;
     }
     if (doneFlag) == 1 && (tok.id == TOKEN_STRING) {
+        //TODO: Actually declare string in data segment and refer to it in form of a variable (see below)
+        libgogo.SetItem(item, libgogo.MODE_VAR, string_t, 0, 1234567890 /* TODO */, 0, 0); //Constant item
         doneFlag = 0;
     }
     if (doneFlag) == 1 && (tok.id == TOKEN_LBRAC) {

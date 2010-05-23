@@ -12,6 +12,8 @@ type test struct {
     barPtr *foo;
 };
 
+var initTest byte = 1 + 2 * 3;
+var initTest2 uint64 = initTest + 1;
 var fooArrInst [10]foo;
 var testInst test;
 var testPtr *test;
@@ -20,7 +22,7 @@ func test(bla uint64, blub string) {
     var a uint64 = 5;
     var b uint64 = 1;
     var c string = "Test";
-    var d *string = "Hello";
+    var d *string;
     var e byte;
     var f byte;
     b = e + f + 1 - a;
