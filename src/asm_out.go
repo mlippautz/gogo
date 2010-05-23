@@ -145,6 +145,9 @@ func PrintInstruction_Reg(op string, opsize uint64, name string, number uint64, 
 }
 
 func PrintInstruction_Reg_Reg(op string, opsize uint64, reg1name string, reg1number uint64, reg1indirect uint64, reg1offset uint64, reg1offsetnegative uint64, reg2name string, reg2number uint64, reg2indirect uint64, reg2offset uint64, reg2offsetnegative uint64) {
+    if (opsize == 1) && (reg2indirect == 0) { //Clear upper bits using AND mask when operating on bytes; don't clear memory as op could be MOV and therefore set 7 bytes unrecoverably to zero
+        PrintInstruction_Imm_Reg("AND", 8, 255, reg2name, reg2number, reg2indirect, reg2offset, reg2offsetnegative); //ANDQ $255, R
+    }
     PrintInstructionStart(op, opsize);
     PrintRegister(reg1name, reg1number, reg1indirect, reg1offset, reg1offsetnegative);
     PrintInstructionOperandSeparator();
@@ -153,6 +156,7 @@ func PrintInstruction_Reg_Reg(op string, opsize uint64, reg1name string, reg1num
 }
 
 func PrintInstruction_Reg_Imm(op string, opsize uint64, regname string, regnumber uint64, regindirect uint64, regoffset uint64, regoffsetnegative uint64, value uint64) {
+    //No opcode check necessary here
     PrintInstructionStart(op, opsize);
     PrintRegister(regname, regnumber, regindirect, regoffset, regoffsetnegative);
     PrintInstructionOperandSeparator();
@@ -161,6 +165,9 @@ func PrintInstruction_Reg_Imm(op string, opsize uint64, regname string, regnumbe
 }
 
 func PrintInstruction_Imm_Reg(op string, opsize uint64, value uint64, regname string, regnumber uint64, regindirect uint64, regoffset uint64, regoffsetnegative uint64) {
+    if (opsize == 1) && (regindirect == 0) { //Clear upper bits using AND mask when operating on bytes; don't clear memory as op could be MOV and therefore set 7 bytes unrecoverably to zero
+        PrintInstruction_Imm_Reg("AND", 8, 255, regname, regnumber, regindirect, regoffset, regoffsetnegative); //ANDQ $255, R
+    }
     PrintInstructionStart(op, opsize);
     PrintImmediate(value);
     PrintInstructionOperandSeparator();
