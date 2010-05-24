@@ -30,7 +30,9 @@ func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
             
             //Allow assigning a byte to a uint64
             if (LHSItem.Itemtype == uint64_t) && (RHSItem.Itemtype == byte_t) {
-                MakeRegistered(RHSItem, 0); //Implicitly convert to uint64 by moving RHSItem to a register, thereby zeroing the upper bits if necessary
+                if RHSItem.Mode != libgogo.MODE_CONST { //No need to convert constants, as their upper bits are already implicitly zeroed
+                    MakeRegistered(RHSItem, 0); //Implicitly convert to uint64 by moving RHSItem to a register, thereby zeroing the upper bits if necessary
+                }
                 RHSItem.Itemtype = uint64_t;
             }
             

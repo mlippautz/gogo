@@ -42,11 +42,15 @@ func AddSubInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
 
         //byte + byte = byte, byte + uint64 = uint64, uint64 + byte = uint64, uint64 + uint64 = uint64
         if (item1.Itemtype == byte_t) && (item2.Itemtype == uint64_t) {
-            MakeRegistered(item1, calculatewithaddresses); //Implicitly convert to uint64 by moving item1 to a register, thereby zeroing the upper bits if necessary
+            if item1.Mode != libgogo.MODE_CONST { //No need to convert constants, as their upper bits are already implicitly zeroed
+                MakeRegistered(item1, calculatewithaddresses); //Implicitly convert to uint64 by moving item1 to a register, thereby zeroing the upper bits if necessary
+            }
             item1.Itemtype = uint64_t;
         }
         if (item2.Itemtype == byte_t) && (item1.Itemtype == uint64_t) {
-            MakeRegistered(item2, calculatewithaddresses); //Implicitly convert to uint64 by moving item2 to a register, thereby zeroing the upper bits if necessary
+            if item2.Mode != libgogo.MODE_CONST { //No need to convert constants, as their upper bits are already implicitly zeroed
+                MakeRegistered(item2, calculatewithaddresses); //Implicitly convert to uint64 by moving item2 to a register, thereby zeroing the upper bits if necessary
+            }
             item2.Itemtype = uint64_t;
         }
         opsize1 = GetOpSize(item1);
@@ -119,11 +123,15 @@ func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
         
         //byte * byte = byte, byte * uint64 = uint64, uint64 * byte = uint64, uint64 * uint64 = uint64
         if (item1.Itemtype == byte_t) && (item2.Itemtype == uint64_t) {
-            MakeRegistered(item1, calculatewithaddresses); //Implicitly convert to uint64 by moving item1 to a register, thereby zeroing the upper bits if necessary
+            if item1.Mode != libgogo.MODE_CONST { //No need to convert constants, as their upper bits are already implicitly zeroed
+                MakeRegistered(item1, calculatewithaddresses); //Implicitly convert to uint64 by moving item1 to a register, thereby zeroing the upper bits if necessary
+            }
             item1.Itemtype = uint64_t;
         }
         if (item2.Itemtype == byte_t) && (item1.Itemtype == uint64_t) {
-            MakeRegistered(item2, calculatewithaddresses); //Implicitly convert to uint64 by moving item2 to a register, thereby zeroing the upper bits if necessary
+            if item2.Mode != libgogo.MODE_CONST { //No need to convert constants, as their upper bits are already implicitly zeroed
+                MakeRegistered(item2, calculatewithaddresses); //Implicitly convert to uint64 by moving item2 to a register, thereby zeroing the upper bits if necessary
+            }
             item2.Itemtype = uint64_t;
         }
 
