@@ -21,7 +21,6 @@ func ResetCode() {
 // GoGo compiler output\n\
 // --------------------\n\
 //\n\
-// File: \
 ";
     libgogo.StringAppend(&Code, fileInfo[curFileIndex].filename);
     libgogo.StringAppend(&Code,"\n\
