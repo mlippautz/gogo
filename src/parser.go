@@ -268,26 +268,26 @@ func ParseVarDecl() uint64 {
         if tok.id == TOKEN_ASSIGN {
             if Compile != 0 {
                 LHSItem = libgogo.NewItem();
-                if InsideFunction != 0 { //Local variable
-    			    tempAddr = libgogo.GetObjectOffset(CurrentObject, LocalObjects);
-            		libgogo.SetItem(LHSItem, libgogo.MODE_VAR, CurrentObject.ObjType, CurrentObject.PtrType, tempAddr, 0, 0); //Varible item
-    			} else { //Global variable
-            	    tempAddr = libgogo.GetObjectOffset(CurrentObject, GlobalObjects);
-            		libgogo.SetItem(LHSItem, libgogo.MODE_VAR, CurrentObject.ObjType, CurrentObject.PtrType, tempAddr, 0, 1); //Varible item
-    			}
                 RHSItem = libgogo.NewItem();
                 if InsideFunction != 0 { //Local variable
+                   GenerateComment("Local variable assignment start");
+                   tempAddr = libgogo.GetObjectOffset(CurrentObject, LocalObjects);
+                   libgogo.SetItem(LHSItem, libgogo.MODE_VAR, CurrentObject.ObjType, CurrentObject.PtrType, tempAddr, 0, 0); //Varible item
                    GenerateComment("Local variable assignment RHS load start");
-                } else { //Global variable
-                   GenerateComment("Global variable assignment RHS load start");
-                }
-                ParseExpression(RHSItem); //Parse RHS
-                if InsideFunction != 0 { //Local variable
+                   ParseExpression(RHSItem); //Parse RHS
                    GenerateComment("Local variable assignment RHS load end");
+                   GenerateAssignment(LHSItem, RHSItem); //LHS = RHS
+                   GenerateComment("Local variable assignment end");
                 } else { //Global variable
+                   GenerateComment("Global variable assignment start");
+                   tempAddr = libgogo.GetObjectOffset(CurrentObject, GlobalObjects);
+                   libgogo.SetItem(LHSItem, libgogo.MODE_VAR, CurrentObject.ObjType, CurrentObject.PtrType, tempAddr, 0, 1); //Varible item
+                   GenerateComment("Global variable assignment RHS load start");
+                   ParseExpression(RHSItem); //Parse RHS
                    GenerateComment("Global variable assignment RHS load end");
+                   GenerateAssignment(LHSItem, RHSItem); //LHS = RHS
+                   GenerateComment("Global variable assignment end");
                 }
-                GenerateAssignment(LHSItem, RHSItem); //LHS = RHS
             } else {
                 ParseExpression(nil);
             }
