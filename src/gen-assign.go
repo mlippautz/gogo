@@ -30,8 +30,9 @@ func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
             
             //Allow assigning a byte to a uint64
             if (LHSItem.Itemtype == uint64_t) && (RHSItem.Itemtype == byte_t) {
+                MakeRegistered(RHSItem, 0); //Implicitly convert to uint64 by moving RHSItem to a register, thereby zeroing the upper bits if necessary
                 RHSItem.Itemtype = uint64_t;
-            } //TODO: Perform real conversion (setting the unused bits to zero etc.)
+            }
             
             if LHSItem.Itemtype != RHSItem.Itemtype {
                 SymbolTableError("Incompatible types:", LHSItem.Itemtype.Name, "and", RHSItem.Itemtype.Name);

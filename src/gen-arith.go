@@ -42,11 +42,13 @@ func AddSubInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
 
         //byte + byte = byte, byte + uint64 = uint64, uint64 + byte = uint64, uint64 + uint64 = uint64
         if (item1.Itemtype == byte_t) && (item2.Itemtype == uint64_t) {
+            MakeRegistered(item1, calculatewithaddresses); //Implicitly convert to uint64 by moving item1 to a register, thereby zeroing the upper bits if necessary
             item1.Itemtype = uint64_t;
         }
         if (item2.Itemtype == byte_t) && (item1.Itemtype == uint64_t) {
+            MakeRegistered(item2, calculatewithaddresses); //Implicitly convert to uint64 by moving item2 to a register, thereby zeroing the upper bits if necessary
             item2.Itemtype = uint64_t;
-        } //TODO: Perform real conversion (setting the unused bits to zero etc.)
+        }
         opsize1 = GetOpSize(item1);
         opsize2 = GetOpSize(item2);
         if opsize1 > opsize2 {
@@ -117,11 +119,13 @@ func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
         
         //byte * byte = byte, byte * uint64 = uint64, uint64 * byte = uint64, uint64 * uint64 = uint64
         if (item1.Itemtype == byte_t) && (item2.Itemtype == uint64_t) {
+            MakeRegistered(item1, calculatewithaddresses); //Implicitly convert to uint64 by moving item1 to a register, thereby zeroing the upper bits if necessary
             item1.Itemtype = uint64_t;
         }
         if (item2.Itemtype == byte_t) && (item1.Itemtype == uint64_t) {
+            MakeRegistered(item2, calculatewithaddresses); //Implicitly convert to uint64 by moving item2 to a register, thereby zeroing the upper bits if necessary
             item2.Itemtype = uint64_t;
-        } //TODO: Perform real conversion (setting the unused bits to zero etc.)
+        }
 
         if item2.Mode != libgogo.MODE_REG {
             // item2 needs to be registered as the second operand of a DIV/MUL
