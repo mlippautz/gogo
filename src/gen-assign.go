@@ -21,11 +21,6 @@ func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item, address ui
             if LHSItem.Itemtype != RHSItem.Itemtype {
                 SymbolTableError("Incompatible pointer types:", LHSItem.Itemtype.Name, "and", RHSItem.Itemtype.Name);
             }
-
-            if address == 0 {
-                DereferItemIfNecessary(LHSItem); //Derefer address if item is a pointer
-                DereferItemIfNecessary(RHSItem); //Derefer address if item is a pointer
-            }
         } else { //Value assignment
             if RHSItem.PtrType == 1 {
                 SymbolTableError("Cannot assign a pointer type to a value", "", "type:", RHSItem.Itemtype.Name);
@@ -72,9 +67,7 @@ func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item, address ui
                 done = 1;
             }
             if (done == 0) && (RHSItem.Mode == libgogo.MODE_REG) { //Reg RHS
-                if address == 0 {
-                    DereferRegisterIfNecessary(RHSItem); //Make sure to work with the value, not the address
-                }
+                DereferRegisterIfNecessary(RHSItem); //Make sure to work with the value, not the address
                 PrintInstruction_Reg_Var("MOV", "R", RHSItem.R, LHSItem); //MOV RHSItem.R, LHSItem.A(SB)
                 done = 1;
             }
@@ -105,9 +98,7 @@ func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item, address ui
                 done = 1;
             }
             if (done == 0) && (RHSItem.Mode == libgogo.MODE_REG) { //Reg RHS
-                if address == 0 {
-                    DereferRegisterIfNecessary(RHSItem); //Make sure to work with the value, not the address
-                }
+                DereferRegisterIfNecessary(RHSItem); //Make sure to work with the value, not the address
                 opsize = GetOpSize(RHSItem);
                 PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "R", LHSItem.R, 1, 0, 0); //MOV RHSItem.R, (LHSItem.R)
                 done = 1;
