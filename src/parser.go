@@ -252,6 +252,7 @@ func ParseVarDeclList() {
 //
 func ParseVarDecl() uint64 {
     var boolFlag uint64;
+    var exprIndicator uint64;
     var tempAddr uint64;
     var LHSItem *libgogo.Item;
     var RHSItem *libgogo.Item;
@@ -274,18 +275,18 @@ func ParseVarDecl() uint64 {
                    tempAddr = libgogo.GetObjectOffset(CurrentObject, LocalObjects);
                    libgogo.SetItem(LHSItem, libgogo.MODE_VAR, CurrentObject.ObjType, CurrentObject.PtrType, tempAddr, 0, 0); //Varible item
                    GenerateComment("Local variable assignment RHS load start");
-                   ParseExpression(RHSItem); //Parse RHS
+                   exprIndicator = ParseExpression(RHSItem); //Parse RHS
                    GenerateComment("Local variable assignment RHS load end");
-                   GenerateAssignment(LHSItem, RHSItem); //LHS = RHS
+                   GenerateAssignment(LHSItem, RHSItem, exprIndicator); //LHS = RHS
                    GenerateComment("Local variable assignment end");
                 } else { //Global variable
                    GenerateComment("Global variable assignment start");
                    tempAddr = libgogo.GetObjectOffset(CurrentObject, GlobalObjects);
                    libgogo.SetItem(LHSItem, libgogo.MODE_VAR, CurrentObject.ObjType, CurrentObject.PtrType, tempAddr, 0, 1); //Varible item
                    GenerateComment("Global variable assignment RHS load start");
-                   ParseExpression(RHSItem); //Parse RHS
+                   exprIndicator = ParseExpression(RHSItem); //Parse RHS
                    GenerateComment("Global variable assignment RHS load end");
-                   GenerateAssignment(LHSItem, RHSItem); //LHS = RHS
+                   GenerateAssignment(LHSItem, RHSItem, exprIndicator); //LHS = RHS
                    GenerateComment("Global variable assignment end");
                 }
             } else {
@@ -305,25 +306,34 @@ func ParseVarDecl() uint64 {
 //
 //
 //
-func ParseExpression(item *libgogo.Item) {
+func ParseExpression(item *libgogo.Item) uint64 {
     var boolFlag uint64;
     var op uint64;
     var tempItem2 *libgogo.Item;
+    var retValue uint64 = 0;
     PrintDebugString("Entering ParseExpression()",1000);
-    IncAndCheckDepth();
     if item == nil {
         item = libgogo.NewItem();
     }
-    ParseSimpleExpression(item);
-    boolFlag = ParseCmpOp();
-    if boolFlag == 0 {
-        tempItem2 = libgogo.NewItem();
-        ParseSimpleExpression(tempItem2);
-        op = libgogo.Pop(&Operators);
-        GenerateRelation(item, tempItem2, op);
-	}
-    DecDepth();
+    GetNextTokenSafe();
+    if tok.id == TOKEN_OP_ADR {
+        AssertNextToken(TOKEN_IDENTIFIER);
+        FindIdentifierAndParseSelector(item);
+        item.PtrType = 1; 
+        retValue = 1;
+    } else {
+        tok.nextToken = tok.id;   
+        ParseSimpleExpression(item);
+        boolFlag = ParseCmpOp();
+        if boolFlag == 0 {
+            tempItem2 = libgogo.NewItem();
+            ParseSimpleExpression(tempItem2);
+            op = libgogo.Pop(&Operators);
+            GenerateRelation(item, tempItem2, op);
+	    }
+    }
     PrintDebugString("Leaving ParseExpression()",1000);
+    return retValue;
 }
 
 //
@@ -478,11 +488,6 @@ func ParseFactor(item *libgogo.Item) uint64 {
     var es [2]uint64;
 
     GetNextTokenSafe();
-    if (doneFlag == 1) && (tok.id == TOKEN_OP_ADR) {
-        AssertNextToken(TOKEN_IDENTIFIER);
-        FindIdentifierAndParseSelector(item); //TODO: Keep address and use it in assignment
-        doneFlag = 0;
-    }
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
         FindIdentifierAndParseSelector(item);
         doneFlag = 0;
@@ -941,6 +946,7 @@ func IsFunction() uint64 {
 
 func ParseAssignment(semicolon uint64) uint64 {
     var boolFlag uint64;
+    var exprIndicator uint64;
     var funcIndicator uint64;
     var LHSItem *libgogo.Item;
     var RHSItem *libgogo.Item;
@@ -961,17 +967,17 @@ func ParseAssignment(semicolon uint64) uint64 {
             } else { //Expression starting with an identifier
                 RHSItem = libgogo.NewItem();
                 GenerateComment("Assignment RHS load start");
-                ParseExpression(RHSItem); //Parse RHS
+                exprIndicator = ParseExpression(RHSItem); //Parse RHS
                 GenerateComment("Assignment RHS load end");
-                GenerateAssignment(LHSItem, RHSItem); //LHS = RHS
+                GenerateAssignment(LHSItem, RHSItem, exprIndicator); //LHS = RHS
             }
         } else { //Expression
             tok.nextToken = tok.id;
             RHSItem = libgogo.NewItem();
             GenerateComment("Assignment RHS load start");
-            ParseExpression(RHSItem); //Parse RHS
+            exprIndicator = ParseExpression(RHSItem); //Parse RHS
             GenerateComment("Assignment RHS load end");
-            GenerateAssignment(LHSItem, RHSItem); //LHS = RHS
+            GenerateAssignment(LHSItem, RHSItem, exprIndicator); //LHS = RHS
         }
         if semicolon != 0 {
             AssertNextTokenWeak(TOKEN_SEMICOLON);
