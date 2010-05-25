@@ -10,10 +10,17 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
+type ExpressionDescriptor struct {
+    ExpressionDepth uint64;
+    RestCounter uint64;
+    GlobalCounter uint64;
+    Prefix string;
+}
+
 //
 // Called by parser (ParseSimpleExpression)
 //
-func GenerateSimpleExpression(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
+func GenerateSimpleExpressionArith(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     if Compile != 0 {
         if (item1.Itemtype != byte_t) && (item1.Itemtype != uint64_t) {
             SymbolTableError("Invalid left operand type for", "", "addition/subtraction:", item1.Itemtype.Name);
@@ -32,13 +39,15 @@ func GenerateSimpleExpression(item1 *libgogo.Item, item2 *libgogo.Item, op uint6
 //
 // Called by parser (ParseTerm)
 //
-func GenerateTerm(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
+func GenerateTermArith(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     if Compile != 0 {
-        if (item1.Itemtype != byte_t) && (item1.Itemtype != uint64_t) {
-            SymbolTableError("Invalid left operand type for", "", "multiplication/division:", item1.Itemtype.Name);
-        }
-        if (item2.Itemtype != byte_t) && (item2.Itemtype != uint64_t) {
-            SymbolTableError("Invalid right operand type for", "", "multiplication/division:", item2.Itemtype.Name);
+        if (op == TOKEN_ARITH_DIV) || op == (TOKEN_ARITH_MUL) {
+            if (item1.Itemtype != byte_t) && (item1.Itemtype != uint64_t) {
+                SymbolTableError("Invalid left operand type for", "", "multiplication/division:", item1.Itemtype.Name);
+            }
+            if (item2.Itemtype != byte_t) && (item2.Itemtype != uint64_t) {
+                SymbolTableError("Invalid right operand type for", "", "multiplication/division:", item2.Itemtype.Name);
+            }
         }
         if op == TOKEN_ARITH_DIV { // Division
             if item2.Mode == libgogo.MODE_CONST {
@@ -58,10 +67,27 @@ func GenerateTerm(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     }
 }
 
+func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
+    var labelString string;
+    if op == TOKEN_REL_AND {
+        labelString = GenerateIfLabel(ed.Prefix,ed.GlobalCounter,ed.ExpressionDepth,"END");
+        PrintJump("JNZ", labelString);
+    } else {
+        if op == TOKEN_REL_OR {
+            labelString = GenerateIfLabel(ed.Prefix,ed.GlobalCounter,0,"OK");
+            PrintJump("JZ", labelString);
+            labelString = GenerateIfLabel(ed.Prefix,ed.GlobalCounter,ed.ExpressionDepth-1,"END");
+            PrintLabel(labelString);
+        } else {
+            GenErrorWeak("Relative AND expected.");
+        }
+    }
+}
+
 //
 // Called by parser (ParseExpression)
 //
-func GenerateRelation(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
+func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     if Compile != 0 {   
         if (item1.Itemtype != uint64_t) || (item2.Itemtype != uint64_t) {
             SymbolTableError("Cannot compare types", "", "other than", uint64_t.Name);

@@ -229,3 +229,17 @@ func PrintInstruction_Var_Reg(op string, variable *libgogo.Item, regname string,
         }
     }
 }
+
+func PrintJump(jump string, label string) {
+    PrintOutput("  ");
+    PrintOutput(jump);
+    PrintOutput(" ");
+    PrintOutput(label);
+    PrintInstructionEnd();
+}
+
+func PrintLabel(label string) {
+    PrintOutput(label);
+    PrintOutput(":");
+    PrintInstructionEnd();
+}

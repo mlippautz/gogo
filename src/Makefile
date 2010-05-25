@@ -18,6 +18,7 @@ GOFILES=\
     gen-expr.go\
     gen-assign.go\
     gen-arith.go\
+    gen-if.go\
     inspector.go
 
 include $(GOROOT)/src/Make.cmd

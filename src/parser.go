@@ -17,6 +17,8 @@ var InsideFunction uint64 = 0;
 var InsideStructDecl uint64 = 0;
 var InsideFunctionVarDecl uint64 = 0;
 
+var Ifs uint64 = 0;
+
 //
 // Package name of currently processed file
 //
@@ -252,6 +254,7 @@ func ParseVarDeclList() {
 //
 func ParseVarDecl() uint64 {
     var boolFlag uint64;
+    var ed ExpressionDescriptor;
     var exprIndicator uint64;
     var tempAddr uint64;
     var LHSItem *libgogo.Item;
@@ -275,7 +278,7 @@ func ParseVarDecl() uint64 {
                    tempAddr = libgogo.GetObjectOffset(CurrentObject, LocalObjects);
                    libgogo.SetItem(LHSItem, libgogo.MODE_VAR, CurrentObject.ObjType, CurrentObject.PtrType, tempAddr, 0, 0); //Varible item
                    GenerateComment("Local variable assignment RHS load start");
-                   exprIndicator = ParseExpression(RHSItem); //Parse RHS
+                   exprIndicator = ParseExpression(RHSItem, &ed); //Parse RHS
                    GenerateComment("Local variable assignment RHS load end");
                    GenerateAssignment(LHSItem, RHSItem, exprIndicator); //LHS = RHS
                    GenerateComment("Local variable assignment end");
@@ -284,13 +287,13 @@ func ParseVarDecl() uint64 {
                    tempAddr = libgogo.GetObjectOffset(CurrentObject, GlobalObjects);
                    libgogo.SetItem(LHSItem, libgogo.MODE_VAR, CurrentObject.ObjType, CurrentObject.PtrType, tempAddr, 0, 1); //Varible item
                    GenerateComment("Global variable assignment RHS load start");
-                   exprIndicator = ParseExpression(RHSItem); //Parse RHS
+                   exprIndicator = ParseExpression(RHSItem, &ed); //Parse RHS
                    GenerateComment("Global variable assignment RHS load end");
                    GenerateAssignment(LHSItem, RHSItem, exprIndicator); //LHS = RHS
                    GenerateComment("Global variable assignment end");
                 }
             } else {
-                ParseExpression(nil);
+                ParseExpression(nil, &ed);
             }
         } else {
             tok.nextToken = tok.id;
@@ -306,11 +309,15 @@ func ParseVarDecl() uint64 {
 //
 //
 //
-func ParseExpression(item *libgogo.Item) uint64 {
+func ParseExpression(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     var boolFlag uint64;
     var op uint64;
     var tempItem2 *libgogo.Item;
     var retValue uint64 = 0;
+    if ed != nil {
+        ed.RestCounter = 0;
+        ed.ExpressionDepth = ed.ExpressionDepth + 1;
+    }
     PrintDebugString("Entering ParseExpression()",1000);
     if item == nil {
         item = libgogo.NewItem();
@@ -323,13 +330,13 @@ func ParseExpression(item *libgogo.Item) uint64 {
         retValue = 1;
     } else {
         tok.nextToken = tok.id;   
-        ParseSimpleExpression(item);
+        ParseSimpleExpression(item, ed);
         boolFlag = ParseCmpOp();
         if boolFlag == 0 {
             tempItem2 = libgogo.NewItem();
-            ParseSimpleExpression(tempItem2);
+            ParseSimpleExpression(tempItem2, ed);
             op = libgogo.Pop(&Operators);
-            GenerateRelation(item, tempItem2, op);
+            GenerateComparison(item, tempItem2, op);
 	    }
     }
     PrintDebugString("Leaving ParseExpression()",1000);
@@ -359,19 +366,21 @@ func ParseCmpOp() uint64 {
 //
 //
 //
-func ParseSimpleExpression(item *libgogo.Item) {
+func ParseSimpleExpression(item *libgogo.Item, ed *ExpressionDescriptor) {
     var boolFlag uint64;
     var tempItem2 *libgogo.Item;
     var op uint64;
     PrintDebugString("Entering ParseSimpleExpression()",1000);
     ParseUnaryArithOp();
     tempItem2 = libgogo.NewItem();
-    ParseTerm(item);
-    for boolFlag = ParseSimpleExpressionOp(tempItem2);
+    ParseTerm(item, ed);
+    for boolFlag = ParseSimpleExpressionOp(tempItem2, ed);
         boolFlag == 0;
-        boolFlag = ParseSimpleExpressionOp(tempItem2) {
+        boolFlag = ParseSimpleExpressionOp(tempItem2, ed) {
         op = libgogo.Pop(&Operators);
-        GenerateSimpleExpression(item, tempItem2, op);
+        if op != TOKEN_REL_OR {
+            GenerateSimpleExpressionArith(item, tempItem2, op);
+        }
     }
     PrintDebugString("Leaving ParseSimpleExpression()",1000);
 }
@@ -379,7 +388,7 @@ func ParseSimpleExpression(item *libgogo.Item) {
 //
 //
 //
-func ParseSimpleExpressionOp(item *libgogo.Item) uint64 {
+func ParseSimpleExpressionOp(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     var boolFlag uint64 = 1;
     PrintDebugString("Entering ParseSimpleExpressionOp()",1000);
     boolFlag = ParseUnaryArithOp(); // +,-
@@ -387,12 +396,13 @@ func ParseSimpleExpressionOp(item *libgogo.Item) uint64 {
         GetNextTokenSafe();
         if tok.id == TOKEN_REL_OR {
             // ||
+            GenerateRelative(item, TOKEN_REL_OR, ed);
             libgogo.Push(&Operators, TOKEN_REL_OR);
             boolFlag = 0;
         } 
     }
     if boolFlag == 0 {
-        ParseTerm(item);
+        ParseTerm(item, ed);
     } else {
         tok.nextToken = tok.id;
     }
@@ -421,18 +431,20 @@ func ParseUnaryArithOp() uint64 {
 //
 //
 //
-func ParseTerm(item *libgogo.Item) {
+func ParseTerm(item *libgogo.Item, ed *ExpressionDescriptor) {
     var boolFlag uint64;
     var tempItem2 *libgogo.Item;
     var op uint64;
     PrintDebugString("Entering ParseTerm()",1000);
-    ParseFactor(item);
+    ParseFactor(item, ed);
     tempItem2 = libgogo.NewItem();
-    for boolFlag = ParseTermOp(tempItem2);
+    for boolFlag = ParseTermOp(tempItem2, ed);
         boolFlag == 0;
-        boolFlag = ParseTermOp(tempItem2) {
+        boolFlag = ParseTermOp(tempItem2, ed) {
         op = libgogo.Pop(&Operators);
-        GenerateTerm(item, tempItem2, op);
+        if op != TOKEN_REL_AND {
+            GenerateTermArith(item, tempItem2, op);
+        }
     }      
     PrintDebugString("Leaving ParseTerm()",1000);
 }
@@ -440,7 +452,7 @@ func ParseTerm(item *libgogo.Item) {
 //
 //
 //
-func ParseTermOp(item *libgogo.Item) uint64 {
+func ParseTermOp(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     var boolFlag uint64;
     PrintDebugString("Entering ParseTermOp()",1000);
     boolFlag = ParseBinaryArithOp(); // *,/
@@ -448,12 +460,13 @@ func ParseTermOp(item *libgogo.Item) uint64 {
         GetNextTokenSafe();
         if tok.id == TOKEN_REL_AND {
             // &&
+            GenerateRelative(item, TOKEN_REL_AND, ed);
             libgogo.Push(&Operators, TOKEN_REL_AND);
             boolFlag = 0;
         }
     }
     if boolFlag == 0 {
-        ParseFactor(item);
+        ParseFactor(item, ed);
     } else {
         tok.nextToken = tok.id;
     }
@@ -482,7 +495,7 @@ func ParseBinaryArithOp() uint64 {
 //
 //
 //
-func ParseFactor(item *libgogo.Item) uint64 {
+func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     var doneFlag uint64 = 1;
     var boolFlag uint64;
     var es [2]uint64;
@@ -506,13 +519,13 @@ func ParseFactor(item *libgogo.Item) uint64 {
         doneFlag = 0;
     }
     if (doneFlag) == 1 && (tok.id == TOKEN_LBRAC) {
-        ParseExpression(item);
+        ParseExpression(item, ed);
         AssertNextTokenWeak(TOKEN_RBRAC);
         doneFlag = 0;
     }
     if (doneFlag == 1) && (tok.id == TOKEN_NOT) {
         //libgogo.Push(&Operators, TOKEN_NOT);
-        ParseFactor(item);
+        ParseFactor(item, ed);
         //TODO: Generate code
         doneFlag = 0;
     }
@@ -769,7 +782,7 @@ func ParseFuncDecl() uint64 {
         ParseStatementSequence();
         GetNextTokenSafe();
         if tok.id == TOKEN_RETURN {
-            ParseExpression(nil); //TODO
+            ParseExpression(nil,nil); //TODO
             AssertNextTokenWeak(TOKEN_SEMICOLON);
         } else {
             tok.nextToken = tok.id;
@@ -967,7 +980,7 @@ func ParseAssignment(semicolon uint64) uint64 {
             } else { //Expression starting with an identifier
                 RHSItem = libgogo.NewItem();
                 GenerateComment("Assignment RHS load start");
-                exprIndicator = ParseExpression(RHSItem); //Parse RHS
+                exprIndicator = ParseExpression(RHSItem,nil); //Parse RHS
                 GenerateComment("Assignment RHS load end");
                 GenerateAssignment(LHSItem, RHSItem, exprIndicator); //LHS = RHS
             }
@@ -975,7 +988,7 @@ func ParseAssignment(semicolon uint64) uint64 {
             tok.nextToken = tok.id;
             RHSItem = libgogo.NewItem();
             GenerateComment("Assignment RHS load start");
-            exprIndicator = ParseExpression(RHSItem); //Parse RHS
+            exprIndicator = ParseExpression(RHSItem,nil); //Parse RHS
             GenerateComment("Assignment RHS load end");
             GenerateAssignment(LHSItem, RHSItem, exprIndicator); //LHS = RHS
         }
@@ -1023,9 +1036,10 @@ func ParseFunctionCall() {
 }
 
 func ParseExpressionList() {
+    var ed ExpressionDescriptor;
     var boolFlag uint64;
     PrintDebugString("Entering ParseExpressionList()",1000);
-    ParseExpression(nil); //TODO
+    ParseExpression(nil, &ed); //TODO
     for boolFlag = ParseExpressionListSub();
         boolFlag == 0;
         boolFlag = ParseExpressionListSub() { }   
@@ -1034,10 +1048,11 @@ func ParseExpressionList() {
 
 func ParseExpressionListSub() uint64 {
     var boolFlag uint64;
+    var ed ExpressionDescriptor;
     PrintDebugString("Entering ParseExpressionListSub()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_COLON {
-        ParseExpression(nil); //TODO
+        ParseExpression(nil, &ed); //TODO
         boolFlag = 0;
     } else {
         tok.nextToken = tok.id;
@@ -1056,6 +1071,7 @@ func ParseFunctionCallStatement() {
 }
 
 func ParseForStatement() {
+    var ed ExpressionDescriptor;
     PrintDebugString("Entering ParseForStatement()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_FOR {
@@ -1075,7 +1091,7 @@ func ParseForStatement() {
             tok.nextToken = tok.id;
         } else {
             tok.nextToken = tok.id;
-            ParseExpression(nil); //TODO
+            ParseExpression(nil, &ed); //TODO
         }
 
         AssertNextToken(TOKEN_SEMICOLON);
@@ -1103,14 +1119,23 @@ func ParseForStatement() {
 // Represents an if statement. Else is parsed in a separate function.
 //
 func ParseIfStatement() {
+    var item *libgogo.Item;
+    var ed ExpressionDescriptor;
+    Ifs = Ifs +1;
+    ed.GlobalCounter = Ifs;
+    ed.Prefix = ""
+    libgogo.StringAppend(&ed.Prefix,fileInfo[curFileIndex].filename);
+    ed.ExpressionDepth = 0;
     PrintDebugString("Entering ParseIfStatement()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_IF {
-        ParseExpression(nil); //TODO
+        item = libgogo.NewItem();
+        ParseExpression(item, &ed);
+        GenerateIfStart(item, ed);
         AssertNextToken(TOKEN_LCBRAC);
         ParseStatementSequence();
         AssertNextToken(TOKEN_RCBRAC);
-
+        GenerateIfEnd(item, ed);
         GetNextTokenSafe();
         if tok.id == TOKEN_ELSE {
             ParseElseStatement();
