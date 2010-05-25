@@ -30,7 +30,7 @@ func ResetCode() {
 //\n\
 \n\
 ");
-    InspectorGadget();
+    //InspectorGadget();
 
     libgogo.StringAppend(&Code,"\n\
 \n\
