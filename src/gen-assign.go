@@ -111,16 +111,13 @@ func GenerateAssignmentWithAmpersandOnRHS(LHSItem *libgogo.Item, RHSItem *libgog
         if LHSItem.Itemtype != RHSItem.Itemtype {
             SymbolTableError("Incompatible pointer types:", LHSItem.Itemtype.Name, "and", RHSItem.Itemtype.Name);
         }
-        
+
+        if RHSItem.Mode == libgogo.MODE_VAR { //Var RHS => load address to register
+            MakeRegistered(RHSItem, 1); //LEA RHSItem.A(SB), to be RHSItem.R
+        } //Reg RHS
         if LHSItem.Mode == libgogo.MODE_VAR { //Variable on LHS
-            if RHSItem.Mode == libgogo.MODE_VAR { //Var RHS => load address to register
-                MakeRegistered(RHSItem, 1); //LEA RHSItem.A(SB), to be RHSItem.R
-            } //Reg RHS
             PrintInstruction_Reg_Var("MOV", "R", RHSItem.R, LHSItem); //MOV RHSItem.R, LHSItem.A(SB)
         } else { //Register with address of variable on LHS; assertion: Register contains address and global/local flag is set correctly
-            if RHSItem.Mode == libgogo.MODE_VAR { //Var RHS => load address to register
-                MakeRegistered(RHSItem, 1); //LEA RHSItem.A(SB), item.R
-            } //Reg RHS
             opsize = GetOpSize(RHSItem);
             PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "R", LHSItem.R, 1, 0, 0); //MOV RHSItem.R, (LHSItem.R)
         }
