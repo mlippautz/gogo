@@ -15,7 +15,7 @@ type ExpressionDescriptor struct {
     RestCounter uint64;
     GlobalCounter uint64;
     Prefix string;
-}
+};
 
 //
 // Called by parser (ParseSimpleExpression)

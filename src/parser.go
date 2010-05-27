@@ -1123,7 +1123,7 @@ func ParseIfStatement() {
     var ed ExpressionDescriptor;
     Ifs = Ifs +1;
     ed.GlobalCounter = Ifs;
-    ed.Prefix = ""
+    ed.Prefix = "";
     libgogo.StringAppend(&ed.Prefix,fileInfo[curFileIndex].filename);
     ed.ExpressionDepth = 0;
     PrintDebugString("Entering ParseIfStatement()",1000);
