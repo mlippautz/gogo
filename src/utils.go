@@ -158,6 +158,8 @@ func SymbolTableError(msg string, position string, msg2 string, identifier strin
     libgogo.PrintString(" '");
     libgogo.PrintString(identifier);
     libgogo.PrintString("'\n");
+    PrintGlobalSymbolTable(); //May be useful for debugging purposes
+    PrintLocalSymbolTable();    
     libgogo.Exit(4);
 }
 

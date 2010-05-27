@@ -100,5 +100,31 @@ func GenerateRawAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
 }
 
 func GenerateAssignmentWithAmpersandOnRHS(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
-    SymbolTableError("Ampersands on RHS", "of assignments", "are currently not supported:", "&"); //TODO
+    var opsize uint64;
+    if Compile != 0 {
+        if LHSItem.PtrType == 0 {
+            SymbolTableError("Cannot assign a pointer type to a value", "", "type:", LHSItem.Itemtype.Name);
+        }
+        if RHSItem.PtrType == 1 {
+            SymbolTableError("Cannot assign a pointer's address to a pointer", "", "type:", LHSItem.Itemtype.Name);
+        }
+        if LHSItem.Itemtype != RHSItem.Itemtype {
+            SymbolTableError("Incompatible pointer types:", LHSItem.Itemtype.Name, "and", RHSItem.Itemtype.Name);
+        }
+        
+        if LHSItem.Mode == libgogo.MODE_VAR { //Variable on LHS
+            if RHSItem.Mode == libgogo.MODE_VAR { //Var RHS => load address to register
+                MakeRegistered(RHSItem, 1); //LEA RHSItem.A(SB), to be RHSItem.R
+            } //Reg RHS
+            PrintInstruction_Reg_Var("MOV", "R", RHSItem.R, LHSItem); //MOV RHSItem.R, LHSItem.A(SB)
+        } else { //Register with address of variable on LHS; assertion: Register contains address and global/local flag is set correctly
+            if RHSItem.Mode == libgogo.MODE_VAR { //Var RHS => load address to register
+                MakeRegistered(RHSItem, 1); //LEA RHSItem.A(SB), item.R
+            } //Reg RHS
+            opsize = GetOpSize(RHSItem);
+            PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "R", LHSItem.R, 1, 0, 0); //MOV RHSItem.R, (LHSItem.R)
+        }
+        FreeRegisterIfRequired(LHSItem);
+        FreeRegisterIfRequired(RHSItem);
+    }
 }

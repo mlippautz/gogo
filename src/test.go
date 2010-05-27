@@ -31,4 +31,8 @@ func test(bla uint64, blub string) {
     c[1] = testPtr.barPtr.bar2[1];
     d[2] = 'x';
     a = fooArrInst[b].bar1 + testInst.barPtr.bar1;
+    fooArrInst[0].bar3 = &a;
+    fooArrInst[0].bar3 = testPtr.barPtr.bar3;
+    fooArrInst[a].bar3 = &a;
+    fooArrInst[a].bar3 = testPtr.barPtr.bar3;
 }

@@ -326,7 +326,6 @@ func ParseExpression(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     if tok.id == TOKEN_OP_ADR {
         AssertNextToken(TOKEN_IDENTIFIER);
         FindIdentifierAndParseSelector(item);
-        item.PtrType = 1; 
         retValue = 1;
     } else {
         tok.nextToken = tok.id;   
