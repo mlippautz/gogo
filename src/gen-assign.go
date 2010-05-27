@@ -11,6 +11,14 @@ package main
 import "./libgogo/_obj/libgogo"
 
 func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item, address uint64) {
+    if address == 0 { //LHS = RHS
+        GenerateRawAssignment(LHSItem, RHSItem);
+    } else { //LHS = &RHS
+        GenerateAssignmentWithAmpersandOnRHS(LHSItem, RHSItem);
+    }
+}
+
+func GenerateRawAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
     var done uint64 = 0;
     var opsize uint64;
     if Compile != 0 {
@@ -44,22 +52,13 @@ func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item, address ui
         
         if LHSItem.Mode == libgogo.MODE_VAR { //Variable on LHS
             if (done == 0) && (RHSItem.Mode == libgogo.MODE_CONST) { //Const RHS
-                if address != 0 {
-                    //Unless we missed something this should never be called (parser should catch everything)
-                    //Important if const variables will be allowed (at some time)
-                    GenErrorWeak("Found const at RHS for address assignment");
-                }
                 PrintInstruction_Imm_Var("MOV", RHSItem.A, LHSItem); //MOV $RHSItem.A, LHSItem.A(SB)
                 done = 1;
             }
             if (done == 0) && (RHSItem.Mode == libgogo.MODE_VAR) { //Var RHS
                 done = GetFreeRegister();
                 OccupyRegister(done);
-                if address == 0 {
-                    PrintInstruction_Var_Reg("MOV", RHSItem, "R", done); //MOV RHSItem.A(SB), Rdone (soon to be RHSItem.R)
-                } else {
-                    PrintInstruction_Var_Reg("LEA", RHSItem, "R", done); //LEA RHSItem.A(SB), Rdone
-                }
+                PrintInstruction_Var_Reg("MOV", RHSItem, "R", done); //MOV RHSItem.A(SB), Rdone (soon to be RHSItem.R)
                 RHSItem.Mode = libgogo.MODE_REG;
                 RHSItem.R = done; //RHS is now a register
                 RHSItem.A = 0; //Register now contains RHS value
@@ -73,11 +72,6 @@ func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item, address ui
             }
         } else { //Register with address of variable on LHS; assertion: Register contains address and global/local flag is set correctly
             if (done == 0) && (RHSItem.Mode == libgogo.MODE_CONST) { //Const RHS
-                if address != 0 {
-                    //Unless we missed something this should never be called (parser should catch everything)
-                    //Important if const variables will be allowed (at some time)
-                    GenErrorWeak("Found const at RHS for address assignment");
-                }
                 opsize = GetOpSize(RHSItem);
                 PrintInstruction_Imm_Reg("MOV", opsize, RHSItem.A, "R", LHSItem.R, 1, 0, 0); //MOV $RHSItem.A, (LHSItem.R)
                 done = 1;
@@ -85,11 +79,7 @@ func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item, address ui
             if (done == 0) && (RHSItem.Mode == libgogo.MODE_VAR) { //Var RHS
                 done = GetFreeRegister();
                 OccupyRegister(done);
-                if address == 0 {
-                    PrintInstruction_Var_Reg("MOV", RHSItem, "R", done); //MOV RHSItem.A(SB), Rdone (soon to be RHSItem.R)
-                } else {
-                    PrintInstruction_Var_Reg("LEA", RHSItem, "R", done); //LEA RHSItem.A(SB), Rdone
-                }
+                PrintInstruction_Var_Reg("MOV", RHSItem, "R", done); //MOV RHSItem.A(SB), Rdone (soon to be RHSItem.R)
                 RHSItem.Mode = libgogo.MODE_REG;
                 RHSItem.R = done; //RHS is now a register
                 RHSItem.A = 0; //Register now contains RHS value
@@ -107,4 +97,8 @@ func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item, address ui
         FreeRegisterIfRequired(LHSItem);
         FreeRegisterIfRequired(RHSItem);
     }
+}
+
+func GenerateAssignmentWithAmpersandOnRHS(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
+    SymbolTableError("Ampersands on RHS", "of assignments", "are currently not supported:", "&"); //TODO
 }
