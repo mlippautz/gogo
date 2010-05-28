@@ -9,26 +9,25 @@
 // This code is automatically generated. DO NOT EDIT IT!
 //
 
-
+GLOBL data(SB),$728
 
 TEXT    main·init(SB),0,$0-0
-  // unused
   RET
 
-TEXT    main·main(SB),0,$0-24
+TEXT    main·main(SB),0,$0-0
   //--- Global variable assignment start at test.go:15:21
   //--- Global variable assignment RHS load start at test.go:15:21
   //--- Global variable assignment RHS load end at test.go:15:31
-  MOVB $7, 8(SB)
+  MOVB $7, data+8(SB)
   //--- Global variable assignment end at test.go:15:31
   //--- Global variable assignment start at test.go:16:24
   //--- Global variable assignment RHS load start at test.go:16:24
   ANDQ $255, R8
-  MOVB 8(SB), R8
+  MOVB data+8(SB), R8
   ANDQ $255, R8
   ADDB $1, R8
   //--- Global variable assignment RHS load end at test.go:16:37
-  MOVQ R8, 16(SB)
+  MOVQ R8, data+16(SB)
   //--- Global variable assignment end at test.go:16:37
   //--- Local variable assignment start at test.go:22:20
   //--- Local variable assignment RHS load start at test.go:22:20
@@ -43,7 +42,7 @@ TEXT    main·main(SB),0,$0-24
   //--- Local variable assignment start at test.go:24:20
   //--- Local variable assignment RHS load start at test.go:24:20
   //--- Local variable assignment RHS load end at test.go:24:27
-  MOV? 712(SB), R8
+  MOV? data+712(SB), R8
   MOV? R8, -32(SP)
   //--- Local variable assignment end at test.go:24:27
   //--- Assignment start at test.go:28:9
@@ -82,7 +81,7 @@ TEXT    main·main(SB),0,$0-24
   MOVQ $32, R8
   MULQ R8
   MOVQ AX, R8
-  LEAQ 24(SB), R9
+  LEAQ data+24(SB), R9
   ADDQ R8, R9
   ADDQ $8, R9
   //--- Assignment RHS load end at test.go:30:28
@@ -95,7 +94,7 @@ TEXT    main·main(SB),0,$0-24
   ADDQ $1, R8
   //--- Assignment LHS load end at test.go:31:12
   //--- Assignment RHS load start at test.go:31:27
-  MOVQ 704(SB), R9
+  MOVQ data+704(SB), R9
   ADDQ $352, R9
   MOVQ (R9), R9
   ADDQ $8, R9
@@ -123,10 +122,10 @@ TEXT    main·main(SB),0,$0-24
   MOVQ $32, R8
   MULQ R8
   MOVQ AX, R8
-  LEAQ 24(SB), R9
+  LEAQ data+24(SB), R9
   ADDQ R8, R9
   ADDQ $0, R9
-  MOVQ 696(SB), R8
+  MOVQ data+696(SB), R8
   ADDQ $0, R8
   MOVQ (R9), R9
   MOVQ (R8), R8
@@ -140,19 +139,19 @@ TEXT    main·main(SB),0,$0-24
   //--- Assignment RHS load start at test.go:34:28
   //--- Assignment RHS load end at test.go:34:29
   LEAQ -8(SP), R8
-  MOVQ R8, 48(SB)
+  MOVQ R8, data+48(SB)
   //--- Assignment end at test.go:34:29
   //--- Assignment start at test.go:35:16
   //--- Assignment LHS load start at test.go:35:16
   //--- Assignment LHS load end at test.go:35:26
   //--- Assignment RHS load start at test.go:35:41
-  MOVQ 704(SB), R8
+  MOVQ data+704(SB), R8
   ADDQ $352, R8
   MOVQ (R8), R8
   ADDQ $24, R8
   //--- Assignment RHS load end at test.go:35:46
   MOVQ (R8), R8
-  MOVQ R8, 48(SB)
+  MOVQ R8, data+48(SB)
   //--- Assignment end at test.go:35:46
   //--- Assignment start at test.go:36:16
   //--- Assignment LHS load start at test.go:36:16
@@ -160,7 +159,7 @@ TEXT    main·main(SB),0,$0-24
   MOVQ $32, R8
   MULQ R8
   MOVQ AX, R8
-  LEAQ 24(SB), R9
+  LEAQ data+24(SB), R9
   ADDQ R8, R9
   ADDQ $24, R9
   //--- Assignment LHS load end at test.go:36:26
@@ -175,12 +174,12 @@ TEXT    main·main(SB),0,$0-24
   MOVQ $32, R8
   MULQ R8
   MOVQ AX, R8
-  LEAQ 24(SB), R9
+  LEAQ data+24(SB), R9
   ADDQ R8, R9
   ADDQ $24, R9
   //--- Assignment LHS load end at test.go:37:26
   //--- Assignment RHS load start at test.go:37:41
-  MOVQ 704(SB), R8
+  MOVQ data+704(SB), R8
   ADDQ $352, R8
   MOVQ (R8), R8
   ADDQ $24, R8
@@ -188,5 +187,4 @@ TEXT    main·main(SB),0,$0-24
   MOVQ (R8), R8
   MOVQ R8, (R9)
   //--- Assignment end at test.go:37:46
-
   RET

@@ -103,7 +103,7 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
             } else {
                 MakeRegistered(item1, 0);
                 if item2.Mode == libgogo.MODE_REG {
-                    PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "R", item2.R, 0, 0, 0);
+                    PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
                 }
                 if item2.Mode == libgogo.MODE_VAR {
                     PrintInstruction_Reg_Var("CMP", "R", item1.R, item2);
@@ -112,10 +112,10 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
         }
         if item1.Mode == libgogo.MODE_REG {
             if item2.Mode == libgogo.MODE_CONST {
-                PrintInstruction_Reg_Imm("CMP", 8, "R", item1.R, 0, 0, 0, item2.A);
+                PrintInstruction_Reg_Imm("CMP", 8, "R", item1.R, 0, 0, 0, "", item2.A);
             }
             if item2.Mode == libgogo.MODE_REG {
-                PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "R", item2.R, 0, 0, 0);
+                PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
             }
             if item2.Mode == libgogo.MODE_VAR {
                 PrintInstruction_Reg_Var("CMP", "R", item1.R, item2);

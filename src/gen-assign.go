@@ -74,7 +74,7 @@ func GenerateRawAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
     } else { //Register with address of variable on LHS; assertion: Register contains address and global/local flag is set correctly
         if (done == 0) && (RHSItem.Mode == libgogo.MODE_CONST) { //Const RHS
             opsize = GetOpSize(RHSItem);
-            PrintInstruction_Imm_Reg("MOV", opsize, RHSItem.A, "R", LHSItem.R, 1, 0, 0); //MOV $RHSItem.A, (LHSItem.R)
+            PrintInstruction_Imm_Reg("MOV", opsize, RHSItem.A, "R", LHSItem.R, 1, 0, 0, ""); //MOV $RHSItem.A, (LHSItem.R)
             done = 1;
         }
         if (done == 0) && (RHSItem.Mode == libgogo.MODE_VAR) { //Var RHS
@@ -85,13 +85,13 @@ func GenerateRawAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
             RHSItem.R = done; //RHS is now a register
             RHSItem.A = 0; //Register now contains RHS value
             opsize = GetOpSize(RHSItem);
-            PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "R", LHSItem.R, 1, 0, 0); //MOV RHSItem.R, (LHSItem.R)
+            PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "", "R", LHSItem.R, 1, 0, 0, ""); //MOV RHSItem.R, (LHSItem.R)
             done = 1;
         }
         if (done == 0) && (RHSItem.Mode == libgogo.MODE_REG) { //Reg RHS
             DereferRegisterIfNecessary(RHSItem); //Make sure to work with the value, not the address
             opsize = GetOpSize(RHSItem);
-            PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "R", LHSItem.R, 1, 0, 0); //MOV RHSItem.R, (LHSItem.R)
+            PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "", "R", LHSItem.R, 1, 0, 0, ""); //MOV RHSItem.R, (LHSItem.R)
             done = 1;
         }
     }        
@@ -118,7 +118,7 @@ func GenerateAssignmentWithAmpersandOnRHS(LHSItem *libgogo.Item, RHSItem *libgog
         PrintInstruction_Reg_Var("MOV", "R", RHSItem.R, LHSItem); //MOV RHSItem.R, LHSItem.A(SB)
     } else { //Register with address of variable on LHS; assertion: Register contains address and global/local flag is set correctly
         opsize = GetOpSize(RHSItem);
-        PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "R", LHSItem.R, 1, 0, 0); //MOV RHSItem.R, (LHSItem.R)
+        PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "", "R", LHSItem.R, 1, 0, 0, ""); //MOV RHSItem.R, (LHSItem.R)
     }
     FreeRegisterIfRequired(LHSItem);
     FreeRegisterIfRequired(RHSItem);

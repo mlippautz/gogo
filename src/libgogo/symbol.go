@@ -225,6 +225,26 @@ func GetFieldOffset(obj *ObjectDesc, objtype *TypeDesc) uint64 {
 }
 
 //
+// Calculates the (memory) size required to store the list of objects given
+// Note that the calculated size is always 64 bit aligned
+//
+func GetAlignedObjectListSize(objList *ObjectDesc) uint64 {
+    var i uint64 = 0; //Init data segment size with 0 in case there are no global objects
+    var j uint64;
+    var lastObj *ObjectDesc = objList; //Initialize last object with the beginning of the global variable list
+    var obj *ObjectDesc;
+    for obj = objList; obj != nil; obj = obj.Next { //Calculate offset of last global variable //TODO: Do this more efficiently
+        i = GetObjectOffset(obj, objList);
+        lastObj = obj;
+    }
+    if lastObj != nil { //Add size of last object to its offset in order to get the total size required for the data segment
+        j = GetObjectSizeAligned(lastObj);
+        i = i + j;
+    }
+    return i;
+}
+
+//
 // Fetches an object with a specific identifier or nil if it is not in the specified list
 //
 func GetObject(name string, packagename string, list *ObjectDesc) *ObjectDesc {

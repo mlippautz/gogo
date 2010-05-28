@@ -62,7 +62,7 @@ func AddSubInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
         }
         
         if (done == 0) && (item2.Mode == libgogo.MODE_CONST) {
-            PrintInstruction_Imm_Reg(op, opsize2, item2.A, "R", item1.R, 0, 0, 0); //OP $item2.A, item1.R
+            PrintInstruction_Imm_Reg(op, opsize2, item2.A, "R", item1.R, 0, 0, 0, ""); //OP $item2.A, item1.R
             done = 1;
         }
         if (done == 0) && (item2.Mode == libgogo.MODE_VAR) {
@@ -79,7 +79,7 @@ func AddSubInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
             } else {
                 opsize1 = opsize2;
             }
-            PrintInstruction_Reg_Reg(op, opsize2, "R", item2.R, 0, 0, 0, "R", item1.R, 0, 0, 0); //OP item2.R, item1.R
+            PrintInstruction_Reg_Reg(op, opsize2, "R", item2.R, 0, 0, 0, "", "R", item1.R, 0, 0, 0, ""); //OP item2.R, item1.R
             done = 1;
         }
     }
@@ -112,13 +112,13 @@ func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
 
         opsize1 = GetOpSize(item1);
         if item1.Mode == libgogo.MODE_CONST {
-            PrintInstruction_Imm_Reg("MOV", opsize1, item1.A, "AX", 0, 0, 0, 0) // move $item1.A into AX
+            PrintInstruction_Imm_Reg("MOV", opsize1, item1.A, "AX", 0, 0, 0, 0, "") // move $item1.A into AX
         }
         if item1.Mode == libgogo.MODE_VAR {
             PrintInstruction_Var_Reg("MOV", item1, "AX", 0); // move item2.A(SB), AX
         }
         if item1.Mode == libgogo.MODE_REG {
-            PrintInstruction_Reg_Reg("MOV", opsize1, "R", item1.R, 0, 0, 0, "AX", 0, 0, 0, 0) // move item1.R into AX
+            PrintInstruction_Reg_Reg("MOV", opsize1, "R", item1.R, 0, 0, 0, "", "AX", 0, 0, 0, 0, "") // move item1.R into AX
         }
         
         //byte * byte = byte, byte * uint64 = uint64, uint64 * byte = uint64, uint64 * uint64 = uint64
@@ -147,7 +147,7 @@ func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
         }
         done = libgogo.StringCompare(op, "DIV");
         if done == 0 { //Set DX to zero to avoid 128 bit division as DX is "high" part of DX:AX 128 bit register
-            PrintInstruction_Reg_Reg("XOR", 8, "DX", 0, 0, 0, 0, "DX", 0, 0, 0, 0); //XORQ DX, DX is equal to MOVQ $0, DX
+            PrintInstruction_Reg_Reg("XOR", 8, "DX", 0, 0, 0, 0, "", "DX", 0, 0, 0, 0, ""); //XORQ DX, DX is equal to MOVQ $0, DX
         }
         
         opsize1 = GetOpSize(item1);
@@ -158,8 +158,8 @@ func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
             opsize1 = opsize2;
         }
         
-        PrintInstruction_Reg(op, opsize2, "R", item2.R, 0, 0, 0); //op item2.R
-        PrintInstruction_Reg_Reg("MOV", opsize2, "AX", 0, 0, 0, 0, "R", item2.R, 0, 0, 0) // move AX into item2.R
+        PrintInstruction_Reg(op, opsize2, "R", item2.R, 0, 0, 0, ""); //op item2.R
+        PrintInstruction_Reg_Reg("MOV", opsize2, "AX", 0, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "") // move AX into item2.R
         
         // Since item2 already had to be converted to a register, we now assign 
         // item2 to item1 after freeing item1 first (if necessary)

@@ -74,7 +74,7 @@ func DereferRegisterIfNecessary(item *libgogo.Item) {
     var opsize uint64;
     opsize = GetOpSize(item);
     if (item.Mode == libgogo.MODE_REG) && (item.A != 0) { //Derefer register if it contains an address
-        PrintInstruction_Reg_Reg("MOV", opsize, "R", item.R, 1, 0, 0, "R", item.R, 0, 0, 0); //MOV (item.R), item.R
+        PrintInstruction_Reg_Reg("MOV", opsize, "R", item.R, 1, 0, 0, "", "R", item.R, 0, 0, 0, ""); //MOV (item.R), item.R
         item.A = 0; //Register now contains a value
     }
 }
@@ -88,7 +88,7 @@ func DereferItemIfNecessary(item *libgogo.Item) {
     opsize = GetOpSize(item);
     if item.PtrType == 1 {
         if item.Mode == libgogo.MODE_REG { //Item is already in a register => derefer register
-            PrintInstruction_Reg_Reg("MOV", opsize, "R", item.R, 1, 0, 0, "R", item.R, 0, 0, 0); //MOV (item.R), item.R
+            PrintInstruction_Reg_Reg("MOV", opsize, "R", item.R, 1, 0, 0, "", "R", item.R, 0, 0, 0, ""); //MOV (item.R), item.R
         } else { //Item is not a register yet => make it a register by loading its value
             oldA = item.A; //Save value of A
             MakeRegistered(item, 0); //Don't load address as loading the value automatically derefers the item
@@ -109,7 +109,7 @@ func GenerateComment(msg string) {
     temp = BuildHead();
     libgogo.StringAppend(&str, temp);
     libgogo.StringAppend(&str, "\n");
-    PrintOutput(str);
+    PrintCodeOutput(str);
 }
 
 
@@ -158,7 +158,7 @@ func MakeRegistered(item *libgogo.Item, calculatewithaddresses uint64) {
         OccupyRegister(reg);
 
         if item.Mode == libgogo.MODE_CONST { // const item
-            PrintInstruction_Imm_Reg("MOV", opsize, item.A, "R", reg, 0, 0, 0); // MOV $item.A, Rdone (soon to be item.R)
+            PrintInstruction_Imm_Reg("MOV", opsize, item.A, "R", reg, 0, 0, 0, ""); // MOV $item.A, Rdone (soon to be item.R)
         } else { // var item
             if calculatewithaddresses == 0 {
                 PrintInstruction_Var_Reg("MOV", item, "R", reg); // MOV item.A(SB), Rdone (soon to be item.R)

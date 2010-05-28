@@ -78,9 +78,11 @@ func main() {
 
     PrintGlobalSymbolTable();
     UndefinedForwardDeclaredTypeCheck();
-
+    
     if Compile == 1 {
-        PrintFile();
+        i = libgogo.GetAlignedObjectListSize(GlobalObjects); //Get required data segment size
+        SetDataSegmentSize(i); //Set data segment size
+        PrintFile(); //Print compiled output to file
     }
 }
 
