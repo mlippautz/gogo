@@ -278,8 +278,11 @@ func EndOfFunction() {
 //
 func VariableObjectDescToItem(obj *libgogo.ObjectDesc, item *libgogo.Item, kind uint64) {
     var tempAddr uint64;
+    var size uint64;
     if kind == 0 { //Local variable
         tempAddr = libgogo.GetObjectOffset(obj, LocalObjects);
+        size = libgogo.GetObjectSizeAligned(obj);
+        tempAddr = tempAddr + size - 8; //Due to sign of the offset (p.e. -8(SP)), the offsets starts at the last byte and end at the first one
     } else { //Global variable or local parameter
         if kind == 1 { //Global variable
             tempAddr = libgogo.GetObjectOffset(obj, GlobalObjects);

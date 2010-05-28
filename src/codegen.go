@@ -118,7 +118,11 @@ func GenerateFieldAccess(item *libgogo.Item, offset uint64) {
     if Compile != 0 {
         DereferItemIfNecessary(item); //Derefer address if item is a pointer
         if item.Mode == libgogo.MODE_VAR { //Variable
-            item.A = item.A + offset; //Direct and indirect offset calculation
+            if item.Global == 0 { //Local variable offset calculation
+                item.A = item.A - offset; //Reverse order due to sign (p.e. -24(SP) with offset 16 is to be -8(SP) and thus 24-16)
+            } else { //Global variable offset calculation
+                item.A = item.A + offset;
+            }
         } else { //Register
             offsetItem = libgogo.NewItem(); //For direct and indirect offset calculation
             libgogo.SetItem(offsetItem, libgogo.MODE_CONST, uint64_t, 0, offset, 0, 0); //Constant item for offset

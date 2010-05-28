@@ -108,7 +108,11 @@ func GetOpSize(item *libgogo.Item) uint64 {
         if item.Itemtype.Form == libgogo.FORM_SIMPLE { //Simple type
             size = item.Itemtype.Len; //Size of type
         } else {
-            size = 8; //Use 64 bits in all other cases (address calculations, records etc.)
+            if item.Itemtype == string_t { //Special treatment for strings => 16 bytes
+                size = 16;
+            } else {
+                size = 8; //Use 64 bits in all other cases (address calculations, records etc.)
+            }
         }
     }
     return size;
