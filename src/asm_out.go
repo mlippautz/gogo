@@ -290,6 +290,7 @@ func PutDataByte(offset uint64, value byte) {
     var temp uint64;
     PrintCodeOutput("DATA ");
     PrintRegister("SB", 0, 1, offset, 0, "data");
+    PrintCodeOutput("/1");
     PrintInstructionOperandSeparator();
     temp = libgogo.ToIntFromByte(value);
     PrintImmediate(temp);
