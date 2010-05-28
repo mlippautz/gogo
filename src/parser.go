@@ -256,7 +256,6 @@ func ParseVarDecl() uint64 {
     var boolFlag uint64;
     var ed ExpressionDescriptor;
     var exprIndicator uint64;
-    var tempAddr uint64;
     var LHSItem *libgogo.Item;
     var RHSItem *libgogo.Item;
     PrintDebugString("Entering ParseVarDecl()",1000);
@@ -275,8 +274,7 @@ func ParseVarDecl() uint64 {
                 RHSItem = libgogo.NewItem();
                 if InsideFunction != 0 { //Local variable
                    GenerateComment("Local variable assignment start");
-                   tempAddr = libgogo.GetObjectOffset(CurrentObject, LocalObjects);
-                   libgogo.SetItem(LHSItem, libgogo.MODE_VAR, CurrentObject.ObjType, CurrentObject.PtrType, tempAddr, 0, 0); //Varible item
+                   VariableObjectDescToItem(CurrentObject, LHSItem, 0); //Local variable
                    GenerateComment("Local variable assignment RHS load start");
                    exprIndicator = ParseExpression(RHSItem, &ed); //Parse RHS
                    GenerateComment("Local variable assignment RHS load end");
@@ -284,8 +282,7 @@ func ParseVarDecl() uint64 {
                    GenerateComment("Local variable assignment end");
                 } else { //Global variable
                    GenerateComment("Global variable assignment start");
-                   tempAddr = libgogo.GetObjectOffset(CurrentObject, GlobalObjects);
-                   libgogo.SetItem(LHSItem, libgogo.MODE_VAR, CurrentObject.ObjType, CurrentObject.PtrType, tempAddr, 0, 1); //Varible item
+                   VariableObjectDescToItem(CurrentObject, LHSItem, 1); //Global variable
                    GenerateComment("Global variable assignment RHS load start");
                    exprIndicator = ParseExpression(RHSItem, &ed); //Parse RHS
                    GenerateComment("Global variable assignment RHS load end");
@@ -498,6 +495,7 @@ func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     var doneFlag uint64 = 1;
     var boolFlag uint64;
     var es [2]uint64;
+    var tempString *libgogo.ObjectDesc;
 
     GetNextTokenSafe();
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
@@ -514,7 +512,10 @@ func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     }
     if (doneFlag) == 1 && (tok.id == TOKEN_STRING) {
         //TODO: Actually declare string in data segment and refer to it in form of a variable (see below)
-        libgogo.SetItem(item, libgogo.MODE_VAR, string_t, 0, 1234567890 /* TODO */, 0, 0); //Constant item
+        tempString = libgogo.NewObject("unique tempstring (TODO)", ".internal", libgogo.CLASS_VAR);
+        tempString.ObjType = string_t;
+        libgogo.AppendObject(tempString, GlobalObjects);
+        VariableObjectDescToItem(tempString, item, 1); //Global variable
         doneFlag = 0;
     }
     if (doneFlag) == 1 && (tok.id == TOKEN_LBRAC) {
@@ -589,7 +590,6 @@ func ParseSelector_FunctionCall() {
 func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
     var boolFlag uint64;
     var tempObject *libgogo.ObjectDesc;
-    var tempAddr uint64;
     var tempList *libgogo.ObjectDesc;
     var tempItem *libgogo.Item;
     PrintDebugString("Entering ParseSelectorSub()",1000);
@@ -608,11 +608,10 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
 			    if tempObject == nil {
 			        SymbolTableError("Package", packagename, "has no variable named", tok.strValue);
 			    }
-			    tempAddr = libgogo.GetObjectOffset(tempObject, tempList);
 			    if tempList == LocalObjects { //Local
-			        libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempObject.PtrType, tempAddr, 0, 0); //Varible item
+			        VariableObjectDescToItem(tempObject, item, 0); //Local variable
 			    } else { //Global
-			        libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempObject.PtrType, tempAddr, 0, 1); //Varible item
+			        VariableObjectDescToItem(tempObject, item, 1); //Global variable
 		  	    }
             } else { //Field access
                 if Compile != 0 {
@@ -1175,7 +1174,6 @@ func ParserSync() {
 func FindIdentifierAndParseSelector(item *libgogo.Item) {
     var boolFlag uint64;
     var tempObject *libgogo.ObjectDesc;
-    var tempAddr uint64;
     var tempList *libgogo.ObjectDesc;
     var packagename string;
     if Compile != 0 {
@@ -1201,14 +1199,13 @@ func FindIdentifierAndParseSelector(item *libgogo.Item) {
 			if tempObject == nil {
 				SymbolTableError("Undefined", "", "variable", tok.strValue);
 			}
-			tempAddr = libgogo.GetObjectOffset(tempObject, tempList);
 			if tempList == LocalObjects { //Local
-				libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempObject.PtrType, tempAddr, 0, 0); //Varible item
+    			VariableObjectDescToItem(tempObject, item, 0); //Local variable
 			} else { //Global or parameter
 			    if tempList == GlobalObjects { //Global
-    				libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempObject.PtrType, tempAddr, 0, 1); //Varible item
+    				VariableObjectDescToItem(tempObject, item, 1); //Global variable
     			} else { //Parameter
-    				libgogo.SetItem(item, libgogo.MODE_VAR, tempObject.ObjType, tempObject.PtrType, tempAddr, 0, 2); //Varible item
+    				VariableObjectDescToItem(tempObject, item, 2); //Local parameter
     	        }
 			}
 		    ParseSelector(item, CurrentPackage); //Parse selectors for an object in the current package

@@ -271,3 +271,21 @@ func EndOfFunction() {
         LocalParameters = nil; //Delete local parameters
     }
 }
+
+//
+// Creates a new variable item from a variable object, considering the according address offsets
+// kind = 0: Local variable, 1: Global variable, 2: Local parameter
+//
+func VariableObjectDescToItem(obj *libgogo.ObjectDesc, item *libgogo.Item, kind uint64) {
+    var tempAddr uint64;
+    if kind == 0 { //Local variable
+        tempAddr = libgogo.GetObjectOffset(obj, LocalObjects);
+    } else { //Global variable or local parameter
+        if kind == 1 { //Global variable
+            tempAddr = libgogo.GetObjectOffset(obj, GlobalObjects);
+        } else { //Local parameter (kind = 2)
+            tempAddr = libgogo.GetObjectOffset(obj, LocalParameters);
+        }
+    }
+    libgogo.SetItem(item, libgogo.MODE_VAR, obj.ObjType, obj.PtrType, tempAddr, 0, kind); //Varible item of given kind
+}
