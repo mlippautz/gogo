@@ -72,8 +72,8 @@ func FreeRegisterIfRequired(item *libgogo.Item) {
 //
 func DereferRegisterIfNecessary(item *libgogo.Item) {
     var opsize uint64;
-    opsize = GetOpSize(item);
     if (item.Mode == libgogo.MODE_REG) && (item.A != 0) { //Derefer register if it contains an address
+        opsize = GetOpSize(item, "MOV");
         PrintInstruction_Reg_Reg("MOV", opsize, "R", item.R, 1, 0, 0, "", "R", item.R, 0, 0, 0, ""); //MOV (item.R), item.R
         item.A = 0; //Register now contains a value
     }
@@ -85,9 +85,9 @@ func DereferRegisterIfNecessary(item *libgogo.Item) {
 func DereferItemIfNecessary(item *libgogo.Item) {
     var oldA uint64;
     var opsize uint64;
-    opsize = GetOpSize(item);
     if item.PtrType == 1 {
         if item.Mode == libgogo.MODE_REG { //Item is already in a register => derefer register
+            opsize = GetOpSize(item, "MOV");
             PrintInstruction_Reg_Reg("MOV", opsize, "R", item.R, 1, 0, 0, "", "R", item.R, 0, 0, 0, ""); //MOV (item.R), item.R
         } else { //Item is not a register yet => make it a register by loading its value
             oldA = item.A; //Save value of A
@@ -157,17 +157,19 @@ func GenerateVariableFieldAccess(item *libgogo.Item, offsetItem *libgogo.Item, b
 func MakeRegistered(item *libgogo.Item, calculatewithaddresses uint64) {
     var reg uint64;
     var opsize uint64;
-    opsize = GetOpSize(item);
     if item.Mode != libgogo.MODE_REG {
         reg = GetFreeRegister();
         OccupyRegister(reg);
 
         if item.Mode == libgogo.MODE_CONST { // const item
+            opsize = GetOpSize(item, "MOV");
             PrintInstruction_Imm_Reg("MOV", opsize, item.A, "R", reg, 0, 0, 0, ""); // MOV $item.A, Rdone (soon to be item.R)
         } else { // var item
             if calculatewithaddresses == 0 {
+                opsize = GetOpSize(item, "MOV");
                 PrintInstruction_Var_Reg("MOV", item, "R", reg); // MOV item.A(SB), Rdone (soon to be item.R)
             } else {
+                opsize = GetOpSize(item, "LEA");
                 PrintInstruction_Var_Reg("LEA", item, "R", reg); // LEA item.A(SB), Rdone (soon to be item.R)
             }
         }

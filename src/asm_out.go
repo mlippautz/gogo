@@ -134,18 +134,23 @@ func PrintImmediate(value uint64) {
     PrintCodeOutputValue(value);
 }
 
-func GetOpSize(item *libgogo.Item) uint64 {
+func GetOpSize(item *libgogo.Item, op string) uint64 {
     var size uint64;
-    if (item.PtrType == 1) || ((item.Mode == libgogo.MODE_REG) && (item.A != 0)) { //Pointer type or register with address
-        size = 8; //Pointers always have a size of 64 bits
-    } else { //Value type
-        if item.Itemtype.Form == libgogo.FORM_SIMPLE { //Simple type
-            size = item.Itemtype.Len; //Size of type
-        } else {
-            if item.Itemtype == string_t { //Special treatment for strings => 16 bytes
-                size = 16;
+    size = libgogo.StringCompare(op, "LEA");
+    if size == 0 { //Always use 64 bits when performing LEA (=> LEAQ) as reading something else than a 64 bit pointer on a 64 bit architecture does not make any sense
+        size = 8;
+    } else {
+        if (item.PtrType == 1) || ((item.Mode == libgogo.MODE_REG) && (item.A != 0)) { //Pointer type or register with address
+            size = 8; //Pointers always have a size of 64 bits
+        } else { //Value type
+            if item.Itemtype.Form == libgogo.FORM_SIMPLE { //Simple type
+                size = item.Itemtype.Len; //Size of type
             } else {
-                size = 8; //Use 64 bits in all other cases (address calculations, records etc.)
+                if item.Itemtype == string_t { //Special treatment for strings => 16 bytes
+                    size = 16;
+                } else {
+                    size = 8; //Use 64 bits in all other cases (address calculations, records etc.)
+                }
             }
         }
     }
@@ -214,7 +219,7 @@ func PrintInstruction_Imm_Reg(op string, opsize uint64, value uint64, regname st
 
 func PrintInstruction_Imm_Var(op string, value uint64, variable *libgogo.Item) {
     var opsize uint64;
-    opsize = GetOpSize(variable);
+    opsize = GetOpSize(variable, op);
     if variable.Global == 1 { //Global
         PrintInstruction_Imm_Reg(op, opsize, value, "SB", 0, 1, variable.A, 0, "data"); //OP $value, data+variable.A(SB)
     } else { //Local
@@ -228,7 +233,7 @@ func PrintInstruction_Imm_Var(op string, value uint64, variable *libgogo.Item) {
 
 func PrintInstruction_Var_Imm(op string, variable *libgogo.Item, value uint64) {
     var opsize uint64;
-    opsize = GetOpSize(variable);
+    opsize = GetOpSize(variable, op);
     if variable.Global == 1 { //Global
         PrintInstruction_Reg_Imm(op, opsize, "SB", 0, 1, variable.A, 0, "data", value); // OP data+variable.A(SB), $value
     } else { //Local
@@ -242,7 +247,7 @@ func PrintInstruction_Var_Imm(op string, variable *libgogo.Item, value uint64) {
 
 func PrintInstruction_Reg_Var(op string, regname string, regnumber uint64, variable *libgogo.Item) {
     var opsize uint64;
-    opsize = GetOpSize(variable);
+    opsize = GetOpSize(variable, op);
     if variable.Global == 1 { //Global
         PrintInstruction_Reg_Reg(op, opsize, regname, regnumber, 0, 0, 0, "", "SB", 0, 1, variable.A, 0, "data"); //OP regname_regnumber, data+variable.A(SB)
     } else { //Local
@@ -256,7 +261,7 @@ func PrintInstruction_Reg_Var(op string, regname string, regnumber uint64, varia
 
 func PrintInstruction_Var_Reg(op string, variable *libgogo.Item, regname string, regnumber uint64) {
     var opsize uint64;
-    opsize = GetOpSize(variable);
+    opsize = GetOpSize(variable, op);
     if variable.Global == 1 { //Global
         PrintInstruction_Reg_Reg(op, opsize, "SB", 0, 1, variable.A, 0, "data", regname, regnumber, 0, 0, 0, ""); //OP data+variable.A(SB), regname_regnumber
     } else { //Local

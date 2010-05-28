@@ -53,8 +53,8 @@ func AddSubInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
             }
             item2.Itemtype = uint64_t;
         }
-        opsize1 = GetOpSize(item1);
-        opsize2 = GetOpSize(item2);
+        opsize1 = GetOpSize(item1, op);
+        opsize2 = GetOpSize(item2, op);
         if opsize1 > opsize2 {
             opsize2 = opsize1;
         } else {
@@ -73,7 +73,7 @@ func AddSubInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
             if calculatewithaddresses == 0 { // Calculate with values
                 DereferRegisterIfNecessary(item2);
             }
-            opsize2 = GetOpSize(item2);
+            opsize2 = GetOpSize(item2, op); //Recalculate op size for item2 as it may have been deref.
             if opsize1 > opsize2 {
                 opsize2 = opsize1;
             } else {
@@ -110,7 +110,7 @@ func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
             DereferRegisterIfNecessary(item1); // Calculate with values
         }
 
-        opsize1 = GetOpSize(item1);
+        opsize1 = GetOpSize(item1, "MOV");
         if item1.Mode == libgogo.MODE_CONST {
             PrintInstruction_Imm_Reg("MOV", opsize1, item1.A, "AX", 0, 0, 0, 0, "") // move $item1.A into AX
         }
@@ -150,8 +150,8 @@ func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
             PrintInstruction_Reg_Reg("XOR", 8, "DX", 0, 0, 0, 0, "", "DX", 0, 0, 0, 0, ""); //XORQ DX, DX is equal to MOVQ $0, DX
         }
         
-        opsize1 = GetOpSize(item1);
-        opsize2 = GetOpSize(item2);
+        opsize1 = GetOpSize(item1, op);
+        opsize2 = GetOpSize(item2, op);
         if opsize1 > opsize2 {
             opsize2 = opsize1;
         } else {

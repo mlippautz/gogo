@@ -34,8 +34,7 @@ TEXT    main·init(SB),0,$0-0
   MOVQ R8, data+16(SB)
   //--- Global variable assignment end at test.go:16:37
   //--- Assign byte buffer to new string constant start at test.go:24:26
-  ANDQ $255, R8
-  LEAB data+712(SB), R8
+  LEAQ data+712(SB), R8
   MOVQ R8, data+720(SB)
   //--- Assign byte buffer to new string constant end at test.go:24:26
   //--- Assign string length to new string constant start at test.go:24:26
