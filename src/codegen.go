@@ -102,8 +102,13 @@ func DereferItemIfNecessary(item *libgogo.Item) {
 // Simple wrapper to asm_out printing
 //
 func GenerateComment(msg string) {
-    var str string = "  //--- ";
+    var str string = "";
     var temp string;
+    if (OutputStringPtr != (&DataSegment)) {
+        str = "  //--- ";
+    } else { //No indentation in data segment
+        str = "//--- ";
+    }
     libgogo.StringAppend(&str, msg);
     libgogo.StringAppend(&str, " at ");
     temp = BuildHead();

@@ -285,3 +285,13 @@ func PrintLabel(label string) {
 func SetDataSegmentSize(size uint64) {
     DataSegmentSize = size;
 }
+
+func PutDataByte(offset uint64, value byte) {
+    var temp uint64;
+    PrintCodeOutput("DATA ");
+    PrintRegister("SB", 0, 1, offset, 0, "data");
+    PrintInstructionOperandSeparator();
+    temp = libgogo.ToIntFromByte(value);
+    PrintImmediate(temp);
+    PrintInstructionEnd();
+}

@@ -9,7 +9,14 @@
 // This code is automatically generated. DO NOT EDIT IT!
 //
 
-GLOBL data(SB),$728
+//--- String buffer start ('Test') at test.go:24:26
+DATA data+712(SB), $84
+DATA data+713(SB), $101
+DATA data+714(SB), $115
+DATA data+715(SB), $116
+DATA data+716(SB), $0
+//--- String buffer end at test.go:24:26
+GLOBL data(SB),$736
 
 TEXT    main·init(SB),0,$0-0
   //--- Global variable assignment start at test.go:15:21
@@ -26,6 +33,14 @@ TEXT    main·init(SB),0,$0-0
   //--- Global variable assignment RHS load end at test.go:16:37
   MOVQ R8, data+16(SB)
   //--- Global variable assignment end at test.go:16:37
+  //--- Assign byte buffer to new string constant start at test.go:24:26
+  ANDQ $255, R8
+  LEAB data+712(SB), R8
+  MOVQ R8, data+720(SB)
+  //--- Assign byte buffer to new string constant end at test.go:24:26
+  //--- Assign string length to new string constant start at test.go:24:26
+  MOVQ $4, data+728(SB)
+  //--- Assign string length to new string constant end at test.go:24:26
   RET
 
 TEXT    main·main(SB),0,$0-0
@@ -42,7 +57,7 @@ TEXT    main·main(SB),0,$0-0
   //--- Local variable assignment start at test.go:24:20
   //--- Local variable assignment RHS load start at test.go:24:20
   //--- Local variable assignment RHS load end at test.go:24:27
-  MOV? data+712(SB), R8
+  MOV? data+720(SB), R8
   MOV? R8, -32(SP)
   //--- Local variable assignment end at test.go:24:27
   //--- Assignment start at test.go:28:9
