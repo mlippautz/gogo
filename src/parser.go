@@ -281,6 +281,7 @@ func ParseVarDecl() uint64 {
                    GenerateAssignment(LHSItem, RHSItem, exprIndicator); //LHS = RHS
                    GenerateComment("Local variable assignment end");
                 } else { //Global variable
+                   SwitchOutputToInitCodeSegment(); //Write code to main.init in order to make sure that the variables are initialized globaly
                    GenerateComment("Global variable assignment start");
                    VariableObjectDescToItem(CurrentObject, LHSItem, 1); //Global variable
                    GenerateComment("Global variable assignment RHS load start");
@@ -288,6 +289,7 @@ func ParseVarDecl() uint64 {
                    GenerateComment("Global variable assignment RHS load end");
                    GenerateAssignment(LHSItem, RHSItem, exprIndicator); //LHS = RHS
                    GenerateComment("Global variable assignment end");
+                   SwitchOutputToCodeSegment(); //Write the rest of the code to the code segment
                 }
             } else {
                 ParseExpression(nil, &ed);

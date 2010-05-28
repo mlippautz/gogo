@@ -12,9 +12,6 @@
 GLOBL data(SB),$728
 
 TEXT    main·init(SB),0,$0-0
-  RET
-
-TEXT    main·main(SB),0,$0-0
   //--- Global variable assignment start at test.go:15:21
   //--- Global variable assignment RHS load start at test.go:15:21
   //--- Global variable assignment RHS load end at test.go:15:31
@@ -29,6 +26,9 @@ TEXT    main·main(SB),0,$0-0
   //--- Global variable assignment RHS load end at test.go:16:37
   MOVQ R8, data+16(SB)
   //--- Global variable assignment end at test.go:16:37
+  RET
+
+TEXT    main·main(SB),0,$0-0
   //--- Local variable assignment start at test.go:22:20
   //--- Local variable assignment RHS load start at test.go:22:20
   //--- Local variable assignment RHS load end at test.go:22:22

@@ -15,6 +15,13 @@ var InitCodeSegment string; //Global variable initialization code
 var CodeSegment string; //Actual code
 
 //
+// Pointer used to decide to which string to append output
+// There are functions like SwitchOutputToCodeSegment() to change this pointer in a clean way
+// By default, it points to the code segment string
+//
+var OutputStringPtr *string = &CodeSegment;
+
+//
 // Size of the data segment
 //
 var DataSegmentSize uint64 = 0;
@@ -73,8 +80,20 @@ func PrintFile() {
     libgogo.FileClose(fd);
 }
 
+func SwitchOutputToInitCodeSegment() {
+    OutputStringPtr = &InitCodeSegment;
+}
+
+func SwitchOutputToCodeSegment() {
+    OutputStringPtr = &CodeSegment;
+}
+
+func SwitchOutputToDataSegment() {
+    OutputStringPtr = &DataSegment;
+}
+
 func PrintCodeOutput(output string) {
-    libgogo.StringAppend(&CodeSegment, output);
+    libgogo.StringAppend(OutputStringPtr, output);
 }
 
 func PrintCodeOutputValue(value uint64) {
