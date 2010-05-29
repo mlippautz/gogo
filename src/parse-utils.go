@@ -8,27 +8,6 @@
 
 package main
 
-import "./libgogo/_obj/libgogo"
-
-//
-// Function used to check whether a certain stackdepth has been reached.
-// Throws a fatal error!
-//
-func IncAndCheckDepth() {
-    curDepth = curDepth +1;
-    if curDepth > maxDepth {
-        libgogo.ExitError("Max code depth reached. Please modify your code.",2);
-    }
-}
-
-//
-// Function decrementing the current depth
-// To be used after some codeblock that has been "protected" by IncAndCheckDepth
-//
-func DecDepth() {
-    curDepth = curDepth -1;
-}
-
 //
 // Function looks 1 token ahead and checks if it equals the provided one
 // Returns: 0 if tokens match, 1 otherwise

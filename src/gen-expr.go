@@ -15,6 +15,8 @@ type ExpressionDescriptor struct {
     RestCounter uint64;
     GlobalCounter uint64;
     Prefix string;
+    CurFile string;
+    CurLine uint64;
 };
 
 //
@@ -69,17 +71,27 @@ func GenerateTermArith(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
 
 func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
     var labelString string;
-    if op == TOKEN_REL_AND {
-        labelString = GenerateIfLabel(ed.Prefix,ed.GlobalCounter,ed.ExpressionDepth,"END");
-        PrintJump("JNZ", labelString);
-    } else {
-        if op == TOKEN_REL_OR {
-            labelString = GenerateIfLabel(ed.Prefix,ed.GlobalCounter,0,"OK");
-            PrintJump("JZ", labelString);
-            labelString = GenerateIfLabel(ed.Prefix,ed.GlobalCounter,ed.ExpressionDepth-1,"END");
-            PrintLabel(labelString);
+    var jmp string;
+
+    if Compile != 0 {
+        if item.Mode != libgogo.MODE_COND {
+            GenErrorWeak("Can use relative operators only with conditionals.");
+        }
+
+        if op == TOKEN_REL_AND {
+            labelString = GenerateIfLabel(ed.CurFile,ed.CurLine,ed.ExpressionDepth,"END");
+            jmp = GetJump(item.C, 1);
+            PrintJump(jmp, labelString);
         } else {
-            GenErrorWeak("Relative AND expected.");
+            if op == TOKEN_REL_OR {
+                labelString = GenerateIfLabel(ed.CurFile,ed.CurLine,0,"OK");
+                jmp = GetJump(item.C, 0);
+                PrintJump(jmp, labelString);
+                labelString = GenerateIfLabel(ed.CurFile,ed.CurLine,ed.ExpressionDepth-1,"END");
+                PrintLabel(labelString);
+            } else {
+                GenErrorWeak("Relative AND expected.");
+            }
         }
     }
 }
@@ -89,9 +101,9 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
 //
 func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     if Compile != 0 {   
-        if (item1.Itemtype != uint64_t) || (item2.Itemtype != uint64_t) {
-            SymbolTableError("Cannot compare types", "", "other than", uint64_t.Name);
-        }    
+        //if (item1.Itemtype != uint64_t) || (item2.Itemtype != uint64_t) {
+        //    SymbolTableError("Cannot compare types", "", "other than", uint64_t.Name);
+        //}    
         DereferItemIfNecessary(item1); //Derefer address if item is a pointer (should not be necessary here)
         DereferItemIfNecessary(item2); //Derefer address if item is a pointer (should not be necessary here)
 
@@ -134,8 +146,29 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
             }
         }
 
+        // Prepare item
         item1.Itemtype = bool_t;
-        FreeRegisterIfRequired(item2);    
+        item1.Mode = libgogo.MODE_COND;
+        if op == TOKEN_EQUALS {
+            item1.C = libgogo.REL_EQ;
+        }
+        if op == TOKEN_NOTEQUAL {
+            item1.C = libgogo.REL_NEQ;
+        }
+        if op == TOKEN_REL_LT {
+            item1.C = libgogo.REL_LT;
+        }
+        if op == TOKEN_REL_LTOE {
+            item1.C = libgogo.REL_LTE;
+        }
+        if op == TOKEN_REL_GT {
+            item1.C = libgogo.REL_GT;
+        }
+        if op == TOKEN_REL_GTOE {
+            item1.C = libgogo.REL_GTE;
+        }
+
+        FreeRegisterIfRequired(item2);
     }
 }
 

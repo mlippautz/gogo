@@ -17,8 +17,6 @@ var InsideFunction uint64 = 0;
 var InsideStructDecl uint64 = 0;
 var InsideFunctionVarDecl uint64 = 0;
 
-var Ifs uint64 = 0;
-
 //
 // Package name of currently processed file
 //
@@ -372,9 +370,10 @@ func ParseSimpleExpression(item *libgogo.Item, ed *ExpressionDescriptor) {
     ParseUnaryArithOp();
     tempItem2 = libgogo.NewItem();
     ParseTerm(item, ed);
-    for boolFlag = ParseSimpleExpressionOp(tempItem2, ed);
+    // TODO(mike): Is this really the right item that is put into ParseSimpleExpressionOp?
+    for boolFlag = ParseSimpleExpressionOp(item, ed);
         boolFlag == 0;
-        boolFlag = ParseSimpleExpressionOp(tempItem2, ed) {
+        boolFlag = ParseSimpleExpressionOp(item, ed) {
         op = libgogo.Pop(&Operators);
         if op != TOKEN_REL_OR {
             GenerateSimpleExpressionArith(item, tempItem2, op);
@@ -436,9 +435,10 @@ func ParseTerm(item *libgogo.Item, ed *ExpressionDescriptor) {
     PrintDebugString("Entering ParseTerm()",1000);
     ParseFactor(item, ed);
     tempItem2 = libgogo.NewItem();
-    for boolFlag = ParseTermOp(tempItem2, ed);
+    // TODO(mike): Is this really the right item?
+    for boolFlag = ParseTermOp(item, ed);
         boolFlag == 0;
-        boolFlag = ParseTermOp(tempItem2, ed) {
+        boolFlag = ParseTermOp(item, ed) {
         op = libgogo.Pop(&Operators);
         if op != TOKEN_REL_AND {
             GenerateTermArith(item, tempItem2, op);
@@ -1168,11 +1168,17 @@ func ParseForStatement() {
 func ParseIfStatement() {
     var item *libgogo.Item;
     var ed ExpressionDescriptor;
-    Ifs = Ifs +1;
-    ed.GlobalCounter = Ifs;
-    ed.Prefix = "";
-    libgogo.StringAppend(&ed.Prefix,fileInfo[curFileIndex].filename);
+    var i uint64;
+    var strLen uint64;
+
+    ed.CurFile = "";
+    strLen = libgogo.StringLength(fileInfo[curFileIndex].filename);
+    for i=0;(i<strLen) && (fileInfo[curFileIndex].filename[i] != '.');i=i+1 {
+        libgogo.CharAppend(&ed.CurFile, fileInfo[curFileIndex].filename[i]);
+    }
     ed.ExpressionDepth = 0;
+    ed.CurLine = fileInfo[curFileIndex].lineCounter;
+
     PrintDebugString("Entering ParseIfStatement()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_IF {
