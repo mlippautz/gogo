@@ -10,8 +10,12 @@ import "./libgogo/_obj/libgogo"
 func GenerateIfStart(item *libgogo.Item, ed ExpressionDescriptor) {
     var labelString string;
     var jmp string;
-    labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "END");
-    jmp = GetJump(item.C, 1);
+    // should not be needed
+    //labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "END");
+    //jmp = GetJump(item.C, 1);
+    //PrintJump(jmp, labelString);
+    labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "OK");
+    jmp = GetJump(item.C, 0);
     PrintJump(jmp, labelString);
     labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, ed.ExpressionDepth-1, "END");
     PrintLabel(labelString);
