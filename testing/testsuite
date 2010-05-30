@@ -84,6 +84,9 @@ function new_valids() {
     do
         $GOGO -p $TESTDIR/$filename > $TMPDIR/$filename
     done
+    $GOGO -c $TESTDIR/test.go
+    mv _gogo_.sog $TMPDIR
+    
     echo ""
     echo "* Generated testsuite results in $TMPDIR"
     echo "* Please check if these results are expected"
@@ -166,6 +169,8 @@ function do_tests() {
     do
         $GOGO -p $TESTDIR/$filename > $TMPDIR/$filename
     done
+    $GOGO -c $TESTDIR/test.go
+    mv _gogo_.sog $TMPDIR
     
     echo ""
     echo ">>> Performing quick check"
