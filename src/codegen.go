@@ -103,8 +103,10 @@ func DereferItemIfNecessary(item *libgogo.Item) {
 //
 func GenerateComment(msg string) {
     var str string = "";
+    var tmpPtr *string;
     var temp string;
-    if (OutputStringPtr != (&DataSegment)) {
+    tmpPtr = &DataSegment;
+    if (OutputStringPtr != tmpPtr) {
         str = "  //--- ";
     } else { //No indentation in data segment
         str = "//--- ";

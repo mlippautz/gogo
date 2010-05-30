@@ -14,11 +14,8 @@ func test(bla uint64, blub string) {
 
 
 
-    if (a < b) && (c < d) || ((c <d) && (a > b)) || (a > b)  {
+    if (a != b) && (c < d) || ((a > b) || (c <d) && (e > f)) || (a > b)  {
     }
 
-    if (bump_ptr == 0) && (end_ptr == 0) {
-
-    }
 }
 

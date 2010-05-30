@@ -370,10 +370,9 @@ func ParseSimpleExpression(item *libgogo.Item, ed *ExpressionDescriptor) {
     ParseUnaryArithOp();
     tempItem2 = libgogo.NewItem();
     ParseTerm(item, ed);
-    // TODO(mike): Is this really the right item that is put into ParseSimpleExpressionOp?
-    for boolFlag = ParseSimpleExpressionOp(tempItem2, ed);
+    for boolFlag = ParseSimpleExpressionOp(item, tempItem2, ed);
         boolFlag == 0;
-        boolFlag = ParseSimpleExpressionOp(tempItem2, ed) {
+        boolFlag = ParseSimpleExpressionOp(item, tempItem2, ed) {
         op = libgogo.Pop(&Operators);
         if op != TOKEN_REL_OR {
             GenerateSimpleExpressionArith(item, tempItem2, op);
@@ -385,7 +384,7 @@ func ParseSimpleExpression(item *libgogo.Item, ed *ExpressionDescriptor) {
 //
 //
 //
-func ParseSimpleExpressionOp(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
+func ParseSimpleExpressionOp(item1 *libgogo.Item, item2 *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     var boolFlag uint64 = 1;
     PrintDebugString("Entering ParseSimpleExpressionOp()",1000);
     boolFlag = ParseUnaryArithOp(); // +,-
@@ -393,13 +392,13 @@ func ParseSimpleExpressionOp(item *libgogo.Item, ed *ExpressionDescriptor) uint6
         GetNextTokenSafe();
         if tok.id == TOKEN_REL_OR {
             // ||
-            GenerateRelative(item, TOKEN_REL_OR, ed);
+            GenerateRelative(item1, TOKEN_REL_OR, ed);
             libgogo.Push(&Operators, TOKEN_REL_OR);
             boolFlag = 0;
         } 
     }
     if boolFlag == 0 {
-        ParseTerm(item, ed);
+        ParseTerm(item2, ed);
     } else {
         tok.nextToken = tok.id;
     }
@@ -435,10 +434,9 @@ func ParseTerm(item *libgogo.Item, ed *ExpressionDescriptor) {
     PrintDebugString("Entering ParseTerm()",1000);
     ParseFactor(item, ed);
     tempItem2 = libgogo.NewItem();
-    // TODO(mike): Is this really the right item?
-    for boolFlag = ParseTermOp(tempItem2, ed);
+    for boolFlag = ParseTermOp(item, tempItem2, ed);
         boolFlag == 0;
-        boolFlag = ParseTermOp(tempItem2, ed) {
+        boolFlag = ParseTermOp(item, tempItem2, ed) {
         op = libgogo.Pop(&Operators);
         if op != TOKEN_REL_AND {
             GenerateTermArith(item, tempItem2, op);
@@ -450,7 +448,7 @@ func ParseTerm(item *libgogo.Item, ed *ExpressionDescriptor) {
 //
 //
 //
-func ParseTermOp(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
+func ParseTermOp(item1 *libgogo.Item, item2 *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     var boolFlag uint64;
     PrintDebugString("Entering ParseTermOp()",1000);
     boolFlag = ParseBinaryArithOp(); // *,/
@@ -458,13 +456,13 @@ func ParseTermOp(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
         GetNextTokenSafe();
         if tok.id == TOKEN_REL_AND {
             // &&
-            GenerateRelative(item, TOKEN_REL_AND, ed);
+            GenerateRelative(item1, TOKEN_REL_AND, ed);
             libgogo.Push(&Operators, TOKEN_REL_AND);
             boolFlag = 0;
         }
     }
     if boolFlag == 0 {
-        ParseFactor(item, ed);
+        ParseFactor(item2, ed);
     } else {
         tok.nextToken = tok.id;
     }
@@ -1175,7 +1173,7 @@ func ParseIfStatement() {
     var i uint64;
     var strLen uint64;
 
-    ed.CurFile = "";
+    ed.CurFile = "IF_";
     strLen = libgogo.StringLength(fileInfo[curFileIndex].filename);
     for i=0;(i<strLen) && (fileInfo[curFileIndex].filename[i] != '.');i=i+1 {
         libgogo.CharAppend(&ed.CurFile, fileInfo[curFileIndex].filename[i]);
