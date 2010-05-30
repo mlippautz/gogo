@@ -371,9 +371,9 @@ func ParseSimpleExpression(item *libgogo.Item, ed *ExpressionDescriptor) {
     tempItem2 = libgogo.NewItem();
     ParseTerm(item, ed);
     // TODO(mike): Is this really the right item that is put into ParseSimpleExpressionOp?
-    for boolFlag = ParseSimpleExpressionOp(item, ed);
+    for boolFlag = ParseSimpleExpressionOp(tempItem2, ed);
         boolFlag == 0;
-        boolFlag = ParseSimpleExpressionOp(item, ed) {
+        boolFlag = ParseSimpleExpressionOp(tempItem2, ed) {
         op = libgogo.Pop(&Operators);
         if op != TOKEN_REL_OR {
             GenerateSimpleExpressionArith(item, tempItem2, op);
@@ -436,9 +436,9 @@ func ParseTerm(item *libgogo.Item, ed *ExpressionDescriptor) {
     ParseFactor(item, ed);
     tempItem2 = libgogo.NewItem();
     // TODO(mike): Is this really the right item?
-    for boolFlag = ParseTermOp(item, ed);
+    for boolFlag = ParseTermOp(tempItem2, ed);
         boolFlag == 0;
-        boolFlag = ParseTermOp(item, ed) {
+        boolFlag = ParseTermOp(tempItem2, ed) {
         op = libgogo.Pop(&Operators);
         if op != TOKEN_REL_AND {
             GenerateTermArith(item, tempItem2, op);

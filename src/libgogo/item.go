@@ -17,7 +17,7 @@ type Item struct {
 //
 // Pseudo constants that specify the descriptor sizes 
 //
-var ITEM_SIZE uint64 = 48; //6*8 bytes space for an object
+var ITEM_SIZE uint64 = 56; //7*8 bytes space for an object
 
 //
 // Modes for items
