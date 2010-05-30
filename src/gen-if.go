@@ -10,20 +10,34 @@ import "./libgogo/_obj/libgogo"
 func GenerateIfStart(item *libgogo.Item, ed ExpressionDescriptor) {
     var labelString string;
     var jmp string;
-    labelString = GenerateIfLabel(ed.CurFile,ed.CurLine,0,"END");
+    labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "END");
     jmp = GetJump(item.C, 1);
     PrintJump(jmp, labelString);
     labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, ed.ExpressionDepth-1, "END");
     PrintLabel(labelString);
     labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "END");
-    PrintJump("JMP",labelString);
+    PrintJump("JMP", labelString);
     labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "OK");
     PrintLabel(labelString);
 }
 
-func GenerateIfEnd(item *libgogo.Item, ed ExpressionDescriptor) {
+func GenerateIfEnd(ed ExpressionDescriptor) {
     var labelString string;
     labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "END");
+    PrintLabel(labelString);
+}
+
+func GenerateElseStart(ed ExpressionDescriptor) {
+    var labelString string;
+    labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "ELSE_END");
+    PrintJump("JMP", labelString);
+    labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "END");
+    PrintLabel(labelString);
+}
+
+func GenerateElseEnd(ed ExpressionDescriptor) {
+    var labelString string;
+    labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "ELSE_END");
     PrintLabel(labelString);
 }
 

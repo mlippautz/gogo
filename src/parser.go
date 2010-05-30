@@ -1190,11 +1190,14 @@ func ParseIfStatement() {
         AssertNextToken(TOKEN_LCBRAC);
         ParseStatementSequence();
         AssertNextToken(TOKEN_RCBRAC);
-        GenerateIfEnd(item, ed);
+        
         GetNextTokenSafe();
         if tok.id == TOKEN_ELSE {
+            GenerateElseStart(ed);
             ParseElseStatement();
+            GenerateElseEnd(ed);
         } else {
+            GenerateIfEnd(ed);
             tok.nextToken = tok.id;
         }
 
