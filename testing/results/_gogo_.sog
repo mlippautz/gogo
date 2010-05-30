@@ -56,8 +56,10 @@ TEXT    main·main(SB),0,$0-0
   //--- Local variable assignment start at tests/test.go:24:20
   //--- Local variable assignment RHS load start at tests/test.go:24:20
   //--- Local variable assignment RHS load end at tests/test.go:24:27
-  MOV? data+720(SB), R8
-  MOV? R8, -32(SP)
+  MOVQ data+720(SB), R8
+  MOVQ data+728(SB), R9
+  MOVQ R8, -32(SP)
+  MOVQ R9, -24(SP)
   //--- Local variable assignment end at tests/test.go:24:27
   //--- Assignment start at tests/test.go:28:9
   //--- Assignment LHS load start at tests/test.go:28:9
@@ -100,7 +102,9 @@ TEXT    main·main(SB),0,$0-0
   ADDQ $8, R9
   //--- Assignment RHS load end at tests/test.go:30:28
   MOVQ (R9), R9
-  MOV? R9, -32(SP)
+  MOVQ 8(R9), R8
+  MOVQ R9, -32(SP)
+  MOVQ R8, -24(SP)
   //--- Assignment end at tests/test.go:30:28
   //--- Assignment start at tests/test.go:31:7
   //--- Assignment LHS load start at tests/test.go:31:7
@@ -115,7 +119,8 @@ TEXT    main·main(SB),0,$0-0
   MOVQ (R9), R9
   ADDQ $1, R9
   //--- Assignment RHS load end at tests/test.go:31:35
-  MOVQ (R9), R9
+  ANDQ $255, R9
+  MOVB (R9), R9
   MOVB R9, (R8)
   //--- Assignment end at tests/test.go:31:35
   //--- Assignment start at tests/test.go:32:7

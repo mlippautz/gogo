@@ -20,6 +20,10 @@ func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item, address ui
     }
 }
 
+//
+// Performs the assignment LHS = RHS
+// Converts the RHS to a uint64 if the LHS is a uint64 and the RHS is a byte
+//
 func GenerateRawAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
     var done uint64 = 0;
     var opsize uint64;
@@ -58,12 +62,12 @@ func GenerateRawAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
         }
         if (done == 0) && (RHSItem.Mode == libgogo.MODE_VAR) { //Var RHS
             MakeRegistered(RHSItem, 0); //Load value
-            PrintInstruction_Reg_Var("MOV", "R", RHSItem.R, LHSItem); //MOV RHSItem.R, LHSItem.A(SB)
+            PrintInstruction_Reg_Var("MOV", "R", RHSItem.R, "R", RHSItem.C, LHSItem); //MOV RHSItem.R, LHSItem.A(SB)
             done = 1;
         }
         if (done == 0) && (RHSItem.Mode == libgogo.MODE_REG) { //Reg RHS
             DereferRegisterIfNecessary(RHSItem); //Make sure to work with the value, not the address
-            PrintInstruction_Reg_Var("MOV", "R", RHSItem.R, LHSItem); //MOV RHSItem.R, LHSItem.A(SB)
+            PrintInstruction_Reg_Var("MOV", "R", RHSItem.R, "R", RHSItem.C, LHSItem); //MOV RHSItem.R, LHSItem.A(SB)
             done = 1;
         }
     } else { //Register with address of variable on LHS; assertion: Register contains address and global/local flag is set correctly
@@ -75,13 +79,19 @@ func GenerateRawAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
         if (done == 0) && (RHSItem.Mode == libgogo.MODE_VAR) { //Var RHS
             MakeRegistered(RHSItem, 0); //Load value
             opsize = GetOpSize(RHSItem, "MOV");
-            PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "", "R", LHSItem.R, 1, 0, 0, ""); //MOV RHSItem.R, (LHSItem.R)
+            done = PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "", "R", LHSItem.R, 1, 0, 0, ""); //MOV RHSItem.R, (LHSItem.R)
+            if done != 0 { //Handle operands > 8 bytes
+                PrintInstruction_Reg_Reg("MOV", done, "R", RHSItem.C, 0, 0, 0, "", "R", LHSItem.C, 1, 0, 0, ""); //MOV RHSItem.C, (LHSItem.C)
+            }
             done = 1;
         }
         if (done == 0) && (RHSItem.Mode == libgogo.MODE_REG) { //Reg RHS
             DereferRegisterIfNecessary(RHSItem); //Make sure to work with the value, not the address
             opsize = GetOpSize(RHSItem, "MOV");
-            PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "", "R", LHSItem.R, 1, 0, 0, ""); //MOV RHSItem.R, (LHSItem.R)
+            done = PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "", "R", LHSItem.R, 1, 0, 0, ""); //MOV RHSItem.R, (LHSItem.R)
+            if done != 0 { //Handle operands > 8 bytes
+                PrintInstruction_Reg_Reg("MOV", done, "R", RHSItem.C, 0, 0, 0, "", "R", LHSItem.C, 1, 0, 0, ""); //MOV RHSItem.C, (LHSItem.C)
+            }
             done = 1;
         }
     }        
@@ -89,8 +99,12 @@ func GenerateRawAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
     FreeRegisterIfRequired(RHSItem);
 }
 
+//
+// Performs the assignment LHS = &RHS
+//
 func GenerateAssignmentWithAmpersandOnRHS(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
     var opsize uint64;
+    var retVal uint64;
     if LHSItem.PtrType == 0 {
         SymbolTableError("Cannot assign a pointer type to a value", "", "type:", LHSItem.Itemtype.Name);
     }
@@ -105,10 +119,13 @@ func GenerateAssignmentWithAmpersandOnRHS(LHSItem *libgogo.Item, RHSItem *libgog
         MakeRegistered(RHSItem, 1); //LEA RHSItem.A(SB), to be RHSItem.R
     } //Reg RHS
     if LHSItem.Mode == libgogo.MODE_VAR { //Variable on LHS
-        PrintInstruction_Reg_Var("MOV", "R", RHSItem.R, LHSItem); //MOV RHSItem.R, LHSItem.A(SB)
+        PrintInstruction_Reg_Var("MOV", "R", RHSItem.R, "R", RHSItem.C, LHSItem); //MOV RHSItem.R, LHSItem.A(SB)
     } else { //Register with address of variable on LHS; assertion: Register contains address and global/local flag is set correctly
         opsize = GetOpSize(RHSItem, "MOV");
-        PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "", "R", LHSItem.R, 1, 0, 0, ""); //MOV RHSItem.R, (LHSItem.R)
+        retVal = PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "", "R", LHSItem.R, 1, 0, 0, ""); //MOV RHSItem.R, (LHSItem.R)
+        if retVal != 0 { //Handle operands > 8 bytes
+            PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.C, 0, 0, 0, "", "R", LHSItem.C, 1, 0, 0, ""); //MOV RHSItem.C, (LHSItem.C)
+        }
     }
     FreeRegisterIfRequired(LHSItem);
     FreeRegisterIfRequired(RHSItem);

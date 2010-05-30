@@ -18,6 +18,7 @@ import "./libgogo/_obj/libgogo"
 // otherwise it is assumed that they contain addresses
 // Note: This function does not perform type checking, but converts one item to
 // type uint64 if necessary
+// Note: This function can only handle operands with a maximum of 8 bytes in size
 //
 func AddSubInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, constvalue uint64, calculatewithaddresses uint64) {
     var done uint64 = 0;
@@ -66,7 +67,7 @@ func AddSubInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
             done = 1;
         }
         if (done == 0) && (item2.Mode == libgogo.MODE_VAR) {
-            PrintInstruction_Var_Reg(op, item2, "R", item1.R); //OP item2.A(SB), item1.R
+            PrintInstruction_Var_Reg(op, item2, "R", item1.R, "", 0); //OP item2.A(SB), item1.R
             done = 1;
         }
         if (done == 0) && (item2.Mode == libgogo.MODE_REG) {
@@ -91,7 +92,9 @@ func AddSubInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
 // item1 = item1 OP item2, or constvalue if both item1 and item2 are constants
 // Difference here is that it uses a one operand assembly instruction which 
 // operates on AX as first operand
-// Note: This function does not perform type checking
+// Note: This function does not perform type checking, but converts one item to
+// type uint64 if necessary
+// Note: This function can only handle operands with a maximum of 8 bytes in size
 //
 func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, constvalue uint64, calculatewithaddresses uint64) {
     var done uint64 = 0;
@@ -115,7 +118,7 @@ func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
             PrintInstruction_Imm_Reg("MOV", opsize1, item1.A, "AX", 0, 0, 0, 0, "") // move $item1.A into AX
         }
         if item1.Mode == libgogo.MODE_VAR {
-            PrintInstruction_Var_Reg("MOV", item1, "AX", 0); // move item2.A(SB), AX
+            PrintInstruction_Var_Reg("MOV", item1, "AX", 0, "", 0); // move item2.A(SB), AX
         }
         if item1.Mode == libgogo.MODE_REG {
             PrintInstruction_Reg_Reg("MOV", opsize1, "R", item1.R, 0, 0, 0, "", "AX", 0, 0, 0, 0, "") // move item1.R into AX

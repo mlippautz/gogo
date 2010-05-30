@@ -10,7 +10,7 @@ type Item struct {
     PtrType uint64; //If 1, item is of type *Itemtype, otherwise it is of type Itemtype
     A uint64; //Mode = MODE_VAR: variable address; Mode = MODE_CONST: const value; Mode = MODE_REG: 0 = register contains value, 1 = register contains address
     R uint64; //Mode = MODE_REGISTER: register number
-    C uint64; // Mode = MODE_COND: Type of comparison
+    C uint64; // Mode = MODE_COND: Type of comparison; Mode = MODE_REG: Optional second register occupied
     Global uint64; //If 1, the variable is global, 0 if it is function-local, 2 if it is a function parameter
 };
 
@@ -61,6 +61,7 @@ func SetItem(item *Item, mode uint64, itemtype *TypeDesc, ptrtype uint64, a uint
     item.Itemtype = itemtype;
     item.PtrType = ptrtype;
     item.A = a;
+    item.C = 0;
     item.R = r;
     item.Global = global;
 }

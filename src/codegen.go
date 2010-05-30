@@ -64,6 +64,9 @@ func FreeRegister(index uint64) {
 func FreeRegisterIfRequired(item *libgogo.Item) {
     if item.Mode == libgogo.MODE_REG {
         FreeRegister(item.R);
+        if item.C != 0 {
+            FreeRegister(item.C);
+        }
     }
 }
 
@@ -72,10 +75,21 @@ func FreeRegisterIfRequired(item *libgogo.Item) {
 //
 func DereferRegisterIfNecessary(item *libgogo.Item) {
     var opsize uint64;
+    var retVal uint64;
     if (item.Mode == libgogo.MODE_REG) && (item.A != 0) { //Derefer register if it contains an address
+        item.A = 0; //Register will soon contain a value; make sure op size calculation is based on the actual type size, not on the pointer size
         opsize = GetOpSize(item, "MOV");
-        PrintInstruction_Reg_Reg("MOV", opsize, "R", item.R, 1, 0, 0, "", "R", item.R, 0, 0, 0, ""); //MOV (item.R), item.R
-        item.A = 0; //Register now contains a value
+        retVal = PrintInstruction_Reg_Reg("MOV", opsize, "R", item.R, 1, 0, 0, "", "R", item.R, 0, 0, 0, ""); //MOV (item.R), item.R
+        if retVal != 0 {
+            if item.C != 0 {
+                PrintInstruction_Reg_Reg("MOV", retVal, "R", item.C, 1, 0, 0, "", "R", item.C, 0, 0, 0, ""); //MOV (item.C), item.C
+            } else {
+                retVal = GetFreeRegister(); //Additional register required
+                OccupyRegister(retVal);
+                item.C = retVal;
+                PrintInstruction_Reg_Reg("MOV", retVal, "R", item.R, 1, 8, 0, "", "R", item.C, 0, 0, 0, ""); //MOV 8(item.R), item.C
+            }
+        }
     }
 }
 
@@ -85,10 +99,21 @@ func DereferRegisterIfNecessary(item *libgogo.Item) {
 func DereferItemIfNecessary(item *libgogo.Item) {
     var oldA uint64;
     var opsize uint64;
+    var retVal uint64;
     if item.PtrType == 1 {
         if item.Mode == libgogo.MODE_REG { //Item is already in a register => derefer register
             opsize = GetOpSize(item, "MOV");
-            PrintInstruction_Reg_Reg("MOV", opsize, "R", item.R, 1, 0, 0, "", "R", item.R, 0, 0, 0, ""); //MOV (item.R), item.R
+            retVal = PrintInstruction_Reg_Reg("MOV", opsize, "R", item.R, 1, 0, 0, "", "R", item.R, 0, 0, 0, ""); //MOV (item.R), item.R
+            if retVal != 0 {
+                if item.C != 0 {
+                    PrintInstruction_Reg_Reg("MOV", retVal, "R", item.C, 1, 0, 0, "", "R", item.C, 0, 0, 0, ""); //MOV (item.C), item.C
+                } else {
+                    retVal = GetFreeRegister(); //Additional register required
+                    OccupyRegister(retVal);
+                    item.C = retVal;
+                    PrintInstruction_Reg_Reg("MOV", retVal, "R", item.R, 1, 8, 0, "", "R", item.C, 0, 0, 0, ""); //MOV 8(item.R), item.C
+                }
+            }
         } else { //Item is not a register yet => make it a register by loading its value
             oldA = item.A; //Save value of A
             MakeRegistered(item, 0); //Don't load address as loading the value automatically derefers the item
@@ -158,6 +183,7 @@ func GenerateVariableFieldAccess(item *libgogo.Item, offsetItem *libgogo.Item, b
 //
 func MakeRegistered(item *libgogo.Item, calculatewithaddresses uint64) {
     var reg uint64;
+    var reg2 uint64;
     var opsize uint64;
     if item.Mode != libgogo.MODE_REG {
         reg = GetFreeRegister();
@@ -169,10 +195,15 @@ func MakeRegistered(item *libgogo.Item, calculatewithaddresses uint64) {
         } else { // var item
             if calculatewithaddresses == 0 {
                 opsize = GetOpSize(item, "MOV");
-                PrintInstruction_Var_Reg("MOV", item, "R", reg); // MOV item.A(SB), Rdone (soon to be item.R)
+                if opsize > 8 { //Occupy additional register if operand size is higher than 8 bytes
+                    reg2 = GetFreeRegister();
+                    OccupyRegister(reg2);
+                    item.C = reg2;
+                }
+                PrintInstruction_Var_Reg("MOV", item, "R", reg, "R", reg2); // MOV item.A(SB), Rdone (soon to be item.R)
             } else {
                 opsize = GetOpSize(item, "LEA");
-                PrintInstruction_Var_Reg("LEA", item, "R", reg); // LEA item.A(SB), Rdone (soon to be item.R)
+                PrintInstruction_Var_Reg("LEA", item, "R", reg, "", 0); // LEA item.A(SB), Rdone (soon to be item.R)
             }
         }
 

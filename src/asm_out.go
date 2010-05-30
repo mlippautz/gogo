@@ -157,7 +157,8 @@ func GetOpSize(item *libgogo.Item, op string) uint64 {
     return size;
 }
 
-func PrintInstructionStart(op string, opsize uint64) {
+func PrintInstructionStart(op string, opsize uint64) uint64 {
+    var retVal uint64 = 0;
     PrintCodeOutput("  ");
     PrintCodeOutput(op);
     if opsize == 1 { //byte => B
@@ -166,10 +167,16 @@ func PrintInstructionStart(op string, opsize uint64) {
         if opsize == 8 { //uint64 => Q
             PrintCodeOutput("Q");
         } else {
-            PrintCodeOutput("?"); //TODO: Error: invalid opsize
+            if opsize > 8 { //>uint64 => Q and return rest of size to be handled additionally
+                PrintCodeOutput("Q");
+                retVal = opsize - 8;
+            } else { //Size between 1 and 8 which is neither byte nor uint64
+                PrintCodeOutput("?"); //TODO: Error: invalid opsize
+            }
         }
     }
     PrintCodeOutput(" ");
+    return retVal;
 }
 
 func PrintInstructionOperandSeparator() {
@@ -180,21 +187,25 @@ func PrintInstructionEnd() {
     PrintCodeOutput("\n");
 }
 
-func PrintInstruction_Reg(op string, opsize uint64, name string, number uint64, indirect uint64, offset uint64, offsetnegative uint64, optionaloffsetname string) {
-    PrintInstructionStart(op, opsize);
+func PrintInstruction_Reg(op string, opsize uint64, name string, number uint64, indirect uint64, offset uint64, offsetnegative uint64, optionaloffsetname string) uint64 {
+    var retVal uint64;
+    retVal = PrintInstructionStart(op, opsize);
     PrintRegister(name, number, indirect, offset, offsetnegative, optionaloffsetname);
     PrintInstructionEnd();
+    return retVal;
 }
 
-func PrintInstruction_Reg_Reg(op string, opsize uint64, reg1name string, reg1number uint64, reg1indirect uint64, reg1offset uint64, reg1offsetnegative uint64, reg1optionaloffsetname string, reg2name string, reg2number uint64, reg2indirect uint64, reg2offset uint64, reg2offsetnegative uint64, reg2optionaloffsetname string) {
+func PrintInstruction_Reg_Reg(op string, opsize uint64, reg1name string, reg1number uint64, reg1indirect uint64, reg1offset uint64, reg1offsetnegative uint64, reg1optionaloffsetname string, reg2name string, reg2number uint64, reg2indirect uint64, reg2offset uint64, reg2offsetnegative uint64, reg2optionaloffsetname string) uint64 {
+    var retVal uint64;
     if (opsize == 1) && (reg2indirect == 0) { //Clear upper bits using AND mask when operating on bytes; don't clear memory as op could be MOV and therefore set 7 bytes unrecoverably to zero
         PrintInstruction_Imm_Reg("AND", 8, 255, reg2name, reg2number, reg2indirect, reg2offset, reg2offsetnegative, reg2optionaloffsetname); //ANDQ $255, R
     }
-    PrintInstructionStart(op, opsize);
+    retVal = PrintInstructionStart(op, opsize);
     PrintRegister(reg1name, reg1number, reg1indirect, reg1offset, reg1offsetnegative, reg1optionaloffsetname);
     PrintInstructionOperandSeparator();
     PrintRegister(reg2name, reg2number, reg2indirect, reg2offset, reg2offsetnegative, reg2optionaloffsetname);
     PrintInstructionEnd();
+    return retVal;
 }
 
 func PrintInstruction_Reg_Imm(op string, opsize uint64, regname string, regnumber uint64, regindirect uint64, regoffset uint64, regoffsetnegative uint64, regoptionaloffsetname string, value uint64) {
@@ -245,30 +256,50 @@ func PrintInstruction_Var_Imm(op string, variable *libgogo.Item, value uint64) {
     }
 }
 
-func PrintInstruction_Reg_Var(op string, regname string, regnumber uint64, variable *libgogo.Item) {
+func PrintInstruction_Reg_Var(op string, regname string, regnumber uint64, optregname string, optregnumber uint64, variable *libgogo.Item) {
     var opsize uint64;
+    var retVal uint64;
     opsize = GetOpSize(variable, op);
     if variable.Global == 1 { //Global
-        PrintInstruction_Reg_Reg(op, opsize, regname, regnumber, 0, 0, 0, "", "SB", 0, 1, variable.A, 0, "data"); //OP regname_regnumber, data+variable.A(SB)
+        retVal = PrintInstruction_Reg_Reg(op, opsize, regname, regnumber, 0, 0, 0, "", "SB", 0, 1, variable.A, 0, "data"); //OP regname_regnumber, data+variable.A(SB)
+        if retVal != 0 { //Handle operands > 8 bytes
+            PrintInstruction_Reg_Reg(op, retVal, optregname, optregnumber, 0, 0, 0, "", "SB", 0, 1, variable.A + 8, 0, "data"); //OP optregname_optregnumber, data+variable.A+8(SB)
+        }
     } else { //Local
         if variable.Global == 2 { //Parameter
-            PrintInstruction_Reg_Reg(op, opsize, regname, regnumber, 0, 0, 0, "", "SP", 0, 1, variable.A + 8, 0, ""); //OP regname_regnumber, [variable.A+8](SP)
+            retVal = PrintInstruction_Reg_Reg(op, opsize, regname, regnumber, 0, 0, 0, "", "SP", 0, 1, variable.A + 8, 0, ""); //OP regname_regnumber, [variable.A+8](SP)
+            if retVal != 0 { //Handle operands > 8 bytes
+                PrintInstruction_Reg_Reg(op, retVal, optregname, optregnumber, 0, 0, 0, "", "SP", 0, 1, variable.A + 16, 0, ""); //OP optregname_optregnumber, [variable.A+8+8](SP)
+            }
         } else { //Local
-            PrintInstruction_Reg_Reg(op, opsize, regname, regnumber, 0, 0, 0, "", "SP", 0, 1, variable.A + 8, 1, ""); //OP regname_regnumber, -[variable.A+8](SP)
+            retVal = PrintInstruction_Reg_Reg(op, opsize, regname, regnumber, 0, 0, 0, "", "SP", 0, 1, variable.A + 8, 1, ""); //OP regname_regnumber, -[variable.A+8](SP)
+            if retVal != 0 { //Handle operands > 8 bytes
+                PrintInstruction_Reg_Reg(op, retVal, optregname, optregnumber, 0, 0, 0, "", "SP", 0, 1, variable.A, 1, ""); //OP optregname_optregnumber, -[variable.A+8-8](SP)
+            }
         }
     }
 }
 
-func PrintInstruction_Var_Reg(op string, variable *libgogo.Item, regname string, regnumber uint64) {
+func PrintInstruction_Var_Reg(op string, variable *libgogo.Item, regname string, regnumber uint64, optregname string, optregnumber uint64) {
     var opsize uint64;
+    var retVal uint64;
     opsize = GetOpSize(variable, op);
     if variable.Global == 1 { //Global
-        PrintInstruction_Reg_Reg(op, opsize, "SB", 0, 1, variable.A, 0, "data", regname, regnumber, 0, 0, 0, ""); //OP data+variable.A(SB), regname_regnumber
+        retVal = PrintInstruction_Reg_Reg(op, opsize, "SB", 0, 1, variable.A, 0, "data", regname, regnumber, 0, 0, 0, ""); //OP data+variable.A(SB), regname_regnumber
+        if retVal != 0 { //Handle operands > 8 byte
+            PrintInstruction_Reg_Reg(op, retVal, "SB", 0, 1, variable.A + 8, 0, "data", optregname, optregnumber, 0, 0, 0, ""); //OP data+variable.A+8(SB), optregname_optregnumber
+        }
     } else { //Local
         if variable.Global == 2 { //Parameter
-            PrintInstruction_Reg_Reg(op, opsize, "SP", 0, 1, variable.A + 8, 0, "", regname, regnumber, 0, 0, 0, ""); //OP [variable.A+8](SP), regname_regnumber
+            retVal = PrintInstruction_Reg_Reg(op, opsize, "SP", 0, 1, variable.A + 8, 0, "", regname, regnumber, 0, 0, 0, ""); //OP [variable.A+8](SP), regname_regnumber
+            if retVal != 0 { //Handle operands > 8 byte
+                PrintInstruction_Reg_Reg(op, retVal, "SP", 0, 1, variable.A + 16, 0, "", optregname, optregnumber, 0, 0, 0, ""); //OP [variable.A+8+8](SP), optregname_optregnumber
+            }
         } else { //Local
-            PrintInstruction_Reg_Reg(op, opsize, "SP", 0, 1, variable.A + 8, 1, "", regname, regnumber, 0, 0, 0, ""); //OP -[variable.A+8](SP), regname_regnumber
+            retVal = PrintInstruction_Reg_Reg(op, opsize, "SP", 0, 1, variable.A + 8, 1, "", regname, regnumber, 0, 0, 0, ""); //OP -[variable.A+8](SP), regname_regnumber
+            if retVal != 0 { //Handle operands > 8 byte
+                PrintInstruction_Reg_Reg(op, retVal, "SP", 0, 1, variable.A, 1, "", optregname, optregnumber, 0, 0, 0, ""); //OP -[variable.A+8-8](SP), optregname_optregnumber
+            }
         }
     }
 }

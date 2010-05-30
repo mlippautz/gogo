@@ -98,6 +98,7 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
 
 //
 // Called by parser (ParseExpression)
+// Note: This function can only handle operands with a maximum of 8 bytes in size
 //
 func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     if Compile != 0 {   
@@ -118,7 +119,7 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
                     PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
                 }
                 if item2.Mode == libgogo.MODE_VAR {
-                    PrintInstruction_Reg_Var("CMP", "R", item1.R, item2);
+                    PrintInstruction_Reg_Var("CMP", "R", item1.R, "", 0, item2);
                 }
             }
         }
@@ -130,7 +131,7 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
                 PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
             }
             if item2.Mode == libgogo.MODE_VAR {
-                PrintInstruction_Reg_Var("CMP", "R", item1.R, item2);
+                PrintInstruction_Reg_Var("CMP", "R", item1.R, "", 0, item2);
             }
         }
         if item1.Mode == libgogo.MODE_VAR {
@@ -138,11 +139,11 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
                 PrintInstruction_Var_Imm("CMP", item1, item2.A);
             }
             if item2.Mode == libgogo.MODE_REG {
-                PrintInstruction_Var_Reg("CMP", item1, "R", item2.R);
+                PrintInstruction_Var_Reg("CMP", item1, "R", item2.R, "", 0);
             }
             if item2.Mode == libgogo.MODE_VAR {
                 MakeRegistered(item2, 0);
-                PrintInstruction_Var_Reg("CMP", item1, "R", item2.R);
+                PrintInstruction_Var_Reg("CMP", item1, "R", item2.R, "", 0);
             }
         }
 
