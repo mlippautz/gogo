@@ -57,12 +57,7 @@ func GenerateRawAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
             done = 1;
         }
         if (done == 0) && (RHSItem.Mode == libgogo.MODE_VAR) { //Var RHS
-            done = GetFreeRegister();
-            OccupyRegister(done);
-            PrintInstruction_Var_Reg("MOV", RHSItem, "R", done); //MOV RHSItem.A(SB), Rdone (soon to be RHSItem.R)
-            RHSItem.Mode = libgogo.MODE_REG;
-            RHSItem.R = done; //RHS is now a register
-            RHSItem.A = 0; //Register now contains RHS value
+            MakeRegistered(RHSItem, 0); //Load value
             PrintInstruction_Reg_Var("MOV", "R", RHSItem.R, LHSItem); //MOV RHSItem.R, LHSItem.A(SB)
             done = 1;
         }
@@ -78,12 +73,7 @@ func GenerateRawAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
             done = 1;
         }
         if (done == 0) && (RHSItem.Mode == libgogo.MODE_VAR) { //Var RHS
-            done = GetFreeRegister();
-            OccupyRegister(done);
-            PrintInstruction_Var_Reg("MOV", RHSItem, "R", done); //MOV RHSItem.A(SB), Rdone (soon to be RHSItem.R)
-            RHSItem.Mode = libgogo.MODE_REG;
-            RHSItem.R = done; //RHS is now a register
-            RHSItem.A = 0; //Register now contains RHS value
+            MakeRegistered(RHSItem, 0); //Load value
             opsize = GetOpSize(RHSItem, "MOV");
             PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "", "R", LHSItem.R, 1, 0, 0, ""); //MOV RHSItem.R, (LHSItem.R)
             done = 1;
