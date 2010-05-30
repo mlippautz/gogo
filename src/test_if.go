@@ -16,6 +16,9 @@ func test(bla uint64, blub string) {
 
     if (a != b) && (c < d) || ((a > b) || (c <d) && (e > f)) || (a > b)  {
         a = 1;
+        if (c > 4) {
+            c = 3;
+        }
     } else {
         a = 5;
     }

@@ -35,4 +35,14 @@ func test(bla uint64, blub string) {
     fooArrInst[0].bar3 = testPtr.barPtr.bar3;
     fooArrInst[a].bar3 = &a;
     fooArrInst[a].bar3 = testPtr.barPtr.bar3;
+
+    if (a < 10) && (b > 10) || (a == 5) {
+        if (b > 15) {
+            b = 4;
+        } else {
+            b = 3;
+        }
+    } else {
+        b = 2;
+    }
 }

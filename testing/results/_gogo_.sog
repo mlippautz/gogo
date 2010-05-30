@@ -206,4 +206,46 @@ TEXT    main·main(SB),0,$0-0
   MOVQ (R8), R8
   MOVQ R8, (R9)
   //--- Assignment end at tests/test.go:37:46
+  CMPQ -8(SP), $10
+  JGE IF_tests/test_39_2_END
+  CMPQ -16(SP), $10
+  JL IF_tests/test_39_OK
+IF_tests/test_39_2_END:
+  CMPQ -8(SP), $5
+  JGE IF_tests/test_39_END
+IF_tests/test_39_3_END:
+  JMP IF_tests/test_39_END
+IF_tests/test_39_OK:
+  CMPQ -16(SP), $15
+  JLE IF_tests/test_40_END
+IF_tests/test_40_1_END:
+  JMP IF_tests/test_40_END
+IF_tests/test_40_OK:
+  //--- Assignment start at tests/test.go:41:17
+  //--- Assignment LHS load start at tests/test.go:41:17
+  //--- Assignment LHS load end at tests/test.go:41:17
+  //--- Assignment RHS load start at tests/test.go:41:19
+  //--- Assignment RHS load end at tests/test.go:41:19
+  MOVQ $4, -16(SP)
+  //--- Assignment end at tests/test.go:41:19
+  JMP IF_tests/test_40_ELSE_END
+IF_tests/test_40_END:
+  //--- Assignment start at tests/test.go:43:17
+  //--- Assignment LHS load start at tests/test.go:43:17
+  //--- Assignment LHS load end at tests/test.go:43:17
+  //--- Assignment RHS load start at tests/test.go:43:19
+  //--- Assignment RHS load end at tests/test.go:43:19
+  MOVQ $3, -16(SP)
+  //--- Assignment end at tests/test.go:43:19
+IF_tests/test_40_ELSE_END:
+  JMP IF_tests/test_39_ELSE_END
+IF_tests/test_39_END:
+  //--- Assignment start at tests/test.go:46:13
+  //--- Assignment LHS load start at tests/test.go:46:13
+  //--- Assignment LHS load end at tests/test.go:46:13
+  //--- Assignment RHS load start at tests/test.go:46:15
+  //--- Assignment RHS load end at tests/test.go:46:15
+  MOVQ $2, -16(SP)
+  //--- Assignment end at tests/test.go:46:15
+IF_tests/test_39_ELSE_END:
   RET
