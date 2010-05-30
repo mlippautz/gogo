@@ -81,14 +81,10 @@ func DereferRegisterIfNecessary(item *libgogo.Item) {
         opsize = GetOpSize(item, "MOV");
         retVal = PrintInstruction_Reg_Reg("MOV", opsize, "R", item.R, 1, 0, 0, "", "R", item.R, 0, 0, 0, ""); //MOV (item.R), item.R
         if retVal != 0 {
-            if item.C != 0 {
-                PrintInstruction_Reg_Reg("MOV", retVal, "R", item.C, 1, 0, 0, "", "R", item.C, 0, 0, 0, ""); //MOV (item.C), item.C
-            } else {
-                retVal = GetFreeRegister(); //Additional register required
-                OccupyRegister(retVal);
-                item.C = retVal;
-                PrintInstruction_Reg_Reg("MOV", retVal, "R", item.R, 1, 8, 0, "", "R", item.C, 0, 0, 0, ""); //MOV 8(item.R), item.C
-            }
+            retVal = GetFreeRegister(); //Additional register required
+            OccupyRegister(retVal);
+            item.C = retVal;
+            PrintInstruction_Reg_Reg("MOV", retVal, "R", item.R, 1, 8, 0, "", "R", item.C, 0, 0, 0, ""); //MOV 8(item.R), item.C
         }
     }
 }
@@ -105,14 +101,10 @@ func DereferItemIfNecessary(item *libgogo.Item) {
             opsize = GetOpSize(item, "MOV");
             retVal = PrintInstruction_Reg_Reg("MOV", opsize, "R", item.R, 1, 0, 0, "", "R", item.R, 0, 0, 0, ""); //MOV (item.R), item.R
             if retVal != 0 {
-                if item.C != 0 {
-                    PrintInstruction_Reg_Reg("MOV", retVal, "R", item.C, 1, 0, 0, "", "R", item.C, 0, 0, 0, ""); //MOV (item.C), item.C
-                } else {
-                    retVal = GetFreeRegister(); //Additional register required
-                    OccupyRegister(retVal);
-                    item.C = retVal;
-                    PrintInstruction_Reg_Reg("MOV", retVal, "R", item.R, 1, 8, 0, "", "R", item.C, 0, 0, 0, ""); //MOV 8(item.R), item.C
-                }
+                retVal = GetFreeRegister(); //Additional register required
+                OccupyRegister(retVal);
+                item.C = retVal;
+                PrintInstruction_Reg_Reg("MOV", retVal, "R", item.R, 1, 8, 0, "", "R", item.C, 0, 0, 0, ""); //MOV 8(item.R), item.C
             }
         } else { //Item is not a register yet => make it a register by loading its value
             oldA = item.A; //Save value of A
