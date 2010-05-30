@@ -388,19 +388,19 @@ func ParseSimpleExpressionOp(item1 *libgogo.Item, item2 *libgogo.Item, ed *Expre
     var boolFlag uint64 = 1;
     PrintDebugString("Entering ParseSimpleExpressionOp()",1000);
     boolFlag = ParseUnaryArithOp(); // +,-
-    if boolFlag != 0 {
+    if boolFlag == 0 {
+        ParseTerm(item2, ed);
+    } else {
         GetNextTokenSafe();
         if tok.id == TOKEN_REL_OR {
             // ||
             GenerateRelative(item1, TOKEN_REL_OR, ed);
             libgogo.Push(&Operators, TOKEN_REL_OR);
+            ParseTerm(item1, ed);
             boolFlag = 0;
-        } 
-    }
-    if boolFlag == 0 {
-        ParseTerm(item2, ed);
-    } else {
-        tok.nextToken = tok.id;
+        } else {
+            tok.nextToken = tok.id;
+        }
     }
     PrintDebugString("Leaving ParseSimpleExpressionOp()",1000);
     return boolFlag;
@@ -452,19 +452,19 @@ func ParseTermOp(item1 *libgogo.Item, item2 *libgogo.Item, ed *ExpressionDescrip
     var boolFlag uint64;
     PrintDebugString("Entering ParseTermOp()",1000);
     boolFlag = ParseBinaryArithOp(); // *,/
-    if boolFlag != 0 {
+    if boolFlag == 0 {
+        ParseFactor(item2, ed); //Arith items
+    } else {
         GetNextTokenSafe();
         if tok.id == TOKEN_REL_AND {
             // &&
             GenerateRelative(item1, TOKEN_REL_AND, ed);
             libgogo.Push(&Operators, TOKEN_REL_AND);
+            ParseFactor(item1, ed); //Rel items
             boolFlag = 0;
+        } else {
+            tok.nextToken = tok.id;
         }
-    }
-    if boolFlag == 0 {
-        ParseFactor(item2, ed);
-    } else {
-        tok.nextToken = tok.id;
     }
     PrintDebugString("Leaving ParseTermOp()",1000);
     return boolFlag;
@@ -1121,9 +1121,13 @@ func ParseFunctionCallStatement() {
 
 func ParseForStatement() {
     var ed ExpressionDescriptor;
+    var item *libgogo.Item;
+    var strLen uint64;
+    var i uint64;
     PrintDebugString("Entering ParseForStatement()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_FOR {
+        GenerateComment("for start");
         GetNextTokenSafe();
 
         if tok.id == TOKEN_SEMICOLON {
@@ -1140,7 +1144,16 @@ func ParseForStatement() {
             tok.nextToken = tok.id;
         } else {
             tok.nextToken = tok.id;
-            ParseExpression(nil, &ed); //TODO
+
+            ed.CurFile = "IF_";
+            strLen = libgogo.StringLength(fileInfo[curFileIndex].filename);
+            for i=0;(i<strLen) && (fileInfo[curFileIndex].filename[i] != '.');i=i+1 {
+                libgogo.CharAppend(&ed.CurFile, fileInfo[curFileIndex].filename[i]);
+            }
+            ed.ExpressionDepth = 0;
+            ed.CurLine = fileInfo[curFileIndex].lineCounter;
+            item = libgogo.NewItem();
+            ParseExpression(item, &ed);
         }
 
         AssertNextToken(TOKEN_SEMICOLON);
@@ -1160,6 +1173,7 @@ func ParseForStatement() {
     } else {
         tok.nextToken = tok.id;
     }   
+    GenerateComment("for end");
     PrintDebugString("Leaving ParseForStatement()",1000);
 }
 
