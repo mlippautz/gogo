@@ -118,9 +118,7 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
 //
 func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     if Compile != 0 {   
-        //if (item1.Itemtype != uint64_t) || (item2.Itemtype != uint64_t) {
-        //    SymbolTableError("Cannot compare types", "", "other than", uint64_t.Name);
-        //}
+        // Type/Pointer checking
         if (item1.Itemtype != item2.Itemtype) && (item1.Itemtype != string_t) && (item2.Itemtype != string_t) {
             GenErrorWeak("Can only compare variables of same type.");
         }            
@@ -132,19 +130,28 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
                 if (op != TOKEN_EQUALS) && (op != TOKEN_NOTEQUAL) {
                     GenErrorWeak("Can only compare '==' or '!=' on pointers'");
                 }
-            } else {
-                GenErrorWeak("Pointer to non-pointer comparison.");
+                if (item1.Mode == libgogo.MODE_CONST) || (item2.Mode == libgogo.MODE_CONST) {
+                    GenErrorWeak("Const pointers not allowed. This should not happen.");
+                }
             }
         }
         if (item2.PtrType == 1) && (item1.PtrType != 1) {
             GenErrorWeak("Non-pointer to pointer comparison.");
         }
+        if (item1.PtrType ==1) && (item2.PtrType != 1) {
+            GenErrorWeak("Pointer to non-pointer comparison.");
+        }
 
         // Generate CMP statements depending on items
         if item1.Mode == libgogo.MODE_CONST {
-            if item2.Mode == libgogo.MODE_CONST {
+            if item2.Mode == libgogo.MODE_CONST { // Values here, since Ptrs are not allowed
+                // Move constvalue to register and compare it against 0                
                 item1.Itemtype = bool_t;
                 item1.A = GetConditionalBool(op, item1.A, item2.A);
+                MakeRegistered(item1, 0);
+                // CMP is handled by other if branch (free optimization, yey)
+                item2.A = 0;
+                op = TOKEN_NOTEQUAL; // Force != for comparison against 0
             } else {
                 if item1.PtrType == 0 {
                     MakeRegistered(item1, 0);
