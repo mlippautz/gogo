@@ -207,20 +207,18 @@ TEXT    main·main(SB),0,$0-0
   MOVQ R8, (R9)
   //--- Assignment end at tests/test.go:37:46
   CMPQ -8(SP), $10
-  JGE IF_tests/test_39_2_END
+  JGE IF_tests/test_39_1_END
   CMPQ -16(SP), $10
-  JL IF_tests/test_39_OK
-IF_tests/test_39_2_END:
+  JG IF_tests/test_39_2_END
+IF_tests/test_39_1_END:
   CMPQ -8(SP), $5
-  JGE IF_tests/test_39_END
-IF_tests/test_39_3_END:
+  JE IF_tests/test_39_2_END
   JMP IF_tests/test_39_END
-IF_tests/test_39_OK:
+IF_tests/test_39_2_END:
   CMPQ -16(SP), $15
-  JLE IF_tests/test_40_END
-IF_tests/test_40_1_END:
+  JG IF_tests/test_40_1_END
   JMP IF_tests/test_40_END
-IF_tests/test_40_OK:
+IF_tests/test_40_1_END:
   //--- Assignment start at tests/test.go:41:17
   //--- Assignment LHS load start at tests/test.go:41:17
   //--- Assignment LHS load end at tests/test.go:41:17
