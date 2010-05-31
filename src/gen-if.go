@@ -7,57 +7,115 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
-func GenerateIfStart(item *libgogo.Item, ed ExpressionDescriptor) {
+func GenerateIfStart(item *libgogo.Item, ed *ExpressionDescriptor) {
     var labelString string;
     var jmp string;
-    // should not be needed
-    //labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "END");
-    //jmp = GetJump(item.C, 1);
-    //PrintJump(jmp, labelString);
-    labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "OK");
+
+    labelString = GenerateSubLabel(ed,1,"END");
     jmp = GetJump(item.C, 0);
     PrintJump(jmp, labelString);
-    labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, ed.ExpressionDepth-1, "END");
-    PrintLabel(labelString);
-    labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "END");
+
+    // Important: Since last jump is a positive one, we have to start with the
+    // negative path
+    if ed.F != 0 {
+        labelString = GetSubLabel(ed,0,"END");
+        PrintLabel(labelString);
+    }
+    labelString = GetGlobLabel(ed,"END");
     PrintJump("JMP", labelString);
-    labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "OK");
+
+    // Positive branch starts after this label, thus insert last remaining 
+    // positive label (if available) here
+    if ed.T != 0 {
+        labelString = GetSubLabel(ed,1,"END");
+        PrintLabel(labelString);
+    }
+}
+
+func GenerateIfEnd(ed *ExpressionDescriptor) {
+    var labelString string;
+    labelString = GetGlobLabel(ed, "END");
     PrintLabel(labelString);
 }
 
-func GenerateIfEnd(ed ExpressionDescriptor) {
+func GenerateElseStart(ed *ExpressionDescriptor) {
     var labelString string;
-    labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "END");
-    PrintLabel(labelString);
-}
-
-func GenerateElseStart(ed ExpressionDescriptor) {
-    var labelString string;
-    labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "ELSE_END");
+    labelString = GetGlobLabel(ed, "ELSE_END");
     PrintJump("JMP", labelString);
-    labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "END");
+    labelString = GetGlobLabel(ed, "END");
     PrintLabel(labelString);
 }
 
-func GenerateElseEnd(ed ExpressionDescriptor) {
+func GenerateElseEnd(ed *ExpressionDescriptor) {
     var labelString string;
-    labelString = GenerateIfLabel(ed.CurFile, ed.CurLine, 0, "ELSE_END");
+    labelString = GetGlobLabel(ed, "ELSE_END");
     PrintLabel(labelString);
 }
 
-func GenerateIfLabel(filename string, line uint64, local uint64, label string) string {
+func GenerateSubLabel(ed *ExpressionDescriptor, i uint64, label string) string {
     var str string;
     var tmpStr string;
-    libgogo.StringAppend(&str, filename);
+    libgogo.StringAppend(&str, ed.CurFile);
     libgogo.StringAppend(&str, "_");
-    tmpStr = libgogo.IntToString(line);
+    tmpStr = libgogo.IntToString(ed.CurLine);
     libgogo.StringAppend(&str, tmpStr);
     libgogo.StringAppend(&str, "_");
-    if local != 0 {
-        tmpStr = libgogo.IntToString(local);
-        libgogo.StringAppend(&str, tmpStr);
-        libgogo.StringAppend(&str, "_");
+
+    if i == 0 {
+        if ed.F == 0 {
+            tmpStr = libgogo.IntToString(ed.IncCnt);
+            ed.F = ed.IncCnt;
+            ed.FDepth = ed.ExpressionDepth;
+            ed.IncCnt = ed.IncCnt + 1;
+        } else {
+            tmpStr = libgogo.IntToString(ed.F);
+        }
+    } else {
+        if ed.T == 0 {
+            tmpStr = libgogo.IntToString(ed.IncCnt);
+            ed.T = ed.IncCnt;
+            ed.TDepth = ed.ExpressionDepth;
+            ed.IncCnt = ed.IncCnt + 1;
+        } else {
+            tmpStr = libgogo.IntToString(ed.T);
+        }
     }
+    libgogo.StringAppend(&str, tmpStr);
+
+    libgogo.StringAppend(&str, "_");
+    libgogo.StringAppend(&str, label);
+    return str;
+}
+
+func GetSubLabel(ed *ExpressionDescriptor, i uint64, label string) string {
+    var str string;
+    var tmpStr string;
+    libgogo.StringAppend(&str, ed.CurFile);
+    libgogo.StringAppend(&str, "_");
+    tmpStr = libgogo.IntToString(ed.CurLine);
+    libgogo.StringAppend(&str, tmpStr);
+    libgogo.StringAppend(&str, "_");
+
+    if i == 0 {
+        tmpStr = libgogo.IntToString(ed.F);
+    } else {
+        tmpStr = libgogo.IntToString(ed.T);
+    }
+    libgogo.StringAppend(&str, tmpStr);
+
+    libgogo.StringAppend(&str, "_");
+    libgogo.StringAppend(&str, label);
+    return str;
+}
+
+func GetGlobLabel(ed *ExpressionDescriptor, label string) string {
+    var str string;
+    var tmpStr string;
+    libgogo.StringAppend(&str, ed.CurFile);
+    libgogo.StringAppend(&str, "_");
+    tmpStr = libgogo.IntToString(ed.CurLine);
+    libgogo.StringAppend(&str, tmpStr);
+    libgogo.StringAppend(&str, "_");
     libgogo.StringAppend(&str, label);
     return str;
 }

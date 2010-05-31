@@ -12,11 +12,16 @@ import "./libgogo/_obj/libgogo"
 
 type ExpressionDescriptor struct {
     ExpressionDepth uint64;
-    RestCounter uint64;
-    GlobalCounter uint64;
-    Prefix string;
+    RestCounter uint64; // depr.
+    IncCnt uint64;
+    GlobalCounter uint64; // depr.
+    Prefix string; // depr.
     CurFile string;
     CurLine uint64;
+    T uint64;
+    F uint64;
+    TDepth uint64;
+    FDepth uint64;
 };
 
 //
@@ -77,20 +82,31 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
         if item.Mode != libgogo.MODE_COND {
             GenErrorWeak("Can use relative operators only with conditionals.");
         }
-
         if op == TOKEN_REL_AND {
-            labelString = GenerateIfLabel(ed.CurFile,ed.CurLine,ed.ExpressionDepth,"END");
+            labelString = GenerateSubLabel(ed,0,"END");
             jmp = GetJump(item.C, 1);
             PrintJump(jmp, labelString);
+            if ed.T != 0 {
+                if ed.TDepth >= ed.ExpressionDepth {
+                    labelString = GetSubLabel(ed,1,"END");
+                    PrintLabel(labelString);
+                    ed.T = 0;
+                }
+            }
         } else {
             if op == TOKEN_REL_OR {
-                labelString = GenerateIfLabel(ed.CurFile,ed.CurLine,0,"OK");
+                labelString = GenerateSubLabel(ed,1,"END");
                 jmp = GetJump(item.C, 0);
                 PrintJump(jmp, labelString);
-                labelString = GenerateIfLabel(ed.CurFile,ed.CurLine,ed.ExpressionDepth-1,"END");
-                PrintLabel(labelString);
+                if ed.F != 0 {
+                    if ed.FDepth >= ed.ExpressionDepth {
+                        labelString = GetSubLabel(ed,0,"END");
+                        PrintLabel(labelString);
+                        ed.F = 0;
+                    }
+                }
             } else {
-                GenErrorWeak("Relative AND expected.");
+                GenErrorWeak("Relative AND or OR expected.");
             }
         }
     }

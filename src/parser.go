@@ -312,7 +312,6 @@ func ParseExpression(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     var tempItem2 *libgogo.Item;
     var retValue uint64 = 0;
     if ed != nil {
-        ed.RestCounter = 0;
         ed.ExpressionDepth = ed.ExpressionDepth + 1;
     }
     PrintDebugString("Entering ParseExpression()",1000);
@@ -334,6 +333,9 @@ func ParseExpression(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
             op = libgogo.Pop(&Operators);
             GenerateComparison(item, tempItem2, op);
 	    }
+    }
+    if ed != nil {
+        ed.ExpressionDepth = ed.ExpressionDepth - 1;
     }
     PrintDebugString("Leaving ParseExpression()",1000);
     return retValue;
@@ -1194,24 +1196,28 @@ func ParseIfStatement() {
     }
     ed.ExpressionDepth = 0;
     ed.CurLine = fileInfo[curFileIndex].lineCounter;
+    ed.IncCnt = 1;
+    ed.RestCounter = 0;
+    ed.T = 0;
+    ed.F = 0;
 
     PrintDebugString("Entering ParseIfStatement()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_IF {
         item = libgogo.NewItem();
         ParseExpression(item, &ed);
-        GenerateIfStart(item, ed);
+        GenerateIfStart(item, &ed);
         AssertNextToken(TOKEN_LCBRAC);
         ParseStatementSequence();
         AssertNextToken(TOKEN_RCBRAC);
         
         GetNextTokenSafe();
         if tok.id == TOKEN_ELSE {
-            GenerateElseStart(ed);
+            GenerateElseStart(&ed);
             ParseElseStatement();
-            GenerateElseEnd(ed);
+            GenerateElseEnd(&ed);
         } else {
-            GenerateIfEnd(ed);
+            GenerateIfEnd(&ed);
             tok.nextToken = tok.id;
         }
 
