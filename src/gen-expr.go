@@ -120,9 +120,25 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     if Compile != 0 {   
         //if (item1.Itemtype != uint64_t) || (item2.Itemtype != uint64_t) {
         //    SymbolTableError("Cannot compare types", "", "other than", uint64_t.Name);
-        //}    
-        DereferItemIfNecessary(item1); //Derefer address if item is a pointer (should not be necessary here)
-        DereferItemIfNecessary(item2); //Derefer address if item is a pointer (should not be necessary here)
+        //}
+        if (item1.Itemtype != item2.Itemtype) && (item1.Itemtype != string_t) && (item2.Itemtype != string_t) {
+            GenErrorWeak("Can only compare variables of same type.");
+        }            
+        if (item1.Itemtype == string_t) || (item2.Itemtype == string_t) {
+            GenErrorWeak("Cannot compare string types.");
+        }
+        if item1.PtrType == 1 {
+            if item2.PtrType == 1 {
+                if (op != TOKEN_EQUALS) && (op != TOKEN_NOTEQUAL) {
+                    GenErrorWeak("Can only compare '==' or '!=' on pointers'");
+                }
+            } else {
+                GenErrorWeak("Pointer to non-pointer comparison.");
+            }
+        }
+        if (item2.PtrType == 1) && (item1.PtrType != 1) {
+            GenErrorWeak("Non-pointer to pointer comparison.");
+        }
 
         // Generate CMP statements depending on items
         if item1.Mode == libgogo.MODE_CONST {
@@ -130,16 +146,26 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
                 item1.Itemtype = bool_t;
                 item1.A = GetConditionalBool(op, item1.A, item2.A);
             } else {
-                MakeRegistered(item1, 0);
+                if item1.PtrType == 0 {
+                    MakeRegistered(item1, 0);
+                } else {
+                    MakeRegistered(item1, 1);
+                }
                 if item2.Mode == libgogo.MODE_REG {
                     PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
                 }
                 if item2.Mode == libgogo.MODE_VAR {
-                    PrintInstruction_Reg_Var("CMP", "R", item1.R, "", 0, item2);
+                    if item2.PtrType == 1 {
+                        MakeRegistered(item2, 1);
+                        PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
+                    } else {
+                        PrintInstruction_Reg_Var("CMP", "R", item1.R, "", 0, item2);
+                    }
                 }
             }
         }
         if item1.Mode == libgogo.MODE_REG {
+            DereferRegisterIfNecessary(item1);
             if item2.Mode == libgogo.MODE_CONST {
                 PrintInstruction_Reg_Imm("CMP", 8, "R", item1.R, 0, 0, 0, "", item2.A);
             }
@@ -155,11 +181,26 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
                 PrintInstruction_Var_Imm("CMP", item1, item2.A);
             }
             if item2.Mode == libgogo.MODE_REG {
-                PrintInstruction_Var_Reg("CMP", item1, "R", item2.R, "", 0);
+                DereferRegisterIfNecessary(item1);
+                if item1.PtrType == 1 {
+                    MakeRegistered(item1, 1);
+                    PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
+                } else {
+                    PrintInstruction_Var_Reg("CMP", item1, "R", item2.R, "", 0);
+                }
             }
             if item2.Mode == libgogo.MODE_VAR {
-                MakeRegistered(item2, 0);
-                PrintInstruction_Var_Reg("CMP", item1, "R", item2.R, "", 0);
+                if item2.PtrType == 0 {
+                    MakeRegistered(item2, 0);
+                } else {
+                    MakeRegistered(item2, 1);
+                }
+                if item1.PtrType == 1 {
+                    MakeRegistered(item1, 1);
+                    PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
+                } else {
+                    PrintInstruction_Var_Reg("CMP", item1, "R", item2.R, "", 0);
+                }
             }
         }
 
