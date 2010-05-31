@@ -504,6 +504,7 @@ func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     var LHSItem *libgogo.Item;
     var RHSItem *libgogo.Item;
     var s string;
+    var tmpBranch uint64;
 
     GetNextTokenSafe();
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
@@ -577,7 +578,10 @@ func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
         doneFlag = 0;
     }
     if (doneFlag == 1) && (tok.id == TOKEN_NOT) {
-        //libgogo.Push(&Operators, TOKEN_NOT);
+        ed.Not = 1;
+        tmpBranch = ed.T;
+        ed.T = ed.F;
+        ed.F = tmpBranch;
         ParseFactor(item, ed);
         doneFlag = 0;
     }
@@ -1193,10 +1197,10 @@ func ParseIfStatement() {
     for i=0;(i<strLen) && (fileInfo[curFileIndex].filename[i] != '.');i=i+1 {
         libgogo.CharAppend(&ed.CurFile, fileInfo[curFileIndex].filename[i]);
     }
+
     ed.ExpressionDepth = 0;
     ed.CurLine = fileInfo[curFileIndex].lineCounter;
     ed.IncCnt = 1;
-    ed.RestCounter = 0;
     ed.T = 0;
     ed.F = 0;
 
