@@ -22,6 +22,7 @@ type ExpressionDescriptor struct {
     F uint64;
     TDepth uint64;
     FDepth uint64;
+    Not uint64;
 };
 
 //
@@ -77,6 +78,7 @@ func GenerateTermArith(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
 func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
     var labelString string;
     var jmp string;
+    var tmp uint64;
 
     if Compile != 0 {
         if item.Mode != libgogo.MODE_COND {
@@ -84,7 +86,20 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
         }
         if op == TOKEN_REL_AND {
             labelString = GenerateSubLabel(ed,0,"END");
-            jmp = GetJump(item.C, 1);
+            if ed.Not == 0 {
+                jmp = GetJump(item.C, 1);
+            } else {
+                if ed.TDepth > ed.ExpressionDepth {
+                    labelString = GenerateSubLabel(ed,1,"END");
+                    jmp = GetJump(item.C, 0);
+                    ed.Not = 0;
+                    tmp = ed.T;
+                    ed.T = ed.F;
+                    ed.F = tmp;
+                } else {
+                    jmp = GetJump(item.C,1);
+                }
+            }
             PrintJump(jmp, labelString);
             if ed.T != 0 {
                 if ed.TDepth >= ed.ExpressionDepth {
@@ -96,7 +111,20 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
         } else {
             if op == TOKEN_REL_OR {
                 labelString = GenerateSubLabel(ed,1,"END");
-                jmp = GetJump(item.C, 0);
+                if ed.Not == 0 {
+                    jmp = GetJump(item.C, 0);
+                } else {
+                    if ed.FDepth > ed.ExpressionDepth {
+                        labelString = GenerateSubLabel(ed,0,"END");
+                        jmp = GetJump(item.C, 1);
+                        ed.Not = 0;
+                        tmp = ed.T;
+                        ed.T = ed.F;
+                        ed.F = tmp;
+                    } else {
+                        jmp = GetJump(item.C,0);
+                    }   
+                }
                 PrintJump(jmp, labelString);
                 if ed.F != 0 {
                     if ed.FDepth >= ed.ExpressionDepth {

@@ -1203,6 +1203,8 @@ func ParseIfStatement() {
     ed.IncCnt = 1;
     ed.T = 0;
     ed.F = 0;
+    ed.TDepth = 0;
+    ed.FDepth = 0;
 
     PrintDebugString("Entering ParseIfStatement()",1000);
     GetNextTokenSafe();

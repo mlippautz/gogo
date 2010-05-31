@@ -10,9 +10,18 @@ import "./libgogo/_obj/libgogo"
 func GenerateIfStart(item *libgogo.Item, ed *ExpressionDescriptor) {
     var labelString string;
     var jmp string;
+    var tmp uint64;
 
     labelString = GenerateSubLabel(ed,1,"END");
-    jmp = GetJump(item.C, 0);
+    if ed.Not == 0 {
+        jmp = GetJump(item.C, 0);
+    } else {
+        labelString = GenerateSubLabel(ed,0,"END");
+        jmp = GetJump(item.C, 1);
+        tmp = ed.T;
+        ed.T = ed.F;
+        ed.F = tmp;
+    }
     PrintJump(jmp, labelString);
 
     // Important: Since last jump is a positive one, we have to start with the
@@ -65,7 +74,7 @@ func GenerateSubLabel(ed *ExpressionDescriptor, i uint64, label string) string {
         if ed.F == 0 {
             tmpStr = libgogo.IntToString(ed.IncCnt);
             ed.F = ed.IncCnt;
-            ed.FDepth = ed.ExpressionDepth;
+            ed.FDepth = ed.ExpressionDepth+1;
             ed.IncCnt = ed.IncCnt + 1;
         } else {
             tmpStr = libgogo.IntToString(ed.F);
@@ -74,7 +83,7 @@ func GenerateSubLabel(ed *ExpressionDescriptor, i uint64, label string) string {
         if ed.T == 0 {
             tmpStr = libgogo.IntToString(ed.IncCnt);
             ed.T = ed.IncCnt;
-            ed.TDepth = ed.ExpressionDepth;
+            ed.TDepth = ed.ExpressionDepth+1;
             ed.IncCnt = ed.IncCnt + 1;
         } else {
             tmpStr = libgogo.IntToString(ed.T);
