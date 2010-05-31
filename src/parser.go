@@ -579,7 +579,6 @@ func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     if (doneFlag == 1) && (tok.id == TOKEN_NOT) {
         //libgogo.Push(&Operators, TOKEN_NOT);
         ParseFactor(item, ed);
-        //TODO: Generate code
         doneFlag = 0;
     }
 

@@ -119,6 +119,21 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
 func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
     if Compile != 0 {   
         // Type/Pointer checking
+
+        //byte op byte = byte, byte op uint64 = uint64, uint64 op byte = uint64, uint64 op uint64 = uint64
+        if (item1.Itemtype == byte_t) && (item2.Itemtype == uint64_t) {
+            if item1.Mode != libgogo.MODE_CONST { //No need to convert constants, as their upper bits are already implicitly zeroed
+                MakeRegistered(item1, item1.PtrType); //Implicitly convert to uint64 by moving item1 to a register, thereby zeroing the upper bits if necessary
+            }
+            item1.Itemtype = uint64_t;
+        }
+        if (item2.Itemtype == byte_t) && (item1.Itemtype == uint64_t) {
+            if item2.Mode != libgogo.MODE_CONST { //No need to convert constants, as their upper bits are already implicitly zeroed
+                MakeRegistered(item2, item2.PtrType); //Implicitly convert to uint64 by moving item2 to a register, thereby zeroing the upper bits if necessary
+            }
+            item2.Itemtype = uint64_t;
+        }
+
         if (item1.Itemtype != item2.Itemtype) && (item1.Itemtype != string_t) && (item2.Itemtype != string_t) {
             GenErrorWeak("Can only compare variables of same type.");
         }            
