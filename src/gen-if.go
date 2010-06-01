@@ -27,8 +27,9 @@ func GenerateIfStart(item *libgogo.Item, ed *ExpressionDescriptor) {
     // Important: Since last jump is a positive one, we have to start with the
     // negative path
     if ed.F != 0 {
-        labelString = GetSubLabel(ed,0,"END");
-        PrintLabel(labelString);
+        PrintLabelWrapped(ed, 1 /*local*/, 0 /*positive*/, "END");
+        //labelString = GetSubLabel(ed,0,"END");
+        //PrintLabel(labelString);
     }
     labelString = GetGlobLabel(ed,"END");
     PrintJump("JMP", labelString);

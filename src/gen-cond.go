@@ -12,6 +12,20 @@ package main
 import "./libgogo/_obj/libgogo"
 
 //
+// Function used to print labels.
+// Internally using the asm version.
+//
+func PrintLabelWrapped(ed *ExpressionDescriptor, global uint64, localBranch uint64, suffix string) {
+    var labelString string;
+    if global == 0 {
+        labelString = GetGlobLabel(ed, suffix);
+    } else {
+        labelString = GetSubLabel(ed, localBranch, suffix);
+    }
+    PrintLabel(labelString);
+}
+
+//
 // Generates a new Sublabel that can be used in a jump and later on be fetched
 // by GetSubLabel().
 //
