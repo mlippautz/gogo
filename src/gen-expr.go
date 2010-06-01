@@ -125,8 +125,7 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
             PrintJump(jmp, labelString);
             if ed.T != 0 {
                 if ed.TDepth >= ed.ExpressionDepth {
-                    labelString = GetSubLabel(ed,1,"END");
-                    PrintLabel(labelString);
+                    PrintLabelWrapped(ed, 1 /*local*/, 1 /*positive*/, "END");
                     ed.T = 0;
                 }
             }
@@ -148,8 +147,7 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
                 PrintJump(jmp, labelString);
                 if ed.F != 0 {
                     if ed.FDepth >= ed.ExpressionDepth {
-                        labelString = GetSubLabel(ed,0,"END");
-                        PrintLabel(labelString);
+                        PrintLabelWrapped(ed, 1 /*local*/, 0 /*negative*/, "END")
                         ed.F = 0;
                     }
                 }

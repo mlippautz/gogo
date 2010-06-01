@@ -12,8 +12,22 @@ package main
 import "./libgogo/_obj/libgogo"
 
 //
+// Function used to print jumps.
+// Internally using the asm version for the final formatting.
+//
+func PrintJumpWrapped(jump string, ed *ExpressionDescriptor, global uint64, localBranch uint64, suffix string) {
+    var labelString string;
+    if global == 0 {
+        labelString = GetGlobLabel(ed, suffix);
+    } else {
+        labelString = GetSubLabel(ed, localBranch, suffix);
+    }
+    PrintJump(jump, labelString);
+}
+
+//
 // Function used to print labels.
-// Internally using the asm version.
+// Internally using the asm version for the final formatting.
 //
 func PrintLabelWrapped(ed *ExpressionDescriptor, global uint64, localBranch uint64, suffix string) {
     var labelString string;

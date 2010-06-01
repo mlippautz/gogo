@@ -27,38 +27,27 @@ func GenerateIfStart(item *libgogo.Item, ed *ExpressionDescriptor) {
     // Important: Since last jump is a positive one, we have to start with the
     // negative path
     if ed.F != 0 {
-        PrintLabelWrapped(ed, 1 /*local*/, 0 /*positive*/, "END");
-        //labelString = GetSubLabel(ed,0,"END");
-        //PrintLabel(labelString);
+        PrintLabelWrapped(ed, 1 /*local*/, 0 /*negative*/, "END");
     }
-    labelString = GetGlobLabel(ed,"END");
-    PrintJump("JMP", labelString);
+    PrintJumpWrapped("JMP", ed, 0 /*global*/, 0 /*unused*/, "END");
 
     // Positive branch starts after this label, thus insert last remaining 
     // positive label (if available) here
     if ed.T != 0 {
-        labelString = GetSubLabel(ed,1,"END");
-        PrintLabel(labelString);
+        PrintLabelWrapped(ed, 1 /*local*/, 1 /*positive*/, "END");
     }
 }
 
 func GenerateIfEnd(ed *ExpressionDescriptor) {
-    var labelString string;
-    labelString = GetGlobLabel(ed, "END");
-    PrintLabel(labelString);
+    PrintLabelWrapped(ed, 0 /*global*/, 0 /*unused*/, "END");
 }
 
 func GenerateElseStart(ed *ExpressionDescriptor) {
-    var labelString string;
-    labelString = GetGlobLabel(ed, "ELSE_END");
-    PrintJump("JMP", labelString);
-    labelString = GetGlobLabel(ed, "END");
-    PrintLabel(labelString);
+    PrintJumpWrapped("JMP", ed, 0 /*global*/, 0 /*unused*/, "ELSE_END");
+    PrintLabelWrapped(ed, 0 /*global*/, 0 /*unused*/, "END");
 }
 
 func GenerateElseEnd(ed *ExpressionDescriptor) {
-    var labelString string;
-    labelString = GetGlobLabel(ed, "ELSE_END");
-    PrintLabel(labelString);
+    PrintLabelWrapped(ed, 0 /*global*/, 0 /*unused*/, "ELSE_END");
 }
 
