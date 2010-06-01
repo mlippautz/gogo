@@ -1193,24 +1193,8 @@ func ParseForStatement() {
 func ParseIfStatement() {
     var item *libgogo.Item;
     var ed ExpressionDescriptor;
-    var i uint64;
-    var strLen uint64;
-
-    ed.CurFile = "IF_";
-    strLen = libgogo.StringLength(fileInfo[curFileIndex].filename);
-    for i=0;(i<strLen) && (fileInfo[curFileIndex].filename[i] != '.');i=i+1 {
-        libgogo.CharAppend(&ed.CurFile, fileInfo[curFileIndex].filename[i]);
-    }
-
-    ed.ExpressionDepth = 0;
-    ed.CurLine = fileInfo[curFileIndex].lineCounter;
-    ed.IncCnt = 1;
-    ed.T = 0;
-    ed.F = 0;
-    ed.TDepth = 0;
-    ed.FDepth = 0;
-
     PrintDebugString("Entering ParseIfStatement()",1000);
+    SetExpressionDescriptor(&ed, "IF_"); // Set the required descriptor parameters
     GetNextTokenSafe();
     if tok.id == TOKEN_IF {
         item = libgogo.NewItem();

@@ -11,19 +11,37 @@ package main
 import "./libgogo/_obj/libgogo"
 
 type ExpressionDescriptor struct {
-    ExpressionDepth uint64;
-    RestCounter uint64; // depr.
-    IncCnt uint64;
-    GlobalCounter uint64; // depr.
-    Prefix string; // depr.
-    CurFile string;
-    CurLine uint64;
-    T uint64;
-    F uint64;
-    TDepth uint64;
-    FDepth uint64;
-    Not uint64;
+    ExpressionDepth uint64; // The current expression depth.
+    IncCnt uint64; // Some incremental counter to guarantee uniqueness
+    CurFile string; // Current file begining with a specified prefix. 
+    CurLine uint64; // Current line in parser. Used for label generation.
+    T uint64; // True branch
+    F uint64; // False branch
+    TDepth uint64; /* Depth when true branch has been started. Used for merge 
+      and printing. */
+    FDepth uint64; // Same as true depth.
+    Not uint64; // Flag indicating not branch
 };
+
+//
+// 
+//
+func SetExpressionDescriptor(ed *ExpressionDescriptor, labelPrefix string) {
+    var strLen uint64;
+    var i uint64;
+    ed.CurFile = labelPrefix;
+    strLen = libgogo.StringLength(fileInfo[curFileIndex].filename);
+    for i=0;(i<strLen) && (fileInfo[curFileIndex].filename[i] != '.');i=i+1 {
+        libgogo.CharAppend(&ed.CurFile, fileInfo[curFileIndex].filename[i]);
+    }
+    ed.ExpressionDepth = 0;
+    ed.CurLine = fileInfo[curFileIndex].lineCounter;
+    ed.IncCnt = 1;
+    ed.T = 0;
+    ed.F = 0;
+    ed.TDepth = 0;
+    ed.FDepth = 0;
+}
 
 //
 // Called by parser (ParseSimpleExpression)
