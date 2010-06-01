@@ -23,6 +23,13 @@ type ExpressionDescriptor struct {
     Not uint64; // Flag indicating not branch
 };
 
+func SwapExpressionBranches(ed *ExpressionDescriptor) {
+    var tmp uint64;
+    tmp = ed.T;
+    ed.T = ed.F;
+    ed.F = tmp;
+}
+
 //
 // 
 //
@@ -96,7 +103,6 @@ func GenerateTermArith(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
 func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
     var labelString string;
     var jmp string;
-    var tmp uint64;
 
     if Compile != 0 {
         if item.Mode != libgogo.MODE_COND {
@@ -111,9 +117,7 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
                     labelString = GenerateSubLabel(ed,1,"END");
                     jmp = GetJump(item.C, 0);
                     ed.Not = 0;
-                    tmp = ed.T;
-                    ed.T = ed.F;
-                    ed.F = tmp;
+                    SwapExpressionBranches(ed);
                 } else {
                     jmp = GetJump(item.C,1);
                 }
@@ -136,9 +140,7 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
                         labelString = GenerateSubLabel(ed,0,"END");
                         jmp = GetJump(item.C, 1);
                         ed.Not = 0;
-                        tmp = ed.T;
-                        ed.T = ed.F;
-                        ed.F = tmp;
+                        SwapExpressionBranches(ed);
                     } else {
                         jmp = GetJump(item.C,0);
                     }   

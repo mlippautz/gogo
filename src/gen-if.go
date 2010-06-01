@@ -10,7 +10,6 @@ import "./libgogo/_obj/libgogo"
 func GenerateIfStart(item *libgogo.Item, ed *ExpressionDescriptor) {
     var labelString string;
     var jmp string;
-    var tmp uint64;
 
     labelString = GenerateSubLabel(ed,1,"END");
     if ed.Not == 0 {
@@ -18,9 +17,7 @@ func GenerateIfStart(item *libgogo.Item, ed *ExpressionDescriptor) {
     } else {
         labelString = GenerateSubLabel(ed,0,"END");
         jmp = GetJump(item.C, 1);
-        tmp = ed.T;
-        ed.T = ed.F;
-        ed.F = tmp;
+        SwapExpressionBranches(ed);
     }
     PrintJump(jmp, labelString);
 

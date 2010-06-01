@@ -504,7 +504,6 @@ func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     var LHSItem *libgogo.Item;
     var RHSItem *libgogo.Item;
     var s string;
-    var tmpBranch uint64;
 
     GetNextTokenSafe();
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
@@ -583,9 +582,7 @@ func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
         } else {
             ed.Not = 1;
         }
-        tmpBranch = ed.T;
-        ed.T = ed.F;
-        ed.F = tmpBranch;
+        SwapExpressionBranches(ed);
         ParseFactor(item, ed);
         doneFlag = 0;
     }
