@@ -10,7 +10,12 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
+var EXPR_IF uint64 = 0; // if
+var EXPR_FOR uint64 = 1; // else
+var EXPR_ELSE uint64 = 2; // for
+
 type ExpressionDescriptor struct {
+    Type uint64;
     ExpressionDepth uint64; // The current expression depth.
     IncCnt uint64; // Some incremental counter to guarantee uniqueness
     CurFile string; // Current file begining with a specified prefix. 
@@ -21,6 +26,8 @@ type ExpressionDescriptor struct {
       and printing. */
     FDepth uint64; // Same as true depth.
     Not uint64; // Flag indicating not branch
+    ForExpr uint64;
+    ForPost uint64;
 };
 
 func SwapExpressionBranches(ed *ExpressionDescriptor) {
@@ -33,13 +40,19 @@ func SwapExpressionBranches(ed *ExpressionDescriptor) {
 //
 // 
 //
-func SetExpressionDescriptor(ed *ExpressionDescriptor, labelPrefix string) {
+func SetExpressionDescriptor(ed *ExpressionDescriptor, labelPrefix string, t uint64) {
     var strLen uint64;
+    var singleChar byte;
     var i uint64;
     ed.CurFile = labelPrefix;
     strLen = libgogo.StringLength(fileInfo[curFileIndex].filename);
     for i=0;(i<strLen) && (fileInfo[curFileIndex].filename[i] != '.');i=i+1 {
-        libgogo.CharAppend(&ed.CurFile, fileInfo[curFileIndex].filename[i]);
+        singleChar = fileInfo[curFileIndex].filename[i];
+        if ((singleChar>=48) && (singleChar<=57)) || ((singleChar>=65) && (singleChar<=90)) || ((singleChar>=97) && (singleChar<=122)) {
+            libgogo.CharAppend(&ed.CurFile, fileInfo[curFileIndex].filename[i]);
+        } else {
+            libgogo.CharAppend(&ed.CurFile, '_');
+        }
     }
     ed.ExpressionDepth = 0;
     ed.CurLine = fileInfo[curFileIndex].lineCounter;
@@ -48,6 +61,7 @@ func SetExpressionDescriptor(ed *ExpressionDescriptor, labelPrefix string) {
     ed.F = 0;
     ed.TDepth = 0;
     ed.FDepth = 0;
+    ed.Type = t;
 }
 
 //

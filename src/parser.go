@@ -834,7 +834,7 @@ func ParseFuncDecl() uint64 {
     if tok.id == TOKEN_LCBRAC {
         InsideFunction = 1;
         ParseVarDeclList();
-        ParseStatementSequence();
+        ParseStatementSequence(nil);
         GetNextTokenSafe();
         if tok.id == TOKEN_RETURN {
             ParseExpression(nil,nil); //TODO
@@ -904,16 +904,16 @@ func ParseIdentifierType() uint64 {
     return boolFlag;
 }
 
-func ParseStatementSequence() {
+func ParseStatementSequence(ed *ExpressionDescriptor) {
     var boolFlag uint64; 
     PrintDebugString("Entering ParseStatementSequence()",1000);
-    for boolFlag = ParseStatement();
+    for boolFlag = ParseStatement(ed);
         boolFlag == 0;
-        boolFlag = ParseStatement() { }
+        boolFlag = ParseStatement(ed) { }
     PrintDebugString("Leaving ParseStatementSequence()",1000);
 }
 
-func ParseStatement() uint64 {
+func ParseStatement(ed *ExpressionDescriptor) uint64 {
     var boolFlag uint64;
     var doneFlag uint64;
     var funcIndicator uint64;
@@ -945,11 +945,21 @@ func ParseStatement() uint64 {
 
     if (doneFlag == 1) && (tok.id == TOKEN_BREAK) {
         // simple break statement
+        if (ed != nil) && ((ed.Type==EXPR_IF) || (ed.Type==EXPR_FOR) || (ed.Type==EXPR_ELSE)) {
+            GenerateBreak(ed);
+        } else {
+            GenErrorWeak("Can only generate code for 'break' in 'for' or 'if'/'else'.");
+        }
         AssertNextToken(TOKEN_SEMICOLON);
         doneFlag = 0;
     }
 
     if (doneFlag == 1) && (tok.id == TOKEN_CONTINUE) {
+        if (ed != nil) && (ed.Type==EXPR_FOR) {
+            GenerateContinue(ed);
+        } else {
+            GenErrorWeak("Can only generate code for 'continue' in 'for'.");
+        }
         AssertNextToken(TOKEN_SEMICOLON);
         doneFlag = 0;
     }
@@ -1125,42 +1135,48 @@ func ParseFunctionCallStatement() {
     PrintDebugString("Leaving ParseFunctionCallStatement()",1000);
 }
 
+//
+//
+//
 func ParseForStatement() {
     var ed ExpressionDescriptor;
     var item *libgogo.Item;
-    var strLen uint64;
-    var i uint64;
     PrintDebugString("Entering ParseForStatement()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_FOR {
-        GenerateComment("for start");
+        GenerateComment("For start");
+        ed.ForExpr = 0;
+        ed.ForPost = 0;
+        SetExpressionDescriptor(&ed, "FOR_", EXPR_FOR); // Set the required descriptor parameters
         GetNextTokenSafe();
 
         if tok.id == TOKEN_SEMICOLON {
             tok.nextToken = tok.id;
         } else {
             tok.nextToken = tok.id;
+            GenerateComment("For [initial assignment] start");
             ParseAssignment(0); //No semicolon
+            GenerateComment("For [initial assignment] end");
         }
         
         AssertNextToken(TOKEN_SEMICOLON);
 
+        GenerateExpressionStart(&ed);
+
         GetNextTokenSafe();
         if tok.id == TOKEN_SEMICOLON {
             tok.nextToken = tok.id;
         } else {
             tok.nextToken = tok.id;
-
-            ed.CurFile = "IF_";
-            strLen = libgogo.StringLength(fileInfo[curFileIndex].filename);
-            for i=0;(i<strLen) && (fileInfo[curFileIndex].filename[i] != '.');i=i+1 {
-                libgogo.CharAppend(&ed.CurFile, fileInfo[curFileIndex].filename[i]);
-            }
-            ed.ExpressionDepth = 0;
-            ed.CurLine = fileInfo[curFileIndex].lineCounter;
             item = libgogo.NewItem();
+            GenerateComment("For [expression] start");
+
             ParseExpression(item, &ed);
+            GenerateForStart(item, &ed);
+            GenerateComment("For [expression] end");
+            ed.ForExpr = 1;
         }
+
 
         AssertNextToken(TOKEN_SEMICOLON);
 
@@ -1168,18 +1184,24 @@ func ParseForStatement() {
         if tok.id == TOKEN_LCBRAC {
             tok.nextToken = tok.id;
         } else {
+            GenerateForBodyJump(&ed);
+            GenerateForBodyExtended(&ed);
             tok.nextToken = tok.id;
+            GenerateComment("For [post assignment] start");
             ParseAssignment(0); //No semicolon
+            GenerateComment("For [post assignment] end");
+            ed.ForPost = 1;
         }
 
+        GenerateForBody(&ed);
         AssertNextToken(TOKEN_LCBRAC);        
-        ParseStatementSequence();
+        ParseStatementSequence(&ed);
         AssertNextToken(TOKEN_RCBRAC);
-
+        GenerateForEnd(&ed);
     } else {
         tok.nextToken = tok.id;
     }   
-    GenerateComment("for end");
+    GenerateComment("For end");
     PrintDebugString("Leaving ParseForStatement()",1000);
 }
 
@@ -1192,24 +1214,24 @@ func ParseIfStatement() {
     var ed ExpressionDescriptor;
     PrintDebugString("Entering ParseIfStatement()",1000);
     GenerateComment("If start");
-    SetExpressionDescriptor(&ed, "IF_"); // Set the required descriptor parameters
+    SetExpressionDescriptor(&ed, "IF_", EXPR_IF); // Set the required descriptor parameters
     GetNextTokenSafe();
     if tok.id == TOKEN_IF {
         item = libgogo.NewItem();
         ParseExpression(item, &ed);
         GenerateIfStart(item, &ed);
         AssertNextToken(TOKEN_LCBRAC);
-        ParseStatementSequence();
+        ParseStatementSequence(&ed);
         AssertNextToken(TOKEN_RCBRAC);
         
         GetNextTokenSafe();
         if tok.id == TOKEN_ELSE {
             GenerateElseStart(&ed);
-            ParseElseStatement();
+            ParseElseStatement(&ed);
             GenerateElseEnd(&ed);
         } else {
-            GenerateComment("If end");
             GenerateIfEnd(&ed);
+            GenerateComment("If end");
             tok.nextToken = tok.id;
         }
 
@@ -1223,11 +1245,12 @@ func ParseIfStatement() {
 // Parses: "{" stmt_sequence "}"
 // The optional else branch of an if.
 //
-func ParseElseStatement() {
+func ParseElseStatement(ed *ExpressionDescriptor) {
     PrintDebugString("Entering ParseElseStatement()",1000);
     GenerateComment("Else start");
     AssertNextTokenWeak(TOKEN_LCBRAC);
-    ParseStatementSequence();
+    ed.Type = EXPR_ELSE;
+    ParseStatementSequence(ed);
     AssertNextToken(TOKEN_RCBRAC);
     GenerateComment("Else end");
     PrintDebugString("Leaving ParseElseStatement()",1000);

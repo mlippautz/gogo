@@ -40,6 +40,7 @@ func GenerateIfStart(item *libgogo.Item, ed *ExpressionDescriptor) {
 
 func GenerateIfEnd(ed *ExpressionDescriptor) {
     PrintLabelWrapped(ed, 0 /*global*/, 0 /*unused*/, "END");
+    PrintLabelWrapped(ed, 0 /*global*/, 0 /*unused*/, "ELSE_END");
 }
 
 func GenerateElseStart(ed *ExpressionDescriptor) {
