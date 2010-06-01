@@ -578,7 +578,11 @@ func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
         doneFlag = 0;
     }
     if (doneFlag == 1) && (tok.id == TOKEN_NOT) {
-        ed.Not = 1;
+        if ed.Not == 1 {
+            ed.Not = 0;
+        } else {
+            ed.Not = 1;
+        }
         tmpBranch = ed.T;
         ed.T = ed.F;
         ed.F = tmpBranch;
