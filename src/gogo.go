@@ -29,8 +29,9 @@ var curFileIndex uint64 = 0;
 // A very basic debug flag
 // Set to 1000 to enable all parsing strings
 // Set to 100 to enable all symbol tables
+// Set to 10 to enable asm debugging
 //
-var DEBUG_LEVEL uint64 = 0;
+var DEBUG_LEVEL uint64 = 10;
 
 //
 // Entry point of the compiler

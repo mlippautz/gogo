@@ -1191,6 +1191,7 @@ func ParseIfStatement() {
     var item *libgogo.Item;
     var ed ExpressionDescriptor;
     PrintDebugString("Entering ParseIfStatement()",1000);
+    GenerateComment("If start");
     SetExpressionDescriptor(&ed, "IF_"); // Set the required descriptor parameters
     GetNextTokenSafe();
     if tok.id == TOKEN_IF {
@@ -1207,6 +1208,7 @@ func ParseIfStatement() {
             ParseElseStatement();
             GenerateElseEnd(&ed);
         } else {
+            GenerateComment("If end");
             GenerateIfEnd(&ed);
             tok.nextToken = tok.id;
         }
@@ -1223,9 +1225,11 @@ func ParseIfStatement() {
 //
 func ParseElseStatement() {
     PrintDebugString("Entering ParseElseStatement()",1000);
+    GenerateComment("Else start");
     AssertNextTokenWeak(TOKEN_LCBRAC);
     ParseStatementSequence();
     AssertNextToken(TOKEN_RCBRAC);
+    GenerateComment("Else end");
     PrintDebugString("Leaving ParseElseStatement()",1000);
 }
 

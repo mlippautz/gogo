@@ -122,18 +122,20 @@ func GenerateComment(msg string) {
     var str string = "";
     var tmpPtr *string;
     var temp string;
-    tmpPtr = &DataSegment;
-    if (OutputStringPtr != tmpPtr) {
-        str = "  //--- ";
-    } else { //No indentation in data segment
-        str = "//--- ";
+    if DEBUG_LEVEL >= 10 {
+        tmpPtr = &DataSegment;
+        if (OutputStringPtr != tmpPtr) {
+            str = "  //--- ";
+        } else { //No indentation in data segment
+            str = "//--- ";
+        }
+        libgogo.StringAppend(&str, msg);
+        libgogo.StringAppend(&str, " at ");
+        temp = BuildHead();
+        libgogo.StringAppend(&str, temp);
+        libgogo.StringAppend(&str, "\n");
+        PrintCodeOutput(str);
     }
-    libgogo.StringAppend(&str, msg);
-    libgogo.StringAppend(&str, " at ");
-    temp = BuildHead();
-    libgogo.StringAppend(&str, temp);
-    libgogo.StringAppend(&str, "\n");
-    PrintCodeOutput(str);
 }
 
 
