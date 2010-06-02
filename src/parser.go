@@ -933,7 +933,7 @@ func ParseStatement(ed *ExpressionDescriptor) uint64 {
     
     if (doneFlag == 1) && (tok.id == TOKEN_IF) {
         tok.nextToken = tok.id;
-        ParseIfStatement();
+        ParseIfStatement(ed);
         doneFlag = 0;
     }
 
@@ -945,20 +945,20 @@ func ParseStatement(ed *ExpressionDescriptor) uint64 {
 
     if (doneFlag == 1) && (tok.id == TOKEN_BREAK) {
         // simple break statement
-        if (ed != nil) && ((ed.Type==EXPR_IF) || (ed.Type==EXPR_FOR) || (ed.Type==EXPR_ELSE)) {
-            GenerateBreak(ed);
+        if ed == nil || ed.ForEd == nil {
+            GenErrorWeak("Can only generate code for 'break' in 'for' clause.");
         } else {
-            GenErrorWeak("Can only generate code for 'break' in 'for' or 'if'/'else'.");
+            GenerateBreak(ed);
         }
         AssertNextToken(TOKEN_SEMICOLON);
         doneFlag = 0;
     }
 
     if (doneFlag == 1) && (tok.id == TOKEN_CONTINUE) {
-        if (ed != nil) && (ed.Type==EXPR_FOR) {
-            GenerateContinue(ed);
+        if ed == nil || ed.ForEd == nil {
+            GenErrorWeak("Can only generate code for 'break' in 'for' clause.");
         } else {
-            GenErrorWeak("Can only generate code for 'continue' in 'for'.");
+            GenerateContinue(ed);
         }
         AssertNextToken(TOKEN_SEMICOLON);
         doneFlag = 0;
@@ -1141,13 +1141,14 @@ func ParseFunctionCallStatement() {
 func ParseForStatement() {
     var ed ExpressionDescriptor;
     var item *libgogo.Item;
+    var expr uint64 = 0;
+    var postassign uint64 = 0;
     PrintDebugString("Entering ParseForStatement()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_FOR {
         GenerateComment("For start");
-        ed.ForExpr = 0;
-        ed.ForPost = 0;
-        SetExpressionDescriptor(&ed, "FOR_", EXPR_FOR); // Set the required descriptor parameters
+        SetExpressionDescriptor(&ed, "FOR_"); // Set the required descriptor parameters
+        ed.ForEd = &ed;
         GetNextTokenSafe();
 
         if tok.id == TOKEN_SEMICOLON {
@@ -1174,7 +1175,7 @@ func ParseForStatement() {
             ParseExpression(item, &ed);
             GenerateForStart(item, &ed);
             GenerateComment("For [expression] end");
-            ed.ForExpr = 1;
+            expr = 1;
         }
 
 
@@ -1190,14 +1191,15 @@ func ParseForStatement() {
             GenerateComment("For [post assignment] start");
             ParseAssignment(0); //No semicolon
             GenerateComment("For [post assignment] end");
+            postassign = 1;
             ed.ForPost = 1;
         }
 
-        GenerateForBody(&ed);
+        GenerateForBody(&ed, postassign, expr);
         AssertNextToken(TOKEN_LCBRAC);        
         ParseStatementSequence(&ed);
         AssertNextToken(TOKEN_RCBRAC);
-        GenerateForEnd(&ed);
+        GenerateForEnd(&ed, postassign);
     } else {
         tok.nextToken = tok.id;
     }   
@@ -1209,12 +1211,15 @@ func ParseForStatement() {
 // Parses: "if" expression "{" stmt_sequence [ "}" "else" else_stmt ].
 // Represents an if statement. Else is parsed in a separate function.
 //
-func ParseIfStatement() {
+func ParseIfStatement(oldEd *ExpressionDescriptor) {
     var item *libgogo.Item;
     var ed ExpressionDescriptor;
     PrintDebugString("Entering ParseIfStatement()",1000);
     GenerateComment("If start");
-    SetExpressionDescriptor(&ed, "IF_", EXPR_IF); // Set the required descriptor parameters
+    SetExpressionDescriptor(&ed, "IF_"); // Set the required descriptor parameters
+    if oldEd != nil {
+        ed.ForEd = oldEd;
+    }
     GetNextTokenSafe();
     if tok.id == TOKEN_IF {
         item = libgogo.NewItem();
@@ -1249,7 +1254,6 @@ func ParseElseStatement(ed *ExpressionDescriptor) {
     PrintDebugString("Entering ParseElseStatement()",1000);
     GenerateComment("Else start");
     AssertNextTokenWeak(TOKEN_LCBRAC);
-    ed.Type = EXPR_ELSE;
     ParseStatementSequence(ed);
     AssertNextToken(TOKEN_RCBRAC);
     GenerateComment("Else end");

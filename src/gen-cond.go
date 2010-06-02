@@ -39,15 +39,6 @@ func PrintLabelWrapped(ed *ExpressionDescriptor, global uint64, localBranch uint
     PrintLabel(labelString);
 }
 
-func GenerateBreak(ed *ExpressionDescriptor) {
-    if (ed.Type == EXPR_FOR) {
-        PrintJumpWrapped("JMP", ed, 0 /*global*/, 0 /*unused*/, "END");
-    }
-    if (ed.Type == EXPR_ELSE) || (ed.Type == EXPR_IF) {
-        PrintJumpWrapped("JMP", ed, 0 /*global*/, 0 /*unused*/, "ELSE_END");
-    }
-}
-
 //
 // Generates a new Sublabel that can be used in a jump and later on be fetched
 // by GetSubLabel().

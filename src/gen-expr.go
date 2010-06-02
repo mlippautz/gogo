@@ -10,23 +10,29 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
-var EXPR_IF uint64 = 0; // if
-var EXPR_FOR uint64 = 1; // else
-var EXPR_ELSE uint64 = 2; // for
-
 type ExpressionDescriptor struct {
-    Type uint64;
+    //
+    // Labeling information
+    //
     ExpressionDepth uint64; // The current expression depth.
     IncCnt uint64; // Some incremental counter to guarantee uniqueness
     CurFile string; // Current file begining with a specified prefix. 
     CurLine uint64; // Current line in parser. Used for label generation.
+
+    //
+    // True/False branches (merge) information
+    //
     T uint64; // True branch
     F uint64; // False branch
     TDepth uint64; /* Depth when true branch has been started. Used for merge 
       and printing. */
     FDepth uint64; // Same as true depth.
     Not uint64; // Flag indicating not branch
-    ForExpr uint64;
+
+    //
+    // Break continue information
+    //
+    ForEd *ExpressionDescriptor;
     ForPost uint64;
 };
 
@@ -40,7 +46,7 @@ func SwapExpressionBranches(ed *ExpressionDescriptor) {
 //
 // 
 //
-func SetExpressionDescriptor(ed *ExpressionDescriptor, labelPrefix string, t uint64) {
+func SetExpressionDescriptor(ed *ExpressionDescriptor, labelPrefix string) {
     var strLen uint64;
     var singleChar byte;
     var i uint64;
@@ -61,7 +67,6 @@ func SetExpressionDescriptor(ed *ExpressionDescriptor, labelPrefix string, t uin
     ed.F = 0;
     ed.TDepth = 0;
     ed.FDepth = 0;
-    ed.Type = t;
 }
 
 //

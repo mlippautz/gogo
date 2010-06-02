@@ -38,8 +38,8 @@ func GenerateForStart(item *libgogo.Item, ed *ExpressionDescriptor) {
     }
 }
 
-func GenerateForEnd(ed *ExpressionDescriptor) {
-    if ed.ForPost != 0 {
+func GenerateForEnd(ed *ExpressionDescriptor, postassign uint64) {
+    if postassign != 0 {
         PrintJumpWrapped("JMP", ed, 0 /*global*/, 0 /*unused*/, "EXTENDED_BODY");
     } else {
         PrintJumpWrapped("JMP", ed, 0 /*global*/, 0 /*unused*/, "EXPR_START");
@@ -51,9 +51,9 @@ func GenerateForBodyExtended(ed *ExpressionDescriptor) {
     PrintLabelWrapped(ed, 0 /*global*/, 0 /*unused*/, "EXTENDED_BODY");
 }
 
-func GenerateForBody(ed *ExpressionDescriptor) {
-    if ed.ForPost != 0 {
-        if ed.ForExpr != 0 {
+func GenerateForBody(ed *ExpressionDescriptor, postassign uint64, expr uint64) {
+    if postassign != 0 {
+        if expr != 0 {
             PrintJumpWrapped("JMP", ed, 0 /*global*/, 0 /*unused*/, "EXPR_START");
         }
         PrintLabelWrapped(ed, 0 /*global*/, 0 /*unused*/, "BODY");
@@ -68,8 +68,12 @@ func GenerateExpressionStart(ed *ExpressionDescriptor) {
     PrintLabelWrapped(ed, 0 /*global*/, 0 /*unused*/, "EXPR_START");
 }
 
+func GenerateBreak(ed *ExpressionDescriptor) {
+    PrintJumpWrapped("JMP", ed.ForEd, 0 /*global*/, 0 /*unused*/, "END");
+}
+
 func GenerateContinue(ed *ExpressionDescriptor) {
-    if ed.ForPost != 0 {
+    if ed.ForEd.ForPost != 0 {
         PrintJumpWrapped("JMP", ed, 0 /*global*/, 0 /*unused*/, "EXTENDED_BODY");
     } else {
         PrintJumpWrapped("JMP", ed, 0 /*global*/, 0 /*unused*/, "EXPR_START");
