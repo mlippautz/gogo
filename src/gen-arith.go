@@ -103,8 +103,8 @@ func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
 
     done = ConstFolding(item1, item2, constvalue);
     
-    if (done == 0) && (item2.Mode == libgogo.MODE_CONST) && (item2.A == 0) { //Omit multiplication/division by zero
-        GenerateComment("Multiplication/division by zero omitted");
+    if (done == 0) && (item2.Mode == libgogo.MODE_CONST) && (item2.A == 1) { //Omit multiplication/division by one
+        GenerateComment("Multiplication/division by one omitted");
         done = 1;
     }
 
