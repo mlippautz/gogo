@@ -93,6 +93,10 @@ func PrintCodeOutput(output string) {
     libgogo.StringAppend(OutputStringPtr, output);
 }
 
+func PrintCodeOutputChar(output byte) {
+    libgogo.CharAppend(OutputStringPtr, output);
+}
+
 func PrintCodeOutputValue(value uint64) {
     var temp string;
     temp = libgogo.IntToString(value);

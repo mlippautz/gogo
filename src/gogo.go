@@ -39,6 +39,9 @@ var DEBUG_LEVEL uint64 = 10;
 func main() {
     var errno uint64;
     var i uint64;
+    var j uint64;
+    var k uint64;
+    var singleChar byte;
 
     libgogo.GetArgv();
 
@@ -67,7 +70,26 @@ func main() {
     fileInfoLen = i-2;
 
     for curFileIndex=0;curFileIndex<fileInfoLen;curFileIndex=curFileIndex+1 {
-        Parse();
+        i = libgogo.StringLength(fileInfo[curFileIndex].filename);
+        if i > 2 { //Check for assembly files
+            j = i - 2;
+            k = i - 1;
+            if (fileInfo[curFileIndex].filename[j] == '.') && (fileInfo[curFileIndex].filename[k] == 's') { //Assembly file
+                if curFileIndex == 0 {
+                    GlobalError("The first file in the list cannot be an assembly file");
+                }
+                for singleChar = libgogo.GetChar(fileInfo[curFileIndex].fd); singleChar != 0; singleChar = libgogo.GetChar(fileInfo[curFileIndex].fd) { //Copy file to output character by character
+                    if singleChar == '·' { //Prepend package name
+                        //PrintCodeOutput(CurrentPackage); //TODO: Fix UTF-8 corruption due to string insertion?!
+                    }
+                    PrintCodeOutputChar(singleChar);
+                }
+            } else { //Go file
+                Parse();
+            }
+        } else { //Go file with a very short name
+            Parse();
+        }
     }
 
     for curFileIndex=0;curFileIndex<fileInfoLen;curFileIndex=curFileIndex+1 {
