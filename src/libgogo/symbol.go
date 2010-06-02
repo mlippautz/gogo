@@ -35,6 +35,7 @@ var TYPE_SIZE uint64 = 80;  //10*8 bytes space for a type
 //
 var CLASS_VAR uint64 = 1;
 var CLASS_FIELD uint64 = 2;
+var CLASS_PARAMETER uint64 = 3;
 
 //
 // Forms for types
@@ -42,6 +43,7 @@ var CLASS_FIELD uint64 = 2;
 var FORM_SIMPLE uint64 = 1;
 var FORM_STRUCT uint64 = 2;
 var FORM_ARRAY uint64 = 3;
+var FORM_FUNCTION uint64 = 4;
 
 //
 // Convert the uint64 value (returned from malloc) to a real object address
@@ -90,7 +92,7 @@ func AppendType(objtype *TypeDesc, list *TypeDesc) *TypeDesc {
 }
 
 //
-// Add a field in form of an object descriptor to the type descriptor given
+// Adds a field in form of an object descriptor to the type descriptor given
 //
 func AddFields(object *ObjectDesc, objtype *TypeDesc) {
     objtype.Form = FORM_STRUCT;
@@ -117,6 +119,15 @@ func GetField(name string, objtype *TypeDesc) *ObjectDesc {
     var tmpObj *ObjectDesc;
     tmpObj = GetObject(name, "", objtype.Fields);
     return tmpObj;
+}
+
+//
+// Adds a parameter in form of an object descriptor to the function (type descriptor) given 
+//
+func AddParameters(object *ObjectDesc, fcn *TypeDesc) {
+    fcn.Form = FORM_FUNCTION;
+    fcn.Fields = AppendObject(object, fcn.Fields);
+    fcn.Len = fcn.Len + 1; //Increase number of parameters
 }
 
 //
@@ -427,6 +438,57 @@ func PrintTypes(list *TypeDesc) {
         PrintNumber(tmp);
         PrintString(")\n");
 				for o = t.Fields; o != nil; o = o.Next {
+            PrintString("  ");
+            PrintString(o.Name);
+            PrintString(" (type: ");
+            if o.PtrType != 0 {
+                PrintString("pointer to ");
+            }
+            if o.ObjType != nil {
+                if o.ObjType.Base != nil {
+                    PrintString("array of ");
+                    PrintString(o.ObjType.Base.Name);
+                    PrintString(" of length ");
+                    PrintNumber(o.ObjType.Len);
+                    PrintString(", internally named ");
+                }
+                strLen = StringLength(o.ObjType.PackageName);
+                if strLen != 0 {
+                    PrintString(o.ObjType.PackageName);
+                    PrintChar('.');
+                }
+                PrintString(o.ObjType.Name);
+            } else {
+                PrintString("<unknown>");
+            }
+            PrintString(", size: ");
+            tmp = GetObjectSize(o);
+            PrintNumber(tmp);
+            PrintString(", offset: ");
+            tmp = GetObjectOffset(o, t.Fields);
+            PrintNumber(tmp);
+            PrintString(")\n");
+        }
+    }
+}
+
+//
+// Prints a formatted output of a given list of functions, including parameters etc.
+//
+func PrintFunctions(list *TypeDesc) {
+    var t *TypeDesc;
+    var o *ObjectDesc;
+    var strLen uint64;
+    var tmp uint64;
+    for t = list; t != nil; t = t.Next {
+        PrintString("Function ");
+        PrintString(t.PackageName);
+        PrintChar('.');
+        PrintString(t.Name);
+        PrintString(" (number of parameters: ");
+        PrintNumber(t.Len);
+        PrintString(")\n");
+            for o = t.Fields; o != nil; o = o.Next {
             PrintString("  ");
             PrintString(o.Name);
             PrintString(" (type: ");

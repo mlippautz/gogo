@@ -23,11 +23,6 @@ var InsideFunctionVarDecl uint64 = 0;
 var CurrentPackage string = "<no package>";
 
 //
-// Name of function currently processed
-//
-var CurrentFunction string = "<no function>";
-
-//
 // Pseudo object representing a function's return value
 //
 var ReturnValuePseudoObject *libgogo.ObjectDesc = nil;
@@ -229,7 +224,7 @@ func ParseTypeOptional() {
 
     PrintDebugString("Entering ParseTypeOptional()",1000); 
     ReturnValuePseudoObject = nil;
-    CurrentObject = libgogo.NewObject("return value", CurrentPackage, libgogo.CLASS_VAR); //Return value object with a name which is impossible declare (contains spaces) and therefore needs no additional checking
+    CurrentObject = libgogo.NewObject("return value", "", libgogo.CLASS_PARAMETER); //Return value object with a name which is impossible declare (contains spaces) and therefore needs no additional checking
     GetNextTokenSafe();
     if tok.id == TOKEN_LSBRAC {
         AssertNextToken(TOKEN_INTEGER);        
@@ -257,7 +252,7 @@ func ParseTypeOptional() {
         SetCurrentObjectType(typename, packagename, arraydim);
         ReturnValuePseudoObject = CurrentObject;
         if (Compile != 0) && (ReturnValuePseudoObject != nil) {
-            LocalParameters = libgogo.AppendObject(ReturnValuePseudoObject, LocalParameters); //Treat return value like an additional parameter at the end of the parameter list
+            libgogo.AddParameters(ReturnValuePseudoObject, CurrentFunction); //Treat return value like an additional parameter at the end of the parameter list
         }
     }
     PrintDebugString("Leaving ParseTypeOptional()",1000);
@@ -831,7 +826,7 @@ func ParseFuncDeclHead() uint64 {
     if tok.id == TOKEN_FUNC {
         AssertNextToken(TOKEN_IDENTIFIER);
         // function name in tok.strValue
-        CurrentFunction = tok.strValue;
+        NewFunction(tok.strValue, 0);
         AssertNextToken(TOKEN_LBRAC);
         ParseIdentifierTypeList();
         AssertNextTokenWeak(TOKEN_RBRAC);
@@ -868,17 +863,19 @@ func ParseFuncDecl() uint64 {
     GetNextTokenSafe();
     if tok.id == TOKEN_LCBRAC {
         InsideFunction = 1;
-        if (Compile != 0) && (ReturnValuePseudoObject != nil) {
-            ReturnValueItem = libgogo.NewItem();
-            VariableObjectDescToItem(ReturnValuePseudoObject, ReturnValueItem, 2); //Treat return value like an additional parameter at the end of the parameter list
+        if Compile != 0 {
+            if ReturnValuePseudoObject != nil {
+                ReturnValueItem = libgogo.NewItem();
+                VariableObjectDescToItem(ReturnValuePseudoObject, ReturnValueItem, 2); //Treat return value like an additional parameter at the end of the parameter list
+            }
+            PrintFunctionStart(CurrentPackage, CurrentFunction.Name);
         }
-        PrintFunctionStart(CurrentPackage, CurrentFunction);
         ParseVarDeclList();
         ParseStatementSequence(nil);
         GetNextTokenSafe();
         if tok.id == TOKEN_RETURN {
             if ReturnValuePseudoObject == nil {
-                SymbolTableError("Cannot return a value when there is no return type", "", "in function", CurrentFunction);
+                SymbolTableError("Cannot return a value when there is no return type", "", "in function", CurrentFunction.Name);
             }
             if Compile != 0 {
                 GenerateComment("Return value assignment start");
@@ -897,7 +894,9 @@ func ParseFuncDecl() uint64 {
         }
         AssertNextToken(TOKEN_RCBRAC);
         InsideFunction = 0;
-        PrintFunctionEnd();
+        if Compile != 0 {
+            PrintFunctionEnd();
+        }
         EndOfFunction(); //Delete local variables etc.
         PrintDebugString("Leaving ParseFuncDecl()",1000);
         boolFlag = 0;
@@ -1337,15 +1336,17 @@ func FindIdentifierAndParseSelector(item *libgogo.Item) {
 		if boolFlag == 0 {
 		    boolFlag = libgogo.FindPackageName(tok.strValue, LocalObjects); //Check local objects
 		}
-		if boolFlag == 0 {
-		    boolFlag = libgogo.FindPackageName(tok.strValue, LocalParameters); //Check local parameters
+		if (boolFlag == 0) && (CurrentFunction != nil) {
+		    boolFlag = libgogo.FindPackageName(tok.strValue, CurrentFunction.Fields); //Check local parameters
 		}
 		if boolFlag == 0 { //Token is not package name, but identifier
 			tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, LocalObjects); //Check local objects
 			tempList = LocalObjects;
 			if tempObject == nil {
-       			tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, LocalParameters); //Check local parameters
-    			tempList = LocalParameters;
+                if CurrentFunction != nil {
+           			tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, CurrentFunction.Fields); //Check local parameters
+        			tempList = CurrentFunction.Fields;
+    			}
     			if tempObject == nil {
     				tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, GlobalObjects); //Check global objects
 	    			tempList = GlobalObjects;

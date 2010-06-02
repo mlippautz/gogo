@@ -11,18 +11,19 @@ import "./libgogo/_obj/libgogo"
 //
 var GlobalObjects *libgogo.ObjectDesc = nil;
 var GlobalTypes *libgogo.TypeDesc = nil;
+var GlobalFunctions *libgogo.TypeDesc = nil;
 
 //
 // List of function-local objects
 //
 var LocalObjects *libgogo.ObjectDesc = nil;
-var LocalParameters *libgogo.ObjectDesc = nil;
 
 //
 // List of currently processed objects and types
 //
 var CurrentType *libgogo.TypeDesc;
 var CurrentObject *libgogo.ObjectDesc;
+var CurrentFunction *libgogo.TypeDesc;
 
 //
 // Basic types for reference
@@ -70,6 +71,7 @@ func PrintGlobalSymbolTable() {
         libgogo.PrintString("--------------------\n");
         libgogo.PrintTypes(GlobalTypes);
         libgogo.PrintObjects(GlobalObjects);
+        libgogo.PrintFunctions(GlobalFunctions);
     }
 }
 
@@ -86,7 +88,7 @@ func PrintLocalSymbolTable() {
         libgogo.PrintString(" of ");
         libgogo.PrintString(fileInfo[curFileIndex].filename);
         libgogo.PrintString(":\n----------------------------------------------------------------------------\n");
-        libgogo.PrintObjects(LocalParameters);
+        libgogo.PrintObjects(CurrentFunction.Fields);
         libgogo.PrintString("--- End of parameters, begin of local variables ---\n");
         libgogo.PrintObjects(LocalObjects);
     }
@@ -101,6 +103,10 @@ func UndefinedForwardDeclaredTypeCheck() {
 		temptype = libgogo.GetFirstForwardDeclType(GlobalTypes);
 		if temptype != nil {
 		    SymbolTableError("undefined", "", "type", temptype.Name);
+		}
+        temptype = libgogo.GetFirstForwardDeclType(GlobalFunctions);
+		if temptype != nil {
+		    SymbolTableError("undefined", "", "function", temptype.Name);
 		}
     }
 }
@@ -229,6 +235,7 @@ func SetCurrentObjectType(typename string, packagename string, arraydim uint64) 
 //
 func NewVariable(name string) {
     var TempObject *libgogo.ObjectDesc;
+    var temp uint64;
     if Compile != 0 {
 		CurrentObject = libgogo.NewObject(name, CurrentPackage, libgogo.CLASS_VAR);
 		if InsideFunction == 0 { //Global objects or function parameters
@@ -239,18 +246,21 @@ func NewVariable(name string) {
 		        }
 		        GlobalObjects = libgogo.AppendObject(CurrentObject, GlobalObjects);
 		    } else { //Function parameters
-   		        TempObject = libgogo.GetObject(name, CurrentPackage, LocalParameters);
-		        if TempObject != nil {
-		            SymbolTableError("duplicate", "", "parameter name", name);
+		        temp = libgogo.HasField(name, CurrentFunction);
+		        if temp != 0 {
+		            SymbolTableError("duplicate", "parameter", "name", name);
+		        } else {
+		            CurrentObject.Class = libgogo.CLASS_PARAMETER;
+		            CurrentObject.PackageName = ""; //A parameter has no package name
+		            libgogo.AddParameters(CurrentObject, CurrentFunction);
 		        }
-		        LocalParameters = libgogo.AppendObject(CurrentObject, LocalParameters);
 		    }
 		} else { //Function-local objects
 	        TempObject = libgogo.GetObject(name, CurrentPackage, LocalObjects);
 	        if TempObject != nil {
 	            SymbolTableError("duplicate", "local", "identifier", name);
 	        }
-	        TempObject = libgogo.GetObject(name, CurrentPackage, LocalParameters);
+	        TempObject = libgogo.GetObject(name, CurrentPackage, CurrentFunction.Fields);
 	        if TempObject != nil {
 	            SymbolTableError("There is already a parameter", "", "named", name);
 	        }
@@ -268,7 +278,6 @@ func EndOfFunction() {
     if Compile != 0 {
         PrintLocalSymbolTable(); //Print local symbol table
         LocalObjects = nil; //Delete local objects
-        LocalParameters = nil; //Delete local parameters
     }
 }
 
@@ -287,8 +296,24 @@ func VariableObjectDescToItem(obj *libgogo.ObjectDesc, item *libgogo.Item, kind 
         if kind == 1 { //Global variable
             tempAddr = libgogo.GetObjectOffset(obj, GlobalObjects);
         } else { //Local parameter (kind = 2)
-            tempAddr = libgogo.GetObjectOffset(obj, LocalParameters);
+            tempAddr = libgogo.GetObjectOffset(obj, CurrentFunction.Fields);
         }
     }
     libgogo.SetItem(item, libgogo.MODE_VAR, obj.ObjType, obj.PtrType, tempAddr, 0, kind); //Varible item of given kind
+}
+
+//
+// Adds a new function to the global symbol table with the specified
+// name
+//
+func NewFunction(name string, forwarddecl uint64) {
+    var TempType *libgogo.TypeDesc;
+    if Compile != 0 {
+		CurrentFunction = libgogo.NewType(name, CurrentPackage, forwarddecl, 0, nil);
+        TempType = libgogo.GetType(name, CurrentPackage, GlobalFunctions, 1);
+        if TempType != nil {
+            SymbolTableError("duplicate", "function", "name", name);
+        }
+        GlobalFunctions = libgogo.AppendType(CurrentFunction, GlobalFunctions);
+    }
 }
