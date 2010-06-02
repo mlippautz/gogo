@@ -45,9 +45,7 @@ func ResetCode() {
 //\n\
 ");
     //InspectorGadget();
-
-    InitCodeSegment = "TEXT    main·init(SB),0,$0-0\n";
-    CodeSegment = "TEXT    main·main(SB),0,$0-0\n"; //The code segment temporarily consists of a main function until function call code generation is implemented
+    InitCodeSegment = "TEXT main·init(SB),0,$0-0\n";
 }
 
 //
@@ -67,8 +65,7 @@ func PrintFile() {
     DataSegmentSizeStr = libgogo.IntToString(DataSegmentSize);
     libgogo.StringAppend(&DataSegment, DataSegmentSizeStr);
     libgogo.StringAppend(&DataSegment, "\n");
-    libgogo.StringAppend(&InitCodeSegment,"  RET\n"); //End of fuunction
-    libgogo.StringAppend(&CodeSegment,"  RET\n"); //The end of code segment temporarilly need an end of function (return jump) until function call code generation is implemented
+    libgogo.StringAppend(&InitCodeSegment,"  RET\n"); //End of function
 
     libgogo.WriteString(fd, Header);
     libgogo.WriteString(fd, "\n"); //Separator
@@ -316,6 +313,21 @@ func PrintLabel(label string) {
     PrintCodeOutput(label);
     PrintCodeOutput(":");
     PrintInstructionEnd();
+}
+
+func PrintFunctionStart(packagename string, label string) {
+    PrintCodeOutput("TEXT ");
+    PrintCodeOutput(packagename);
+    PrintCodeOutput("·");
+    PrintCodeOutput(label);
+    PrintCodeOutput("(SB),0,$0-$0"); //TODO
+    PrintInstructionEnd();
+}
+
+func PrintFunctionEnd() {
+    PrintCodeOutput("  RET");
+    PrintInstructionEnd();
+    PrintInstructionEnd(); //Additional new line separation
 }
 
 func SetDataSegmentSize(size uint64) {

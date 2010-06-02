@@ -23,6 +23,11 @@ var InsideFunctionVarDecl uint64 = 0;
 var CurrentPackage string = "<no package>";
 
 //
+// Name of function currently processed
+//
+var CurrentFunction string = "<no function>";
+
+//
 // Main parsing function. Corresponds to the EBNF main structure called 
 // go_program.
 //
@@ -800,6 +805,7 @@ func ParseFuncDeclHead() uint64 {
     if tok.id == TOKEN_FUNC {
         AssertNextToken(TOKEN_IDENTIFIER);
         // function name in tok.strValue
+        CurrentFunction = tok.strValue;
         AssertNextToken(TOKEN_LBRAC);
         ParseIdentifierTypeList();
         AssertNextTokenWeak(TOKEN_RBRAC);
@@ -833,6 +839,7 @@ func ParseFuncDecl() uint64 {
     GetNextTokenSafe();
     if tok.id == TOKEN_LCBRAC {
         InsideFunction = 1;
+        PrintFunctionStart(CurrentPackage, CurrentFunction);
         ParseVarDeclList();
         ParseStatementSequence(nil);
         GetNextTokenSafe();
@@ -844,6 +851,7 @@ func ParseFuncDecl() uint64 {
         }
         AssertNextToken(TOKEN_RCBRAC);
         InsideFunction = 0;
+        PrintFunctionEnd();
         EndOfFunction(); //Delete local variables etc.
         PrintDebugString("Leaving ParseFuncDecl()",1000);
         boolFlag = 0;

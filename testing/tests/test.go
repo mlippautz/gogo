@@ -1,4 +1,4 @@
-package test
+package main
 
 type foo struct {
     bar1 uint64;
@@ -18,7 +18,7 @@ var fooArrInst [10]foo;
 var testInst test;
 var testPtr *test;
 
-func test(bla uint64, blub string) {
+func main(bla uint64, blub string) {
     var a uint64 = 5;
     var b uint64 = 1;
     var c string = "Test";

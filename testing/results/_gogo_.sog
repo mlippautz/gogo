@@ -18,7 +18,7 @@ DATA data+716(SB)/1, $0
 //--- String buffer end at tests/test.go:24:26
 GLOBL data(SB),$736
 
-TEXT    main·init(SB),0,$0-0
+TEXT main·init(SB),0,$0-0
   //--- Global variable assignment start at tests/test.go:15:21
   //--- Global variable assignment RHS load start at tests/test.go:15:21
   //--- Global variable assignment RHS load end at tests/test.go:15:31
@@ -42,7 +42,7 @@ TEXT    main·init(SB),0,$0-0
   //--- Assign string length to new string constant end at tests/test.go:24:26
   RET
 
-TEXT    main·main(SB),0,$0-0
+TEXT main·main(SB),0,$0-$0
   //--- Local variable assignment start at tests/test.go:22:20
   //--- Local variable assignment RHS load start at tests/test.go:22:20
   //--- Local variable assignment RHS load end at tests/test.go:22:22
@@ -253,3 +253,4 @@ IF_tests_test_39_END:
   //--- Else end at tests/test.go:47:6
 IF_tests_test_39_ELSE_END:
   RET
+
