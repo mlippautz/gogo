@@ -28,6 +28,11 @@ var CurrentPackage string = "<no package>";
 var CurrentFunction string = "<no function>";
 
 //
+// Pseudo object representing a function's return value
+//
+var ReturnValuePseudoObject *libgogo.ObjectDesc = nil;
+
+//
 // Main parsing function. Corresponds to the EBNF main structure called 
 // go_program.
 //
@@ -213,26 +218,47 @@ func ParseType() {
 
 //
 // Parses: [ "[" integer "]" ] identifier
-// Is completelly optional. Only used to parse return value of a function
+// Is completely optional. Only used to parse return value of a function
 // declaration.
 //
 func ParseTypeOptional() {
+    var arraydim uint64 = 0;
+    var boolFlag uint64;
+    var packagename string = CurrentPackage;
+    var typename string;
+
     PrintDebugString("Entering ParseTypeOptional()",1000); 
+    ReturnValuePseudoObject = nil;
+    CurrentObject = libgogo.NewObject("return value", CurrentPackage, libgogo.CLASS_VAR); //Return value object with a name which is impossible declare (contains spaces) and therefore needs no additional checking
     GetNextTokenSafe();
     if tok.id == TOKEN_LSBRAC {
         AssertNextToken(TOKEN_INTEGER);        
+        arraydim = tok.intValue;
         AssertNextToken(TOKEN_RSBRAC);
     } else {
         tok.nextToken = tok.id;
     }
     if tok.id == TOKEN_ARITH_MUL {
         // Return type is a pointer
+        SetCurrentObjectTypeToPointer(); //Pointer type (indicated by *)
         GetNextTokenSafe();
     }
 
     GetNextTokenSafe();
     if tok.id != TOKEN_IDENTIFIER  {
         tok.nextToken = tok.id;
+    } else {
+        typename = tok.strValue;
+        boolFlag = ParseSimpleSelector();
+        if boolFlag == 0 { //Take selector into consideration if there is one
+            packagename = typename; //Previously read namespace is actually the namespace
+            typename = tok.strValue;
+        }
+        SetCurrentObjectType(typename, packagename, arraydim);
+        ReturnValuePseudoObject = CurrentObject;
+        if (Compile != 0) && (ReturnValuePseudoObject != nil) {
+            LocalParameters = libgogo.AppendObject(ReturnValuePseudoObject, LocalParameters); //Treat return value like an additional parameter at the end of the parameter list
+        }
     }
     PrintDebugString("Leaving ParseTypeOptional()",1000);
 }
@@ -835,16 +861,36 @@ func ParseFuncDeclRaw() uint64 {
 
 func ParseFuncDecl() uint64 {
     var boolFlag uint64;
+    var exprIndicator uint64;
+    var ReturnValueItem *libgogo.Item = nil;
+    var ReturnExpression *libgogo.Item;
     PrintDebugString("Entering ParseFuncDecl()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_LCBRAC {
         InsideFunction = 1;
+        if (Compile != 0) && (ReturnValuePseudoObject != nil) {
+            ReturnValueItem = libgogo.NewItem();
+            VariableObjectDescToItem(ReturnValuePseudoObject, ReturnValueItem, 2); //Treat return value like an additional parameter at the end of the parameter list
+        }
         PrintFunctionStart(CurrentPackage, CurrentFunction);
         ParseVarDeclList();
         ParseStatementSequence(nil);
         GetNextTokenSafe();
         if tok.id == TOKEN_RETURN {
-            ParseExpression(nil,nil); //TODO
+            if ReturnValuePseudoObject == nil {
+                SymbolTableError("Cannot return a value when there is no return type", "", "in function", CurrentFunction);
+            }
+            if Compile != 0 {
+                GenerateComment("Return value assignment start");
+                ReturnExpression = libgogo.NewItem();
+                GenerateComment("Return expression load start");
+                exprIndicator = ParseExpression(ReturnExpression,nil); //Parse return expression
+                GenerateComment("Return expression load end");
+                GenerateAssignment(ReturnValueItem, ReturnExpression, exprIndicator); //Return value = Return value expression
+                GenerateComment("Return value assignment end");
+            } else {
+                ParseExpression(nil, nil);
+            }
             AssertNextTokenWeak(TOKEN_SEMICOLON);
         } else {
             tok.nextToken = tok.id;

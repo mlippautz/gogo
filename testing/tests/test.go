@@ -46,3 +46,16 @@ func main(bla uint64, blub string) {
         b = 2;
     }
 }
+
+func foo() uint64 {
+    return 3;
+}
+
+func bar(a uint64) uint64 {
+    return a;
+}
+
+func bazz(a uint64) string {
+    var b string = "Hello";
+    return b;
+}

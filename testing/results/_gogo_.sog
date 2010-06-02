@@ -16,7 +16,15 @@ DATA data+714(SB)/1, $115
 DATA data+715(SB)/1, $116
 DATA data+716(SB)/1, $0
 //--- String buffer end at tests/test.go:24:26
-GLOBL data(SB),$736
+//--- String buffer start ('Hello') at tests/test.go:59:27
+DATA data+736(SB)/1, $72
+DATA data+737(SB)/1, $101
+DATA data+738(SB)/1, $108
+DATA data+739(SB)/1, $108
+DATA data+740(SB)/1, $111
+DATA data+741(SB)/1, $0
+//--- String buffer end at tests/test.go:59:27
+GLOBL data(SB),$760
 
 TEXT main·init(SB),0,$0-0
   //--- Global variable assignment start at tests/test.go:15:21
@@ -40,6 +48,13 @@ TEXT main·init(SB),0,$0-0
   //--- Assign string length to new string constant start at tests/test.go:24:26
   MOVQ $4, data+728(SB)
   //--- Assign string length to new string constant end at tests/test.go:24:26
+  //--- Assign byte buffer to new string constant start at tests/test.go:59:27
+  LEAQ data+736(SB), R8
+  MOVQ R8, data+744(SB)
+  //--- Assign byte buffer to new string constant end at tests/test.go:59:27
+  //--- Assign string length to new string constant start at tests/test.go:59:27
+  MOVQ $5, data+752(SB)
+  //--- Assign string length to new string constant end at tests/test.go:59:27
   RET
 
 TEXT main·main(SB),0,$0-$0
@@ -252,5 +267,41 @@ IF_tests_test_39_END:
   //--- Assignment end at tests/test.go:46:15
   //--- Else end at tests/test.go:47:6
 IF_tests_test_39_ELSE_END:
+  RET
+
+TEXT main·foo(SB),0,$0-$0
+  //--- Return value assignment start at tests/test.go:51:12
+  //--- Return expression load start at tests/test.go:51:12
+  //--- Return expression load end at tests/test.go:51:14
+  MOVQ $3, 8(SP)
+  //--- Return value assignment end at tests/test.go:51:14
+  RET
+
+TEXT main·bar(SB),0,$0-$0
+  //--- Return value assignment start at tests/test.go:55:12
+  //--- Return expression load start at tests/test.go:55:12
+  //--- Return expression load end at tests/test.go:55:14
+  MOVQ 8(SP), R8
+  MOVQ R8, 16(SP)
+  //--- Return value assignment end at tests/test.go:55:14
+  RET
+
+TEXT main·bazz(SB),0,$0-$0
+  //--- Local variable assignment start at tests/test.go:59:20
+  //--- Local variable assignment RHS load start at tests/test.go:59:20
+  //--- Local variable assignment RHS load end at tests/test.go:59:28
+  MOVQ data+744(SB), R8
+  MOVQ data+752(SB), R9
+  MOVQ R8, -16(SP)
+  MOVQ R9, -8(SP)
+  //--- Local variable assignment end at tests/test.go:59:28
+  //--- Return value assignment start at tests/test.go:60:12
+  //--- Return expression load start at tests/test.go:60:12
+  //--- Return expression load end at tests/test.go:60:14
+  MOVQ -16(SP), R8
+  MOVQ -8(SP), R9
+  MOVQ R8, 16(SP)
+  MOVQ R9, 24(SP)
+  //--- Return value assignment end at tests/test.go:60:14
   RET
 
