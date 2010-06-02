@@ -143,9 +143,9 @@ TEXT    main·main(SB),0,$0-0
   MOVQ AX, R8
   LEAQ data+24(SB), R9
   ADDQ R8, R9
-  ADDQ $0, R9
+  //--- Addition/subtraction by zero omitted at tests/test.go:33:28
   MOVQ data+696(SB), R8
-  ADDQ $0, R8
+  //--- Addition/subtraction by zero omitted at tests/test.go:33:51
   MOVQ (R9), R9
   MOVQ (R8), R8
   ADDQ R8, R9

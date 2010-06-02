@@ -27,9 +27,9 @@ func AddSubInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
 
     done = ConstFolding(item1, item2, constvalue);
     
-    if done == 0 {
-        DereferItemIfNecessary(item1); //Derefer address if item is a pointer
-        DereferItemIfNecessary(item2); //Derefer address if item is a pointer
+    if (done == 0) && (item2.Mode == libgogo.MODE_CONST) && (item2.A == 0) { //Omit addition/subtraction by zero
+        GenerateComment("Addition/subtraction by zero omitted");
+        done = 1;
     }
 
     if (done == 0) && (item1.Mode != libgogo.MODE_REG) { //item1 is not a register => make it a register
@@ -103,9 +103,9 @@ func DivMulInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
 
     done = ConstFolding(item1, item2, constvalue);
     
-    if done == 0 {
-        DereferItemIfNecessary(item1); //Derefer address if item is a pointer
-        DereferItemIfNecessary(item2); //Derefer address if item is a pointer
+    if (done == 0) && (item2.Mode == libgogo.MODE_CONST) && (item2.A == 0) { //Omit multiplication/division by zero
+        GenerateComment("Multiplication/division by zero omitted");
+        done = 1;
     }
 
     if done == 0 { // item1 is now (or has even already been) a register => use it

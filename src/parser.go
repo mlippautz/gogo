@@ -945,7 +945,7 @@ func ParseStatement(ed *ExpressionDescriptor) uint64 {
 
     if (doneFlag == 1) && (tok.id == TOKEN_BREAK) {
         // simple break statement
-        if ed == nil || ed.ForEd == nil {
+        if (ed == nil) || (ed.ForEd == nil) {
             GenErrorWeak("Can only generate code for 'break' in 'for' clause.");
         } else {
             GenerateBreak(ed);
@@ -955,7 +955,7 @@ func ParseStatement(ed *ExpressionDescriptor) uint64 {
     }
 
     if (doneFlag == 1) && (tok.id == TOKEN_CONTINUE) {
-        if ed == nil || ed.ForEd == nil {
+        if (ed == nil) || (ed.ForEd == nil) {
             GenErrorWeak("Can only generate code for 'break' in 'for' clause.");
         } else {
             GenerateContinue(ed);
