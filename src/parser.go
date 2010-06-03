@@ -1205,7 +1205,7 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
             tempString = libgogo.IntToString(FunctionCalled.Len);
             SymbolTableError("Expecting", tempString, "parameters (more than the actual ones) for function", FullFunctionName);
         }
-        PrintFunctionCall(FunctionCalled.PackageName, FunctionCalled.Name, TotalLocalVariableSize);
+        PrintFunctionCall(FunctionCalled.PackageName, FunctionCalled.Name, TotalParameterSize + TotalLocalVariableSize);
         RestoreUsedRegisters();
     }
     PrintDebugString("Leaving ParseFunctionCall()",1000);
@@ -1217,7 +1217,7 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
         LocalObjects = FunctionCalled.Fields; //Use parameters with local object offsets
         ReturnItem = libgogo.NewItem();
         VariableObjectDescToItem(ReturnObject, ReturnItem, 0); //Treat parameter as if it was a local object
-        ReturnItem.A = TotalParameterSize + TotalLocalVariableSize - ReturnItem.A; //Add offset (total size of parameters and variables)
+        ReturnItem.A = TotalParameterSize + TotalLocalVariableSize - ReturnItem.A - 8; //Add offset (total size of parameters and variables)
         LocalObjects = OldLocalObjects; //Restore old local objects pointer
     }
     return ReturnItem;
@@ -1246,7 +1246,7 @@ func ParseExpressionList(FunctionCalled *libgogo.TypeDesc, TotalParameterSize ui
         LocalObjects = FunctionCalled.Fields; //Use parameters with local object offsets
         Parameter = libgogo.NewItem();
         VariableObjectDescToItem(ParameterLHSObject, Parameter, 0); //Treat parameter as if it was a local object
-        Parameter.A = TotalParameterSize - Parameter.A; //Add offset (total size of parameters)
+        Parameter.A = TotalParameterSize - Parameter.A - 8; //Add offset (total size of parameters)
         LocalObjects = OldLocalObjects; //Restore old local objects pointer
         GenerateAssignment(Parameter, ExprItem, boolFlag); //Assignment
         GenerateComment("First parameter expression end");
@@ -1269,7 +1269,9 @@ func ParseExpressionList(FunctionCalled *libgogo.TypeDesc, TotalParameterSize ui
             paramCount = paramCount - 1;
         }
     } else {
-        for boolFlag = ParseExpressionListSub(FunctionCalled, TotalParameterSize, paramCount + 1); boolFlag == 0; boolFlag = ParseExpressionListSub(FunctionCalled, TotalParameterSize, paramCount + 1) { }
+        for boolFlag = ParseExpressionListSub(FunctionCalled, TotalParameterSize, paramCount + 1);
+            boolFlag == 0;
+            boolFlag = ParseExpressionListSub(FunctionCalled, TotalParameterSize, paramCount + 1) { }
     }
     PrintDebugString("Leaving ParseExpressionList()",1000);
     return paramCount;
@@ -1297,7 +1299,7 @@ func ParseExpressionListSub(FunctionCalled *libgogo.TypeDesc, TotalParameterSize
             LocalObjects = FunctionCalled.Fields; //Use parameters with local object offsets
             Parameter = libgogo.NewItem();
             VariableObjectDescToItem(ParameterLHSObject, Parameter, 0); //Treat parameter as if it was a local object
-            Parameter.A = TotalParameterSize - Parameter.A; //Add offset (total size of parameters)
+            Parameter.A = TotalParameterSize - Parameter.A - 8; //Add offset (total size of parameters)
             LocalObjects = OldLocalObjects; //Restore old local objects pointer
             GenerateAssignment(Parameter, ExprItem, boolFlag); //Assignment
             GenerateComment("Subsequent parameter expression end");
