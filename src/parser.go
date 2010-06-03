@@ -1112,22 +1112,35 @@ func ParseAssignment(semicolon uint64) uint64 {
         if tok.id == TOKEN_IDENTIFIER {
             funcIndicator = IsFunction();
             if funcIndicator == 1 { //Function call
-                ParseFunctionCallStatement();
-                //TODO: Assign return value to LHS
+                RHSItem = ParseFunctionCallStatement();
+                if Compile != 0 {
+                    if RHSItem == nil {
+                        SymbolTableError("Function has", "no", "return value", "");
+                    }
+                    GenerateAssignment(LHSItem, RHSItem, 0); //LHS = RHS
+                }
             } else { //Expression starting with an identifier
-                RHSItem = libgogo.NewItem();
-                GenerateComment("Assignment RHS load start");
-                exprIndicator = ParseExpression(RHSItem,nil); //Parse RHS
-                GenerateComment("Assignment RHS load end");
-                GenerateAssignment(LHSItem, RHSItem, exprIndicator); //LHS = RHS
+                if Compile != 0 {
+                    RHSItem = libgogo.NewItem();
+                    GenerateComment("Assignment RHS load start");
+                    exprIndicator = ParseExpression(RHSItem, nil); //Parse RHS
+                    GenerateComment("Assignment RHS load end");
+                    GenerateAssignment(LHSItem, RHSItem, exprIndicator); //LHS = RHS
+                } else {
+                    ParseExpression(nil, nil);
+                }
             }
         } else { //Expression
             tok.nextToken = tok.id;
-            RHSItem = libgogo.NewItem();
-            GenerateComment("Assignment RHS load start");
-            exprIndicator = ParseExpression(RHSItem,nil); //Parse RHS
-            GenerateComment("Assignment RHS load end");
-            GenerateAssignment(LHSItem, RHSItem, exprIndicator); //LHS = RHS
+            if Compile != 0 {
+                RHSItem = libgogo.NewItem();
+                GenerateComment("Assignment RHS load start");
+                exprIndicator = ParseExpression(RHSItem, nil); //Parse RHS
+                GenerateComment("Assignment RHS load end");
+                GenerateAssignment(LHSItem, RHSItem, exprIndicator); //LHS = RHS
+            } else {
+                ParseExpression(nil, nil);
+            }
         }
         if semicolon != 0 {
             AssertNextTokenWeak(TOKEN_SEMICOLON);
@@ -1160,12 +1173,16 @@ func ParseFunctionCallOptional() {
     PrintDebugString("Leaving ParseFunctionCallOptional()",1000);
 }
 
-func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) {
+func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
     var paramCount uint64 = 0;
     var FullFunctionName string;
     var tempString string;
     var TotalParameterSize uint64;
     var TotalCurrentParameterSize uint64;
+    var OldLocalObjects *libgogo.ObjectDesc;
+    var ReturnObject *libgogo.ObjectDesc;
+    var ReturnItem *libgogo.Item;
+    
     PrintDebugString("Entering ParseFunctionCall()",1000);
     AssertNextToken(TOKEN_LBRAC);
     GetNextTokenSafe();
@@ -1192,6 +1209,18 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) {
         RestoreUsedRegisters();
     }
     PrintDebugString("Leaving ParseFunctionCall()",1000);
+    ReturnObject = libgogo.GetObject("return value", "", FunctionCalled.Fields); //Find return value
+    if ReturnObject == nil {
+        ReturnItem = nil;
+    } else {
+        OldLocalObjects = LocalObjects; //Save pointer to local objects
+        LocalObjects = FunctionCalled.Fields; //Use parameters with local object offsets
+        ReturnItem = libgogo.NewItem();
+        VariableObjectDescToItem(ReturnObject, ReturnItem, 0); //Treat parameter as if it was a local object
+        ReturnItem.A = ReturnItem.A + TotalParameterSize + TotalCurrentParameterSize; //Add offset (total size of parameters)
+        LocalObjects = OldLocalObjects; //Restore old local objects pointer
+    }
+    return ReturnItem;
 }
 
 func ParseExpressionList(FunctionCalled *libgogo.TypeDesc, TotalParameterSize uint64) uint64 {
@@ -1246,14 +1275,16 @@ func ParseExpressionListSub() uint64 {
     return boolFlag;   
 }
 
-func ParseFunctionCallStatement() {
+func ParseFunctionCallStatement() *libgogo.Item {
     var FunctionCalled *libgogo.TypeDesc;
+    var ReturnValue *libgogo.Item;
     PrintDebugString("Entering ParseFunctionCallStatement()",1000);
     AssertNextToken(TOKEN_IDENTIFIER);
     FunctionCalled = libgogo.NewType("", "", 0, 0, nil);
     FunctionCalled = FindIdentifierAndParseSelector_FunctionCall(FunctionCalled);
-    ParseFunctionCall(FunctionCalled);
+    ReturnValue = ParseFunctionCall(FunctionCalled);
     PrintDebugString("Leaving ParseFunctionCallStatement()",1000);
+    return ReturnValue;
 }
 
 //

@@ -310,6 +310,8 @@ TEXT main·bazz(SB),0,$0-$0
   //--- Stack offset after function call for local variables and parameters start at tests/test.go:62:17
   ADDQ $40, SP
   //--- Stack offset after function call for local variables and parameters end at tests/test.go:62:17
+  MOVQ -40(SP), R8
+  MOVQ R8, -32(SP)
   //--- Assignment end at tests/test.go:62:18
   //--- Assignment start at tests/test.go:63:11
   //--- Assignment LHS load start at tests/test.go:63:11
@@ -327,6 +329,8 @@ TEXT main·bazz(SB),0,$0-$0
   //--- Stack offset after function call for local variables and parameters start at tests/test.go:63:19
   ADDQ $48, SP
   //--- Stack offset after function call for local variables and parameters end at tests/test.go:63:19
+  MOVQ -56(SP), R8
+  MOVQ R8, -24(SP)
   //--- Assignment end at tests/test.go:63:20
   //--- If start at tests/test.go:64:8
   MOVQ -32(SP), R8
