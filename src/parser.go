@@ -1178,7 +1178,7 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
     var FullFunctionName string;
     var tempString string;
     var TotalParameterSize uint64;
-    var TotalCurrentParameterSize uint64;
+    var TotalLocalVariableSize uint64;
     var OldLocalObjects *libgogo.ObjectDesc;
     var ReturnObject *libgogo.ObjectDesc;
     var ReturnItem *libgogo.Item;
@@ -1189,11 +1189,11 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
     if Compile != 0 {
         SaveUsedRegisters();
         TotalParameterSize = libgogo.GetAlignedObjectListSize(FunctionCalled.Fields); //Get total size of parameters of function called
-        TotalCurrentParameterSize = libgogo.GetAlignedObjectListSize(CurrentFunction.Fields); //Get total size of parameters of current function
+        TotalLocalVariableSize = libgogo.GetAlignedObjectListSize(LocalObjects); //Get total size of local variables of current function
     }
     if tok.id != TOKEN_RBRAC {
         tok.nextToken = tok.id;
-        paramCount = ParseExpressionList(FunctionCalled, TotalParameterSize + TotalCurrentParameterSize);
+        paramCount = ParseExpressionList(FunctionCalled, TotalParameterSize + TotalLocalVariableSize);
         AssertNextTokenWeak(TOKEN_RBRAC);
     }
     if Compile != 0 {
@@ -1205,7 +1205,7 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
             tempString = libgogo.IntToString(FunctionCalled.Len);
             SymbolTableError("Expecting", tempString, "parameters (more than the actual ones) for function", FullFunctionName);
         }
-        PrintFunctionCall(FunctionCalled.PackageName, FunctionCalled.Name, TotalParameterSize + TotalCurrentParameterSize);
+        PrintFunctionCall(FunctionCalled.PackageName, FunctionCalled.Name, TotalLocalVariableSize);
         RestoreUsedRegisters();
     }
     PrintDebugString("Leaving ParseFunctionCall()",1000);
@@ -1217,7 +1217,7 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
         LocalObjects = FunctionCalled.Fields; //Use parameters with local object offsets
         ReturnItem = libgogo.NewItem();
         VariableObjectDescToItem(ReturnObject, ReturnItem, 0); //Treat parameter as if it was a local object
-        ReturnItem.A = ReturnItem.A + TotalParameterSize + TotalCurrentParameterSize; //Add offset (total size of parameters)
+        ReturnItem.A = TotalParameterSize + TotalLocalVariableSize - ReturnItem.A; //Add offset (total size of parameters and variables)
         LocalObjects = OldLocalObjects; //Restore old local objects pointer
     }
     return ReturnItem;
@@ -1246,7 +1246,7 @@ func ParseExpressionList(FunctionCalled *libgogo.TypeDesc, TotalParameterSize ui
         LocalObjects = FunctionCalled.Fields; //Use parameters with local object offsets
         Parameter = libgogo.NewItem();
         VariableObjectDescToItem(ParameterLHSObject, Parameter, 0); //Treat parameter as if it was a local object
-        Parameter.A = Parameter.A + TotalParameterSize; //Add offset (total size of parameters)
+        Parameter.A = TotalParameterSize - Parameter.A; //Add offset (total size of parameters)
         LocalObjects = OldLocalObjects; //Restore old local objects pointer
         GenerateAssignment(Parameter, ExprItem, boolFlag); //Assignment
         GenerateComment("First parameter expression end");
@@ -1297,7 +1297,7 @@ func ParseExpressionListSub(FunctionCalled *libgogo.TypeDesc, TotalParameterSize
             LocalObjects = FunctionCalled.Fields; //Use parameters with local object offsets
             Parameter = libgogo.NewItem();
             VariableObjectDescToItem(ParameterLHSObject, Parameter, 0); //Treat parameter as if it was a local object
-            Parameter.A = Parameter.A + TotalParameterSize; //Add offset (total size of parameters)
+            Parameter.A = TotalParameterSize - Parameter.A; //Add offset (total size of parameters)
             LocalObjects = OldLocalObjects; //Restore old local objects pointer
             GenerateAssignment(Parameter, ExprItem, boolFlag); //Assignment
             GenerateComment("Subsequent parameter expression end");
