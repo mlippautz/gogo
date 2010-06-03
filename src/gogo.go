@@ -79,7 +79,7 @@ func main() {
                     GlobalError("The first file in the list cannot be an assembly file");
                 }
                 for singleChar = libgogo.GetChar(fileInfo[curFileIndex].fd); singleChar != 0; singleChar = libgogo.GetChar(fileInfo[curFileIndex].fd) { //Copy file to output character by character
-                    if singleChar == '·' { //Prepend package name
+                    if singleChar == 183 /*'·'*/ { //Prepend package name
                         //PrintCodeOutput(CurrentPackage); //TODO: Fix UTF-8 corruption due to string insertion?!
                     }
                     PrintCodeOutputChar(singleChar);

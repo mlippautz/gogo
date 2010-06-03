@@ -58,6 +58,30 @@ func FreeRegister(index uint64) {
 }
 
 //
+// Saves the currently used registers to the stack
+//
+func SaveUsedRegisters() {
+    var i uint64;
+    for i = 0; i < NumRegisters; i = i + 1 {
+        if FreeRegisters[i] == 0 {
+            PrintInstruction_Reg("PUSH", 8, "R", i + 8, 0, 0, 0, "");
+        }
+    }
+}
+
+//
+// Restores the currently used registers from the stack
+//
+func RestoreUsedRegisters() {
+    var i uint64;
+    for i = NumRegisters - 1; i >= 0; i = i - 1 { //Reverse order (stack!)
+        if FreeRegisters[i] == 0 {
+            PrintInstruction_Reg("POP", 8, "R", i + 8, 0, 0, 0, "");
+        }
+    }
+}
+
+//
 // Frees the register occupied by the given item if applicable.
 // Freeing is only possible if the mode is registered.
 //

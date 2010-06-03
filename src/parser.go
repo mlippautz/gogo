@@ -657,14 +657,15 @@ func ParseSelector(item *libgogo.Item, packagename string) {
     PrintDebugString("Leaving ParseSelector()",1000);
 }
 
-func ParseSelector_FunctionCall() {
+func ParseSelector_FunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.TypeDesc {
    var boolFlag uint64;
    PrintDebugString("Entering ParseSelector_FunctionCall()",1000);
-    for boolFlag = ParseSelectorSub_FunctionCall();
+    for boolFlag = ParseSelectorSub_FunctionCall(FunctionCalled);
         boolFlag == 0; 
-        boolFlag = ParseSelectorSub_FunctionCall() {
+        boolFlag = ParseSelectorSub_FunctionCall(FunctionCalled) {
     }
     PrintDebugString("Leaving ParseSelector_FunctionCall()",1000);
+    return FunctionCalled;
 }
 
 //
@@ -769,12 +770,28 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
     return boolFlag;
 }
 
-func ParseSelectorSub_FunctionCall() uint64 {
+func ParseSelectorSub_FunctionCall(FunctionCalled *libgogo.TypeDesc) uint64 {
     var boolFlag uint64;
+    var tempFcn *libgogo.TypeDesc;
     PrintDebugString("Entering ParseSelectorSub_FunctionCall()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_PT {
         AssertNextToken(TOKEN_IDENTIFIER);
+        if Compile != 0 {
+            boolFlag = libgogo.StringLength(FunctionCalled.Name);
+            if boolFlag != 0 {
+                SymbolTableError("Cannot apply a selector to", "a", "function, function ", FunctionCalled.Name);
+            } else {
+                tempFcn = libgogo.GetType(tok.strValue, FunctionCalled.PackageName, GlobalFunctions, 0); //Check global functions
+   			    if tempFcn == nil {
+			        SymbolTableError("Package", FunctionCalled.PackageName, "has no function named", tok.strValue);
+			    } else {
+			        FunctionCalled.Name = tempFcn.Name;
+			        FunctionCalled.Len = tempFcn.Len;
+  			        FunctionCalled.Fields = tempFcn.Fields;
+			    }
+            }
+        }
         boolFlag = 0;
     } else {
         tok.nextToken = tok.id;
@@ -1181,10 +1198,12 @@ func ParseExpressionListSub() uint64 {
 }
 
 func ParseFunctionCallStatement() {
+    var FunctionCalled *libgogo.TypeDesc;
     PrintDebugString("Entering ParseFunctionCallStatement()",1000);
-    AssertNextToken(TOKEN_IDENTIFIER); //TODO
-    ParseSelector_FunctionCall(); //TODO
-    ParseFunctionCall();
+    AssertNextToken(TOKEN_IDENTIFIER);
+    FunctionCalled = libgogo.NewType("", "", 0, 0, nil);
+    FunctionCalled = FindIdentifierAndParseSelector_FunctionCall(FunctionCalled);
+    ParseFunctionCall(); //TODO: Pass FunctionCalled
     PrintDebugString("Leaving ParseFunctionCallStatement()",1000);
 }
 
@@ -1376,4 +1395,29 @@ func FindIdentifierAndParseSelector(item *libgogo.Item) {
     } else {
         ParseSelector(item, CurrentPackage);
     }
+}
+
+func FindIdentifierAndParseSelector_FunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.TypeDesc {
+    var boolFlag uint64;
+    var tempFcn *libgogo.TypeDesc;
+    if Compile != 0 {
+		//Token can be package name
+		boolFlag = libgogo.FindTypePackageName(tok.strValue, GlobalFunctions); //Check global functions
+		if boolFlag == 0 { //Token is not package name, but identifier
+			tempFcn = libgogo.GetType(tok.strValue, CurrentPackage, GlobalFunctions, 0); //Check global functions
+            if tempFcn == nil {
+                SymbolTableError("There is no", "function", "named", tok.strValue); //TODO: Allow forward declarations
+            } //else: tempFcn is already the return value
+        } else { //Token is package name
+            FunctionCalled.PackageName = tok.strValue; //Set package name
+            tempFcn = ParseSelector_FunctionCall(FunctionCalled); //Parse selector for an undefined function in the given package
+            boolFlag = libgogo.StringLength(tempFcn.Name);
+            if boolFlag == 0 {
+		        SymbolTableError("Cannot use package", "", "as a function:", tempFcn.PackageName);
+		    }
+        }
+    } else {
+        tempFcn = ParseSelector_FunctionCall(FunctionCalled);
+    }
+    return tempFcn;
 }

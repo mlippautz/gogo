@@ -319,6 +319,24 @@ func FindPackageName(packagename string, list *ObjectDesc) uint64 {
 }
 
 //
+// Tries to find the given package name in one of the types of the given list
+// Returns 1 if an object has been found, or 0 otherwise
+//
+func FindTypePackageName(packagename string, list *TypeDesc) uint64 {
+    var retVal uint64 = 0;
+    var tmpObj *TypeDesc;
+    var packageNameCompare uint64;
+    for tmpObj = list; tmpObj != nil; tmpObj = tmpObj.Next {
+        packageNameCompare = StringCompare(tmpObj.PackageName, packagename);
+        if packageNameCompare == 0 {
+            retVal = 1;
+            break;
+        }
+    }
+    return retVal;
+}
+
+//
 // Returns the first type from the list which is forward declared
 //
 func GetFirstForwardDeclType(list *TypeDesc) *TypeDesc {
