@@ -253,6 +253,7 @@ func ParseTypeOptional() {
         ReturnValuePseudoObject = CurrentObject;
         if (Compile != 0) && (ReturnValuePseudoObject != nil) {
             libgogo.AddParameters(ReturnValuePseudoObject, CurrentFunction); //Treat return value like an additional parameter at the end of the parameter list
+            CurrentFunction.Len = CurrentFunction.Len - 1; //Don't count parameter as input parameter
         }
     }
     PrintDebugString("Leaving ParseTypeOptional()",1000);
@@ -1112,6 +1113,7 @@ func ParseAssignment(semicolon uint64) uint64 {
             funcIndicator = IsFunction();
             if funcIndicator == 1 { //Function call
                 ParseFunctionCallStatement();
+                //TODO: Assign return value to LHS
             } else { //Expression starting with an identifier
                 RHSItem = libgogo.NewItem();
                 GenerateComment("Assignment RHS load start");
@@ -1149,7 +1151,7 @@ func ParseFunctionCallOptional() {
 
         } else {
             tok.nextToken = tok.id;
-            ParseExpressionList();
+            ParseExpressionList(nil, 0); //TODO
             AssertNextToken(TOKEN_RBRAC);
         }
     } else {
@@ -1158,27 +1160,74 @@ func ParseFunctionCallOptional() {
     PrintDebugString("Leaving ParseFunctionCallOptional()",1000);
 }
 
-func ParseFunctionCall() {
+func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) {
+    var paramCount uint64 = 0;
+    var FullFunctionName string;
+    var tempString string;
+    var TotalParameterSize uint64;
+    var TotalCurrentParameterSize uint64;
     PrintDebugString("Entering ParseFunctionCall()",1000);
     AssertNextToken(TOKEN_LBRAC);
     GetNextTokenSafe();
+    if Compile != 0 {
+        SaveUsedRegisters();
+        TotalParameterSize = libgogo.GetAlignedObjectListSize(FunctionCalled.Fields); //Get total size of parameters of function called
+        TotalCurrentParameterSize = libgogo.GetAlignedObjectListSize(CurrentFunction.Fields); //Get total size of parameters of current function
+    }
     if tok.id != TOKEN_RBRAC {
         tok.nextToken = tok.id;
-        ParseExpressionList();
-        AssertNextTokenWeak(TOKEN_RBRAC);     
-    }     
+        paramCount = ParseExpressionList(FunctionCalled, TotalParameterSize + TotalCurrentParameterSize);
+        AssertNextTokenWeak(TOKEN_RBRAC);
+    }
+    if Compile != 0 {
+        if FunctionCalled.Len != paramCount { //Compare number of actual parameters
+            FullFunctionName = "";
+            libgogo.StringAppend(&FullFunctionName, FunctionCalled.PackageName);
+            libgogo.CharAppend(&FullFunctionName, '.');
+            libgogo.StringAppend(&FullFunctionName, FunctionCalled.Name);
+            tempString = libgogo.IntToString(FunctionCalled.Len);
+            SymbolTableError("Expecting", tempString, "parameters for function", FullFunctionName);
+        }
+        PrintFunctionCall(FunctionCalled.PackageName, FunctionCalled.Name, TotalParameterSize + TotalCurrentParameterSize);
+        RestoreUsedRegisters();
+    }
     PrintDebugString("Leaving ParseFunctionCall()",1000);
 }
 
-func ParseExpressionList() {
+func ParseExpressionList(FunctionCalled *libgogo.TypeDesc, TotalParameterSize uint64) uint64 {
     var ed ExpressionDescriptor;
     var boolFlag uint64;
+    var paramCount uint64 = 1; //There has to be at least one expression
+    var ExprItem *libgogo.Item;
+    var OldLocalObjects *libgogo.ObjectDesc;
+    var ParameterLHSObject *libgogo.ObjectDesc;
+    var Parameter *libgogo.Item;
     PrintDebugString("Entering ParseExpressionList()",1000);
-    ParseExpression(nil, &ed); //TODO
+    if Compile != 0 {
+        GenerateComment("First parameter expression start");
+        ExprItem = libgogo.NewItem();
+        GenerateComment("First parameter expression load start");
+        boolFlag = ParseExpression(ExprItem, &ed);
+        GenerateComment("First parameter expression load end");
+        ParameterLHSObject = libgogo.GetParameterAt(paramCount, FunctionCalled);
+        OldLocalObjects = LocalObjects; //Save pointer to local objects
+        LocalObjects = FunctionCalled.Fields; //Use parameters with local object offsets
+        Parameter = libgogo.NewItem();
+        VariableObjectDescToItem(ParameterLHSObject, Parameter, 0); //Treat parameter as if it was a local object
+        Parameter.A = Parameter.A + TotalParameterSize; //Add offset (total size of parameters)
+        LocalObjects = OldLocalObjects; //Restore old local objects pointer
+        GenerateAssignment(Parameter, ExprItem, boolFlag); //Assignment
+        GenerateComment("First parameter expression end");
+    } else  {
+        ParseExpression(nil, &ed);
+    }
     for boolFlag = ParseExpressionListSub();
         boolFlag == 0;
-        boolFlag = ParseExpressionListSub() { }   
+        boolFlag = ParseExpressionListSub() {
+        paramCount = paramCount + 1; //One more parameter
+    }   
     PrintDebugString("Leaving ParseExpressionList()",1000);
+    return paramCount;
 }
 
 func ParseExpressionListSub() uint64 {
@@ -1187,7 +1236,7 @@ func ParseExpressionListSub() uint64 {
     PrintDebugString("Entering ParseExpressionListSub()",1000);
     GetNextTokenSafe();
     if tok.id == TOKEN_COLON {
-        ParseExpression(nil, &ed); //TODO
+        ParseExpression(nil, &ed); //TODO: assign parameter
         boolFlag = 0;
     } else {
         tok.nextToken = tok.id;
@@ -1203,7 +1252,7 @@ func ParseFunctionCallStatement() {
     AssertNextToken(TOKEN_IDENTIFIER);
     FunctionCalled = libgogo.NewType("", "", 0, 0, nil);
     FunctionCalled = FindIdentifierAndParseSelector_FunctionCall(FunctionCalled);
-    ParseFunctionCall(); //TODO: Pass FunctionCalled
+    ParseFunctionCall(FunctionCalled);
     PrintDebugString("Leaving ParseFunctionCallStatement()",1000);
 }
 

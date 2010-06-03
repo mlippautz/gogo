@@ -319,6 +319,20 @@ func PrintLabel(label string) {
     PrintInstructionEnd();
 }
 
+func PrintFunctionCall(packagename string, label string, stackoffset uint64) {
+    GenerateComment("Stack offset before function call for local variables and parameters start");
+    PrintInstruction_Imm_Reg("SUB", 8, stackoffset + 8, "SP", 0, 0, 0, 0, ""); //SUBQ $[stackoffset+8], SP
+    GenerateComment("Stack offset before function call for local variables and parameters end");
+    PrintCodeOutput("  CALL ");
+    PrintCodeOutput(packagename);
+    PrintCodeOutput("·");
+    PrintCodeOutput(label);
+    PrintInstructionEnd();
+    GenerateComment("Stack offset after function call for local variables and parameters start");
+    PrintInstruction_Imm_Reg("ADD", 8, stackoffset + 8, "SP", 0, 0, 0, 0, ""); //ADDQ $[stackoffset+8], SP
+    GenerateComment("Stack offset after function call for local variables and parameters end");
+}
+
 func PrintFunctionStart(packagename string, label string) {
     PrintCodeOutput("TEXT ");
     PrintCodeOutput(packagename);

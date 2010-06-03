@@ -349,6 +349,17 @@ func GetFirstForwardDeclType(list *TypeDesc) *TypeDesc {
     return retValue;
 }
 
+func GetParameterAt(index uint64, list *TypeDesc) *ObjectDesc {
+    var retValue *ObjectDesc;
+    for retValue = list.Fields; retValue != nil; retValue = retValue.Next {
+        index = index - 1;
+        if index == 0 {
+            break;
+        }
+    }
+    return retValue;
+}
+
 //
 // Creates a new object
 //

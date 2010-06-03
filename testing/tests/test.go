@@ -57,5 +57,12 @@ func bar(a uint64) uint64 {
 
 func bazz(a uint64) string {
     var b string = "Hello";
+    var tmp uint64 = 3;
+    var tmp2 uint64;
+    tmp2 = foo();
+    tmp = bar(tmp);
+    if tmp == tmp2 {
+        foo();
+    }
     return b;
 }
