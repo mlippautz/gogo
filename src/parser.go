@@ -1155,24 +1155,6 @@ func ParseAssignment(semicolon uint64) uint64 {
     return boolFlag;
 }
 
-func ParseFunctionCallOptional() {
-    PrintDebugString("Entering ParseFunctionCallOptional()",1000);
-    GetNextTokenSafe();
-    if tok.id == TOKEN_LBRAC {
-        GetNextTokenSafe();
-        if tok.id == TOKEN_RBRAC {
-
-        } else {
-            tok.nextToken = tok.id;
-            ParseExpressionList(nil, 0); //TODO
-            AssertNextToken(TOKEN_RBRAC);
-        }
-    } else {
-        tok.nextToken = tok.id;
-    }
-    PrintDebugString("Leaving ParseFunctionCallOptional()",1000);
-}
-
 func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
     var paramCount uint64 = 0;
     var FullFunctionName string;
