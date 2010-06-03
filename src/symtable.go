@@ -314,11 +314,13 @@ func VariableObjectDescToItem(obj *libgogo.ObjectDesc, item *libgogo.Item, kind 
 func ObjectToStackParameter(obj *libgogo.ObjectDesc, FunctionCalled *libgogo.TypeDesc, stackoffset uint64) *libgogo.Item {
     var OldLocalObjects *libgogo.ObjectDesc;
     var ReturnItem *libgogo.Item;
+    var ObjSize uint64;
+    ObjSize = libgogo.GetObjectSizeAligned(obj);
     OldLocalObjects = LocalObjects; //Save pointer to local objects
     LocalObjects = FunctionCalled.Fields; //Use parameters with local object offsets
     ReturnItem = libgogo.NewItem();
     VariableObjectDescToItem(obj, ReturnItem, 0); //Treat parameter as if it was a local object
-    ReturnItem.A = stackoffset - ReturnItem.A - 8; //Add offset (total size of parameters and variables)
+    ReturnItem.A = stackoffset - 8 - ReturnItem.A - 8 + ObjSize; //Add offset (total size of parameters and variables); compensate both local offsets (stackoffset and ReturnItem.A) by subtracting -8 for each, then adding the parameter size
     LocalObjects = OldLocalObjects; //Restore old local objects pointer
     return ReturnItem;
 }

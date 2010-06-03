@@ -68,7 +68,15 @@ func bazz(a uint64) uint64 {
     return ret;
 }
 
+func blub(r string) string {
+    var x string = r;
+    return x;
+}
+
 func main() {
     var ret uint64;
+    var u string = "ABC";
+    var x string;
     ret = bazz(1);
+    x = blub(u);
 }
