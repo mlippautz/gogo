@@ -42,6 +42,8 @@ var nilPtr *libgogo.ObjectDesc = nil;
 // Initializes the global symbol table (objects and types)
 //
 func InitSymbolTable() {
+    var main_init_fcn *libgogo.TypeDesc;
+
     //Default data types
     uint64_t = libgogo.NewType("uint64", "", 0, 8, nil);
     GlobalTypes = libgogo.AppendType(uint64_t, GlobalTypes);
@@ -57,6 +59,10 @@ func InitSymbolTable() {
     nilPtr.ObjType = nil;
     nilPtr.PtrType = 1; //nil is a pointer to no specified type (universal)
     GlobalObjects = libgogo.AppendObject(nilPtr, GlobalObjects);
+    
+    //Default functions
+    main_init_fcn = libgogo.NewType("init", "main", 0, 0, nil); //main.init (avoid external redeclaraction)
+    GlobalFunctions = libgogo.AppendType(main_init_fcn, GlobalFunctions);
 }
 
 //
@@ -300,6 +306,21 @@ func VariableObjectDescToItem(obj *libgogo.ObjectDesc, item *libgogo.Item, kind 
         }
     }
     libgogo.SetItem(item, libgogo.MODE_VAR, obj.ObjType, obj.PtrType, tempAddr, 0, kind); //Varible item of given kind
+}
+
+//
+// Converts an object representing a parameter of a function call into an item with the correct address offset
+//
+func ObjectToStackParameter(obj *libgogo.ObjectDesc, FunctionCalled *libgogo.TypeDesc, stackoffset uint64) *libgogo.Item {
+    var OldLocalObjects *libgogo.ObjectDesc;
+    var ReturnItem *libgogo.Item;
+    OldLocalObjects = LocalObjects; //Save pointer to local objects
+    LocalObjects = FunctionCalled.Fields; //Use parameters with local object offsets
+    ReturnItem = libgogo.NewItem();
+    VariableObjectDescToItem(obj, ReturnItem, 0); //Treat parameter as if it was a local object
+    ReturnItem.A = stackoffset - ReturnItem.A - 8; //Add offset (total size of parameters and variables)
+    LocalObjects = OldLocalObjects; //Restore old local objects pointer
+    return ReturnItem;
 }
 
 //
