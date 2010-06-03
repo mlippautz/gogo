@@ -16,15 +16,7 @@ DATA data+714(SB)/1, $115
 DATA data+715(SB)/1, $116
 DATA data+716(SB)/1, $0
 //--- String buffer end at tests/test.go:24:26
-//--- String buffer start ('Hello') at tests/test.go:59:27
-DATA data+736(SB)/1, $72
-DATA data+737(SB)/1, $101
-DATA data+738(SB)/1, $108
-DATA data+739(SB)/1, $108
-DATA data+740(SB)/1, $111
-DATA data+741(SB)/1, $0
-//--- String buffer end at tests/test.go:59:27
-GLOBL data(SB),$760
+GLOBL data(SB),$736
 
 TEXT main·init(SB),0,$0-0
   //--- Global variable assignment start at tests/test.go:15:21
@@ -48,16 +40,9 @@ TEXT main·init(SB),0,$0-0
   //--- Assign string length to new string constant start at tests/test.go:24:26
   MOVQ $4, data+728(SB)
   //--- Assign string length to new string constant end at tests/test.go:24:26
-  //--- Assign byte buffer to new string constant start at tests/test.go:59:27
-  LEAQ data+736(SB), R8
-  MOVQ R8, data+744(SB)
-  //--- Assign byte buffer to new string constant end at tests/test.go:59:27
-  //--- Assign string length to new string constant start at tests/test.go:59:27
-  MOVQ $5, data+752(SB)
-  //--- Assign string length to new string constant end at tests/test.go:59:27
   RET
 
-TEXT main·main(SB),0,$0-$0
+TEXT main·test(SB),0,$0-0
   //--- Local variable assignment start at tests/test.go:22:20
   //--- Local variable assignment RHS load start at tests/test.go:22:20
   //--- Local variable assignment RHS load end at tests/test.go:22:22
@@ -269,7 +254,7 @@ IF_tests_test_39_END:
 IF_tests_test_39_ELSE_END:
   RET
 
-TEXT main·foo(SB),0,$0-$0
+TEXT main·foo(SB),0,$0-0
   //--- Return value assignment start at tests/test.go:51:12
   //--- Return expression load start at tests/test.go:51:12
   //--- Return expression load end at tests/test.go:51:14
@@ -277,7 +262,7 @@ TEXT main·foo(SB),0,$0-$0
   //--- Return value assignment end at tests/test.go:51:14
   RET
 
-TEXT main·bar(SB),0,$0-$0
+TEXT main·bar(SB),0,$0-0
   //--- Return value assignment start at tests/test.go:55:12
   //--- Return expression load start at tests/test.go:55:12
   //--- Return expression load end at tests/test.go:55:14
@@ -286,75 +271,105 @@ TEXT main·bar(SB),0,$0-$0
   //--- Return value assignment end at tests/test.go:55:14
   RET
 
-TEXT main·bazz(SB),0,$0-$0
-  //--- Local variable assignment start at tests/test.go:59:20
-  //--- Local variable assignment RHS load start at tests/test.go:59:20
-  //--- Local variable assignment RHS load end at tests/test.go:59:28
-  MOVQ data+744(SB), R8
-  MOVQ data+752(SB), R9
-  MOVQ R8, -16(SP)
-  MOVQ R9, -8(SP)
-  //--- Local variable assignment end at tests/test.go:59:28
-  //--- Local variable assignment start at tests/test.go:60:22
-  //--- Local variable assignment RHS load start at tests/test.go:60:22
-  //--- Local variable assignment RHS load end at tests/test.go:60:24
-  MOVQ $3, -24(SP)
-  //--- Local variable assignment end at tests/test.go:60:24
-  //--- Assignment start at tests/test.go:62:12
-  //--- Assignment LHS load start at tests/test.go:62:12
-  //--- Assignment LHS load end at tests/test.go:62:12
-  //--- Stack offset before function call for local variables and parameters start at tests/test.go:62:17
-  SUBQ $40, SP
-  //--- Stack offset before function call for local variables and parameters end at tests/test.go:62:17
-  CALL main·foo
-  //--- Stack offset after function call for local variables and parameters start at tests/test.go:62:17
-  ADDQ $40, SP
-  //--- Stack offset after function call for local variables and parameters end at tests/test.go:62:17
-  MOVQ -40(SP), R8
-  MOVQ R8, -32(SP)
-  //--- Assignment end at tests/test.go:62:18
-  //--- Assignment start at tests/test.go:63:11
-  //--- Assignment LHS load start at tests/test.go:63:11
-  //--- Assignment LHS load end at tests/test.go:63:11
-  //--- First parameter expression start at tests/test.go:63:19
-  //--- First parameter expression load start at tests/test.go:63:19
-  //--- First parameter expression load end at tests/test.go:63:19
-  MOVQ -24(SP), R8
-  MOVQ R8, -48(SP)
-  //--- First parameter expression end at tests/test.go:63:19
-  //--- Stack offset before function call for local variables and parameters start at tests/test.go:63:19
-  SUBQ $48, SP
-  //--- Stack offset before function call for local variables and parameters end at tests/test.go:63:19
-  CALL main·bar
-  //--- Stack offset after function call for local variables and parameters start at tests/test.go:63:19
-  ADDQ $48, SP
-  //--- Stack offset after function call for local variables and parameters end at tests/test.go:63:19
-  MOVQ -56(SP), R8
-  MOVQ R8, -24(SP)
-  //--- Assignment end at tests/test.go:63:20
-  //--- If start at tests/test.go:64:8
-  MOVQ -32(SP), R8
-  CMPQ -24(SP), R8
-  JE IF_tests_test_64_1_END
-  JMP IF_tests_test_64_END
-IF_tests_test_64_1_END:
-  //--- Stack offset before function call for local variables and parameters start at tests/test.go:65:14
-  SUBQ $40, SP
-  //--- Stack offset before function call for local variables and parameters end at tests/test.go:65:14
-  CALL main·foo
-  //--- Stack offset after function call for local variables and parameters start at tests/test.go:65:14
-  ADDQ $40, SP
-  //--- Stack offset after function call for local variables and parameters end at tests/test.go:65:14
-IF_tests_test_64_END:
-IF_tests_test_64_ELSE_END:
-  //--- If end at tests/test.go:67:12
-  //--- Return value assignment start at tests/test.go:67:12
-  //--- Return expression load start at tests/test.go:67:12
-  //--- Return expression load end at tests/test.go:67:14
+TEXT main·foobar(SB),0,$0-0
+  //--- Return value assignment start at tests/test.go:59:12
+  //--- Return expression load start at tests/test.go:59:12
+  MOVQ 8(SP), R8
+  ADDQ 16(SP), R8
+  ADDQ 24(SP), R8
+  //--- Return expression load end at tests/test.go:59:22
+  MOVQ R8, 32(SP)
+  //--- Return value assignment end at tests/test.go:59:22
+  RET
+
+TEXT main·bazz(SB),0,$0-0
+  //--- Local variable assignment start at tests/test.go:64:22
+  //--- Local variable assignment RHS load start at tests/test.go:64:22
+  //--- Local variable assignment RHS load end at tests/test.go:64:24
+  MOVQ $3, -16(SP)
+  //--- Local variable assignment end at tests/test.go:64:24
+  //--- Stack offset before function call for local variables and parameters start at tests/test.go:65:10
+  SUBQ $16, SP
+  //--- Stack offset before function call for local variables and parameters end at tests/test.go:65:10
+  CALL main·foo(SB)
+  //--- Stack offset after function call for local variables and parameters start at tests/test.go:65:10
+  ADDQ $16, SP
+  //--- Stack offset after function call for local variables and parameters end at tests/test.go:65:10
+  //--- Assignment start at tests/test.go:66:11
+  //--- Assignment LHS load start at tests/test.go:66:11
+  //--- Assignment LHS load end at tests/test.go:66:11
+  //--- First parameter expression start at tests/test.go:66:19
+  //--- First parameter expression load start at tests/test.go:66:19
+  //--- First parameter expression load end at tests/test.go:66:19
   MOVQ -16(SP), R8
-  MOVQ -8(SP), R9
+  MOVQ R8, -40(SP)
+  //--- First parameter expression end at tests/test.go:66:19
+  //--- Stack offset before function call for local variables and parameters start at tests/test.go:66:19
+  SUBQ $24, SP
+  //--- Stack offset before function call for local variables and parameters end at tests/test.go:66:19
+  CALL main·bar(SB)
+  //--- Stack offset after function call for local variables and parameters start at tests/test.go:66:19
+  ADDQ $24, SP
+  //--- Stack offset after function call for local variables and parameters end at tests/test.go:66:19
+  MOVQ -48(SP), R8
+  MOVQ R8, -16(SP)
+  //--- Assignment end at tests/test.go:66:20
+  //--- Assignment start at tests/test.go:67:11
+  //--- Assignment LHS load start at tests/test.go:67:11
+  //--- Assignment LHS load end at tests/test.go:67:11
+  //--- First parameter expression start at tests/test.go:67:20
+  //--- First parameter expression load start at tests/test.go:67:20
+  //--- First parameter expression load end at tests/test.go:67:20
+  MOVQ 8(SP), R8
+  MOVQ R8, -56(SP)
+  //--- First parameter expression end at tests/test.go:67:20
+  //--- Subsequent parameter expression start at tests/test.go:67:20
+  //--- Subsequent parameter expression load start at tests/test.go:67:20
+  //--- Subsequent parameter expression load end at tests/test.go:67:25
+  MOVQ -16(SP), R8
+  MOVQ R8, -64(SP)
+  //--- Subsequent parameter expression end at tests/test.go:67:25
+  //--- Subsequent parameter expression start at tests/test.go:67:25
+  //--- Subsequent parameter expression load start at tests/test.go:67:25
+  //--- Subsequent parameter expression load end at tests/test.go:67:28
+  MOVQ $3, -72(SP)
+  //--- Subsequent parameter expression end at tests/test.go:67:28
+  //--- Stack offset before function call for local variables and parameters start at tests/test.go:67:28
+  SUBQ $40, SP
+  //--- Stack offset before function call for local variables and parameters end at tests/test.go:67:28
+  CALL main·foobar(SB)
+  //--- Stack offset after function call for local variables and parameters start at tests/test.go:67:28
+  ADDQ $40, SP
+  //--- Stack offset after function call for local variables and parameters end at tests/test.go:67:28
+  MOVQ -80(SP), R8
+  MOVQ R8, -8(SP)
+  //--- Assignment end at tests/test.go:67:29
+  //--- Return value assignment start at tests/test.go:68:12
+  //--- Return expression load start at tests/test.go:68:12
+  //--- Return expression load end at tests/test.go:68:16
+  MOVQ -8(SP), R8
   MOVQ R8, 16(SP)
-  MOVQ R9, 24(SP)
-  //--- Return value assignment end at tests/test.go:67:14
+  //--- Return value assignment end at tests/test.go:68:16
+  RET
+
+TEXT main·main(SB),0,$0-0
+  //--- Assignment start at tests/test.go:73:11
+  //--- Assignment LHS load start at tests/test.go:73:11
+  //--- Assignment LHS load end at tests/test.go:73:11
+  //--- First parameter expression start at tests/test.go:73:18
+  //--- First parameter expression load start at tests/test.go:73:18
+  //--- First parameter expression load end at tests/test.go:73:18
+  MOVQ $1, -24(SP)
+  //--- First parameter expression end at tests/test.go:73:18
+  //--- Stack offset before function call for local variables and parameters start at tests/test.go:73:18
+  SUBQ $8, SP
+  //--- Stack offset before function call for local variables and parameters end at tests/test.go:73:18
+  CALL main·bazz(SB)
+  //--- Stack offset after function call for local variables and parameters start at tests/test.go:73:18
+  ADDQ $8, SP
+  //--- Stack offset after function call for local variables and parameters end at tests/test.go:73:18
+  MOVQ -32(SP), R8
+  MOVQ R8, -8(SP)
+  //--- Assignment end at tests/test.go:73:19
   RET
 

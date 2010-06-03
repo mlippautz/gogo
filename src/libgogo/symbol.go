@@ -349,6 +349,10 @@ func GetFirstForwardDeclType(list *TypeDesc) *TypeDesc {
     return retValue;
 }
 
+//
+// Returns the (index)th parameter of the given function
+// Note that counting starts at 1, not at 0!
+//
 func GetParameterAt(index uint64, list *TypeDesc) *ObjectDesc {
     var retValue *ObjectDesc;
     for retValue = list.Fields; retValue != nil; retValue = retValue.Next {

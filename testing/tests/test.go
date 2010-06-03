@@ -18,7 +18,7 @@ var fooArrInst [10]foo;
 var testInst test;
 var testPtr *test;
 
-func main(bla uint64, blub string) {
+func test(bla uint64, blub string) {
     var a uint64 = 5;
     var b uint64 = 1;
     var c string = "Test";
@@ -55,14 +55,20 @@ func bar(a uint64) uint64 {
     return a;
 }
 
-func bazz(a uint64) string {
-    var b string = "Hello";
+func foobar(a uint64, b uint64, c uint64) uint64 {
+    return a + b + c;
+}
+
+func bazz(a uint64) uint64 {
+    var ret uint64;
     var tmp uint64 = 3;
-    var tmp2 uint64;
-    tmp2 = foo();
+    foo();
     tmp = bar(tmp);
-    if tmp == tmp2 {
-        foo();
-    }
-    return b;
+    ret = foobar(a, tmp, 3);
+    return ret;
+}
+
+func main() {
+    var ret uint64;
+    ret = bazz(1);
 }
