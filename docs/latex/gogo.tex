@@ -1,0 +1,215 @@
+\documentclass{book}
+
+\usepackage[usenames,dvipsnames]{color}
+\usepackage[latin1]{inputenc}
+\usepackage{listings}
+\usepackage[english]{babel}
+\usepackage[pdftex,plainpages=false,pdfpagelabels,hyperfootnotes=false]{hyperref}
+\hypersetup{pdftitle={GoGo -- A Go compiler written in Go},pdfauthor={Michael Lippautz, Andreas Unterweger},pdfsubject={GoGo},pdfkeywords={Go,Compiler,GoGo}}
+
+\definecolor{lightgray}{RGB}{250,250,250}
+
+\lstset{
+    basicstyle=\small,
+    frame=lines,
+    backgroundcolor=\color{lightgray}
+}
+
+\title{GoGo\\ \large{A Go compiler written in Go}}
+\author{
+  Michael~Lippautz \\ \normalsize{\texttt{michael.lippautz@sbg.ac.at}} 
+    \and 
+  Andreas~Unterweger \\ \normalsize{\texttt{andreas.unterweger@sbg.ac.at}} 
+}
+
+\date{\today}
+
+\begin{document}
+  \maketitle
+  \tableofcontents
+
+  \chapter{Introduction}
+    Lorem ipsum dolor sit amet...
+
+  \chapter{Input Language}
+    Go is a programming language developed by Google, based on a C like syntax and fully specified in \cite{var10}. The input language follows the one defined by Go. This results in programs being able to be compiled by the official Go compilers and GoGo.
+
+    \section{Differences to Go}
+      \begin{enumerate}
+        \item GoGo only provides only a \textbf{very} basic featureset. Expect every advanced and interesting feature to be missing.
+        \item GoGo forces the usage of semicolons at the end of statements. This restriction was made to make parsing easier.
+        \item Go is fully Unicode compatible, while GoGo uses ASCII characters only.
+        \item Simplified expressions, following Wirth's \cite{wir96} defintions.
+      \end{enumerate}
+
+    \section{EBNF}
+      Lorem ipsum dolor sit amet...
+
+      \subsection{Atoms}
+        The following listing described the basic atoms that are possible in GoGo programs.
+
+        \begin{lstlisting}[caption=Atoms]
+single_char = CHR(32)|...|CHR(127).
+char = "'" single_char "'".
+string = """ {single_char} """.
+
+digit = "0"|...|"9".	
+integer = digit {digit}.
+
+letter = "a"|...|"z"|"A"|...|"Z"|"_".
+identifier = letter { letter | digit }.
+selector = { "." identifier 
+    | "[" (integer | identifier selector) "]" }.
+        \end{lstlisting}
+
+      \subsection{Expressions}
+        Although not as expressive as the ones from Go, these rules define expressions that have comparisons, relations and arithmetical terms. 
+
+        \begin{lstlisting}[caption=Expressions]
+cmp_op = ">" | "<" | ">=" | "<=" | "==" | "!=".
+unary_arith_op = "+" | "-".
+binary_arith_op = "*" | "/" .
+
+factor = identifier selector | integer | char | string 
+    | "(" expression ")" | "!" factor.	
+term = factor { (binary_arith_op | "&&") factor}.
+simple_expression = [ unary_arith_op ] term 
+    { (unary_arith_op | "||") term }.
+expression = "&" identifier selector 
+    | simple_expression [ cmp_op simple_expression ].
+        \end{lstlisting}
+
+      \subsection{Types and Variable Declarations}
+
+        \begin{lstlisting}[caption=Types]
+type = ([ "[" integer "]" ] identifier | "uint64" | "byte") 
+    | "string".
+var_decl = "var" identifier type [ "=" expression ] ";".
+var_decl_list = { var_decl }
+        \end{lstlisting}
+
+      \subsection{Structs}
+
+        \begin{lstlisting}[caption=Structs]
+struct_var_decl = identifier type ";".
+struct_var_decl_list = { struct_var_decl }.
+struct_decl = "type" identifier "struct" "{" 
+    struct_var_decl_list "}" ";".
+struct_decl_list = { struct_decl }. 
+        \end{lstlisting}
+
+      \subsection{Statements}
+
+        \begin{lstlisting}[caption=Statements]
+package_stmt = "package" identifier ";".
+import_stmt = "import" string.
+import_stmt_list = { import_stmt }.
+
+stmt_sequence = { stmt }
+stmt = assignment ";" | function_call_stmt ";" | if_stmt 
+    | for_stmt | ";".
+
+assignment = identifier selector "=" expression
+if_stmt = "if" expression "{" stmt_sequence "}" [ else_stmt ].
+else_stmt = "else" "{" stmt_sequence "}".
+for_stmt = "for" [assignment] ";" [expression] ";" [assignment] 
+    "{" stmt_sequence "}".
+        \end{lstlisting}
+
+      \subsection{Functions}
+
+        \begin{lstlisting}[caption=Functions]
+expression_list = expression { "," expression }.
+function_call = "(" [expression_list] ")".
+function_call_stmt = identifier selector function_call.
+
+identifier_type = identifier [ "*" ] type.
+identifier_type_list = [ identifier_type 
+    { "," identifier_type } ].
+func_decl_head = "func" identifier "(" identifier_type_list ")"  [type].
+func_decl = "{" var_decl_list stmt_sequence 
+    ["return" expression ";"] "}".
+func_decl_raw = ";".
+func_decl_list = { func_decl_head (func_decl | func_decl_raw) 
+        \end{lstlisting}
+
+      \subsection{The GoGo Program}
+        Finally, the main program structure is defined by \texttt{go\_program}. The sequence of the various program parts has been forced to the following to make parsing easier.
+
+        \begin{lstlisting}[caption=GoGo Program]
+go_program = package_stmt import_stmt_list struct_decl_list 
+    var_decl_list func_decl_list.
+        \end{lstlisting}
+
+
+  \chapter{Output Language}
+    The output language is Plan-9 assembler \cite{pik00}. It is a modified version of 64 bit assembly for Intel x86 processors with AT\&T syntax that has been created by Bell Labs to be used in their compiler and assembler collection.
+
+  \chapter{Scanner}
+    Lorem ipsum dolor sit amet...
+    
+  \chapter{Parser}
+    Lorem ipsum dolor sit amet...
+
+  \chapter{Symbol table}
+    Lorem ipsum dolor sit amet...		
+
+    \section{Supported data types}
+      Lorem ipsum dolor sit amet...
+		
+    \section{Local variables and offset calculations}
+      Lorem ipsum dolor sit amet...
+
+  \chapter{The code generator}
+     Lorem ipsum dolor sit amet...
+
+    \section{Assembly output}
+      Lorem ipsum dolor sit amet...
+
+    \section{Register allocation}
+      Lorem ipsum dolor sit amet...
+
+    \section{The generation of arithmetical expressions}
+      Lorem ipsum dolor sit amet...
+
+    \section{The generation of assignments}
+      Lorem ipsum dolor sit amet...
+
+    \section{The generation of conditional expressions}
+      Lorem ipsum dolor sit amet...
+
+    \section{The generation of loops}
+      Lorem ipsum dolor sit amet...
+
+    \section{The generation of functions}
+      Lorem ipsum dolor sit amet...
+
+    \section{Global variable initialization}
+      Lorem ipsum dolor sit amet...
+
+    \section{String constants}
+      Lorem ipsum dolor sit amet...
+
+  \chapter{Library and run time}
+    Lorem ipsum dolor sit amet...
+
+    \section{I/O syscalls}
+      Lorem ipsum dolor sit amet...
+
+    \section{The memory manager}
+      Lorem ipsum dolor sit amet...
+	
+  \chapter{Building}
+    Lorem ipsum dolor sit amet...
+
+  \chapter{Testing}
+    In order to test the compiler, a test suite has been constructed that may be used to verify results against an already existing result set. \\ \\
+    The test suite offers the following functions:
+    \begin{itemize}
+      \item \textbf{newvalids/ackvalids/fullclean} -- These commands are used to create a new result set as reference for further tests. While \texttt{fullclean} deletes the old set, \texttt{newvalids} is used to create a new one. After verifying that the compiled output is correct (by manually checking it), the command \texttt{ackvalids} can be used to acknowledge the set (resulting in a checksum file). 
+      \item \textbf{test/clean} -- \texttt{test} is used to perform a compilation and compare the results against the last valid result set. In order to do so, checksums of the tests are compared. If they are not equal, a \texttt{diff} is printed to the user.
+    \end{itemize}
+
+  \bibliographystyle{alpha}
+  \bibliography{gogo}
+\end{document}

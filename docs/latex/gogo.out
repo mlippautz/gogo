@@ -1,0 +1,32 @@
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}
+\BOOKMARK [0][-]{chapter.2}{Input Language}{}
+\BOOKMARK [1][-]{section.2.1}{Differences to Go}{chapter.2}
+\BOOKMARK [1][-]{section.2.2}{EBNF}{chapter.2}
+\BOOKMARK [2][-]{subsection.2.2.1}{Atoms}{section.2.2}
+\BOOKMARK [2][-]{subsection.2.2.2}{Expressions}{section.2.2}
+\BOOKMARK [2][-]{subsection.2.2.3}{Types and Variable Declarations}{section.2.2}
+\BOOKMARK [2][-]{subsection.2.2.4}{Structs}{section.2.2}
+\BOOKMARK [2][-]{subsection.2.2.5}{Statements}{section.2.2}
+\BOOKMARK [2][-]{subsection.2.2.6}{Functions}{section.2.2}
+\BOOKMARK [2][-]{subsection.2.2.7}{The GoGo Program}{section.2.2}
+\BOOKMARK [0][-]{chapter.3}{Output Language}{}
+\BOOKMARK [0][-]{chapter.4}{Scanner}{}
+\BOOKMARK [0][-]{chapter.5}{Parser}{}
+\BOOKMARK [0][-]{chapter.6}{Symbol table}{}
+\BOOKMARK [1][-]{section.6.1}{Supported data types}{chapter.6}
+\BOOKMARK [1][-]{section.6.2}{Local variables and offset calculations}{chapter.6}
+\BOOKMARK [0][-]{chapter.7}{The code generator}{}
+\BOOKMARK [1][-]{section.7.1}{Assembly output}{chapter.7}
+\BOOKMARK [1][-]{section.7.2}{Register allocation}{chapter.7}
+\BOOKMARK [1][-]{section.7.3}{The generation of arithmetical expressions}{chapter.7}
+\BOOKMARK [1][-]{section.7.4}{The generation of assignments}{chapter.7}
+\BOOKMARK [1][-]{section.7.5}{The generation of conditional expressions}{chapter.7}
+\BOOKMARK [1][-]{section.7.6}{The generation of loops}{chapter.7}
+\BOOKMARK [1][-]{section.7.7}{The generation of functions}{chapter.7}
+\BOOKMARK [1][-]{section.7.8}{Global variable initialization}{chapter.7}
+\BOOKMARK [1][-]{section.7.9}{String constants}{chapter.7}
+\BOOKMARK [0][-]{chapter.8}{Library and run time}{}
+\BOOKMARK [1][-]{section.8.1}{I/O syscalls}{chapter.8}
+\BOOKMARK [1][-]{section.8.2}{The memory manager}{chapter.8}
+\BOOKMARK [0][-]{chapter.9}{Building}{}
+\BOOKMARK [0][-]{chapter.10}{Testing}{}

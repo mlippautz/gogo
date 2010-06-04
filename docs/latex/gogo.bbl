@@ -1,0 +1,18 @@
+\begin{thebibliography}{{Goo}10}
+
+\bibitem[{Goo}10]{var10}
+{Google Inc.}
+\newblock {The Go Programming Language Specification}.
+\newblock \url{http://golang.org/doc/go_spec.html} (4.6.2010), 2010.
+
+\bibitem[{Pik}00]{pik00}
+{Pike, R.}
+\newblock {A Manual for the Plan 9 assembler}.
+\newblock \url{http://doc.cat-v.org/plan_9/4th_edition/papers/asm}, 2000.
+
+\bibitem[{Wir}96]{wir96}
+{Wirth, N.}
+\newblock {\em {Compiler Construction}}.
+\newblock {Addison-Wesley}, 1996.
+
+\end{thebibliography}
