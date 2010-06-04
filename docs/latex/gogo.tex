@@ -1,4 +1,4 @@
-\documentclass[a4paper]{article}
+\documentclass[a4paper]{scrreprt}
 
 \usepackage[usenames,dvipsnames]{color}
 \usepackage[latin1]{inputenc}
@@ -28,13 +28,13 @@
   \maketitle
   \tableofcontents
 
-  \section{Introduction}
+  \chapter{Introduction}
     Lorem ipsum dolor sit amet...
 
-  \section{Input Language}
+  \chapter{Input Language}
     Go is a programming language developed by Google, based on a C like syntax and fully specified in \cite{var10}. The input language follows the one defined by Go. This results in programs being able to be compiled by the official Go compilers and GoGo.
 
-    \subsection{Differences to Go}
+    \section{Differences to Go}
       \begin{enumerate}
         \item GoGo only provides only a \textbf{very} basic featureset. Expect every advanced and interesting feature to be missing.
         \item GoGo forces the usage of semicolons at the end of statements. This restriction was made to make parsing easier.
@@ -45,7 +45,7 @@
     \subsection{EBNF}
       Lorem ipsum dolor sit amet...
 
-      \subsubsubsection{Atoms}
+      \subsubsection{Atoms}
         The following listing described the basic atoms that are possible in GoGo programs.
 
         \begin{lstlisting}[caption=Atoms]
@@ -62,7 +62,7 @@ selector = { "." identifier
     | "[" (integer | identifier selector) "]" }.
         \end{lstlisting}
 
-      \subsubsubsection{Expressions}
+      \subsubsection{Expressions}
         Although not as expressive as the ones from Go, these rules define expressions that have comparisons, relations and arithmetical terms. 
 
         \begin{lstlisting}[caption=Expressions]
@@ -79,7 +79,7 @@ expression = "&" identifier selector
     | simple_expression [ cmp_op simple_expression ].
         \end{lstlisting}
 
-      \subsubsubsection{Types and Variable Declarations}
+      \subsubsection{Types and Variable Declarations}
 
         \begin{lstlisting}[caption=Types]
 type = ([ "[" integer "]" ] identifier | "uint64" | "byte") 
@@ -88,7 +88,7 @@ var_decl = "var" identifier type [ "=" expression ] ";".
 var_decl_list = { var_decl }
         \end{lstlisting}
 
-      \subsubsubsection{Structs}
+      \subsubsection{Structs}
 
         \begin{lstlisting}[caption=Structs]
 struct_var_decl = identifier type ";".
@@ -98,7 +98,7 @@ struct_decl = "type" identifier "struct" "{"
 struct_decl_list = { struct_decl }. 
         \end{lstlisting}
 
-      \subsubsubsection{Statements}
+      \subsubsection{Statements}
 
         \begin{lstlisting}[caption=Statements]
 package_stmt = "package" identifier ";".
@@ -116,7 +116,7 @@ for_stmt = "for" [assignment] ";" [expression] ";" [assignment]
     "{" stmt_sequence "}".
         \end{lstlisting}
 
-      \subsubsubsection{Functions}
+      \subsubsection{Functions}
 
         \begin{lstlisting}[caption=Functions]
 expression_list = expression { "," expression }.
@@ -133,7 +133,7 @@ func_decl_raw = ";".
 func_decl_list = { func_decl_head (func_decl | func_decl_raw) 
         \end{lstlisting}
 
-      \subsubsubsection{The GoGo Program}
+      \subsubsection{The GoGo Program}
         Finally, the main program structure is defined by \texttt{go\_program}. The sequence of the various program parts has been forced to the following to make parsing easier.
 
         \begin{lstlisting}[caption=GoGo Program]
@@ -142,67 +142,67 @@ go_program = package_stmt import_stmt_list struct_decl_list
         \end{lstlisting}
 
 
-  \section{Output Language}
+  \chapter{Output Language}
     The output language is Plan-9 assembler \cite{pik00}. It is a modified version of 64 bit assembly for Intel x86 processors with AT\&T syntax that has been created by Bell Labs to be used in their compiler and assembler collection.
 
-  \section{Scanner}
+  \chapter{Scanner}
     Lorem ipsum dolor sit amet...
     
-  \section{Parser}
+  \chapter{Parser}
     Lorem ipsum dolor sit amet...
 
-  \section{Symbol table}
+  \chapter{Symbol table}
     Lorem ipsum dolor sit amet...		
 
-    \subsection{Supported data types}
+    \section{Supported data types}
       Lorem ipsum dolor sit amet...
 		
-    \subsection{Local variables and offset calculations}
+    \section{Local variables and offset calculations}
       Lorem ipsum dolor sit amet...
 
-  \section{The code generator}
+  \chapter{The code generator}
      Lorem ipsum dolor sit amet...
 
-    \subsection{Assembly output}
+    \section{Assembly output}
       Lorem ipsum dolor sit amet...
 
-    \subsection{Register allocation}
+    \section{Register allocation}
       Lorem ipsum dolor sit amet...
 
-    \subsection{The generation of arithmetical expressions}
+    \section{The generation of arithmetical expressions}
       Lorem ipsum dolor sit amet...
 
-    \subsection{The generation of assignments}
+    \section{The generation of assignments}
       Lorem ipsum dolor sit amet...
 
     \subsection{The generation of conditional expressions}
       Lorem ipsum dolor sit amet...
 
-    \subsection{The generation of loops}
+    \section{The generation of loops}
       Lorem ipsum dolor sit amet...
 
-    \subsection{The generation of functions}
+    \section{The generation of functions}
       Lorem ipsum dolor sit amet...
 
-    \subsection{Global variable initialization}
+    \section{Global variable initialization}
       Lorem ipsum dolor sit amet...
 
-    \subsection{String constants}
+    \section{String constants}
       Lorem ipsum dolor sit amet...
 
-  \section{Library and run time}
+  \chapter{Library and run time}
     Lorem ipsum dolor sit amet...
 
-    \subsection{I/O syscalls}
+    \section{I/O syscalls}
       Lorem ipsum dolor sit amet...
 
-    \subsection{The memory manager}
+    \section{The memory manager}
       Lorem ipsum dolor sit amet...
 	
-  \section{Building}
+  \chapter{Building}
     Lorem ipsum dolor sit amet...
 
-  \section{Testing}
+  \chapter{Testing}
     In order to test the compiler, a test suite has been constructed that may be used to verify results against an already existing result set. \\ \\
     The test suite offers the following functions:
     \begin{itemize}

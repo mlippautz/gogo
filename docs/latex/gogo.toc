@@ -1,26 +1,33 @@
 \select@language {english}
-\contentsline {section}{\numberline {1}Introduction}{2}{section.1}
-\contentsline {section}{\numberline {2}Input Language}{2}{section.2}
-\contentsline {subsection}{\numberline {2.1}Differences to Go}{2}{subsection.2.1}
-\contentsline {subsection}{\numberline {2.2}EBNF}{2}{subsection.2.2}
-\contentsline {section}{\numberline {3}Output Language}{4}{section.3}
-\contentsline {section}{\numberline {4}Scanner}{4}{section.4}
-\contentsline {section}{\numberline {5}Parser}{4}{section.5}
-\contentsline {section}{\numberline {6}Symbol table}{4}{section.6}
-\contentsline {subsection}{\numberline {6.1}Supported data types}{4}{subsection.6.1}
-\contentsline {subsection}{\numberline {6.2}Local variables and offset calculations}{4}{subsection.6.2}
-\contentsline {section}{\numberline {7}The code generator}{4}{section.7}
-\contentsline {subsection}{\numberline {7.1}Assembly output}{4}{subsection.7.1}
-\contentsline {subsection}{\numberline {7.2}Register allocation}{5}{subsection.7.2}
-\contentsline {subsection}{\numberline {7.3}The generation of arithmetical expressions}{5}{subsection.7.3}
-\contentsline {subsection}{\numberline {7.4}The generation of assignments}{5}{subsection.7.4}
-\contentsline {subsection}{\numberline {7.5}The generation of conditional expressions}{5}{subsection.7.5}
-\contentsline {subsection}{\numberline {7.6}The generation of loops}{5}{subsection.7.6}
-\contentsline {subsection}{\numberline {7.7}The generation of functions}{5}{subsection.7.7}
-\contentsline {subsection}{\numberline {7.8}Global variable initialization}{5}{subsection.7.8}
-\contentsline {subsection}{\numberline {7.9}String constants}{5}{subsection.7.9}
-\contentsline {section}{\numberline {8}Library and run time}{5}{section.8}
-\contentsline {subsection}{\numberline {8.1}I/O syscalls}{5}{subsection.8.1}
-\contentsline {subsection}{\numberline {8.2}The memory manager}{5}{subsection.8.2}
-\contentsline {section}{\numberline {9}Building}{5}{section.9}
-\contentsline {section}{\numberline {10}Testing}{6}{section.10}
+\contentsline {chapter}{\numberline {1}Introduction}{3}{chapter.1}
+\contentsline {chapter}{\numberline {2}Input Language}{4}{chapter.2}
+\contentsline {section}{\numberline {2.1}Differences to Go}{4}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}EBNF}{4}{subsection.2.1.1}
+\contentsline {subsubsection}{Atoms}{4}{section*.2}
+\contentsline {subsubsection}{Expressions}{5}{section*.3}
+\contentsline {subsubsection}{Types and Variable Declarations}{5}{section*.4}
+\contentsline {subsubsection}{Structs}{5}{section*.5}
+\contentsline {subsubsection}{Statements}{5}{section*.6}
+\contentsline {subsubsection}{Functions}{6}{section*.7}
+\contentsline {subsubsection}{The GoGo Program}{6}{section*.8}
+\contentsline {chapter}{\numberline {3}Output Language}{7}{chapter.3}
+\contentsline {chapter}{\numberline {4}Scanner}{8}{chapter.4}
+\contentsline {chapter}{\numberline {5}Parser}{9}{chapter.5}
+\contentsline {chapter}{\numberline {6}Symbol table}{10}{chapter.6}
+\contentsline {section}{\numberline {6.1}Supported data types}{10}{section.6.1}
+\contentsline {section}{\numberline {6.2}Local variables and offset calculations}{10}{section.6.2}
+\contentsline {chapter}{\numberline {7}The code generator}{11}{chapter.7}
+\contentsline {section}{\numberline {7.1}Assembly output}{11}{section.7.1}
+\contentsline {section}{\numberline {7.2}Register allocation}{11}{section.7.2}
+\contentsline {section}{\numberline {7.3}The generation of arithmetical expressions}{11}{section.7.3}
+\contentsline {section}{\numberline {7.4}The generation of assignments}{11}{section.7.4}
+\contentsline {subsection}{\numberline {7.4.1}The generation of conditional expressions}{11}{subsection.7.4.1}
+\contentsline {section}{\numberline {7.5}The generation of loops}{11}{section.7.5}
+\contentsline {section}{\numberline {7.6}The generation of functions}{11}{section.7.6}
+\contentsline {section}{\numberline {7.7}Global variable initialization}{11}{section.7.7}
+\contentsline {section}{\numberline {7.8}String constants}{12}{section.7.8}
+\contentsline {chapter}{\numberline {8}Library and run time}{13}{chapter.8}
+\contentsline {section}{\numberline {8.1}I/O syscalls}{13}{section.8.1}
+\contentsline {section}{\numberline {8.2}The memory manager}{13}{section.8.2}
+\contentsline {chapter}{\numberline {9}Building}{14}{chapter.9}
+\contentsline {chapter}{\numberline {10}Testing}{15}{chapter.10}

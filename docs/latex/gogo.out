@@ -1,25 +1,25 @@
-\BOOKMARK [1][-]{section.1}{Introduction}{}
-\BOOKMARK [1][-]{section.2}{Input Language}{}
-\BOOKMARK [2][-]{subsection.2.1}{Differences to Go}{section.2}
-\BOOKMARK [2][-]{subsection.2.2}{EBNF}{section.2}
-\BOOKMARK [1][-]{section.3}{Output Language}{}
-\BOOKMARK [1][-]{section.4}{Scanner}{}
-\BOOKMARK [1][-]{section.5}{Parser}{}
-\BOOKMARK [1][-]{section.6}{Symbol table}{}
-\BOOKMARK [2][-]{subsection.6.1}{Supported data types}{section.6}
-\BOOKMARK [2][-]{subsection.6.2}{Local variables and offset calculations}{section.6}
-\BOOKMARK [1][-]{section.7}{The code generator}{}
-\BOOKMARK [2][-]{subsection.7.1}{Assembly output}{section.7}
-\BOOKMARK [2][-]{subsection.7.2}{Register allocation}{section.7}
-\BOOKMARK [2][-]{subsection.7.3}{The generation of arithmetical expressions}{section.7}
-\BOOKMARK [2][-]{subsection.7.4}{The generation of assignments}{section.7}
-\BOOKMARK [2][-]{subsection.7.5}{The generation of conditional expressions}{section.7}
-\BOOKMARK [2][-]{subsection.7.6}{The generation of loops}{section.7}
-\BOOKMARK [2][-]{subsection.7.7}{The generation of functions}{section.7}
-\BOOKMARK [2][-]{subsection.7.8}{Global variable initialization}{section.7}
-\BOOKMARK [2][-]{subsection.7.9}{String constants}{section.7}
-\BOOKMARK [1][-]{section.8}{Library and run time}{}
-\BOOKMARK [2][-]{subsection.8.1}{I/O syscalls}{section.8}
-\BOOKMARK [2][-]{subsection.8.2}{The memory manager}{section.8}
-\BOOKMARK [1][-]{section.9}{Building}{}
-\BOOKMARK [1][-]{section.10}{Testing}{}
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}% 1
+\BOOKMARK [0][-]{chapter.2}{Input Language}{}% 2
+\BOOKMARK [1][-]{section.2.1}{Differences to Go}{chapter.2}% 3
+\BOOKMARK [2][-]{subsection.2.1.1}{EBNF}{section.2.1}% 4
+\BOOKMARK [0][-]{chapter.3}{Output Language}{}% 5
+\BOOKMARK [0][-]{chapter.4}{Scanner}{}% 6
+\BOOKMARK [0][-]{chapter.5}{Parser}{}% 7
+\BOOKMARK [0][-]{chapter.6}{Symbol table}{}% 8
+\BOOKMARK [1][-]{section.6.1}{Supported data types}{chapter.6}% 9
+\BOOKMARK [1][-]{section.6.2}{Local variables and offset calculations}{chapter.6}% 10
+\BOOKMARK [0][-]{chapter.7}{The code generator}{}% 11
+\BOOKMARK [1][-]{section.7.1}{Assembly output}{chapter.7}% 12
+\BOOKMARK [1][-]{section.7.2}{Register allocation}{chapter.7}% 13
+\BOOKMARK [1][-]{section.7.3}{The generation of arithmetical expressions}{chapter.7}% 14
+\BOOKMARK [1][-]{section.7.4}{The generation of assignments}{chapter.7}% 15
+\BOOKMARK [2][-]{subsection.7.4.1}{The generation of conditional expressions}{section.7.4}% 16
+\BOOKMARK [1][-]{section.7.5}{The generation of loops}{chapter.7}% 17
+\BOOKMARK [1][-]{section.7.6}{The generation of functions}{chapter.7}% 18
+\BOOKMARK [1][-]{section.7.7}{Global variable initialization}{chapter.7}% 19
+\BOOKMARK [1][-]{section.7.8}{String constants}{chapter.7}% 20
+\BOOKMARK [0][-]{chapter.8}{Library and run time}{}% 21
+\BOOKMARK [1][-]{section.8.1}{I/O syscalls}{chapter.8}% 22
+\BOOKMARK [1][-]{section.8.2}{The memory manager}{chapter.8}% 23
+\BOOKMARK [0][-]{chapter.9}{Building}{}% 24
+\BOOKMARK [0][-]{chapter.10}{Testing}{}% 25

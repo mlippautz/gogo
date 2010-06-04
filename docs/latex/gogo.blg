@@ -1,3 +1,45 @@
-This is BibTeX, Version 0.99cThe top-level auxiliary file: gogo.aux
+This is BibTeX, Version 0.99c (Web2C 2009)
+The top-level auxiliary file: gogo.aux
 The style file: alpha.bst
 Database file #1: gogo.bib
+You've used 3 entries,
+            2543 wiz_defined-function locations,
+            572 strings with 4723 characters,
+and the built_in function-call counts, 830 in all, are:
+= -- 75
+> -- 24
+< -- 3
++ -- 6
+- -- 6
+* -- 37
+:= -- 143
+add.period$ -- 9
+call.type$ -- 3
+change.case$ -- 14
+chr.to.int$ -- 3
+cite$ -- 3
+duplicate$ -- 38
+empty$ -- 76
+format.name$ -- 12
+if$ -- 171
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 2
+newline$ -- 18
+num.names$ -- 9
+pop$ -- 27
+preamble$ -- 1
+purify$ -- 18
+quote$ -- 0
+skip$ -- 32
+stack$ -- 0
+substring$ -- 21
+swap$ -- 3
+text.length$ -- 3
+text.prefix$ -- 3
+top$ -- 0
+type$ -- 20
+warning$ -- 0
+while$ -- 6
+width$ -- 5
+write$ -- 38
