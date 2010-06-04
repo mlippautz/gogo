@@ -1,33 +1,33 @@
 \select@language {english}
-\contentsline {chapter}{\numberline {1}Introduction}{5}{chapter.1}
-\contentsline {chapter}{\numberline {2}Input Language}{7}{chapter.2}
-\contentsline {section}{\numberline {2.1}Differences to Go}{7}{section.2.1}
-\contentsline {section}{\numberline {2.2}EBNF}{7}{section.2.2}
-\contentsline {subsection}{\numberline {2.2.1}Atoms}{7}{subsection.2.2.1}
-\contentsline {subsection}{\numberline {2.2.2}Expressions}{8}{subsection.2.2.2}
-\contentsline {subsection}{\numberline {2.2.3}Types and Variable Declarations}{8}{subsection.2.2.3}
-\contentsline {subsection}{\numberline {2.2.4}Structs}{8}{subsection.2.2.4}
-\contentsline {subsection}{\numberline {2.2.5}Statements}{9}{subsection.2.2.5}
-\contentsline {subsection}{\numberline {2.2.6}Functions}{9}{subsection.2.2.6}
-\contentsline {subsection}{\numberline {2.2.7}The GoGo Program}{9}{subsection.2.2.7}
-\contentsline {chapter}{\numberline {3}Output Language}{11}{chapter.3}
-\contentsline {chapter}{\numberline {4}Scanner}{13}{chapter.4}
-\contentsline {chapter}{\numberline {5}Parser}{15}{chapter.5}
-\contentsline {chapter}{\numberline {6}Symbol table}{17}{chapter.6}
-\contentsline {section}{\numberline {6.1}Supported data types}{17}{section.6.1}
-\contentsline {section}{\numberline {6.2}Local variables and offset calculations}{17}{section.6.2}
-\contentsline {chapter}{\numberline {7}The code generator}{19}{chapter.7}
-\contentsline {section}{\numberline {7.1}Assembly output}{19}{section.7.1}
-\contentsline {section}{\numberline {7.2}Register allocation}{19}{section.7.2}
-\contentsline {section}{\numberline {7.3}The generation of arithmetical expressions}{19}{section.7.3}
-\contentsline {section}{\numberline {7.4}The generation of assignments}{19}{section.7.4}
-\contentsline {section}{\numberline {7.5}The generation of conditional expressions}{19}{section.7.5}
-\contentsline {section}{\numberline {7.6}The generation of loops}{19}{section.7.6}
-\contentsline {section}{\numberline {7.7}The generation of functions}{20}{section.7.7}
-\contentsline {section}{\numberline {7.8}Global variable initialization}{20}{section.7.8}
-\contentsline {section}{\numberline {7.9}String constants}{20}{section.7.9}
-\contentsline {chapter}{\numberline {8}Library and run time}{21}{chapter.8}
-\contentsline {section}{\numberline {8.1}I/O syscalls}{21}{section.8.1}
-\contentsline {section}{\numberline {8.2}The memory manager}{21}{section.8.2}
-\contentsline {chapter}{\numberline {9}Building}{23}{chapter.9}
-\contentsline {chapter}{\numberline {10}Testing}{25}{chapter.10}
+\contentsline {chapter}{\numberline {1}Introduction}{3}{chapter.1}
+\contentsline {chapter}{\numberline {2}Input Language}{4}{chapter.2}
+\contentsline {section}{\numberline {2.1}Differences to Go}{4}{section.2.1}
+\contentsline {section}{\numberline {2.2}EBNF}{4}{section.2.2}
+\contentsline {subsection}{\numberline {2.2.1}Atoms}{4}{subsection.2.2.1}
+\contentsline {subsection}{\numberline {2.2.2}Expressions}{5}{subsection.2.2.2}
+\contentsline {subsection}{\numberline {2.2.3}Types and Variable Declarations}{5}{subsection.2.2.3}
+\contentsline {subsection}{\numberline {2.2.4}Structs}{5}{subsection.2.2.4}
+\contentsline {subsection}{\numberline {2.2.5}Statements}{5}{subsection.2.2.5}
+\contentsline {subsection}{\numberline {2.2.6}Functions}{6}{subsection.2.2.6}
+\contentsline {subsection}{\numberline {2.2.7}The GoGo Program}{6}{subsection.2.2.7}
+\contentsline {chapter}{\numberline {3}Output Language}{7}{chapter.3}
+\contentsline {chapter}{\numberline {4}Scanner}{8}{chapter.4}
+\contentsline {chapter}{\numberline {5}Parser}{9}{chapter.5}
+\contentsline {chapter}{\numberline {6}Symbol table}{10}{chapter.6}
+\contentsline {section}{\numberline {6.1}Supported data types}{10}{section.6.1}
+\contentsline {section}{\numberline {6.2}Local variables and offset calculations}{10}{section.6.2}
+\contentsline {chapter}{\numberline {7}The code generator}{11}{chapter.7}
+\contentsline {section}{\numberline {7.1}Assembly output}{11}{section.7.1}
+\contentsline {section}{\numberline {7.2}Register allocation}{11}{section.7.2}
+\contentsline {section}{\numberline {7.3}The generation of arithmetical expressions}{11}{section.7.3}
+\contentsline {section}{\numberline {7.4}The generation of assignments}{11}{section.7.4}
+\contentsline {section}{\numberline {7.5}The generation of conditional expressions}{11}{section.7.5}
+\contentsline {section}{\numberline {7.6}The generation of loops}{11}{section.7.6}
+\contentsline {section}{\numberline {7.7}The generation of functions}{11}{section.7.7}
+\contentsline {section}{\numberline {7.8}Global variable initialization}{12}{section.7.8}
+\contentsline {section}{\numberline {7.9}String constants}{12}{section.7.9}
+\contentsline {chapter}{\numberline {8}Library and run time}{13}{chapter.8}
+\contentsline {section}{\numberline {8.1}I/O syscalls}{13}{section.8.1}
+\contentsline {section}{\numberline {8.2}The memory manager}{13}{section.8.2}
+\contentsline {chapter}{\numberline {9}Building}{14}{chapter.9}
+\contentsline {chapter}{\numberline {10}Testing}{15}{chapter.10}
