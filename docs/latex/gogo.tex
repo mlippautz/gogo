@@ -1,4 +1,4 @@
-\documentclass[a4paper]{report}
+\documentclass[a4paper]{article}
 
 \usepackage[usenames,dvipsnames]{color}
 \usepackage[latin1]{inputenc}
@@ -28,13 +28,13 @@
   \maketitle
   \tableofcontents
 
-  \chapter{Introduction}
+  \section{Introduction}
     Lorem ipsum dolor sit amet...
 
-  \chapter{Input Language}
+  \section{Input Language}
     Go is a programming language developed by Google, based on a C like syntax and fully specified in \cite{var10}. The input language follows the one defined by Go. This results in programs being able to be compiled by the official Go compilers and GoGo.
 
-    \section{Differences to Go}
+    \subsection{Differences to Go}
       \begin{enumerate}
         \item GoGo only provides only a \textbf{very} basic featureset. Expect every advanced and interesting feature to be missing.
         \item GoGo forces the usage of semicolons at the end of statements. This restriction was made to make parsing easier.
@@ -42,10 +42,10 @@
         \item Simplified expressions, following Wirth's \cite{wir96} defintions.
       \end{enumerate}
 
-    \section{EBNF}
+    \subsection{EBNF}
       Lorem ipsum dolor sit amet...
 
-      \subsection{Atoms}
+      \subsubsubsection{Atoms}
         The following listing described the basic atoms that are possible in GoGo programs.
 
         \begin{lstlisting}[caption=Atoms]
@@ -62,7 +62,7 @@ selector = { "." identifier
     | "[" (integer | identifier selector) "]" }.
         \end{lstlisting}
 
-      \subsection{Expressions}
+      \subsubsubsection{Expressions}
         Although not as expressive as the ones from Go, these rules define expressions that have comparisons, relations and arithmetical terms. 
 
         \begin{lstlisting}[caption=Expressions]
@@ -79,7 +79,7 @@ expression = "&" identifier selector
     | simple_expression [ cmp_op simple_expression ].
         \end{lstlisting}
 
-      \subsection{Types and Variable Declarations}
+      \subsubsubsection{Types and Variable Declarations}
 
         \begin{lstlisting}[caption=Types]
 type = ([ "[" integer "]" ] identifier | "uint64" | "byte") 
@@ -88,7 +88,7 @@ var_decl = "var" identifier type [ "=" expression ] ";".
 var_decl_list = { var_decl }
         \end{lstlisting}
 
-      \subsection{Structs}
+      \subsubsubsection{Structs}
 
         \begin{lstlisting}[caption=Structs]
 struct_var_decl = identifier type ";".
@@ -98,7 +98,7 @@ struct_decl = "type" identifier "struct" "{"
 struct_decl_list = { struct_decl }. 
         \end{lstlisting}
 
-      \subsection{Statements}
+      \subsubsubsection{Statements}
 
         \begin{lstlisting}[caption=Statements]
 package_stmt = "package" identifier ";".
@@ -116,7 +116,7 @@ for_stmt = "for" [assignment] ";" [expression] ";" [assignment]
     "{" stmt_sequence "}".
         \end{lstlisting}
 
-      \subsection{Functions}
+      \subsubsubsection{Functions}
 
         \begin{lstlisting}[caption=Functions]
 expression_list = expression { "," expression }.
@@ -133,7 +133,7 @@ func_decl_raw = ";".
 func_decl_list = { func_decl_head (func_decl | func_decl_raw) 
         \end{lstlisting}
 
-      \subsection{The GoGo Program}
+      \subsubsubsection{The GoGo Program}
         Finally, the main program structure is defined by \texttt{go\_program}. The sequence of the various program parts has been forced to the following to make parsing easier.
 
         \begin{lstlisting}[caption=GoGo Program]
@@ -142,67 +142,67 @@ go_program = package_stmt import_stmt_list struct_decl_list
         \end{lstlisting}
 
 
-  \chapter{Output Language}
+  \section{Output Language}
     The output language is Plan-9 assembler \cite{pik00}. It is a modified version of 64 bit assembly for Intel x86 processors with AT\&T syntax that has been created by Bell Labs to be used in their compiler and assembler collection.
 
-  \chapter{Scanner}
+  \section{Scanner}
     Lorem ipsum dolor sit amet...
     
-  \chapter{Parser}
+  \section{Parser}
     Lorem ipsum dolor sit amet...
 
-  \chapter{Symbol table}
+  \section{Symbol table}
     Lorem ipsum dolor sit amet...		
 
-    \section{Supported data types}
+    \subsection{Supported data types}
       Lorem ipsum dolor sit amet...
 		
-    \section{Local variables and offset calculations}
+    \subsection{Local variables and offset calculations}
       Lorem ipsum dolor sit amet...
 
-  \chapter{The code generator}
+  \section{The code generator}
      Lorem ipsum dolor sit amet...
 
-    \section{Assembly output}
+    \subsection{Assembly output}
       Lorem ipsum dolor sit amet...
 
-    \section{Register allocation}
+    \subsection{Register allocation}
       Lorem ipsum dolor sit amet...
 
-    \section{The generation of arithmetical expressions}
+    \subsection{The generation of arithmetical expressions}
       Lorem ipsum dolor sit amet...
 
-    \section{The generation of assignments}
+    \subsection{The generation of assignments}
       Lorem ipsum dolor sit amet...
 
-    \section{The generation of conditional expressions}
+    \subsection{The generation of conditional expressions}
       Lorem ipsum dolor sit amet...
 
-    \section{The generation of loops}
+    \subsection{The generation of loops}
       Lorem ipsum dolor sit amet...
 
-    \section{The generation of functions}
+    \subsection{The generation of functions}
       Lorem ipsum dolor sit amet...
 
-    \section{Global variable initialization}
+    \subsection{Global variable initialization}
       Lorem ipsum dolor sit amet...
 
-    \section{String constants}
+    \subsection{String constants}
       Lorem ipsum dolor sit amet...
 
-  \chapter{Library and run time}
+  \section{Library and run time}
     Lorem ipsum dolor sit amet...
 
-    \section{I/O syscalls}
+    \subsection{I/O syscalls}
       Lorem ipsum dolor sit amet...
 
-    \section{The memory manager}
+    \subsection{The memory manager}
       Lorem ipsum dolor sit amet...
 	
-  \chapter{Building}
+  \section{Building}
     Lorem ipsum dolor sit amet...
 
-  \chapter{Testing}
+  \section{Testing}
     In order to test the compiler, a test suite has been constructed that may be used to verify results against an already existing result set. \\ \\
     The test suite offers the following functions:
     \begin{itemize}
