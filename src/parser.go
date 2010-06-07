@@ -6,11 +6,6 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
-var maxDepth uint64 = 10;
-var curDepth uint64 = 1;
-
-var Compile uint64 = 0;
-
 var Operators libgogo.Stack;
 
 var InsideFunction uint64 = 0;

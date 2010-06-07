@@ -26,6 +26,11 @@ var fileInfoLen uint64 = 0;
 var curFileIndex uint64 = 0;
 
 //
+// Compiler flag
+//
+var Compile uint64 = 0;
+
+//
 // A very basic debug flag
 // Set to 1000 to enable all parsing strings
 // Set to 100 to enable all symbol tables
@@ -69,33 +74,39 @@ func main() {
     }
     fileInfoLen = i-2;
 
-    for curFileIndex=0;curFileIndex<fileInfoLen;curFileIndex=curFileIndex+1 {
-        i = libgogo.StringLength(fileInfo[curFileIndex].filename);
-        if i > 2 { //Check for assembly files
-            j = i - 2;
-            k = i - 1;
-            if (fileInfo[curFileIndex].filename[j] == '.') && (fileInfo[curFileIndex].filename[k] == 's') { //Assembly file
-                if curFileIndex == 0 {
-                    GlobalError("The first file in the list cannot be an assembly file");
-                }
-                for singleChar = libgogo.GetChar(fileInfo[curFileIndex].fd); singleChar != 0; singleChar = libgogo.GetChar(fileInfo[curFileIndex].fd) { //Copy file to output character by character
-                    /* middot '·' is U+00C7 => UTF-8: C2B7*/
-                    if singleChar != 194 /*C2*/ {
-                        if singleChar == 183 /*B7*/ { //Prepend package name
-                            PrintCodeOutput(CurrentPackage); 
-                            PrintCodeOutputChar(194);
-                            PrintCodeOutputChar(183);
-                        } else {
-                            PrintCodeOutputChar(singleChar);
+    if (Compile == 0) || (Compile == 1) { // Compile == 0|1 => Parse/Compile
+        for curFileIndex=0;curFileIndex<fileInfoLen;curFileIndex=curFileIndex+1 {
+            i = libgogo.StringLength(fileInfo[curFileIndex].filename);
+            if i > 2 { //Check for assembly files
+                j = i - 2;
+                k = i - 1;
+                if (Compile == 1) && (fileInfo[curFileIndex].filename[j] == '.') && (fileInfo[curFileIndex].filename[k] == 's') { 
+                    // Assembly file: compile if in compiler mode
+                    if curFileIndex == 0 {
+                        GlobalError("The first file in the list cannot be an assembly file");
+                    }
+                    for singleChar = libgogo.GetChar(fileInfo[curFileIndex].fd); singleChar != 0; singleChar = libgogo.GetChar(fileInfo[curFileIndex].fd) { //Copy file to output character by character
+                        /* middot '·' is U+00C7 => UTF-8: C2B7*/
+                        if singleChar != 194 /*C2*/ {
+                            if singleChar == 183 /*B7*/ { //Prepend package name
+                                PrintCodeOutput(CurrentPackage); 
+                                PrintCodeOutputChar(194);
+                                PrintCodeOutputChar(183);
+                            } else {
+                                PrintCodeOutputChar(singleChar);
+                            }
                         }
                     }
+                } else {
+                    // Go file: parse and/or compile
+                    Parse();
                 }
-            } else { //Go file
+            } else { //Go file: parse and/or compile
                 Parse();
             }
-        } else { //Go file with a very short name
-            Parse();
         }
+    } else { // Compile==2 => Link
+        Link();
     }
 
     for curFileIndex=0;curFileIndex<fileInfoLen;curFileIndex=curFileIndex+1 {
@@ -145,6 +156,12 @@ func ParseOption() {
     strIndicator = libgogo.StringCompare("-p", libgogo.Argv[1]);
     if (done == 0) && (strIndicator == 0) {
         Compile = 0;
+        done = 1;
+    }
+
+    strIndicator = libgogo.StringCompare("-l", libgogo.Argv[1]);
+    if (done == 0) && (strIndicator == 0) {
+        Compile = 2;
         done = 1;
     }
     

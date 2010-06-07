@@ -21,6 +21,7 @@ GOFILES=\
     gen-if.go\
     gen-cond.go\
     gen-for.go\
+    linker.go\
     inspector.go
 
 include $(GOROOT)/src/Make.cmd
