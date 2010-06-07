@@ -231,6 +231,7 @@ func PrintInstruction_Imm_Reg(op string, opsize uint64, value uint64, regname st
 
 func PrintInstruction_Imm_Var(op string, value uint64, variable *libgogo.Item) {
     var opsize uint64;
+    var temp uint64;
     opsize = GetOpSize(variable, op);
     if variable.Global == 1 { //Global
         PrintInstruction_Imm_Reg(op, opsize, value, "SB", 0, 1, variable.A, 0, "data"); //OP $value, data+variable.A(SB)
@@ -238,13 +239,19 @@ func PrintInstruction_Imm_Var(op string, value uint64, variable *libgogo.Item) {
         if variable.Global == 2 { //Parameter
             PrintInstruction_Imm_Reg(op, opsize, value, "SP", 0, 1, variable.A + 8, 0, ""); //OP $value, [variable.A+8](SP)
         } else { //Local
-            PrintInstruction_Imm_Reg(op, opsize, value, "SP", 0, 1, variable.A + 8, 1, ""); //OP $value, -[variable.A+8](SP)
+            temp = libgogo.StringLength(variable.LinkerInformation);
+            if temp == 0 {
+                PrintInstruction_Imm_Reg(op, opsize, value, "SP", 0, 1, variable.A + 8, 1, ""); //OP $value, -[variable.A+8](SP)
+            } else {
+                PrintInstruction_Imm_Reg(op, opsize, value, "SP", 0, 1, variable.A + 8, 1, variable.LinkerInformation); //OP $value, ##LINKER_TODO##-[variable.A+8](SP)
+            }
         }
     }
 }
 
 func PrintInstruction_Var_Imm(op string, variable *libgogo.Item, value uint64) {
     var opsize uint64;
+    var temp uint64;
     opsize = GetOpSize(variable, op);
     if variable.Global == 1 { //Global
         PrintInstruction_Reg_Imm(op, opsize, "SB", 0, 1, variable.A, 0, "data", value); // OP data+variable.A(SB), $value
@@ -252,7 +259,12 @@ func PrintInstruction_Var_Imm(op string, variable *libgogo.Item, value uint64) {
         if variable.Global == 2 { //Parameter
             PrintInstruction_Reg_Imm(op, opsize, "SP", 0, 1, variable.A + 8, 0, "", value); // OP [variable.A+8](SP), $value
         } else { //Local
-            PrintInstruction_Reg_Imm(op, opsize, "SP", 0, 1, variable.A + 8, 1, "", value); // OP -[variable.A+8](SP), $value
+            temp = libgogo.StringLength(variable.LinkerInformation);
+            if temp == 0 {
+                PrintInstruction_Reg_Imm(op, opsize, "SP", 0, 1, variable.A + 8, 1, "", value); // OP -[variable.A+8](SP), $value
+            } else {
+                PrintInstruction_Reg_Imm(op, opsize, "SP", 0, 1, variable.A + 8, 1, variable.LinkerInformation, value); // OP ##LINKER_TODO##-[variable.A+8](SP), $value
+            }
         }
     }
 }
@@ -260,6 +272,7 @@ func PrintInstruction_Var_Imm(op string, variable *libgogo.Item, value uint64) {
 func PrintInstruction_Reg_Var(op string, regname string, regnumber uint64, optregname string, optregnumber uint64, variable *libgogo.Item) {
     var opsize uint64;
     var retVal uint64;
+    var temp uint64;
     opsize = GetOpSize(variable, op);
     if variable.Global == 1 { //Global
         retVal = PrintInstruction_Reg_Reg(op, opsize, regname, regnumber, 0, 0, 0, "", "SB", 0, 1, variable.A, 0, "data"); //OP regname_regnumber, data+variable.A(SB)
@@ -273,9 +286,18 @@ func PrintInstruction_Reg_Var(op string, regname string, regnumber uint64, optre
                 PrintInstruction_Reg_Reg(op, retVal, optregname, optregnumber, 0, 0, 0, "", "SP", 0, 1, variable.A + 16, 0, ""); //OP optregname_optregnumber, [variable.A+8+8](SP)
             }
         } else { //Local
-            retVal = PrintInstruction_Reg_Reg(op, opsize, regname, regnumber, 0, 0, 0, "", "SP", 0, 1, variable.A + 8, 1, ""); //OP regname_regnumber, -[variable.A+8](SP)
+            temp = libgogo.StringLength(variable.LinkerInformation);
+            if temp == 0 {
+                retVal = PrintInstruction_Reg_Reg(op, opsize, regname, regnumber, 0, 0, 0, "", "SP", 0, 1, variable.A + 8, 1, ""); //OP regname_regnumber, -[variable.A+8](SP)
+            } else {
+                retVal = PrintInstruction_Reg_Reg(op, opsize, regname, regnumber, 0, 0, 0, "", "SP", 0, 1, variable.A + 8, 1, variable.LinkerInformation); //OP regname_regnumber, ##LINKER_TODO##-[variable.A+8](SP)
+            }
             if retVal != 0 { //Handle operands > 8 bytes
-                PrintInstruction_Reg_Reg(op, retVal, optregname, optregnumber, 0, 0, 0, "", "SP", 0, 1, variable.A, 1, ""); //OP optregname_optregnumber, -[variable.A+8-8](SP)
+                if temp == 0 {
+                    PrintInstruction_Reg_Reg(op, retVal, optregname, optregnumber, 0, 0, 0, "", "SP", 0, 1, variable.A, 1, ""); //OP optregname_optregnumber, -[variable.A+8-8](SP)
+                } else {
+                    PrintInstruction_Reg_Reg(op, retVal, optregname, optregnumber, 0, 0, 0, "", "SP", 0, 1, variable.A, 1, variable.LinkerInformation); //OP optregname_optregnumber, ##LINKER_TODO##-[variable.A+8-8](SP)
+                }
             }
         }
     }
@@ -284,6 +306,7 @@ func PrintInstruction_Reg_Var(op string, regname string, regnumber uint64, optre
 func PrintInstruction_Var_Reg(op string, variable *libgogo.Item, regname string, regnumber uint64, optregname string, optregnumber uint64) {
     var opsize uint64;
     var retVal uint64;
+    var temp uint64;
     opsize = GetOpSize(variable, op);
     if variable.Global == 1 { //Global
         retVal = PrintInstruction_Reg_Reg(op, opsize, "SB", 0, 1, variable.A, 0, "data", regname, regnumber, 0, 0, 0, ""); //OP data+variable.A(SB), regname_regnumber
@@ -297,9 +320,18 @@ func PrintInstruction_Var_Reg(op string, variable *libgogo.Item, regname string,
                 PrintInstruction_Reg_Reg(op, retVal, "SP", 0, 1, variable.A + 16, 0, "", optregname, optregnumber, 0, 0, 0, ""); //OP [variable.A+8+8](SP), optregname_optregnumber
             }
         } else { //Local
-            retVal = PrintInstruction_Reg_Reg(op, opsize, "SP", 0, 1, variable.A + 8, 1, "", regname, regnumber, 0, 0, 0, ""); //OP -[variable.A+8](SP), regname_regnumber
+            temp = libgogo.StringLength(variable.LinkerInformation);
+            if temp == 0 {
+                retVal = PrintInstruction_Reg_Reg(op, opsize, "SP", 0, 1, variable.A + 8, 1, "", regname, regnumber, 0, 0, 0, ""); //OP -[variable.A+8](SP), regname_regnumber
+            } else {
+                retVal = PrintInstruction_Reg_Reg(op, opsize, "SP", 0, 1, variable.A + 8, 1, variable.LinkerInformation, regname, regnumber, 0, 0, 0, ""); //OP ##LINKER_TODO##-[variable.A+8](SP), regname_regnumber
+            }
             if retVal != 0 { //Handle operands > 8 byte
-                PrintInstruction_Reg_Reg(op, retVal, "SP", 0, 1, variable.A, 1, "", optregname, optregnumber, 0, 0, 0, ""); //OP -[variable.A+8-8](SP), optregname_optregnumber
+                if temp == 0 {
+                    PrintInstruction_Reg_Reg(op, retVal, "SP", 0, 1, variable.A, 1, "", optregname, optregnumber, 0, 0, 0, ""); //OP -[variable.A+8-8](SP), optregname_optregnumber
+                } else {
+                    PrintInstruction_Reg_Reg(op, retVal, "SP", 0, 1, variable.A, 1, variable.LinkerInformation, optregname, optregnumber, 0, 0, 0, ""); //OP ##LINKER_TODO##-[variable.A+8-8](SP), optregname_optregnumber
+                }
             }
         }
     }

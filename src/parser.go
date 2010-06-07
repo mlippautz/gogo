@@ -776,21 +776,32 @@ func ParseSelectorSub_FunctionCall(FunctionCalled *libgogo.TypeDesc) uint64 {
         if Compile != 0 {
             boolFlag = libgogo.StringLength(FunctionCalled.Name);
             if boolFlag != 0 {
-                SymbolTableError("Cannot apply a selector to", "a", "function, function ", FunctionCalled.Name);
+                SymbolTableError("Cannot apply a selector to", "a", "function, function", FunctionCalled.Name);
             } else {
                 tempFcn = libgogo.GetType(tok.strValue, FunctionCalled.PackageName, GlobalFunctions, 0); //Check global functions
-   			    if tempFcn == nil {
-			        SymbolTableError("Package", FunctionCalled.PackageName, "has no function named", tok.strValue);
-			    } else {
-			        FunctionCalled.Name = tempFcn.Name;
-			        FunctionCalled.Len = tempFcn.Len;
-  			        FunctionCalled.Fields = tempFcn.Fields;
+   			    if tempFcn == nil { //Forward declaration
+   			        tempFcn = NewFunction(tok.strValue, FunctionCalled.PackageName, 1);
 			    }
+		        FunctionCalled.Name = tempFcn.Name;
+		        FunctionCalled.Len = tempFcn.Len;
+		        FunctionCalled.Fields = tempFcn.Fields;
+		        FunctionCalled.ForwardDecl = tempFcn.ForwardDecl;
             }
         }
         boolFlag = 0;
     } else {
         tok.nextToken = tok.id;
+        if Compile != 0 {
+            tempFcn = libgogo.GetType(FunctionCalled.PackageName, CurrentPackage, GlobalFunctions, 0); //Check global functions
+	        if tempFcn == nil { //Forward declaration
+	            tempFcn = NewFunction(FunctionCalled.PackageName, CurrentPackage, 1);
+                FunctionCalled.Name = tempFcn.Name;
+                FunctionCalled.PackageName = tempFcn.PackageName;
+                FunctionCalled.Len = tempFcn.Len;
+                FunctionCalled.Fields = tempFcn.Fields;
+                FunctionCalled.ForwardDecl = tempFcn.ForwardDecl;
+	        }
+	    }
         boolFlag = 1;
     }
     PrintDebugString("Leaving ParseSelectorSub_FunctionCall()",1000);
@@ -839,7 +850,7 @@ func ParseFuncDeclHead() uint64 {
     if tok.id == TOKEN_FUNC {
         AssertNextToken(TOKEN_IDENTIFIER);
         // function name in tok.strValue
-        NewFunction(tok.strValue, 0);
+        NewFunction(tok.strValue, CurrentPackage, 0);
         AssertNextToken(TOKEN_LBRAC);
         ParseIdentifierTypeList();
         AssertNextTokenWeak(TOKEN_RBRAC);
@@ -990,7 +1001,7 @@ func ParseStatement(ed *ExpressionDescriptor) uint64 {
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
         funcIndicator = IsFunction();
         if funcIndicator == 1 {
-            ParseFunctionCallStatement();
+            ParseFunctionCallStatement(nil, 0);
         } else {
             ParseAssignment(1); //Trailing semicolon
         }
@@ -1107,7 +1118,7 @@ func ParseAssignment(semicolon uint64) uint64 {
         if tok.id == TOKEN_IDENTIFIER {
             funcIndicator = IsFunction();
             if funcIndicator == 1 { //Function call
-                RHSItem = ParseFunctionCallStatement();
+                RHSItem = ParseFunctionCallStatement(LHSItem.Itemtype, LHSItem.PtrType);
                 if Compile != 0 {
                     if RHSItem == nil {
                         SymbolTableError("Function has", "no", "return value", "");
@@ -1173,6 +1184,8 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
         AssertNextTokenWeak(TOKEN_RBRAC);
     }
     if Compile != 0 {
+        TotalParameterSize = libgogo.GetAlignedObjectListSize(FunctionCalled.Fields); //Recalculate sizes as function may have been forward declared
+        TotalLocalVariableSize = libgogo.GetAlignedObjectListSize(LocalObjects); //Recalculate sizes as function may have been forward declared
         if FunctionCalled.Len > paramCount { //Compare number of actual parameters
             FullFunctionName = "";
             libgogo.StringAppend(&FullFunctionName, FunctionCalled.PackageName);
@@ -1201,6 +1214,7 @@ func ParseExpressionList(FunctionCalled *libgogo.TypeDesc, TotalParameterSize ui
     var ExprItem *libgogo.Item;
     var ParameterLHSObject *libgogo.ObjectDesc;
     var Parameter *libgogo.Item;
+    var TempObject *libgogo.ObjectDesc;
     var tempString string;
     var FullFunctionName string;
     
@@ -1211,6 +1225,12 @@ func ParseExpressionList(FunctionCalled *libgogo.TypeDesc, TotalParameterSize ui
         GenerateComment("First parameter expression load start");
         boolFlag = ParseExpression(ExprItem, &ed);
         GenerateComment("First parameter expression load end");
+        if FunctionCalled.ForwardDecl == 1 { //Create artificial parameter from expression (based on the latter's type)
+            TempObject = libgogo.NewObject("Artificial parameter", "", libgogo.CLASS_PARAMETER);
+            TempObject.ObjType = ExprItem.Itemtype; //Derive type from expression
+            TempObject.PtrType = ExprItem.PtrType; //Derive pointer type from expression
+            libgogo.AddParameters(TempObject, FunctionCalled); //Add a new, artificial parameter
+        }
         ParameterLHSObject = libgogo.GetParameterAt(paramCount, FunctionCalled);
         Parameter = ObjectToStackParameter(ParameterLHSObject, FunctionCalled, TotalParameterSize);
         GenerateAssignment(Parameter, ExprItem, boolFlag); //Assignment
@@ -1248,6 +1268,7 @@ func ParseExpressionListSub(FunctionCalled *libgogo.TypeDesc, TotalParameterSize
     var ExprItem *libgogo.Item;
     var ParameterLHSObject *libgogo.ObjectDesc;
     var Parameter *libgogo.Item;
+    var TempObject *libgogo.ObjectDesc;
     
     PrintDebugString("Entering ParseExpressionListSub()",1000);
     GetNextTokenSafe();
@@ -1258,6 +1279,12 @@ func ParseExpressionListSub(FunctionCalled *libgogo.TypeDesc, TotalParameterSize
             GenerateComment("Subsequent parameter expression load start");
             boolFlag = ParseExpression(ExprItem, &ed);
             GenerateComment("Subsequent parameter expression load end");
+            if FunctionCalled.ForwardDecl == 1 { //Create artificial parameter from expression (based on the latter's type)
+                TempObject = libgogo.NewObject("Artificial parameter", "", libgogo.CLASS_PARAMETER);
+                TempObject.ObjType = ExprItem.Itemtype; //Derive type from expression
+                TempObject.PtrType = ExprItem.PtrType; //Derive pointer type from expression
+                libgogo.AddParameters(TempObject, FunctionCalled); //Add a new, artificial parameter
+            }
             ParameterLHSObject = libgogo.GetParameterAt(ParameterIndex, FunctionCalled);
             Parameter = ObjectToStackParameter(ParameterLHSObject, FunctionCalled, TotalParameterSize);
             GenerateAssignment(Parameter, ExprItem, boolFlag); //Assignment
@@ -1274,14 +1301,25 @@ func ParseExpressionListSub(FunctionCalled *libgogo.TypeDesc, TotalParameterSize
     return boolFlag;   
 }
 
-func ParseFunctionCallStatement() *libgogo.Item {
+func ParseFunctionCallStatement(ForwardDeclExpectedReturnType *libgogo.TypeDesc, ForwardDeclExpectedReturnPtrType uint64) *libgogo.Item {
     var FunctionCalled *libgogo.TypeDesc;
     var ReturnValue *libgogo.Item;
+    var TotalLocalVariableSize uint64;
     PrintDebugString("Entering ParseFunctionCallStatement()",1000);
     AssertNextToken(TOKEN_IDENTIFIER);
     FunctionCalled = libgogo.NewType("", "", 0, 0, nil);
     FunctionCalled = FindIdentifierAndParseSelector_FunctionCall(FunctionCalled);
     ReturnValue = ParseFunctionCall(FunctionCalled);
+    if Compile != 0 {
+        if FunctionCalled.ForwardDecl == 1 {
+            CurrentObject = libgogo.NewObject("return value", "", libgogo.CLASS_PARAMETER); //Create artificial return value
+            CurrentObject.ObjType = ForwardDeclExpectedReturnType;
+            CurrentObject.PtrType = ForwardDeclExpectedReturnPtrType;
+            libgogo.AddParameters(CurrentObject, FunctionCalled); //Add a new, artificial return value
+            TotalLocalVariableSize = libgogo.GetAlignedObjectListSize(LocalObjects); //Take local variable size into consideration for offset below
+            ReturnValue = ObjectToStackParameter(CurrentObject, FunctionCalled, TotalLocalVariableSize);
+        }
+    }
     PrintDebugString("Leaving ParseFunctionCallStatement()",1000);
     return ReturnValue;
 }
@@ -1484,8 +1522,13 @@ func FindIdentifierAndParseSelector_FunctionCall(FunctionCalled *libgogo.TypeDes
 		boolFlag = libgogo.FindTypePackageName(tok.strValue, GlobalFunctions); //Check global functions
 		if boolFlag == 0 { //Token is not package name, but identifier
 			tempFcn = libgogo.GetType(tok.strValue, CurrentPackage, GlobalFunctions, 0); //Check global functions
-            if tempFcn == nil {
-                SymbolTableError("There is no", "function", "named", tok.strValue); //TODO: Allow forward declarations
+            if tempFcn == nil { //Forward declaration
+                FunctionCalled.PackageName = tok.strValue; //Set package name
+                tempFcn = ParseSelector_FunctionCall(FunctionCalled); //Parse selector for an undefined function in the given package
+                boolFlag = libgogo.StringLength(tempFcn.Name);
+                if boolFlag == 0 {
+		            SymbolTableError("Cannot use package", "", "as a function:", tempFcn.PackageName);
+		        }
             } //else: tempFcn is already the return value
         } else { //Token is package name
             FunctionCalled.PackageName = tok.strValue; //Set package name

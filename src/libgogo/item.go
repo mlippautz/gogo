@@ -12,12 +12,13 @@ type Item struct {
     R uint64; //Mode = MODE_REGISTER: register number
     C uint64; // Mode = MODE_COND: Type of comparison; Mode = MODE_REG: Optional second register occupied
     Global uint64; //If 1, the variable is global, 0 if it is function-local, 2 if it is a function parameter
+    LinkerInformation string; //Mode = MODE_VAR and Global = 0: If non-empty, indicates unknown parameter offset to be replaced by the linker
 };
 
 //
 // Pseudo constants that specify the descriptor sizes 
 //
-var ITEM_SIZE uint64 = 56; //7*8 bytes space for an object
+var ITEM_SIZE uint64 = 72; //9*8 bytes space for an object
 
 //
 // Modes for items
@@ -64,4 +65,5 @@ func SetItem(item *Item, mode uint64, itemtype *TypeDesc, ptrtype uint64, a uint
     item.C = 0;
     item.R = r;
     item.Global = global;
+    item.LinkerInformation = "";
 }

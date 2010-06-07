@@ -321,6 +321,14 @@ func ObjectToStackParameter(obj *libgogo.ObjectDesc, FunctionCalled *libgogo.Typ
     ReturnItem = libgogo.NewItem();
     VariableObjectDescToItem(obj, ReturnItem, 0); //Treat parameter as if it was a local object
     ReturnItem.A = stackoffset - 8 - ReturnItem.A - 8 + ObjSize; //Add offset (total size of parameters and variables); compensate both local offsets (stackoffset and ReturnItem.A) by subtracting -8 for each, then adding the parameter size
+    if FunctionCalled.ForwardDecl == 1 {
+        ReturnItem.LinkerInformation = "##"; //Invalid characters to make assembly impossible
+        libgogo.StringAppend(&ReturnItem.LinkerInformation, FunctionCalled.PackageName);
+        libgogo.StringAppend(&ReturnItem.LinkerInformation, "·");
+        libgogo.StringAppend(&ReturnItem.LinkerInformation, FunctionCalled.Name);
+        libgogo.StringAppend(&ReturnItem.LinkerInformation, "##");
+        ReturnItem.A = ReturnItem.A + 100000; //Add dummy offset of 100000 to bias negative calculations in order to prevent underflow
+    }
     LocalObjects = OldLocalObjects; //Restore old local objects pointer
     return ReturnItem;
 }
@@ -329,14 +337,23 @@ func ObjectToStackParameter(obj *libgogo.ObjectDesc, FunctionCalled *libgogo.Typ
 // Adds a new function to the global symbol table with the specified
 // name
 //
-func NewFunction(name string, forwarddecl uint64) {
+func NewFunction(name string, packagename string, forwarddecl uint64) *libgogo.TypeDesc {
     var TempType *libgogo.TypeDesc;
+    var DontAppend uint64 = 0;
     if Compile != 0 {
-		CurrentFunction = libgogo.NewType(name, CurrentPackage, forwarddecl, 0, nil);
-        TempType = libgogo.GetType(name, CurrentPackage, GlobalFunctions, 1);
+		CurrentFunction = libgogo.NewType(name, packagename, forwarddecl, 0, nil);
+        TempType = libgogo.GetType(name, packagename, GlobalFunctions, 1);
         if TempType != nil {
-            SymbolTableError("duplicate", "function", "name", name);
+            if TempType.ForwardDecl == 1 { //Unset forward declaration
+                TempType.ForwardDecl = forwarddecl;
+                DontAppend = 1;
+            } else {
+                SymbolTableError("duplicate function", name, "in package", name);
+            }
         }
-        GlobalFunctions = libgogo.AppendType(CurrentFunction, GlobalFunctions);
+        if DontAppend == 0 {
+            GlobalFunctions = libgogo.AppendType(CurrentFunction, GlobalFunctions);
+        }
     }
+    return CurrentFunction;
 }
