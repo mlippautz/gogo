@@ -72,13 +72,13 @@ func Link() {
     tok.llCnt = 0; 
     
     for line = GetLine(); tok.id != TOKEN_EOS ;line = GetLine() {
-        strCmp = libgogo.StringCompare("// ##START_SYM_TABLE", line)
+        strCmp = libgogo.StringCompare("// ##START_SYM_TABLE", line);
         if (strCmp == 0) {
             libgogo.PrintString("Symboltable start\n");
             InSymTable = 1;
             line = GetLine();
         } 
-        strCmp = libgogo.StringCompare("// ##END_SYM_TABLE", line)
+        strCmp = libgogo.StringCompare("// ##END_SYM_TABLE", line);
         if (strCmp == 0) {
             libgogo.PrintString("Symboltable end\n");
             InSymTable = 0;
