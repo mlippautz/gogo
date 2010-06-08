@@ -207,6 +207,7 @@ func ParseType() {
         packagename = typename; //Previously read namespace is actually the namespace
         typename = tok.strValue;
     }
+    //TODO: Type check if function was forward decl.
     SetCurrentObjectType(typename, packagename, arraydim);
     PrintDebugString("Leaving ParseType()",1000);
 }
@@ -224,7 +225,7 @@ func ParseTypeOptional() {
 
     PrintDebugString("Entering ParseTypeOptional()",1000); 
     ReturnValuePseudoObject = nil;
-    CurrentObject = libgogo.NewObject("return value", "", libgogo.CLASS_PARAMETER); //Return value object with a name which is impossible declare (contains spaces) and therefore needs no additional checking
+    CurrentObject = libgogo.NewObject("return value", "", libgogo.CLASS_PARAMETER); //Return value object with a name which is impossible to declare (contains spaces) and therefore needs no additional checking
     GetNextTokenSafe();
     if tok.id == TOKEN_LSBRAC {
         AssertNextToken(TOKEN_INTEGER);        
@@ -252,6 +253,7 @@ func ParseTypeOptional() {
         SetCurrentObjectType(typename, packagename, arraydim);
         ReturnValuePseudoObject = CurrentObject;
         if (Compile != 0) && (ReturnValuePseudoObject != nil) {
+            //TODO: Type check if function was forward decl.
             libgogo.AddParameters(ReturnValuePseudoObject, CurrentFunction); //Treat return value like an additional parameter at the end of the parameter list
             CurrentFunction.Len = CurrentFunction.Len - 1; //Don't count parameter as input parameter
         }

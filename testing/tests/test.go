@@ -79,7 +79,7 @@ func main() {
     var x string;
     ret = bazz(1);
     x = blub(u);
-    //ret = bazz_fwd(1);
+    ret = bazz_fwd(1);
 }
 
 func foo_fwd() {
