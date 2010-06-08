@@ -320,15 +320,14 @@ func ObjectToStackParameter(obj *libgogo.ObjectDesc, FunctionCalled *libgogo.Typ
     LocalObjects = FunctionCalled.Fields; //Use parameters with local object offsets
     ReturnItem = libgogo.NewItem();
     VariableObjectDescToItem(obj, ReturnItem, 0); //Treat parameter as if it was a local object
+    ReturnItem.A = stackoffset - 8 - ReturnItem.A - 8 + ObjSize; //Add offset (total size of parameters and variables); compensate both local offsets (stackoffset and ReturnItem.A) by subtracting -8 for each, then adding the parameter size
     if FunctionCalled.ForwardDecl == 1 {
-        ReturnItem.A = stackoffset - ReturnItem.A - 8 + ObjSize; //Add offset (total size of variables only); compensate local offset
         ReturnItem.LinkerInformation = "##"; //Invalid characters to make assembly impossible
         libgogo.StringAppend(&ReturnItem.LinkerInformation, FunctionCalled.PackageName);
         libgogo.StringAppend(&ReturnItem.LinkerInformation, "·");
         libgogo.StringAppend(&ReturnItem.LinkerInformation, FunctionCalled.Name);
         libgogo.StringAppend(&ReturnItem.LinkerInformation, "##");
-    } else {
-        ReturnItem.A = stackoffset - 8 - ReturnItem.A - 8 + ObjSize; //Add offset (total size of parameters and variables); compensate both local offsets (stackoffset and ReturnItem.A) by subtracting -8 for each, then adding the parameter size
+        ReturnItem.A = ReturnItem.A + 100000; //Bias to avoid underflows
     }
     LocalObjects = OldLocalObjects; //Restore old local objects pointer
     return ReturnItem;

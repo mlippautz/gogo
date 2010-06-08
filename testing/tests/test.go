@@ -93,8 +93,8 @@ func bazz_fwd(b byte) uint64 {
 
 func muh() {
     var x string;
-    x = maeh(x);
+    x = maeh(x, x);
 }
 
-func maeh(y string) string {
+func maeh(y string, z string) string {
 }
