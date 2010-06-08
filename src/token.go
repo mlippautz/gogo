@@ -86,6 +86,15 @@ var TOKEN_CONTINUE uint64 = 113;
 // Helper functions
 //
 
+//
+// Resets the token to the initial state
+//
+func ResetToken() {
+    tok.id = 0;
+    tok.nextChar = 0;
+    tok.nextToken = 0;   
+    tok.llCnt = 0; 
+}
 
 //
 // Returns a string representation of a supplied token.

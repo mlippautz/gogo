@@ -32,10 +32,7 @@ var ReturnedFunction *libgogo.TypeDesc = nil;
 // go_program.
 //
 func Parse() {
-    tok.id = 0;
-    tok.nextChar = 0;
-    tok.nextToken = 0;   
-    tok.llCnt = 0; 
+    ResetToken();
 
     libgogo.InitializeStack(&Operators);
 

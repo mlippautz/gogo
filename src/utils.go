@@ -143,6 +143,18 @@ func GenErrorWeak(msg string) {
     ParserSync();
 }
 
+//
+// Linker error; Always Fatal since this means someone edited the object file
+// by hand
+//
+func LinkError(msg string) {
+    PrintHead();
+    libgogo.PrintString(": linker error: ");
+    libgogo.PrintString(msg);
+    libgogo.PrintString("\n");
+    libgogo.Exit(5);
+}
+
 func SymbolTableError(msg string, position string, msg2 string, identifier string) {
     var strLen uint64;
     PrintHead();

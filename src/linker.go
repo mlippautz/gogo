@@ -6,9 +6,15 @@ package main
 
 import "./libgogo/_obj/libgogo"
 
-var InSymTable uint64 = 0;
+type LineDesc struct {
+    Line string;
+    Offset uint64;
+};
 
-func GetLine() string {
+//
+// Function fetches the next line from the assembly file.
+//
+func GetLine(ld *LineDesc) {
     var line string;
     var singleChar byte;
     for singleChar = GetCharWrapped(); (singleChar != 0) && (singleChar != 10); singleChar = GetCharWrapped() {
@@ -17,60 +23,48 @@ func GetLine() string {
     if singleChar == 0 {
         tok.id = TOKEN_EOS;
     }
-    return line;
+    ld.Line = line;
+    ld.Offset = 0;
 }
 
-func GetNextSymToken(lineRest string, offset *uint64) string {
+func GetNextSymToken(ld *LineDesc) string {
     var symtoken string;
     var i uint64;
     var len uint64;
-    len = libgogo.StringLength(lineRest);
-    for i = *offset; (i < len) && (lineRest[i] != ','); i=i+1 {
-        if (lineRest[i] != '/') && (lineRest[i] != ' ') {
-            libgogo.CharAppend(&symtoken, lineRest[i]);
+    len = libgogo.StringLength(ld.Line);
+    for i = ld.Offset; (i < len) && (ld.Line[i] != ','); i=i+1 {
+        if (ld.Line[i] != '/') && (ld.Line[i] != ' ') {
+            libgogo.CharAppend(&symtoken, ld.Line[i]);
         }
     }
-    *offset = i+1;
+    ld.Offset = i+1;
     return symtoken;
 }
 
-func ParseLine(line string) {
+
+func ParseLine(ld *LineDesc) {
     // Something like 
     // Type, Ndx, Name, Ret, Params [,...]
     // FUNC ,UND    ,test·test      ,           ,uint64
-/*
-    var offset uint64 = 0;
+
     var symtoken string;
-    symtoken = GetNextSymToken(line,&offset);
-    libgogo.PrintString("Type: ");
-    libgogo.PrintString(symtoken);
-    libgogo.PrintString("\n");
-
-    symtoken = GetNextSymToken(line,&offset);
-    libgogo.PrintString("Defined: ");
-    libgogo.PrintString(symtoken);
-    libgogo.PrintString("\n");
-
-    symtoken = GetNextSymToken(line,&offset);
-    libgogo.PrintString("Packagename+Var-/Functionname: ");
-    libgogo.PrintString(symtoken);
-    libgogo.PrintString("\n");
-
-    symtoken = GetNextSymToken(line,&offset);
-    libgogo.PrintString("Return, vartype: ");
-    libgogo.PrintString(symtoken);
-    libgogo.PrintString("\n");
-*/
+    symtoken = GetNextSymToken(ld);
+    symtoken = GetNextSymToken(ld);
+    symtoken = symtoken;
 }
 
 func GetParameterSize(packageName string, functionName string) uint64 {
     return 16;
 }
 
-func FixOffsetIfNecessary(line string) string {
+//
+// Function processing a line and fixing offsets if necessary
+//
+func FixOffsetIfNecessary(ld *LineDesc) string {
     var packageName string;
     var functionName string;
     var i uint64;
+    var j uint64;
     var strLen uint64;
     var position uint64 = 0;
     var size uint64;
@@ -78,86 +72,97 @@ func FixOffsetIfNecessary(line string) string {
     var numstr string;
     var newLine string;
 
-    strLen = libgogo.StringLength(line);
-    for i=0;i<strLen;i=i+1 {
-        if position == 1 {
-            if line[i] != 194 {
-                if line[i] == 183 {
-                    position = position + 1;
-                    continue;
-                } else {
-                    libgogo.CharAppend(&packageName, line[i]);
-                }
-            }
-        }
-        if position == 2 {
-            if line[i] == '#' {
-                if line[i-1] == '#' {
-                    position = position +1;
-                    continue;
-                }
-            } else {
-                libgogo.CharAppend(&functionName, line[i]);
-            }
-        }
-        if position == 3 {
+    strLen = libgogo.StringLength(ld.Line);
+    for i=0 ; i < strLen ; i=i+1 {
+        if position == 3 { // Create new offset using the parametersize of packageName·functionName
             size = GetParameterSize(packageName, functionName);
-            libgogo.CharAppend(&newLine, line[i]); // dismiss '-', which is mandatory
+            // Dismiss '-', which is mandatory. I.e.: -8(SP)
+            libgogo.CharAppend(&newLine, ld.Line[i]); 
             i = i+1; 
-            for ;line[i]!='(';i=i+1 {
-                libgogo.CharAppend(&numstr, line[i]);
+            // Read the number in -<number>(SP)
+            for ;ld.Line[i]!='(';i=i+1 {
+                libgogo.CharAppend(&numstr, ld.Line[i]);
             }
-            oldsize = libgogo.StringToInt(numstr);
-            size = size + oldsize;
-            numstr = libgogo.IntToString(size);
-            libgogo.StringAppend(&newLine, numstr);
-            position = 0;
+            oldsize = libgogo.StringToInt(numstr); // Convert to uint64
+            size = size + oldsize; // Caluclate new size
+            numstr = libgogo.IntToString(size); // Convert back
+            libgogo.StringAppend(&newLine, numstr); // Append
+            libgogo.CharAppend(&newLine,'('); // Finally append '(' again
+            position = 0; // Reset flag to starting indication
+            continue;
         }
-        if line[i] == '#' {
-            if i == 0 {
-                // TODO(mike): throw some error
-            }
-            if line[i-1] == '#' {
-                position = position +1;
+        if position == 2 { // Fetch functionName until "##"
+            if ld.Line[i] == '#' {
+                j = i-1;
+                if ld.Line[j] == '#' {
+                    position = position +1;
+                }
             } else {
-                continue;
+                libgogo.CharAppend(&functionName, ld.Line[i]);
             }
         }
-        if position == 0 {
-            libgogo.CharAppend(&newLine, line[i]);
+        if position == 1 { // Fetch packageName until '·'
+            if ld.Line[i] != 194 {
+                if ld.Line[i] == 183 {
+                    position = position + 1;
+                } else {
+                    libgogo.CharAppend(&packageName, ld.Line[i]);
+                }
+            }
+        }
+        if position == 0 { // Append characters until separator "##" is reached
+            if ld.Line[i] == '#' {
+                if i==0 {
+                    LinkError("Found '#' at linestart. Not a valid object file.");
+                } else {
+                    j = i-1;
+                    if ld.Line[j] == '#' {
+                        position = position +1;
+                    }
+                }                 
+            }  else {
+                if (i>0) {
+                    j = i-1;
+                    if ld.Line[j] == '#' {                    
+                        LinkError("Single '#' not allowed. Not a valid object file.");
+                    }
+                } 
+                libgogo.CharAppend(&newLine, ld.Line[i]);
+            }
         }
     }
     return newLine;
 }
 
+//
+// Main linking method
+//
 func Link() {
-    var line string;
+    var newLine string;
     var strCmp uint64;
+    var symtable uint64 = 0;
+    var ld LineDesc;
 
-    tok.id = 0;
-    tok.nextChar = 0;
-    tok.nextToken = 0;   
-    tok.llCnt = 0; 
-    
-    for line = GetLine(); tok.id != TOKEN_EOS ;line = GetLine() {
-        strCmp = libgogo.StringCompare("// ##START_SYM_TABLE", line);
+    ResetToken();
+    GetLine(&ld);
+    for ;tok.id != TOKEN_EOS;{
+        strCmp = libgogo.StringCompare("// ##START_SYM_TABLE", ld.Line);
         if (strCmp == 0) {
-            libgogo.PrintString("Symboltable start\n");
-            InSymTable = 1;
-            line = GetLine();
+            symtable = 1;
+            GetLine(&ld); // Proceed to next line
         } 
-        strCmp = libgogo.StringCompare("// ##END_SYM_TABLE", line);
+        strCmp = libgogo.StringCompare("// ##END_SYM_TABLE", ld.Line);
         if (strCmp == 0) {
-            libgogo.PrintString("Symboltable end\n");
-            InSymTable = 0;
+            symtable = 0;
+            GetLine(&ld); // Proceed to next line
         }
-        if InSymTable != 0 {
-            ParseLine(line);
-            libgogo.PrintString("\n");
-        } else {
-            line = FixOffsetIfNecessary(line);
-            libgogo.PrintString(line);
+        if symtable != 0 { // Parse symtable entries
+            ParseLine(&ld);
+        } else { // Parse normal lines and fix everything
+            newLine = FixOffsetIfNecessary(&ld);
+            libgogo.PrintString(newLine);
             libgogo.PrintString("\n");
         }
+        GetLine(&ld);
     }
 }
