@@ -79,4 +79,14 @@ func main() {
     var x string;
     ret = bazz(1);
     x = blub(u);
+    //ret = bazz_fwd(1);
+}
+
+func foo_fwd() {
+    var ret uint64;
+    ret = bazz_fwd(1);
+}
+
+func bazz_fwd(b byte) uint64 {
+    return b;
 }
