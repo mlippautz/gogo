@@ -90,3 +90,11 @@ func foo_fwd() {
 func bazz_fwd(b byte) uint64 {
     return b;
 }
+
+func muh() {
+    var x string;
+    x = maeh(x);
+}
+
+func maeh(y string) string {
+}
