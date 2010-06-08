@@ -38,6 +38,7 @@ func ParseLine(line string) {
     // Something like 
     // Type, Ndx, Name, Ret, Params [,...]
     // FUNC ,UND    ,test·test      ,           ,uint64
+/*
     var offset uint64 = 0;
     var symtoken string;
     symtoken = GetNextSymToken(line,&offset);
@@ -59,7 +60,74 @@ func ParseLine(line string) {
     libgogo.PrintString("Return, vartype: ");
     libgogo.PrintString(symtoken);
     libgogo.PrintString("\n");
+*/
+}
 
+func GetParameterSize(packageName string, functionName string) uint64 {
+    return 16;
+}
+
+func FixOffsetIfNecessary(line string) string {
+    var packageName string;
+    var functionName string;
+    var i uint64;
+    var strLen uint64;
+    var position uint64 = 0;
+    var size uint64;
+    var oldsize uint64;
+    var numstr string;
+    var newLine string;
+
+    strLen = libgogo.StringLength(line);
+    for i=0;i<strLen;i=i+1 {
+        if position == 1 {
+            if line[i] != 194 {
+                if line[i] == 183 {
+                    position = position + 1;
+                    continue;
+                } else {
+                    libgogo.CharAppend(&packageName, line[i]);
+                }
+            }
+        }
+        if position == 2 {
+            if line[i] == '#' {
+                if line[i-1] == '#' {
+                    position = position +1;
+                    continue;
+                }
+            } else {
+                libgogo.CharAppend(&functionName, line[i]);
+            }
+        }
+        if position == 3 {
+            size = GetParameterSize(packageName, functionName);
+            libgogo.CharAppend(&newLine, line[i]); // dismiss '-', which is mandatory
+            i = i+1; 
+            for ;line[i]!='(';i=i+1 {
+                libgogo.CharAppend(&numstr, line[i]);
+            }
+            oldsize = libgogo.StringToInt(numstr);
+            size = size + oldsize;
+            numstr = libgogo.IntToString(size);
+            libgogo.StringAppend(&newLine, numstr);
+            position = 0;
+        }
+        if line[i] == '#' {
+            if i == 0 {
+                // TODO(mike): throw some error
+            }
+            if line[i-1] == '#' {
+                position = position +1;
+            } else {
+                continue;
+            }
+        }
+        if position == 0 {
+            libgogo.CharAppend(&newLine, line[i]);
+        }
+    }
+    return newLine;
 }
 
 func Link() {
@@ -86,6 +154,10 @@ func Link() {
         if InSymTable != 0 {
             ParseLine(line);
             libgogo.PrintString("\n");
-        }        
+        } else {
+            line = FixOffsetIfNecessary(line);
+            libgogo.PrintString(line);
+            libgogo.PrintString("\n");
+        }
     }
 }
