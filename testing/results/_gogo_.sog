@@ -489,3 +489,34 @@ TEXT main·bazz_fwd(SB),0,$0-0
   //--- Return value assignment end at tests/test.go:91:14
   RET
 
+TEXT main·muh(SB),0,$0-0
+  //--- Assignment start at tests/test.go:96:9
+  //--- Assignment LHS load start at tests/test.go:96:9
+  //--- Assignment LHS load end at tests/test.go:96:9
+  //--- First parameter expression start at tests/test.go:96:16
+  //--- First parameter expression load start at tests/test.go:96:16
+  //--- First parameter expression load end at tests/test.go:96:16
+  MOVQ -16(SP), R8
+  MOVQ -8(SP), R9
+  MOVQ R8, ##main·maeh##-24(SP)
+  MOVQ R9, ##main·maeh##-16(SP)
+  //--- First parameter expression end at tests/test.go:96:16
+  //--- Stack pointer offset before function call for local variables start at tests/test.go:96:16
+  //--- ##LINKER##TODO: Fix offset in next line using function in line after the next at tests/test.go:96:16
+  SUBQ $16, SP
+  //--- Stack pointer offset before function call for local variables end at tests/test.go:96:16
+  CALL main·maeh(SB)
+  //--- Stack pointer offset after function call for local variables start at tests/test.go:96:16
+  //--- ##LINKER##TODO: Fix offset in next line using function in line after the next at tests/test.go:96:16
+  ADDQ $16, SP
+  //--- Stack pointer offset after function call for local variables end at tests/test.go:96:16
+  MOVQ ##main·maeh##-8(SP), R8
+  MOVQ ##main·maeh##(SP), R9
+  MOVQ R8, -16(SP)
+  MOVQ R9, -8(SP)
+  //--- Assignment end at tests/test.go:96:17
+  RET
+
+TEXT main·maeh(SB),0,$0-0
+  RET
+
