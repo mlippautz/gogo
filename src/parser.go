@@ -1195,12 +1195,14 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
     }
     if tok.id != TOKEN_RBRAC {
         tok.nextToken = tok.id;
-        paramCount = ParseExpressionList(FunctionCalled, TotalParameterSize + TotalLocalVariableSize);
+        if FunctionCalled.ForwardDecl == 1 {
+            paramCount = ParseExpressionList(FunctionCalled, TotalLocalVariableSize);
+        } else {
+            paramCount = ParseExpressionList(FunctionCalled, TotalParameterSize + TotalLocalVariableSize);
+        }
         AssertNextTokenWeak(TOKEN_RBRAC);
     }
     if Compile != 0 {
-        TotalParameterSize = libgogo.GetAlignedObjectListSize(FunctionCalled.Fields); //Recalculate sizes as function may have been forward declared
-        TotalLocalVariableSize = libgogo.GetAlignedObjectListSize(LocalObjects); //Recalculate sizes as function may have been forward declared
         if FunctionCalled.Len > paramCount { //Compare number of actual parameters
             FullFunctionName = "";
             libgogo.StringAppend(&FullFunctionName, FunctionCalled.PackageName);
@@ -1209,7 +1211,12 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
             tempString = libgogo.IntToString(FunctionCalled.Len);
             SymbolTableError("Expecting", tempString, "parameters (more than the actual ones) for function", FullFunctionName);
         }
-        PrintFunctionCall(FunctionCalled.PackageName, FunctionCalled.Name, TotalParameterSize + TotalLocalVariableSize);
+        TotalParameterSize = libgogo.GetAlignedObjectListSize(FunctionCalled.Fields); //Recalculate sizes as function may have been forward declared
+        if FunctionCalled.ForwardDecl == 1 {
+            PrintFunctionCall(FunctionCalled.PackageName, FunctionCalled.Name, TotalLocalVariableSize, 1);
+        } else {
+            PrintFunctionCall(FunctionCalled.PackageName, FunctionCalled.Name, TotalParameterSize + TotalLocalVariableSize, 0);
+        }
         RestoreUsedRegisters();
     }
     PrintDebugString("Leaving ParseFunctionCall()",1000);
@@ -1217,7 +1224,11 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
     if ReturnObject == nil {
         ReturnItem = nil;
     } else {
-        ReturnItem = ObjectToStackParameter(ReturnObject, FunctionCalled, TotalParameterSize + TotalLocalVariableSize);
+        if FunctionCalled.ForwardDecl == 1 {
+            ReturnItem = ObjectToStackParameter(ReturnObject, FunctionCalled, TotalLocalVariableSize);
+        } else {
+            ReturnItem = ObjectToStackParameter(ReturnObject, FunctionCalled, TotalParameterSize + TotalLocalVariableSize);
+        }
     }
     return ReturnItem;
 }

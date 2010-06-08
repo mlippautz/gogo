@@ -351,8 +351,11 @@ func PrintLabel(label string) {
     PrintInstructionEnd();
 }
 
-func PrintFunctionCall(packagename string, label string, stackoffset uint64) {
+func PrintFunctionCall(packagename string, label string, stackoffset uint64, unknownoffset uint64) {
     GenerateComment("Stack pointer offset before function call for local variables start");
+    if unknownoffset != 0 {
+        GenerateComment("##LINKER##TODO: Fix offset in next line using function in line after the next");
+    }
     PrintInstruction_Imm_Reg("SUB", 8, stackoffset, "SP", 0, 0, 0, 0, ""); //SUBQ $stackoffset, SP
     GenerateComment("Stack pointer offset before function call for local variables end");
     PrintCodeOutput("  CALL ");
@@ -362,6 +365,9 @@ func PrintFunctionCall(packagename string, label string, stackoffset uint64) {
     PrintCodeOutput("(SB)");
     PrintInstructionEnd();
     GenerateComment("Stack pointer offset after function call for local variables start");
+    if unknownoffset != 0 {
+        GenerateComment("##LINKER##TODO: Fix offset in next line using function in line after the next");
+    }
     PrintInstruction_Imm_Reg("ADD", 8, stackoffset, "SP", 0, 0, 0, 0, ""); //ADDQ $stackoffset, SP
     GenerateComment("Stack pointer offset after function call for local variables end");
 }
@@ -371,7 +377,7 @@ func PrintFunctionStart(packagename string, label string) {
     PrintCodeOutput(packagename);
     PrintCodeOutput("·");
     PrintCodeOutput(label);
-    PrintCodeOutput("(SB),0,$0-0"); //TODO: Print actual stack and parameter size
+    PrintCodeOutput("(SB),0,$0-0"); //Stack is managed manually
     PrintInstructionEnd();
 }
 

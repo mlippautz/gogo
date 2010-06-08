@@ -443,11 +443,13 @@ TEXT main·main(SB),0,$0-0
   MOVB $1, ##main·bazz_fwd##-100040(SP)
   //--- First parameter expression end at tests/test.go:82:22
   //--- Stack pointer offset before function call for local variables start at tests/test.go:82:22
-  SUBQ $48, SP
+  //--- ##LINKER##TODO: Fix offset in next line using function in line after the next at tests/test.go:82:22
+  SUBQ $40, SP
   //--- Stack pointer offset before function call for local variables end at tests/test.go:82:22
   CALL main·bazz_fwd(SB)
   //--- Stack pointer offset after function call for local variables start at tests/test.go:82:22
-  ADDQ $48, SP
+  //--- ##LINKER##TODO: Fix offset in next line using function in line after the next at tests/test.go:82:22
+  ADDQ $40, SP
   //--- Stack pointer offset after function call for local variables end at tests/test.go:82:22
   MOVQ ##main·bazz_fwd##-100032(SP), R8
   MOVQ R8, -8(SP)
@@ -461,16 +463,18 @@ TEXT main·foo_fwd(SB),0,$0-0
   //--- First parameter expression start at tests/test.go:87:22
   //--- First parameter expression load start at tests/test.go:87:22
   //--- First parameter expression load end at tests/test.go:87:22
-  MOVB $1, ##main·bazz_fwd##-100024(SP)
+  MOVB $1, ##main·bazz_fwd##-100008(SP)
   //--- First parameter expression end at tests/test.go:87:22
   //--- Stack pointer offset before function call for local variables start at tests/test.go:87:22
-  SUBQ $24, SP
+  //--- ##LINKER##TODO: Fix offset in next line using function in line after the next at tests/test.go:87:22
+  SUBQ $8, SP
   //--- Stack pointer offset before function call for local variables end at tests/test.go:87:22
   CALL main·bazz_fwd(SB)
   //--- Stack pointer offset after function call for local variables start at tests/test.go:87:22
-  ADDQ $24, SP
+  //--- ##LINKER##TODO: Fix offset in next line using function in line after the next at tests/test.go:87:22
+  ADDQ $8, SP
   //--- Stack pointer offset after function call for local variables end at tests/test.go:87:22
-  MOVQ ##main·bazz_fwd##-100016(SP), R8
+  MOVQ ##main·bazz_fwd##-100000(SP), R8
   MOVQ R8, -8(SP)
   //--- Assignment end at tests/test.go:87:23
   RET
