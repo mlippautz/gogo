@@ -115,7 +115,22 @@ func FixOffset(ld *LineDesc) string {
         }
     }
     if ld.NeedsFix == 2 { // Type 2 fix of offsets
-
+        strLen = libgogo.StringLength(ld.Line);
+        size = GetParameterSize(ld.PackageName, ld.FunctionName);
+        for i = 0; ld.Line[i] != '$' ; i = i +1 {
+            libgogo.CharAppend(&newLine, ld.Line[i]);
+        }
+        libgogo.CharAppend(&newLine, ld.Line[i]);
+        for i = i+1 /*Dismiss '-'*/ ;ld.Line[i]!=',';i=i+1 {
+            libgogo.CharAppend(&numstr, ld.Line[i]);
+        }
+        oldsize = libgogo.StringToInt(numstr);
+        size = size + oldsize;
+        numstr = libgogo.IntToString(size);
+        libgogo.StringAppend(&newLine, numstr);
+        for ; i < strLen; i = i +1 {
+            libgogo.CharAppend(&newLine, ld.Line[i]);
+        }
     }
 
     ld.NeedsFix = 0;
