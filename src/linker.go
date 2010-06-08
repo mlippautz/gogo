@@ -81,7 +81,7 @@ func ParseLine(ld *LineDesc) {
 }
 
 func GetParameterSize(packageName string, functionName string) uint64 {
-    return 16;
+    return 48;
 }
 
 //
@@ -110,7 +110,6 @@ func FixOffset(ld *LineDesc) string {
         size = size - 100000;
         numstr = libgogo.IntToString(size);
         libgogo.StringAppend(&newLine, numstr);
-        libgogo.CharAppend(&newLine,'(');
         for ; i < strLen; i = i +1 {
             libgogo.CharAppend(&newLine, ld.Line[i]);
         }
@@ -156,8 +155,8 @@ func Link() {
                 libgogo.PrintString(newLine);
                 libgogo.PrintString("\n");
             } else {
-                libgogo.PrintString(ld.Line);
-                libgogo.PrintString("\n");
+                //libgogo.PrintString(ld.Line);
+                //libgogo.PrintString("\n");
             }
 
         }
