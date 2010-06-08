@@ -346,7 +346,7 @@ func NewFunction(name string, packagename string, forwarddecl uint64) *libgogo.T
         if TempType != nil {
             if TempType.ForwardDecl == 1 { //Unset forward declaration
                 TempType.ForwardDecl = forwarddecl;
-                DontAppend = 1;
+                DontAppend = 1; //Don't add function again
             } else {
                 SymbolTableError("duplicate function", name, "in package", name);
             }

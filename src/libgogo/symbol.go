@@ -20,7 +20,7 @@ type TypeDesc struct {
     Form uint64;
     Len uint64;
     Fields *ObjectDesc;
-    Base *TypeDesc;
+    Base *TypeDesc; //If Form=FORM_FUNCTION, a value unequal nil indicates that the function has been called at least once
     Next *TypeDesc;
 };
 
