@@ -1269,6 +1269,14 @@ func ParseExpressionList(FunctionCalled *libgogo.TypeDesc, TotalParameterSize ui
             SymbolTableError("Function expects", "no", "parameters:", FullFunctionName);
         }
         ParameterLHSObject = libgogo.GetParameterAt(paramCount, FunctionCalled);
+        if FunctionCalled.ForwardDecl == 1 { //Parameter type up-conversion
+            if (ParameterLHSObject.ObjType == byte_t) && (ParameterLHSObject.PtrType == 0) && (ExprItem.Itemtype == uint64_t) && (ExprItem.PtrType == 0) { //If previous forward declaration of this parameter was of type byte, it is possible that is was a byte constant and is now of type uint64 => set to type uint64 in declaration
+                ParameterLHSObject.ObjType = uint64_t;
+            }
+            if (ParameterLHSObject.ObjType == nil) && (ParameterLHSObject.PtrType == 1) && (ExprItem.PtrType == 1) { //If previous forward declaration of this parameter was of type unspecified pointer, it was nil and is now of type *rhs_type => set to type of RHS in declaration
+                ParameterLHSObject.ObjType = ExprItem.Itemtype;
+            }
+        }
         Parameter = ObjectToStackParameter(ParameterLHSObject, FunctionCalled, TotalParameterSize);
         GenerateAssignment(Parameter, ExprItem, boolFlag); //Assignment
         GenerateComment("First parameter expression end");
@@ -1330,6 +1338,14 @@ func ParseExpressionListSub(FunctionCalled *libgogo.TypeDesc, TotalParameterSize
                 libgogo.AddParameters(TempObject, FunctionCalled); //Add a new, artificial parameter
             }
             ParameterLHSObject = libgogo.GetParameterAt(ParameterIndex, FunctionCalled);
+            if FunctionCalled.ForwardDecl == 1 { //Parameter type up-conversion
+                if (ParameterLHSObject.ObjType == byte_t) && (ParameterLHSObject.PtrType == 0) && (ExprItem.Itemtype == uint64_t) && (ExprItem.PtrType == 0) { //If previous forward declaration of this parameter was of type byte, it is possible that is was a byte constant and is now of type uint64 => set to type uint64 in declaration
+                    ParameterLHSObject.ObjType = uint64_t;
+                }
+                if (ParameterLHSObject.ObjType == nil) && (ParameterLHSObject.PtrType == 1) && (ExprItem.PtrType == 1) { //If previous forward declaration of this parameter was of type unspecified pointer, it was nil and is now of type *rhs_type => set to type of RHS in declaration
+                    ParameterLHSObject.ObjType = ExprItem.Itemtype;
+                }
+            }
             Parameter = ObjectToStackParameter(ParameterLHSObject, FunctionCalled, TotalParameterSize);
             GenerateAssignment(Parameter, ExprItem, boolFlag); //Assignment
             GenerateComment("Subsequent parameter expression end");
