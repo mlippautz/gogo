@@ -32,7 +32,7 @@
     Lorem ipsum dolor sit amet...
 
   \chapter{Input Language}
-    Go is a programming language developed by Google, based on a C like syntax and fully specified in \cite{var10}. The input language follows the one defined by Go. This results in programs being able to be compiled by the official Go compilers and GoGo.
+    Go is a programming language developed by Google, based on a C like syntax and fully specified in \cite{goo10}. The input language follows the one defined by Go. This results in programs being able to be compiled by the official Go compilers and GoGo.
 
     \section{Differences to Go}
       \begin{enumerate}
@@ -167,7 +167,8 @@ go_program = package_stmt import_stmt_list struct_decl_list
       Lorem ipsum dolor sit amet...
 
     \section{Register allocation}
-      Lorem ipsum dolor sit amet...
+        The target architecture provides 8 general purpose registers (\texttt{R8}-\texttt{R15}) as well as the registers \texttt{RAX}, \texttt{RBX}, \texttt{RCX} and \texttt{RDX}\cite{int09}. The latter are not being used by GoGo to store variables as their values may change when performing arithmetical operations (p.e. \texttt{RAX} and \texttt{RDX} are always used as the destination registers for multiplications), thus possibly overwriting values previously stored there.\\
+        GoGo stores a list for every one of the 8 registers currently free, returning the first free register if required by the code generator. Whenever a register is no longer required (freed), it will be reinserted into the "free" list in order to make it available for future use. Due to the limited amout of registers, the list described is implemented in form of a bit array in the compiler.
 
     \section{The generation of arithmetical expressions}
       Lorem ipsum dolor sit amet...
@@ -185,19 +186,43 @@ go_program = package_stmt import_stmt_list struct_decl_list
       Lorem ipsum dolor sit amet...
 
     \section{Global variable initialization}
-      Lorem ipsum dolor sit amet...
+        Besides the compiled functions from the input file, the code segment contains a function called main.init which performs the initialization of global variables. In contrast to local variables which can be initialized directly at point of their declaration, global variables need to be initialized before any other methods are called, thus requiring the main.init function.\\
+        Global variables in general are stored in the data segment, called \texttt{data} in the output. They are addressed by their corresponding symbol table offsets relative to the beginning of the data segment. For the special treatment of string constants, please refer to the next section.
 
     \section{String constants}
-      Lorem ipsum dolor sit amet...
+        Strings in Go are 16 bytes in size, containing an 8 byte address (pointer) to its character buffer and an 8 byte length (of which only 4 bytes are used). This makes string length calculations unnecessary and also explains why strings in Go are read-only and have to be reallocated when being changed.\\
+        Whenever a string constant is found in the input code, a new byte array with the string's length is declared and initialized with the string's characters. Next, another 16 bytes are allocated which represent the actual string. Using the main.init function as described in the previous section, the string's length and the previously allocated byte array address are assigned to the according offsets of the string in the data segment. When assigning the string constant (or using it as a parameter), an item representing a data segment variable with the string's address is used, therefore eliminating the need for any further special treatment.
 
   \chapter{Library and run time}
-    Lorem ipsum dolor sit amet...
+    In order to be able to perform I/O operations and memory management, a library called libgogo is implemented which wraps Linux syscalls and provides an easy to use interface to the GoGo compiler. As GoGo generates assembly code for 64 bit Linux operating systems and the Go compiler allows to mix assembly and Go code, the operating system's built-in functions can be used via syscalls in order to provide the functionality described above.
 
     \section{I/O syscalls}
-      Lorem ipsum dolor sit amet...
+      Besides read and write operations to files (and the console), exiting the program as well as opening and closing files requires the use of syscalls. On Linux 64 bit operating systems with Intel architecture, these syscalls can be invoked by the assembly mnemonic \texttt{SYSCALL} where the register \texttt{RAX} contains the syscall number defining the syscall, and the registers \texttt{RDI}, \texttt{RSI} and \texttt{RDX} contain the first, second and third parameter respectively\cite{var08}.\\
+      The following table lists the syscalls used by libgogo, together with the value of \texttt{RAX} representing the syscall number. The latter were derived from the constants defined in \texttt{/usr/src/linux-headers-2.6.32-22/arch/x86/include/asm/unistd\_64.h} of the current Linux kernel source\cite{var10}. The syscall function prototypes (for semantics and formal parameters) were derived from the corresponding Linux man pages (see \cite{var97} and others).\\
+      \begin{tabular}{|c|c|c|}
+        \hline
+        Syscall number (\texttt{RAX}) & Syscall function & Purpose\\ \hline
+        0 & \texttt{sys\_read} & Reads from a file\\ \hline
+        1 & \texttt{sys\_write} & Writes to a file\\ \hline
+        2 & \texttt{sys\_open} & Opens a file\\ \hline
+        3 & \texttt{sys\_close} & Closes a file\\ \hline
+        12 & \texttt{sys\_brk} & See next section\\ \hline
+        60 & \texttt{sys\_exit} & Exits the program\\ \hline
+        %\caption{List of syscalls used in libgogo, based on \var{var10}}
+      \end{tabular}
 
     \section{The memory manager}
-      Lorem ipsum dolor sit amet...
+      Libgogo provides a very simple memory manager using a bump pointer which can allocate, but not free memory. By using the \texttt{sys\_brk}\cite{var97} function, the memory manager expands the data segment of the running program in steps of 10 KB if necessary in order to deal with subsequent allocations.\\
+      As the Go compiler used for boot strapping uses a custom memory manager in its run time environment, the libgogo memory manager and the GoGo compiler take measures to avoid conflicts with the former. First and foremost, all implicit and explicit memory allocations in the GoGo compiler rely on the libgogo memory manager in order to keep the amount of memory allocated by the Go run time constant. Additionally, the memory manager does not allocate any memory in the original data segment to not overwrite any string constants or other information stored there by the Go run time. This is achieved by directly expanding the data segment during the initialization of the libgogo memory manager which also allows to store the first address allocated, thus being able to distinguish between memory allocated by the libgogo memory manager and memory allocated by the Go run time.
+
+    \section{String memory management}
+      Based on the memory manager described above, functions to copy and append strings are implemented in libgogo. As strings in Go are read-only once they are created (or appended), subsequent appending operands require the string to be entirely copied to a new memory location first. In order to avoid this in most cases, the functions handling string appending in libgogo allocate more memory than needed for the current operation in order to be able to reuse this memory in subsequent append operations if the string appended is short enough to fit in the memory already allocated.\\
+      Empirical testing showed that it is most convenient to allocate the next power of two of the string length required (p.e. 16 if 9 bytes are initially required). This reduces the number of copy operations and thus memory consumption by more than a power of 10 for very large strings and small appended string (which is common appending code output).\\
+      The string manager also has to take care of strings which have been allocated by the Go run time as those strings don't have any "spare" bytes left. Thus, a reallocation of memory for these strings is necessary and cannot be avoided. Subsequent allocations (after the reallocation) can then be dealt with as described above, leading to the performance gains mentioned. The distinction between strings allocated by the Go run time and the libgogo memory manager can be performed easily by comparing the string's address with the first address available to the libgogo memory manager as described in the previous section. If the string's address is smaller, the string is not yet managed by the libgogo memory manager.
+        
+    \section{Program parameter determination}
+      Usually, a program's parameters are accessible through \texttt{argc} and \texttt{argv}, positioned on the stack as function parameters of the main (entry) function. As the Go compiler used for bootstrapping adds run time routines which are invoked before the main function, the parameters cannot be fetched from the stack as their position cannot be determined. The Go compiler allows to access these parameters using a separate package (library) which could not be used in order to remain independent of third party libraries.\\
+      The current approach to fetch parameters requires the activation of the \texttt{proc} file system in the Linux kernel which is enabled by default in most Linux distributions\cite{var06}. The \texttt{proc} file system allows (among other information) to access parameters of all processes running in the system, including the current process. The latter's parameters can be through the virtual file \texttt{/proc/self/cmdline} where \texttt{self} refers to the current process. The virtual file contains all parameters, separated by zero bytes and terminated by a sequence of two zero bytes. When parsed, this allows to access the program's parameters without having to access the stack.
 	
   \chapter{Building}
     Lorem ipsum dolor sit amet...
