@@ -31,7 +31,7 @@ func GenerateRawAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
         if RHSItem.PtrType != 1 {
             SymbolTableError("Cannot assign a value type to a pointer", "", "type:", RHSItem.Itemtype.Name);
         }
-        if LHSItem.Itemtype != RHSItem.Itemtype {
+        if (LHSItem.Itemtype != RHSItem.Itemtype) && (RHSItem.Itemtype != nil) { //Itemtype nil refers to the "nil" object
             SymbolTableError("Incompatible pointer types:", LHSItem.Itemtype.Name, "and", RHSItem.Itemtype.Name);
         }
     } else { //Value assignment
