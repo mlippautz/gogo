@@ -257,7 +257,7 @@ func NewVariable(name string) {
 		            SymbolTableError("duplicate", "parameter", "name", name);
 		        } else {
 		            CurrentObject.Class = libgogo.CLASS_PARAMETER;
-		            CurrentObject.PackageName = ""; //A parameter has no package name
+		            CurrentObject.PackageName = CurrentFunction.PackageName;
 		            libgogo.AddParameters(CurrentObject, CurrentFunction);
 		        }
 		    }
@@ -340,8 +340,12 @@ func ObjectToStackParameter(obj *libgogo.ObjectDesc, FunctionCalled *libgogo.Typ
 func NewFunction(name string, packagename string, forwarddecl uint64) *libgogo.TypeDesc {
     var TempType *libgogo.TypeDesc;
     var DontAppend uint64 = 0;
+    var NewFct *libgogo.TypeDesc;
     if Compile != 0 {
-		CurrentFunction = libgogo.NewType(name, packagename, forwarddecl, 0, nil);
+		NewFct = libgogo.NewType(name, packagename, forwarddecl, 0, nil);
+		if forwarddecl == 0 {
+		    CurrentFunction = NewFct;
+		}
         TempType = libgogo.GetType(name, packagename, GlobalFunctions, 1);
         if TempType != nil {
             if TempType.ForwardDecl == 1 { //Unset forward declaration
@@ -352,8 +356,8 @@ func NewFunction(name string, packagename string, forwarddecl uint64) *libgogo.T
             }
         }
         if DontAppend == 0 {
-            GlobalFunctions = libgogo.AppendType(CurrentFunction, GlobalFunctions);
+            GlobalFunctions = libgogo.AppendType(NewFct, GlobalFunctions);
         }
     }
-    return CurrentFunction;
+    return NewFct;
 }
