@@ -1252,6 +1252,13 @@ func ParseExpressionList(FunctionCalled *libgogo.TypeDesc, TotalParameterSize ui
             TempObject = libgogo.NewObject("Artificial parameter", "", libgogo.CLASS_PARAMETER);
             TempObject.ObjType = ExprItem.Itemtype; //Derive type from expression
             TempObject.PtrType = ExprItem.PtrType; //Derive pointer type from expression
+            if boolFlag != 0 { //& in expression forces pointer type
+                if TempObject.PtrType == 0 {
+                    TempObject.PtrType = 1;
+                } else {
+                    SymbolTableError("& operator on pointer type not allowed,", "", "type: pointer to", ExprItem.Itemtype.Name);
+                }
+            }
             libgogo.AddParameters(TempObject, FunctionCalled); //Add a new, artificial parameter
         }
         if FunctionCalled.Len == 0 { //Check if function expects parameters
@@ -1313,6 +1320,13 @@ func ParseExpressionListSub(FunctionCalled *libgogo.TypeDesc, TotalParameterSize
                 TempObject = libgogo.NewObject("Artificial parameter", "", libgogo.CLASS_PARAMETER);
                 TempObject.ObjType = ExprItem.Itemtype; //Derive type from expression
                 TempObject.PtrType = ExprItem.PtrType; //Derive pointer type from expression
+                if boolFlag != 0 { //& in expression forces pointer type
+                    if TempObject.PtrType == 0 {
+                        TempObject.PtrType = 1;
+                    } else {
+                        SymbolTableError("& operator on pointer type not allowed,", "", "type: pointer to", ExprItem.Itemtype.Name);
+                    }
+                }
                 libgogo.AddParameters(TempObject, FunctionCalled); //Add a new, artificial parameter
             }
             ParameterLHSObject = libgogo.GetParameterAt(ParameterIndex, FunctionCalled);
