@@ -36,6 +36,8 @@ func GenerateIfStart(item *libgogo.Item, ed *ExpressionDescriptor) {
     if ed.T != 0 {
         PrintLabelWrapped(ed, 1 /*local*/, 1 /*positive*/, "END");
     }
+    item.C = 0;
+    FreeRegisterIfRequired(item);
 }
 
 func GenerateIfEnd(ed *ExpressionDescriptor) {

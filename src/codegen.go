@@ -33,6 +33,7 @@ func GetFreeRegister() uint64 {
     for i = 0; FreeRegisters[i] == 0; {
         i = i + 1;
         if i == NumRegisters {
+            PrintHead();
             libgogo.ExitError("No more free registers available for code generation", 5);
         }
     }
@@ -77,6 +78,7 @@ func RestoreUsedRegisters() {
     for i = NumRegisters - 1; i >= 0; i = i - 1 { //Reverse order (stack!)
         if FreeRegisters[i] == 0 {
             PrintInstruction_Reg("POP", 8, "R", i + 8, 0, 0, 0, "");
+            FreeRegisters[i] = 1;
         }
         if i == 0 { //Break on i = 0 as i-1 on uint64 yields to underflow
             break;
