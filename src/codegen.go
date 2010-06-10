@@ -78,7 +78,6 @@ func RestoreUsedRegisters() {
     for i = NumRegisters - 1; i >= 0; i = i - 1 { //Reverse order (stack!)
         if FreeRegisters[i] == 0 {
             PrintInstruction_Reg("POP", 8, "R", i + 8, 0, 0, 0, "");
-            FreeRegisters[i] = 1;
         }
         if i == 0 { //Break on i = 0 as i-1 on uint64 yields to underflow
             break;
