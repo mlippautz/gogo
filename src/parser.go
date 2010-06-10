@@ -565,7 +565,7 @@ func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
             }
             PutDataByte(startAddress + doneFlag, 0); //Add trailing 0
             GenerateComment("String buffer end");
-            SwitchOutputToCodeSegment(); //Reset to default output
+            //SwitchOutputToCodeSegment(); //Reset to default output
             
             tempString = libgogo.NewObject("tempString", ".internal", libgogo.CLASS_VAR); //Create object for actual string
             tempString.ObjType = string_t;
@@ -658,12 +658,12 @@ func ParseSelector(item *libgogo.Item, packagename string) {
 }
 
 func ParseSelector_FunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.TypeDesc {
-   var boolFlag uint64;
+   //var boolFlag uint64;
    PrintDebugString("Entering ParseSelector_FunctionCall()",1000);
-    for boolFlag = ParseSelectorSub_FunctionCall(FunctionCalled);
+    /*for boolFlag = ParseSelectorSub_FunctionCall(FunctionCalled);
         boolFlag == 0; 
         boolFlag = ParseSelectorSub_FunctionCall(FunctionCalled) {
-    }
+    }*/ ParseSelectorSub_FunctionCall(FunctionCalled);
     PrintDebugString("Leaving ParseSelector_FunctionCall()",1000);
     if ReturnedFunction != nil {
         FunctionCalled = ReturnedFunction;

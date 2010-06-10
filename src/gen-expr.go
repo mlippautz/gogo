@@ -201,7 +201,7 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
         }
 
         if (item1.Itemtype != item2.Itemtype) && (item1.Itemtype != string_t) && (item2.Itemtype != string_t) {
-            if (item1.PtrType == 1) && (item2.PtrType == 1) && (item1.Itemtype != nil || item2.Itemtype != nil) {
+            if (item1.PtrType == 1) && (item2.PtrType == 1) && ((item1.Itemtype != nil) || (item2.Itemtype != nil)) {
                 ;
             } else {
                 GenErrorWeak("Can only compare variables of same type.");
