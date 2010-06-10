@@ -90,7 +90,36 @@ func SwitchOutputToDataSegment() {
 }
 
 func PrintCodeOutput(output string) {
+    /*var whichSegment string;
+    var tempPtr *string;
+    var oldLength uint64;
+    var appendLength uint64;
+    var newLength uint64;
+    oldLength = libgogo.StringLength2(OutputStringPtr);
+    appendLength = libgogo.StringLength(output);*/
     libgogo.StringAppend(OutputStringPtr, output);
+    /*newLength = libgogo.StringLength2(OutputStringPtr);
+    tempPtr = &DataSegment;
+    if OutputStringPtr == tempPtr {
+        whichSegment = "data";
+    }
+    tempPtr = &CodeSegment;
+    if OutputStringPtr == tempPtr {
+        whichSegment = "code";
+    }
+    tempPtr = &InitCodeSegment;
+    if OutputStringPtr == tempPtr {
+        whichSegment = "init code";
+    }
+    libgogo.PrintString("DEBUG: ");
+    libgogo.PrintString(whichSegment);
+    libgogo.PrintString(" of length ");
+    libgogo.PrintNumber(oldLength);
+    libgogo.PrintString(" was extended by length ");
+    libgogo.PrintNumber(appendLength);
+    libgogo.PrintString(" to new length ");
+    libgogo.PrintNumber(newLength);
+    libgogo.PrintString("\n");*/
 }
 
 func PrintCodeOutputChar(output byte) {
