@@ -25,7 +25,12 @@ TEXT ·ToUint64FromBytePtr(SB),$0-16 //ToUint64FromBytePtr: 1 parameter, 1 retur
 
 TEXT ·ToUint64FromUint64Ptr(SB),$0-16 //ToUint64FromUint64Ptr: 1 parameter, 1 return value
   MOVQ 8(SP), AX //Move address to AX (first parameter => SP+64bit)
-  MOVQ AX, 16(SP) //Move address from BX to return value (return value after one parameter => SP+2*64bit)
+  MOVQ AX, 16(SP) //Move address from AX to return value (return value after one parameter => SP+2*64bit)
+  RET
+  
+TEXT ·ToUint64FromStringPtr(SB),$0-16 //ToUint64FromStringPtr: 1 parameter, 1 return value
+  MOVQ 8(SP), AX //Move address to AX (first parameter => SP+64bit)
+  MOVQ AX, 16(SP) //Move address from AX to return value (return value after one parameter => SP+2*64bit)
   RET
 
 TEXT ·GetStringFromAddress(SB),$0-16 //GetStringFromAddress: 1 parameter, 1 return value

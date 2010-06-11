@@ -10,8 +10,11 @@ import "./libgogo/_obj/libgogo"
 // Variables holding the compiled code and data segment (as assembly code)
 //
 var Header string; //Header
+var DataSegmentList libgogo.StringList;
 var DataSegment string; //Data section for global variables
+var InitCodeSegmentList libgogo.StringList;
 var InitCodeSegment string; //Global variable initialization code
+var CodeSegmentList libgogo.StringList;
 var CodeSegment string; //Actual code
 
 //
@@ -46,6 +49,10 @@ func ResetCode() {
 ");
     //InspectorGadget();
     InitCodeSegment = "TEXT main·init(SB),0,$0-0\n";
+    
+    libgogo.InitializeStringList(&DataSegmentList);
+    libgogo.InitializeStringList(&InitCodeSegmentList);
+    libgogo.InitializeStringList(&CodeSegmentList);
 }
 
 //
@@ -61,20 +68,33 @@ func PrintFile() {
     // mode: S_IWUSR | S_IRUSR | S_IRGRP => 416
     fd = libgogo.FileOpen2(outfile,577,416);
 
-    libgogo.StringAppend(&DataSegment, "GLOBL data(SB),$");
-    DataSegmentSizeStr = libgogo.IntToString(DataSegmentSize);
-    libgogo.StringAppend(&DataSegment, DataSegmentSizeStr);
-    libgogo.StringAppend(&DataSegment, "\n");
-    libgogo.StringAppend(&InitCodeSegment,"  RET\n"); //End of function
-
     libgogo.WriteString(fd, Header);
     libgogo.WriteString(fd, "\n"); //Separator
-    libgogo.WriteString(fd, DataSegment);
+    PrintStringList(fd, &DataSegmentList);
+    libgogo.WriteString(fd, DataSegment); //Data segment
+    libgogo.WriteString(fd, "GLOBL data(SB),$"); //(Begin of) end of data segment
+    DataSegmentSizeStr = libgogo.IntToString(DataSegmentSize);
+    libgogo.WriteString(fd, DataSegmentSizeStr); //Size of data segment
+    libgogo.WriteString(fd, "\n"); //End of data segment
     libgogo.WriteString(fd, "\n"); //Separator
-    libgogo.WriteString(fd, InitCodeSegment);
+    PrintStringList(fd, &InitCodeSegmentList);
+    libgogo.WriteString(fd, InitCodeSegment); //main.init
+    libgogo.WriteString(fd, "  RET\n"); //End of function (main.init)
     libgogo.WriteString(fd, "\n"); //Separator
-    libgogo.WriteString(fd, CodeSegment);
+    PrintStringList(fd, &CodeSegmentList);
+    libgogo.WriteString(fd, CodeSegment); //Code segment
     libgogo.FileClose(fd);
+}
+
+func PrintStringList(fd uint64, list *libgogo.StringList) {
+    var i uint64;
+    var n uint64;
+    var temp string;
+    n = libgogo.GetStringListItemCount(list);
+    for i = 0; i < n; i = i + 1 {
+        temp = libgogo.GetStringItemAt(list, i);
+        libgogo.WriteString(fd, temp);
+    }
 }
 
 func SwitchOutputToInitCodeSegment() {
@@ -90,36 +110,30 @@ func SwitchOutputToDataSegment() {
 }
 
 func PrintCodeOutput(output string) {
-    /*var whichSegment string;
     var tempPtr *string;
     var oldLength uint64;
     var appendLength uint64;
-    var newLength uint64;
     oldLength = libgogo.StringLength2(OutputStringPtr);
-    appendLength = libgogo.StringLength(output);*/
+    appendLength = libgogo.StringLength(output);
+    if oldLength + appendLength >= 65535 { //If code output exceeds max. string size allowed by Go runtime...
+        tempPtr = &DataSegment;
+        if OutputStringPtr == tempPtr {
+            libgogo.AddStringItem(&DataSegmentList, DataSegment); //...save the current code to the code list...
+            //DataSegment = "";
+        }
+        tempPtr = &InitCodeSegment;
+        if OutputStringPtr == tempPtr {
+            libgogo.AddStringItem(&InitCodeSegmentList, InitCodeSegment); //...save the current code to the code list...
+            //InitCodeSegment = "";
+        }
+        tempPtr = &CodeSegment;
+        if OutputStringPtr == tempPtr {
+            libgogo.AddStringItem(&CodeSegmentList, CodeSegment); //...save the current code to the code list...
+            //CodeSegment = ""; 
+        }
+        libgogo.ResetString(OutputStringPtr); //... and start over with a new output string
+    }
     libgogo.StringAppend(OutputStringPtr, output);
-    /*newLength = libgogo.StringLength2(OutputStringPtr);
-    tempPtr = &DataSegment;
-    if OutputStringPtr == tempPtr {
-        whichSegment = "data";
-    }
-    tempPtr = &CodeSegment;
-    if OutputStringPtr == tempPtr {
-        whichSegment = "code";
-    }
-    tempPtr = &InitCodeSegment;
-    if OutputStringPtr == tempPtr {
-        whichSegment = "init code";
-    }
-    libgogo.PrintString("DEBUG: ");
-    libgogo.PrintString(whichSegment);
-    libgogo.PrintString(" of length ");
-    libgogo.PrintNumber(oldLength);
-    libgogo.PrintString(" was extended by length ");
-    libgogo.PrintNumber(appendLength);
-    libgogo.PrintString(" to new length ");
-    libgogo.PrintNumber(newLength);
-    libgogo.PrintString("\n");*/
 }
 
 func PrintCodeOutputChar(output byte) {

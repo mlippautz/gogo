@@ -27,6 +27,19 @@ func StringLength2(str *string) uint64;
 func GetStringAddress(str *string) uint64;
 
 //
+// Allocates a new, empty byte array for a string
+//
+func ResetString(str *string) {
+    var nullByte byte = 0; //End of string constant
+    var nullByte_addr uint64;
+    var n uint64;
+    n = Alloc(1);
+    nullByte_addr = ToUint64FromBytePtr(&nullByte);
+    CopyMem(n, nullByte_addr, 1);
+    SetStringAddressAndLength(str, n, 0); //New string with length 0
+}
+
+//
 // Compares to strings and returns 0 for equality and 1 otherwise
 //
 func StringCompare(str1 string, str2 string) uint64 {
