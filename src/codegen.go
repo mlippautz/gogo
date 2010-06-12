@@ -96,6 +96,9 @@ func FreeRegisterIfRequired(item *libgogo.Item) {
             FreeRegister(item.C);
         }
     }
+    if (item.Mode == libgogo.MODE_COND) && (item.R != 0) {
+        FreeRegister(item.R);
+    }
 }
 
 //

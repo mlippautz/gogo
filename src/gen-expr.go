@@ -174,6 +174,7 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
                 GenErrorWeak("Relative AND or OR expected.");
             }
         }
+        FreeRegisterIfRequired(item);
     }
 }
 
@@ -182,7 +183,6 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
 // Note: This function can only handle operands with a maximum of 8 bytes in size
 //
 func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
-    var cTemp uint64;
     if Compile != 0 {   
         // Type/Pointer checking
 
@@ -318,10 +318,7 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
             item1.C = libgogo.REL_GTE;
         }
 
-        cTemp = item1.C;
-        item2.C = 0;
         FreeRegisterIfRequired(item1);
-        item1.C = cTemp;
         FreeRegisterIfRequired(item2);
     }
 }

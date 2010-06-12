@@ -37,7 +37,6 @@ func GenerateForStart(item *libgogo.Item, ed *ExpressionDescriptor) {
         PrintLabelWrapped(ed, 1 /*local*/, 1 /*positive*/, "END");
     }
 
-    item.C = 0;
     FreeRegisterIfRequired(item);
 }
 
