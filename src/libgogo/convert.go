@@ -33,6 +33,12 @@ func ToUint64FromBytePtr(char *byte) uint64;
 func ToUint64FromUint64Ptr(value *uint64) uint64;
 
 //
+// Converts an unsigned 64-bit integer to a pointer
+// Implemented in assembler (see corresponding .s file)
+//
+func ToUint64PtrFromUint64(value uint64) *uint64;
+
+//
 // Converts a string pointer to an unsigned 64-bit integer
 // Implemented in assembler (see corresponding .s file)
 //
