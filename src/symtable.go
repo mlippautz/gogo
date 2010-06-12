@@ -419,3 +419,146 @@ func PackageFunctionToNameFunction(PackageFunction *libgogo.TypeDesc) *libgogo.T
     PackageFunction.Base = tempFcn.Base;
     return ReturnedFunction;
 }
+
+func VariableOrFieldAccess(item *libgogo.Item, packagename string, name string) {
+    var boolFlag uint64;
+    var tempObject *libgogo.ObjectDesc;
+    var tempList *libgogo.ObjectDesc;
+    if (item.Itemtype == nil) && (item.A == 0) && (item.R == 0) { //Item undefined, only package known => Find object
+        tempObject = libgogo.GetObject(name, packagename, LocalObjects); //Check local objects
+	    tempList = LocalObjects;
+	    if tempObject == nil {
+	        tempObject = libgogo.GetObject(name, packagename, GlobalObjects); //Check global objects
+	        tempList = GlobalObjects;
+	    }
+	    if tempObject == nil {
+	        SymbolTableError("Package", packagename, "has no variable named", name);
+	    }
+	    if tempList == LocalObjects { //Local
+	        VariableObjectDescToItem(tempObject, item, 0); //Local variable
+	    } else { //Global
+	        VariableObjectDescToItem(tempObject, item, 1); //Global variable
+  	    }
+    } else { //Field access
+        if Compile != 0 {
+            if item.Itemtype == nil {
+                SymbolTableError("Type has", "no", "fields:", "?");
+            }
+            if item.Itemtype.Form != libgogo.FORM_STRUCT { //Struct check
+                SymbolTableError("Type is", "not a", "struct:", item.Itemtype.Name);
+            } else {
+                boolFlag = libgogo.HasField(name, item.Itemtype);
+                if boolFlag == 0 { //Field check
+                    SymbolTableError("Type", item.Itemtype.Name, "has no field named", name);
+                } else {
+                    tempObject = libgogo.GetField(name, item.Itemtype);
+                    boolFlag = libgogo.GetFieldOffset(tempObject, item.Itemtype); //Calculate offset
+                    GenerateFieldAccess(item, boolFlag);
+                    item.Itemtype = tempObject.ObjType; //Set item type to field type
+                    item.PtrType = tempObject.PtrType;
+                }
+            }
+        }
+    }
+}
+
+func ArrayAccessCheck(item *libgogo.Item, packagename string)  {
+    var boolFlag uint64;
+    if Compile != 0 {
+        if (item.Itemtype == nil) && (item.A == 0) && (item.R == 0) {
+            SymbolTableError("No array access possible to", "", "package", packagename);
+        }
+        if item.Itemtype.Form != libgogo.FORM_ARRAY { //Array check
+            SymbolTableError("Type is", "not an", "array:", item.Itemtype.Name);
+        }
+        if item.Itemtype == string_t { //Derefer string address at offset 0 to access actual byte array of characters
+            boolFlag = item.PtrType; //Save old value of PtrType
+            item.PtrType = 1; //Force deref.
+            DereferItemIfNecessary(item); //Actual deref.
+            item.PtrType = boolFlag; //Restore old value of PtrType
+        }
+    }
+}
+
+func FindIdentifierAndParseSelector(item *libgogo.Item) {
+    var boolFlag uint64;
+    var tempObject *libgogo.ObjectDesc;
+    var tempList *libgogo.ObjectDesc;
+    var packagename string;
+    if Compile != 0 {
+		//Token can be package name
+		boolFlag = libgogo.FindPackageName(tok.strValue, GlobalObjects); //Check global objects
+		if boolFlag == 0 {
+		    boolFlag = libgogo.FindPackageName(tok.strValue, LocalObjects); //Check local objects
+		}
+		if (boolFlag == 0) && (CurrentFunction != nil) {
+		    boolFlag = libgogo.FindPackageName(tok.strValue, CurrentFunction.Fields); //Check local parameters
+		}
+		if boolFlag == 0 { //Token is not package name, but identifier
+			tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, LocalObjects); //Check local objects
+			tempList = LocalObjects;
+			if tempObject == nil {
+                if CurrentFunction != nil {
+           			tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, CurrentFunction.Fields); //Check local parameters
+        			tempList = CurrentFunction.Fields;
+    			}
+    			if tempObject == nil {
+    				tempObject = libgogo.GetObject(tok.strValue, CurrentPackage, GlobalObjects); //Check global objects
+	    			tempList = GlobalObjects;
+	    		}
+			}
+			if tempObject == nil {
+				SymbolTableError("Undefined", "", "variable", tok.strValue);
+			}
+			if tempList == LocalObjects { //Local
+    			VariableObjectDescToItem(tempObject, item, 0); //Local variable
+			} else { //Global or parameter
+			    if tempList == GlobalObjects { //Global
+    				VariableObjectDescToItem(tempObject, item, 1); //Global variable
+    			} else { //Parameter
+    				VariableObjectDescToItem(tempObject, item, 2); //Local parameter
+    	        }
+			}
+		    ParseSelector(item, CurrentPackage); //Parse selectors for an object in the current package
+		} else { //Token is package name
+		    libgogo.SetItem(item, 0, nil, 0, 0, 0, 0); //Mark item as not being set
+		    packagename = tok.strValue; //Save package name
+		    ParseSelector(item, tok.strValue); //Parse selectors for an undefined object in the given package
+		    if (item.Itemtype == nil) && (item.A == 0) && (item.R == 0) {
+		        SymbolTableError("Cannot use package", "", "as a variable:", packagename);
+		    }
+		}
+    } else {
+        ParseSelector(item, CurrentPackage);
+    }
+}
+
+func FindIdentifierAndParseSelector_FunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.TypeDesc {
+    var boolFlag uint64;
+    var tempFcn *libgogo.TypeDesc;
+    if Compile != 0 {
+		//Token can be package name
+		boolFlag = libgogo.FindTypePackageName(tok.strValue, GlobalFunctions); //Check global functions
+		if boolFlag == 0 { //Token is not package name, but identifier
+			tempFcn = libgogo.GetType(tok.strValue, CurrentPackage, GlobalFunctions, 1); //Check global functions
+            if tempFcn == nil { //New forward declaration
+                FunctionCalled.PackageName = tok.strValue; //Set package name
+                tempFcn = ParseSelector_FunctionCall(FunctionCalled); //Parse selector for an undefined function in the given package
+                boolFlag = libgogo.StringLength(tempFcn.Name);
+                if boolFlag == 0 {
+		            SymbolTableError("Cannot use package", "", "as a function:", tempFcn.PackageName);
+		        }
+            } //else: tempFcn is already the return value
+        } else { //Token is package name
+            FunctionCalled.PackageName = tok.strValue; //Set package name
+            tempFcn = ParseSelector_FunctionCall(FunctionCalled); //Parse selector for an undefined function in the given package
+            boolFlag = libgogo.StringLength(tempFcn.Name);
+            if boolFlag == 0 {
+		        SymbolTableError("Cannot use package", "", "as a function:", tempFcn.PackageName);
+		    }
+        }
+    } else {
+        tempFcn = ParseSelector_FunctionCall(FunctionCalled);
+    }
+    return tempFcn;
+}
