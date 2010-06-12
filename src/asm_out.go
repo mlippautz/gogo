@@ -146,6 +146,35 @@ func PrintCodeOutputValue(value uint64) {
     PrintCodeOutput(temp);
 }
 
+func GenerateComment(msg string) {
+    var str string = "";
+    var tmpPtr *string;
+    var temp string;
+    var i uint64;
+    var n uint64;
+    if DEBUG_LEVEL >= 10 {
+        tmpPtr = &DataSegment;
+        if (OutputStringPtr != tmpPtr) {
+            str = "  //--- ";
+        } else { //No indentation in data segment
+            str = "//--- ";
+        }
+        n = libgogo.StringLength(msg);
+        for i = 0; i < n; i = i + 1 {
+            if msg[i] == 10 { //Unescape line breaks in comments to avoid invalid assembly code
+                libgogo.StringAppend(&str, "\\n"); //Literal \n, not actual \n
+            } else {
+                libgogo.CharAppend(&str, msg[i]);
+            }
+        }
+        libgogo.StringAppend(&str, " at ");
+        temp = BuildHead();
+        libgogo.StringAppend(&str, temp);
+        libgogo.StringAppend(&str, "\n");
+        PrintCodeOutput(str);
+    }
+}
+
 func PrintRegister(name string, number uint64, indirect uint64, offset uint64, negativeoffset uint64, optionaloffsetname string) {
     var R uint64;
     if indirect != 0 {
@@ -283,11 +312,10 @@ func PrintInstruction_Imm_Var(op string, value uint64, variable *libgogo.Item) {
             PrintInstruction_Imm_Reg(op, opsize, value, "SP", 0, 1, variable.A + 8, 0, ""); //OP $value, [variable.A+8](SP)
         } else { //Local
             temp = libgogo.StringLength(variable.LinkerInformation);
-            if temp == 0 {
-                PrintInstruction_Imm_Reg(op, opsize, value, "SP", 0, 1, variable.A + 8, 1, ""); //OP $value, -[variable.A+8](SP)
-            } else {
-                PrintInstruction_Imm_Reg(op, opsize, value, "SP", 0, 1, variable.A + 8, 1, variable.LinkerInformation); //OP $value, ##LINKER_TODO##-[variable.A+8](SP)
+            if temp != 0 {
+                GenerateComment(variable.LinkerInformation);
             }
+            PrintInstruction_Imm_Reg(op, opsize, value, "SP", 0, 1, variable.A + 8, 1, ""); //OP $value, -[variable.A+8](SP)
         }
     }
 }
@@ -303,11 +331,10 @@ func PrintInstruction_Var_Imm(op string, variable *libgogo.Item, value uint64) {
             PrintInstruction_Reg_Imm(op, opsize, "SP", 0, 1, variable.A + 8, 0, "", value); // OP [variable.A+8](SP), $value
         } else { //Local
             temp = libgogo.StringLength(variable.LinkerInformation);
-            if temp == 0 {
-                PrintInstruction_Reg_Imm(op, opsize, "SP", 0, 1, variable.A + 8, 1, "", value); // OP -[variable.A+8](SP), $value
-            } else {
-                PrintInstruction_Reg_Imm(op, opsize, "SP", 0, 1, variable.A + 8, 1, variable.LinkerInformation, value); // OP ##LINKER_TODO##-[variable.A+8](SP), $value
+            if temp != 0 {
+                GenerateComment(variable.LinkerInformation);
             }
+            PrintInstruction_Reg_Imm(op, opsize, "SP", 0, 1, variable.A + 8, 1, "", value); // OP -[variable.A+8](SP), $value
         }
     }
 }
@@ -330,17 +357,15 @@ func PrintInstruction_Reg_Var(op string, regname string, regnumber uint64, optre
             }
         } else { //Local
             temp = libgogo.StringLength(variable.LinkerInformation);
-            if temp == 0 {
-                retVal = PrintInstruction_Reg_Reg(op, opsize, regname, regnumber, 0, 0, 0, "", "SP", 0, 1, variable.A + 8, 1, ""); //OP regname_regnumber, -[variable.A+8](SP)
-            } else {
-                retVal = PrintInstruction_Reg_Reg(op, opsize, regname, regnumber, 0, 0, 0, "", "SP", 0, 1, variable.A + 8, 1, variable.LinkerInformation); //OP regname_regnumber, ##LINKER_TODO##-[variable.A+8](SP)
+            if temp != 0 {
+                GenerateComment(variable.LinkerInformation);
             }
+            retVal = PrintInstruction_Reg_Reg(op, opsize, regname, regnumber, 0, 0, 0, "", "SP", 0, 1, variable.A + 8, 1, ""); //OP regname_regnumber, -[variable.A+8](SP)
             if retVal != 0 { //Handle operands > 8 bytes
-                if temp == 0 {
-                    PrintInstruction_Reg_Reg(op, retVal, optregname, optregnumber, 0, 0, 0, "", "SP", 0, 1, variable.A, 1, ""); //OP optregname_optregnumber, -[variable.A+8-8](SP)
-                } else {
-                    PrintInstruction_Reg_Reg(op, retVal, optregname, optregnumber, 0, 0, 0, "", "SP", 0, 1, variable.A, 1, variable.LinkerInformation); //OP optregname_optregnumber, ##LINKER_TODO##-[variable.A+8-8](SP)
+                if temp != 0 {
+                    GenerateComment(variable.LinkerInformation);
                 }
+                PrintInstruction_Reg_Reg(op, retVal, optregname, optregnumber, 0, 0, 0, "", "SP", 0, 1, variable.A, 1, ""); //OP optregname_optregnumber, -[variable.A+8-8](SP)
             }
         }
     }
@@ -364,17 +389,15 @@ func PrintInstruction_Var_Reg(op string, variable *libgogo.Item, regname string,
             }
         } else { //Local
             temp = libgogo.StringLength(variable.LinkerInformation);
-            if temp == 0 {
-                retVal = PrintInstruction_Reg_Reg(op, opsize, "SP", 0, 1, variable.A + 8, 1, "", regname, regnumber, 0, 0, 0, ""); //OP -[variable.A+8](SP), regname_regnumber
-            } else {
-                retVal = PrintInstruction_Reg_Reg(op, opsize, "SP", 0, 1, variable.A + 8, 1, variable.LinkerInformation, regname, regnumber, 0, 0, 0, ""); //OP ##LINKER_TODO##-[variable.A+8](SP), regname_regnumber
+            if temp != 0 {
+                GenerateComment(variable.LinkerInformation);
             }
+            retVal = PrintInstruction_Reg_Reg(op, opsize, "SP", 0, 1, variable.A + 8, 1, "", regname, regnumber, 0, 0, 0, ""); //OP -[variable.A+8](SP), regname_regnumber
             if retVal != 0 { //Handle operands > 8 byte
-                if temp == 0 {
-                    PrintInstruction_Reg_Reg(op, retVal, "SP", 0, 1, variable.A, 1, "", optregname, optregnumber, 0, 0, 0, ""); //OP -[variable.A+8-8](SP), optregname_optregnumber
-                } else {
-                    PrintInstruction_Reg_Reg(op, retVal, "SP", 0, 1, variable.A, 1, variable.LinkerInformation, optregname, optregnumber, 0, 0, 0, ""); //OP ##LINKER_TODO##-[variable.A+8-8](SP), optregname_optregnumber
+                if temp != 0 {
+                    GenerateComment(variable.LinkerInformation);
                 }
+                PrintInstruction_Reg_Reg(op, retVal, "SP", 0, 1, variable.A, 1, "", optregname, optregnumber, 0, 0, 0, ""); //OP -[variable.A+8-8](SP), optregname_optregnumber
             }
         }
     }
@@ -395,9 +418,15 @@ func PrintLabel(label string) {
 }
 
 func PrintFunctionCall(packagename string, label string, stackoffset uint64, unknownoffset uint64) {
+    var comment string;
     GenerateComment("Stack pointer offset before function call for local variables start");
-    if unknownoffset != 0 {
-        GenerateComment("##LINKER##TODO: Fix offset in next line using function in line after the next");
+    if unknownoffset != 0 { //Output linker information
+        comment = "##2##";
+        libgogo.StringAppend(&comment, packagename);
+        libgogo.StringAppend(&comment, "·");
+        libgogo.StringAppend(&comment, label);
+        libgogo.StringAppend(&comment, "##");
+        GenerateComment(comment);
     }
     PrintInstruction_Imm_Reg("SUB", 8, stackoffset, "SP", 0, 0, 0, 0, ""); //SUBQ $stackoffset, SP
     GenerateComment("Stack pointer offset before function call for local variables end");
@@ -408,8 +437,8 @@ func PrintFunctionCall(packagename string, label string, stackoffset uint64, unk
     PrintCodeOutput("(SB)");
     PrintInstructionEnd();
     GenerateComment("Stack pointer offset after function call for local variables start");
-    if unknownoffset != 0 {
-        GenerateComment("##LINKER##TODO: Fix offset in next line using function in line after the next");
+    if unknownoffset != 0 { //Output linker information
+        GenerateComment(comment);
     }
     PrintInstruction_Imm_Reg("ADD", 8, stackoffset, "SP", 0, 0, 0, 0, ""); //ADDQ $stackoffset, SP
     GenerateComment("Stack pointer offset after function call for local variables end");
