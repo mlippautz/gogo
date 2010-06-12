@@ -24,7 +24,7 @@ type List struct {
 func InitializeList(uninitializedList *List, itemSize uint64) {
     uninitializedList.itemSize = itemSize;
     uninitializedList.capacity = 16; //Allocate 16 items by default
-    uninitializedList.baseAddress = Alloc(uninitializedList.capacity * uninitializedList.baseAddress);
+    uninitializedList.baseAddress = Alloc(uninitializedList.capacity * uninitializedList.itemSize);
     uninitializedList.itemCount = 0; //Reset item count (to zero)
 }
 
