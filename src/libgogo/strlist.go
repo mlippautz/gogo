@@ -19,8 +19,7 @@ type StringList struct {
 // Initializes the given string list
 //
 func InitializeStringList(uninitializedList *StringList) {
-    InitializeList(&uninitializedList.internalList);
-    SetListItemSize(&uninitializedList.internalList, 16); //A string has a size of 16 bytes
+    InitializeList(&uninitializedList.internalList, 16); //A string has a size of 16 bytes
 }
 
 //

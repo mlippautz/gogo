@@ -111,7 +111,7 @@ func main() {
 
   //Library test IX
   var list libgogo.List;
-  libgogo.InitializeList(&list);
+  libgogo.InitializeList(&list, 8);
   fmt.Printf("List initialized: item count: %d, capacity: %d\n", libgogo.GetListItemCount(&list), libgogo.GetListCapacity(&list));
   fmt.Printf("Putting the 20 values into the list\n");
   for val = 1; val <= 20; val++ {

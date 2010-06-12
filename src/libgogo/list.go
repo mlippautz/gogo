@@ -21,8 +21,8 @@ type List struct {
 //
 // Initializes the given list
 //
-func InitializeList(uninitializedList *List) {
-    uninitializedList.itemSize = 8; //Default size 64 bits = 8 bytes
+func InitializeList(uninitializedList *List, itemSize uint64) {
+    uninitializedList.itemSize = itemSize;
     uninitializedList.capacity = 16; //Allocate 16 items by default
     uninitializedList.baseAddress = Alloc(uninitializedList.capacity * uninitializedList.baseAddress);
     uninitializedList.itemCount = 0; //Reset item count (to zero)
@@ -96,11 +96,4 @@ func GetListItemCount(list *List) uint64 {
 //
 func GetListCapacity(list *List) uint64 {
     return list.capacity;
-}
-
-//
-// Sets the list's item size
-//
-func SetListItemSize(list *List, itemSize uint64) {
-    list.itemSize = itemSize;
 }
