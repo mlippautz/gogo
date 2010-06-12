@@ -153,6 +153,8 @@ func GenerateComment(msg string) {
     var str string = "";
     var tmpPtr *string;
     var temp string;
+    var i uint64;
+    var n uint64;
     if DEBUG_LEVEL >= 10 {
         tmpPtr = &DataSegment;
         if (OutputStringPtr != tmpPtr) {
@@ -160,7 +162,14 @@ func GenerateComment(msg string) {
         } else { //No indentation in data segment
             str = "//--- ";
         }
-        libgogo.StringAppend(&str, msg);
+        n = libgogo.StringLength(msg);
+        for i = 0; i < n; i = i + 1 {
+            if msg[i] == 10 { //Unescape line breaks in comments to avoid invalid assembly code
+                libgogo.StringAppend(&str, "\\n"); //Literal \n, not actual \n
+            } else {
+                libgogo.CharAppend(&str, msg[i]);
+            }
+        }
         libgogo.StringAppend(&str, " at ");
         temp = BuildHead();
         libgogo.StringAppend(&str, temp);
