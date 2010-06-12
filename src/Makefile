@@ -21,6 +21,8 @@ GOFILES=\
     gen-if.go\
     gen-cond.go\
     gen-for.go\
+    gen-const.go\
+    gen-fcn.go\
     linker.go\
     inspector.go
 

@@ -249,10 +249,8 @@ func ParseTypeOptional() {
         }
         SetCurrentObjectType(typename, packagename, arraydim);
         ReturnValuePseudoObject = CurrentObject;
-        if (Compile != 0) && (ReturnValuePseudoObject != nil) {
-            //TODO: Type check if function was forward decl.
-            libgogo.AddParameters(ReturnValuePseudoObject, CurrentFunction); //Treat return value like an additional parameter at the end of the parameter list
-            CurrentFunction.Len = CurrentFunction.Len - 1; //Don't count parameter as input parameter
+        if Compile != 0 {
+            AddReturnParameter(CurrentFunction, ReturnValuePseudoObject);
         }
     }
     PrintDebugString("Leaving ParseTypeOptional()",1000);
@@ -523,13 +521,6 @@ func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     var doneFlag uint64 = 1;
     var boolFlag uint64;
     var es [2]uint64;
-    var tempType *libgogo.TypeDesc;
-    var tempByteArray *libgogo.ObjectDesc;
-    var tempString *libgogo.ObjectDesc;
-    var startAddress uint64;
-    var LHSItem *libgogo.Item;
-    var RHSItem *libgogo.Item;
-    var s string;
 
     GetNextTokenSafe();
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
@@ -538,62 +529,13 @@ func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     } 
     if (doneFlag == 1) && (tok.id == TOKEN_INTEGER) {
         if Compile != 0 {
-            if (tok.intValue <= 255) { //Value fits into byte_t
-                libgogo.SetItem(item, libgogo.MODE_CONST, byte_t, 0, tok.intValue, 0, 0); //Constant item
-            } else { //Value does not fit into byte_t
-                libgogo.SetItem(item, libgogo.MODE_CONST, uint64_t, 0, tok.intValue, 0, 0); //Constant item
-            }
+            CreateIntegerConstant(tok.intValue, item);
         }
         doneFlag = 0;
     }
     if (doneFlag == 1) && (tok.id == TOKEN_STRING) {
         if Compile != 0 {
-            boolFlag = libgogo.StringLength(tok.strValue); //Compute length
-            tempType = libgogo.NewType("byteArray", ".internal", 0, boolFlag + 1, byte_t); //Create byte array type of according length (including trailing 0) to be able to address the characters
-            tempByteArray = libgogo.NewObject("tempByteArray", ".internal", libgogo.CLASS_VAR); //Create object of previously declared byte array type
-            tempByteArray.ObjType = tempType;
-            libgogo.AppendObject(tempByteArray, GlobalObjects); //Add byte array to global objects
-            startAddress = libgogo.GetObjectOffset(tempByteArray, GlobalObjects); //Calculate buffer start address
-            
-            SwitchOutputToDataSegment(); //Place content of byte array in data segment
-            s = "String buffer start ('";
-            libgogo.StringAppend(&s, tok.strValue);
-            libgogo.StringAppend(&s, "')");
-            GenerateComment(s); //Output string in comment
-            for doneFlag = 0; doneFlag < boolFlag; doneFlag = doneFlag + 1 { //Set values in data segment accordingly
-                PutDataByte(startAddress + doneFlag, tok.strValue[doneFlag]);
-            }
-            PutDataByte(startAddress + doneFlag, 0); //Add trailing 0
-            GenerateComment("String buffer end");
-            //SwitchOutputToCodeSegment(); //Reset to default output
-            
-            tempString = libgogo.NewObject("tempString", ".internal", libgogo.CLASS_VAR); //Create object for actual string
-            tempString.ObjType = string_t;
-            libgogo.AppendObject(tempString, GlobalObjects); //Add string to global objects
-            
-            SwitchOutputToInitCodeSegment(); //Initialize strings globally
-            GenerateComment("Assign byte buffer to new string constant start");
-            LHSItem = libgogo.NewItem();
-            VariableObjectDescToItem(tempString, LHSItem, 1); //Global variable
-            LHSItem.Itemtype = byte_t; //Set appropriate type for byte (array) pointer
-            LHSItem.PtrType = 1;
-            RHSItem = libgogo.NewItem();
-            VariableObjectDescToItem(tempByteArray, RHSItem, 1); //Global variable
-            RHSItem.Itemtype = byte_t; //Set appropriate type for byte (array) to be pointed at
-            GenerateAssignment(LHSItem, RHSItem, 1); //tempString{first qword} = &tempByteArray
-            GenerateComment("Assign byte buffer to new string constant end");
-            GenerateComment("Assign string length to new string constant start");
-            LHSItem = libgogo.NewItem();
-            VariableObjectDescToItem(tempString, LHSItem, 1); //Global variable
-            LHSItem.A = LHSItem.A + 8; //Access second qword of string to place length in there
-            LHSItem.Itemtype = uint64_t; //Set appropriate type for string length
-            RHSItem = libgogo.NewItem();
-            libgogo.SetItem(RHSItem, libgogo.MODE_CONST, uint64_t, 0, boolFlag, 0, 0); //Constant item containing the length of the string
-            GenerateAssignment(LHSItem, RHSItem, 0); //tempString{second qword} = boolFlag (string length)
-            GenerateComment("Assign string length to new string constant end");
-            SwitchOutputToCodeSegment(); //Reset to default output
-            
-            VariableObjectDescToItem(tempString, item, 1); //Global variable to return (reference to properly initialized, global string)
+            CreateStringConstant(tok.strValue, item);
         }
         doneFlag = 0;
     }
@@ -775,44 +717,19 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
 
 func ParseSelectorSub_FunctionCall(FunctionCalled *libgogo.TypeDesc) uint64 {
     var boolFlag uint64;
-    var tempFcn *libgogo.TypeDesc;
     PrintDebugString("Entering ParseSelectorSub_FunctionCall()",1000);
     GetNextTokenSafe();
     ReturnedFunction = nil; //No new FunctionCalled pointer by default
     if tok.id == TOKEN_PT {
         AssertNextToken(TOKEN_IDENTIFIER);
         if Compile != 0 {
-            boolFlag = libgogo.StringLength(FunctionCalled.Name);
-            if boolFlag != 0 {
-                SymbolTableError("Cannot apply a selector to", "a", "function, function", FunctionCalled.Name);
-            } else {
-                tempFcn = libgogo.GetType(tok.strValue, FunctionCalled.PackageName, GlobalFunctions, 1); //Check global functions
-   			    if tempFcn == nil { //New forward declaration
-   			        tempFcn = NewFunction(tok.strValue, FunctionCalled.PackageName, 1);
-   			        ReturnedFunction = tempFcn; //Assign new tempFcn pointer to FunctionCalled (outside this function)
-			    }
-		        FunctionCalled.Name = tempFcn.Name;
-		        FunctionCalled.Len = tempFcn.Len;
-		        FunctionCalled.Fields = tempFcn.Fields;
-		        FunctionCalled.ForwardDecl = tempFcn.ForwardDecl;
-		        FunctionCalled.Base = tempFcn.Base;
-            }
+            ReturnedFunction = ApplyFunctionSelector(FunctionCalled, tok.strValue);
         }
         boolFlag = 0;
     } else {
         tok.nextToken = tok.id;
         if Compile != 0 {
-            tempFcn = libgogo.GetType(FunctionCalled.PackageName, CurrentPackage, GlobalFunctions, 1); //Check global functions
-            if tempFcn == nil { //New forward declaration
-                tempFcn = NewFunction(FunctionCalled.PackageName, CurrentPackage, 1);
-    	        ReturnedFunction = tempFcn; //Assign new tempFcn pointer to FunctionCalled (outside this function)
-            }
-            FunctionCalled.Name = tempFcn.Name;
-            FunctionCalled.PackageName = tempFcn.PackageName;
-            FunctionCalled.Len = tempFcn.Len;
-            FunctionCalled.Fields = tempFcn.Fields;
-            FunctionCalled.ForwardDecl = tempFcn.ForwardDecl;
-            FunctionCalled.Base = tempFcn.Base;
+            ReturnedFunction = PackageFunctionToNameFunction(FunctionCalled);
 	    }
         boolFlag = 1;
     }
@@ -1175,11 +1092,8 @@ func ParseAssignment(semicolon uint64) uint64 {
 
 func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
     var paramCount uint64 = 0;
-    var FullFunctionName string;
-    var tempString string;
     var TotalParameterSize uint64;
     var TotalLocalVariableSize uint64;
-    var ReturnObject *libgogo.ObjectDesc;
     var ReturnItem *libgogo.Item;
     
     PrintDebugString("Entering ParseFunctionCall()",1000);
@@ -1200,33 +1114,13 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
         AssertNextTokenWeak(TOKEN_RBRAC);
     }
     if Compile != 0 {
-        if FunctionCalled.Len > paramCount { //Compare number of actual parameters
-            FullFunctionName = "";
-            libgogo.StringAppend(&FullFunctionName, FunctionCalled.PackageName);
-            libgogo.CharAppend(&FullFunctionName, '.');
-            libgogo.StringAppend(&FullFunctionName, FunctionCalled.Name);
-            tempString = libgogo.IntToString(FunctionCalled.Len);
-            SymbolTableError("Expecting", tempString, "parameters (more than the actual ones) for function", FullFunctionName);
-        }
+        ParameterCheck_More(FunctionCalled, paramCount);
         TotalParameterSize = libgogo.GetAlignedObjectListSize(FunctionCalled.Fields); //Recalculate sizes as function may have been forward declared
-        if FunctionCalled.ForwardDecl == 1 {
-            PrintFunctionCall(FunctionCalled.PackageName, FunctionCalled.Name, TotalLocalVariableSize, 1);
-        } else {
-            PrintFunctionCall(FunctionCalled.PackageName, FunctionCalled.Name, TotalParameterSize + TotalLocalVariableSize, 0);
-        }
+        PrintActualFunctionCall(FunctionCalled, TotalLocalVariableSize, TotalParameterSize);
         RestoreUsedRegisters();
     }
     PrintDebugString("Leaving ParseFunctionCall()",1000);
-    ReturnObject = libgogo.GetObject("return value", "", FunctionCalled.Fields); //Find return value
-    if ReturnObject == nil {
-        ReturnItem = nil;
-    } else {
-        if FunctionCalled.ForwardDecl == 1 {
-            ReturnItem = ObjectToStackParameter(ReturnObject, FunctionCalled, TotalLocalVariableSize);
-        } else {
-            ReturnItem = ObjectToStackParameter(ReturnObject, FunctionCalled, TotalParameterSize + TotalLocalVariableSize);
-        }
-    }
+    ReturnItem = GetReturnItem(FunctionCalled, TotalLocalVariableSize, TotalParameterSize);
     return ReturnItem;
 }
 
@@ -1237,9 +1131,6 @@ func ParseExpressionList(FunctionCalled *libgogo.TypeDesc, TotalParameterSize ui
     var ExprItem *libgogo.Item;
     var ParameterLHSObject *libgogo.ObjectDesc;
     var Parameter *libgogo.Item;
-    var TempObject *libgogo.ObjectDesc;
-    var tempString string;
-    var FullFunctionName string;
     
     PrintDebugString("Entering ParseExpressionList()",1000);
     if Compile != 0 {
@@ -1248,35 +1139,10 @@ func ParseExpressionList(FunctionCalled *libgogo.TypeDesc, TotalParameterSize ui
         GenerateComment("First parameter expression load start");
         boolFlag = ParseExpression(ExprItem, &ed);
         GenerateComment("First parameter expression load end");
-        if (FunctionCalled.ForwardDecl == 1) && (FunctionCalled.Base == nil) { //Create artificial parameter from expression (based on the latter's type) if the function is called the first time without being declared
-            TempObject = libgogo.NewObject("Artificial parameter", "", libgogo.CLASS_PARAMETER);
-            TempObject.ObjType = ExprItem.Itemtype; //Derive type from expression
-            TempObject.PtrType = ExprItem.PtrType; //Derive pointer type from expression
-            if boolFlag != 0 { //& in expression forces pointer type
-                if TempObject.PtrType == 0 {
-                    TempObject.PtrType = 1;
-                } else {
-                    SymbolTableError("& operator on pointer type not allowed,", "", "type: pointer to", ExprItem.Itemtype.Name);
-                }
-            }
-            libgogo.AddParameters(TempObject, FunctionCalled); //Add a new, artificial parameter
-        }
-        if FunctionCalled.Len == 0 { //Check if function expects parameters
-            FullFunctionName = "";
-            libgogo.StringAppend(&FullFunctionName, FunctionCalled.PackageName);
-            libgogo.CharAppend(&FullFunctionName, '.');
-            libgogo.StringAppend(&FullFunctionName, FunctionCalled.Name);
-            SymbolTableError("Function expects", "no", "parameters:", FullFunctionName);
-        }
+        AddArtificialParameterIfNecessary(FunctionCalled, ExprItem);
+        ZeroParameterCheck(FunctionCalled);
         ParameterLHSObject = libgogo.GetParameterAt(paramCount, FunctionCalled);
-        if FunctionCalled.ForwardDecl == 1 { //Parameter type up-conversion
-            if (ParameterLHSObject.ObjType == byte_t) && (ParameterLHSObject.PtrType == 0) && (ExprItem.Itemtype == uint64_t) && (ExprItem.PtrType == 0) { //If previous forward declaration of this parameter was of type byte, it is possible that is was a byte constant and is now of type uint64 => set to type uint64 in declaration
-                ParameterLHSObject.ObjType = uint64_t;
-            }
-            if (ParameterLHSObject.ObjType == nil) && (ParameterLHSObject.PtrType == 1) && (ExprItem.PtrType == 1) { //If previous forward declaration of this parameter was of type unspecified pointer, it was nil and is now of type *rhs_type => set to type of RHS in declaration
-                ParameterLHSObject.ObjType = ExprItem.Itemtype;
-            }
-        }
+        CorrectArtificialParameterIfNecessary(FunctionCalled, ParameterLHSObject, ExprItem);
         Parameter = ObjectToStackParameter(ParameterLHSObject, FunctionCalled, TotalParameterSize);
         GenerateAssignment(Parameter, ExprItem, boolFlag); //Assignment
         GenerateComment("First parameter expression end");
@@ -1285,14 +1151,7 @@ func ParseExpressionList(FunctionCalled *libgogo.TypeDesc, TotalParameterSize ui
     }
     if Compile != 0 {
         for boolFlag = 0; boolFlag == 0; paramCount = paramCount + 1 {
-            if FunctionCalled.Len < paramCount { //Compare number of actual parameters
-                FullFunctionName = "";
-                libgogo.StringAppend(&FullFunctionName, FunctionCalled.PackageName);
-                libgogo.CharAppend(&FullFunctionName, '.');
-                libgogo.StringAppend(&FullFunctionName, FunctionCalled.Name);
-                tempString = libgogo.IntToString(FunctionCalled.Len);
-                SymbolTableError("Expecting", tempString, "parameters (less than the actual ones) for function", FullFunctionName);
-            }
+            ParameterCheck_Less(FunctionCalled, paramCount);
             boolFlag = ParseExpressionListSub(FunctionCalled, TotalParameterSize, paramCount + 1);
         }
         if paramCount != 0 { //Correct param count if for loop has been entered
@@ -1313,7 +1172,6 @@ func ParseExpressionListSub(FunctionCalled *libgogo.TypeDesc, TotalParameterSize
     var ExprItem *libgogo.Item;
     var ParameterLHSObject *libgogo.ObjectDesc;
     var Parameter *libgogo.Item;
-    var TempObject *libgogo.ObjectDesc;
     
     PrintDebugString("Entering ParseExpressionListSub()",1000);
     GetNextTokenSafe();
@@ -1324,28 +1182,9 @@ func ParseExpressionListSub(FunctionCalled *libgogo.TypeDesc, TotalParameterSize
             GenerateComment("Subsequent parameter expression load start");
             boolFlag = ParseExpression(ExprItem, &ed);
             GenerateComment("Subsequent parameter expression load end");
-            if (FunctionCalled.ForwardDecl == 1) && (FunctionCalled.Base == nil) { //Create artificial parameter from expression (based on the latter's type) if the function is called the first time without being declared
-                TempObject = libgogo.NewObject("Artificial parameter", "", libgogo.CLASS_PARAMETER);
-                TempObject.ObjType = ExprItem.Itemtype; //Derive type from expression
-                TempObject.PtrType = ExprItem.PtrType; //Derive pointer type from expression
-                if boolFlag != 0 { //& in expression forces pointer type
-                    if TempObject.PtrType == 0 {
-                        TempObject.PtrType = 1;
-                    } else {
-                        SymbolTableError("& operator on pointer type not allowed,", "", "type: pointer to", ExprItem.Itemtype.Name);
-                    }
-                }
-                libgogo.AddParameters(TempObject, FunctionCalled); //Add a new, artificial parameter
-            }
+            AddArtificialParameterIfNecessary(FunctionCalled, ExprItem);
             ParameterLHSObject = libgogo.GetParameterAt(ParameterIndex, FunctionCalled);
-            if FunctionCalled.ForwardDecl == 1 { //Parameter type up-conversion
-                if (ParameterLHSObject.ObjType == byte_t) && (ParameterLHSObject.PtrType == 0) && (ExprItem.Itemtype == uint64_t) && (ExprItem.PtrType == 0) { //If previous forward declaration of this parameter was of type byte, it is possible that is was a byte constant and is now of type uint64 => set to type uint64 in declaration
-                    ParameterLHSObject.ObjType = uint64_t;
-                }
-                if (ParameterLHSObject.ObjType == nil) && (ParameterLHSObject.PtrType == 1) && (ExprItem.PtrType == 1) { //If previous forward declaration of this parameter was of type unspecified pointer, it was nil and is now of type *rhs_type => set to type of RHS in declaration
-                    ParameterLHSObject.ObjType = ExprItem.Itemtype;
-                }
-            }
+            CorrectArtificialParameterIfNecessary(FunctionCalled, ParameterLHSObject, ExprItem);
             Parameter = ObjectToStackParameter(ParameterLHSObject, FunctionCalled, TotalParameterSize);
             GenerateAssignment(Parameter, ExprItem, boolFlag); //Assignment
             GenerateComment("Subsequent parameter expression end");
@@ -1364,26 +1203,13 @@ func ParseExpressionListSub(FunctionCalled *libgogo.TypeDesc, TotalParameterSize
 func ParseFunctionCallStatement(ForwardDeclExpectedReturnType *libgogo.TypeDesc, ForwardDeclExpectedReturnPtrType uint64) *libgogo.Item {
     var FunctionCalled *libgogo.TypeDesc;
     var ReturnValue *libgogo.Item;
-    var TotalLocalVariableSize uint64;
     PrintDebugString("Entering ParseFunctionCallStatement()",1000);
     AssertNextToken(TOKEN_IDENTIFIER);
     FunctionCalled = libgogo.NewType("", "", 0, 0, nil);
     FunctionCalled = FindIdentifierAndParseSelector_FunctionCall(FunctionCalled);
     ReturnValue = ParseFunctionCall(FunctionCalled);
     if Compile != 0 {
-        if (FunctionCalled.ForwardDecl == 1) && (FunctionCalled.Base == nil) { //Create artifical return value if function is called the first time
-            if ForwardDeclExpectedReturnType != nil { //Return type expected
-                CurrentObject = libgogo.NewObject("return value", "", libgogo.CLASS_PARAMETER); //Create artificial return value
-                CurrentObject.ObjType = ForwardDeclExpectedReturnType;
-                CurrentObject.PtrType = ForwardDeclExpectedReturnPtrType;
-                libgogo.AddParameters(CurrentObject, FunctionCalled); //Add a new, artificial return value
-                FunctionCalled.Len = FunctionCalled.Len - 1; //Don't count parameter as input parameter
-                TotalLocalVariableSize = libgogo.GetAlignedObjectListSize(LocalObjects); //Take local variable size into consideration for offset below
-                ReturnValue = ObjectToStackParameter(CurrentObject, FunctionCalled, TotalLocalVariableSize);
-            } else { //No return type expected
-                ReturnValue = nil;
-            }
-        }
+        ReturnValue = AddArtificialReturnValueIfNecessary(FunctionCalled, ReturnValue, ForwardDeclExpectedReturnType, ForwardDeclExpectedReturnPtrType);
         FunctionCalled.Base = FunctionCalled; //Abuse Base field to indicate that the function has been called at least once
     }
     PrintDebugString("Leaving ParseFunctionCallStatement()",1000);

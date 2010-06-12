@@ -361,3 +361,61 @@ func NewFunction(name string, packagename string, forwarddecl uint64) *libgogo.T
     }
     return NewFct;
 }
+
+//
+// Adds a return parameter to the given function if necessary
+//
+func AddReturnParameter(CurrentFunction *libgogo.TypeDesc, ReturnValuePseudoObject *libgogo.ObjectDesc) {
+    if ReturnValuePseudoObject != nil {
+        //TODO: Type check if function was forward decl.
+        libgogo.AddParameters(ReturnValuePseudoObject, CurrentFunction); //Treat return value like an additional parameter at the end of the parameter list
+        CurrentFunction.Len = CurrentFunction.Len - 1; //Don't count parameter as input parameter
+    }
+}
+
+//
+// Applies a name selector to a function defined by its package name
+// Returns a new forward declared function if there is no function name matching in the package given
+//
+func ApplyFunctionSelector(PackageFunction *libgogo.TypeDesc, name string) *libgogo.TypeDesc {
+    var boolFlag uint64;
+    var tempFcn *libgogo.TypeDesc;
+    var ReturnedFunction *libgogo.TypeDesc = nil;
+    boolFlag = libgogo.StringLength(PackageFunction.Name);
+    if boolFlag != 0 {
+        SymbolTableError("Cannot apply a selector to", "a", "function, function", PackageFunction.Name);
+    } else {
+        tempFcn = libgogo.GetType(name, PackageFunction.PackageName, GlobalFunctions, 1); //Check global functions
+	    if tempFcn == nil { //New forward declaration
+	        tempFcn = NewFunction(name, PackageFunction.PackageName, 1);
+	        ReturnedFunction = tempFcn; //Assign new tempFcn pointer to PackageFunction (outside this function)
+	    }
+        PackageFunction.Name = tempFcn.Name;
+        PackageFunction.Len = tempFcn.Len;
+        PackageFunction.Fields = tempFcn.Fields;
+        PackageFunction.ForwardDecl = tempFcn.ForwardDecl;
+        PackageFunction.Base = tempFcn.Base;
+    }
+    return ReturnedFunction;
+}
+
+//
+// Sets a function's name based on its package name and resets its package name to the current package
+// Returns a new forward declared function if there is no function name matching in current package
+//
+func PackageFunctionToNameFunction(PackageFunction *libgogo.TypeDesc) *libgogo.TypeDesc {
+    var tempFcn *libgogo.TypeDesc;
+    var ReturnedFunction *libgogo.TypeDesc = nil;
+    tempFcn = libgogo.GetType(PackageFunction.PackageName, CurrentPackage, GlobalFunctions, 1); //Check global functions
+    if tempFcn == nil { //New forward declaration
+        tempFcn = NewFunction(PackageFunction.PackageName, CurrentPackage, 1);
+        ReturnedFunction = tempFcn; //Assign new tempFcn pointer to PackageFunction (outside this function)
+    }
+    PackageFunction.Name = tempFcn.Name;
+    PackageFunction.PackageName = tempFcn.PackageName;
+    PackageFunction.Len = tempFcn.Len;
+    PackageFunction.Fields = tempFcn.Fields;
+    PackageFunction.ForwardDecl = tempFcn.ForwardDecl;
+    PackageFunction.Base = tempFcn.Base;
+    return ReturnedFunction;
+}
