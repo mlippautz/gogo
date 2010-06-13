@@ -352,7 +352,7 @@ func ObjectToStackParameter(obj *libgogo.ObjectDesc, FunctionCalled *libgogo.Typ
     VariableObjectDescToItem(obj, ReturnItem, 0); //Treat parameter as if it was a local object
     ReturnItem.A = stackoffset - 8 - ReturnItem.A - 8 + ObjSize; //Add offset (total size of parameters and variables); compensate both local offsets (stackoffset and ReturnItem.A) by subtracting -8 for each, then adding the parameter size
     if FunctionCalled.ForwardDecl == 1 { //Add linker information
-        ReturnItem.LinkerInformation = "##1#";
+        ReturnItem.LinkerInformation = "##1##";
         libgogo.StringAppend(&ReturnItem.LinkerInformation, FunctionCalled.PackageName);
         libgogo.StringAppend(&ReturnItem.LinkerInformation, "·");
         libgogo.StringAppend(&ReturnItem.LinkerInformation, FunctionCalled.Name);

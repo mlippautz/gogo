@@ -440,7 +440,7 @@ TEXT main·main(SB),0,$0-0
   //--- First parameter expression start at tests/test.go:82:22
   //--- First parameter expression load start at tests/test.go:82:22
   //--- First parameter expression load end at tests/test.go:82:22
-  //--- ##1#main·bazz_fwd## at tests/test.go:82:22
+  //--- ##1##main·bazz_fwd## at tests/test.go:82:22
   MOVB $1, -100040(SP)
   //--- First parameter expression end at tests/test.go:82:22
   //--- Stack pointer offset before function call for local variables start at tests/test.go:82:22
@@ -452,7 +452,7 @@ TEXT main·main(SB),0,$0-0
   //--- ##2##main·bazz_fwd## at tests/test.go:82:22
   ADDQ $40, SP
   //--- Stack pointer offset after function call for local variables end at tests/test.go:82:22
-  //--- ##1#main·bazz_fwd## at tests/test.go:82:22
+  //--- ##1##main·bazz_fwd## at tests/test.go:82:22
   MOVQ -100032(SP), R8
   MOVQ R8, -8(SP)
   //--- Assignment end at tests/test.go:82:23
@@ -465,7 +465,7 @@ TEXT main·foo_fwd(SB),0,$0-0
   //--- First parameter expression start at tests/test.go:87:22
   //--- First parameter expression load start at tests/test.go:87:22
   //--- First parameter expression load end at tests/test.go:87:22
-  //--- ##1#main·bazz_fwd## at tests/test.go:87:22
+  //--- ##1##main·bazz_fwd## at tests/test.go:87:22
   MOVB $1, -100008(SP)
   //--- First parameter expression end at tests/test.go:87:22
   //--- Stack pointer offset before function call for local variables start at tests/test.go:87:22
@@ -477,7 +477,7 @@ TEXT main·foo_fwd(SB),0,$0-0
   //--- ##2##main·bazz_fwd## at tests/test.go:87:22
   ADDQ $8, SP
   //--- Stack pointer offset after function call for local variables end at tests/test.go:87:22
-  //--- ##1#main·bazz_fwd## at tests/test.go:87:22
+  //--- ##1##main·bazz_fwd## at tests/test.go:87:22
   MOVQ -100000(SP), R8
   MOVQ R8, -8(SP)
   //--- Assignment end at tests/test.go:87:23
@@ -502,9 +502,9 @@ TEXT main·muh(SB),0,$0-0
   //--- First parameter expression load end at tests/test.go:96:16
   MOVQ -16(SP), R8
   MOVQ -8(SP), R9
-  //--- ##1#main·maeh## at tests/test.go:96:16
+  //--- ##1##main·maeh## at tests/test.go:96:16
   MOVQ R8, -100016(SP)
-  //--- ##1#main·maeh## at tests/test.go:96:16
+  //--- ##1##main·maeh## at tests/test.go:96:16
   MOVQ R9, -100008(SP)
   //--- First parameter expression end at tests/test.go:96:16
   //--- Subsequent parameter expression start at tests/test.go:96:16
@@ -512,9 +512,9 @@ TEXT main·muh(SB),0,$0-0
   //--- Subsequent parameter expression load end at tests/test.go:96:19
   MOVQ -16(SP), R8
   MOVQ -8(SP), R9
-  //--- ##1#main·maeh## at tests/test.go:96:19
+  //--- ##1##main·maeh## at tests/test.go:96:19
   MOVQ R8, -100000(SP)
-  //--- ##1#main·maeh## at tests/test.go:96:19
+  //--- ##1##main·maeh## at tests/test.go:96:19
   MOVQ R9, -99992(SP)
   //--- Subsequent parameter expression end at tests/test.go:96:19
   //--- Stack pointer offset before function call for local variables start at tests/test.go:96:19
@@ -526,9 +526,9 @@ TEXT main·muh(SB),0,$0-0
   //--- ##2##main·maeh## at tests/test.go:96:19
   ADDQ $16, SP
   //--- Stack pointer offset after function call for local variables end at tests/test.go:96:19
-  //--- ##1#main·maeh## at tests/test.go:96:19
+  //--- ##1##main·maeh## at tests/test.go:96:19
   MOVQ -99984(SP), R8
-  //--- ##1#main·maeh## at tests/test.go:96:19
+  //--- ##1##main·maeh## at tests/test.go:96:19
   MOVQ -99976(SP), R9
   MOVQ R8, -16(SP)
   MOVQ R9, -8(SP)
