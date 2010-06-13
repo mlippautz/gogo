@@ -18,6 +18,12 @@ var CodeSegmentList libgogo.StringList;
 var CodeSegment string; //Actual code
 
 //
+// String lists containing the symbol tables
+//
+var FunctionSymbolTable libgogo.StringList;
+var TypeSymbolTable libgogo.StringList;
+
+//
 // Pointer used to decide to which string to append output
 // There are functions like SwitchOutputToCodeSegment() to change this pointer in a clean way
 // By default, it points to the code segment string
@@ -53,13 +59,16 @@ func ResetCode() {
     libgogo.InitializeStringList(&DataSegmentList);
     libgogo.InitializeStringList(&InitCodeSegmentList);
     libgogo.InitializeStringList(&CodeSegmentList);
+    
+    libgogo.InitializeStringList(&FunctionSymbolTable);
+    libgogo.InitializeStringList(&TypeSymbolTable);
 }
 
 //
 // Function printing the generated code (stored in Code) to a file called the
 // same name as the input file + '.sog' extension
 //
-func PrintFile() {
+func PrintFile(Functions *libgogo.TypeDesc, Types *libgogo.TypeDesc) {
     var fd uint64;
     var outfile string = "_gogo_.sog";
     var DataSegmentSizeStr string;
@@ -70,30 +79,42 @@ func PrintFile() {
 
     libgogo.WriteString(fd, Header);
     libgogo.WriteString(fd, "\n"); //Separator
-    PrintStringList(fd, &DataSegmentList);
+    libgogo.WriteString(fd, "//Symbol table:\n"); //Separator
+    libgogo.SymbolTableFunctionsToStringList(Functions, &FunctionSymbolTable);
+    PrintStringList(fd, &FunctionSymbolTable, 1); //Function symbol table
+    libgogo.SymbolTableTypesToStringList(Types, &TypeSymbolTable);
+    PrintStringList(fd, &TypeSymbolTable, 1); //Type symbol table
+    libgogo.WriteString(fd, "\n"); //Separator
+    PrintStringList(fd, &DataSegmentList, 0);
     libgogo.WriteString(fd, DataSegment); //Data segment
     libgogo.WriteString(fd, "GLOBL data(SB),$"); //(Begin of) end of data segment
     DataSegmentSizeStr = libgogo.IntToString(DataSegmentSize);
     libgogo.WriteString(fd, DataSegmentSizeStr); //Size of data segment
     libgogo.WriteString(fd, "\n"); //End of data segment
     libgogo.WriteString(fd, "\n"); //Separator
-    PrintStringList(fd, &InitCodeSegmentList);
+    PrintStringList(fd, &InitCodeSegmentList, 0);
     libgogo.WriteString(fd, InitCodeSegment); //main.init
     libgogo.WriteString(fd, "  RET\n"); //End of function (main.init)
     libgogo.WriteString(fd, "\n"); //Separator
-    PrintStringList(fd, &CodeSegmentList);
+    PrintStringList(fd, &CodeSegmentList, 0);
     libgogo.WriteString(fd, CodeSegment); //Code segment
     libgogo.FileClose(fd);
 }
 
-func PrintStringList(fd uint64, list *libgogo.StringList) {
+func PrintStringList(fd uint64, list *libgogo.StringList, comment uint64) {
     var i uint64;
     var n uint64;
     var temp string;
     n = libgogo.GetStringListItemCount(list);
     for i = 0; i < n; i = i + 1 {
         temp = libgogo.GetStringItemAt(list, i);
+        if comment != 0 {
+            libgogo.WriteString(fd, "//");
+        }
         libgogo.WriteString(fd, temp);
+        if comment != 0 {
+            libgogo.WriteString(fd, "\n");
+        }
     }
 }
 

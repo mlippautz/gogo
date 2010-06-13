@@ -555,3 +555,61 @@ func PrintFunctions(list *TypeDesc) {
         }
     }
 }
+
+//
+// Prints a simple and parseable function prototypes to an (initialized) string list
+// Syntax per item: FUNC,forwarddecl,package,name,parameter1name:parameter1type,parameter2name:parameter2type...
+//
+func SymbolTableFunctionsToStringList(list *TypeDesc, result *StringList) {
+    var t *TypeDesc;
+    var o *ObjectDesc;
+    var temp string;
+    var temp2 string;
+    for t = list; t != nil; t = t.Next {
+        temp = "FUNC,";
+        temp2 = IntToString(t.ForwardDecl);
+        StringAppend(&temp, temp2);
+        StringAppend(&temp, ",");
+        StringAppend(&temp, t.PackageName);
+        StringAppend(&temp, "·");
+        StringAppend(&temp, t.Name);
+        StringAppend(&temp, ",");
+        for o = t.Fields; o != nil; o = o.Next {
+            StringAppend(&temp, o.Name);
+            StringAppend(&temp, ":");
+            if o.ObjType != nil {
+                StringAppend(&temp, o.ObjType.Name);
+            }
+            if o.Next != nil {
+                StringAppend(&temp, ",");
+            }
+        }
+        AddStringItem(result, temp);
+    }
+}
+
+//
+// Prints a simple and parseable type information to an (initialized) string list
+// Syntax per item: TYPE,package.name,size,aligned_size
+//
+func SymbolTableTypesToStringList(list *TypeDesc, result *StringList) {
+    var t *TypeDesc;
+    var temp string;
+    var tmp uint64;
+    var temp2 string;
+    for t = list; t != nil; t = t.Next {
+        temp = "TYPE,";
+        StringAppend(&temp, t.PackageName);
+        StringAppend(&temp, "·");
+        StringAppend(&temp, t.Name);
+        StringAppend(&temp, ",");
+        tmp = GetTypeSize(t);
+        temp2 = IntToString(tmp);
+        StringAppend(&temp, temp2);
+        StringAppend(&temp, ",");
+        tmp = GetTypeSizeAligned(t);
+        temp2 = IntToString(tmp);
+        StringAppend(&temp, temp2);
+        AddStringItem(result, temp);
+    }
+}

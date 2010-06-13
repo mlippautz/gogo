@@ -124,7 +124,7 @@ func main() {
     if Compile == 1 {
         i = libgogo.GetAlignedObjectListSize(GlobalObjects); //Get required data segment size
         SetDataSegmentSize(i); //Set data segment size
-        PrintFile(); //Print compiled output to file
+        PrintFile(GlobalFunctions, GlobalTypes); //Print compiled output to file
     }
 }
 

@@ -9,6 +9,26 @@
 // This code is automatically generated. DO NOT EDIT IT!
 //
 
+//Symbol table:
+//FUNC,0,main·init,
+//FUNC,0,main·test,bla:uint64,blub:string
+//FUNC,0,main·foo,return value:uint64
+//FUNC,0,main·bar,a:uint64,return value:uint64
+//FUNC,0,main·foobar,a:uint64,b:uint64,c:uint64,return value:uint64
+//FUNC,0,main·bazz,a:uint64,return value:uint64
+//FUNC,0,main·blub,r:string,return value:string
+//FUNC,0,main·main,
+//FUNC,0,main·bazz_fwd,b:byte,return value:uint64
+//FUNC,0,main·foo_fwd,
+//FUNC,0,main·muh,
+//FUNC,0,main·maeh,y:string,z:string,return value:string
+//TYPE,·uint64,8,8
+//TYPE,·byte,1,8
+//TYPE,·string,16,16
+//TYPE,·bool,8,8
+//TYPE,main·foo,32,32
+//TYPE,main·test,360,360
+
 //--- String buffer start ('Test') at tests/test.go:24:26
 DATA data+712(SB)/1, $84
 DATA data+713(SB)/1, $101
