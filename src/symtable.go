@@ -198,6 +198,7 @@ func SetCurrentObjectType(typename string, packagename string, arraydim uint64) 
     var tempstr string = "";
     var tempstr2 string;
     var boolFlag uint64;
+    var TempObject *libgogo.ObjectDesc;
 
     if Compile != 0 {
 	    if InsideStructDecl == 1 { //Allow types in struct declarations which are already forward declared
@@ -237,6 +238,17 @@ func SetCurrentObjectType(typename string, packagename string, arraydim uint64) 
 	        temptype = libgogo.NewType(tempstr, packagename, 0, arraydim, basetype);
 	        CurrentObject.ObjType = temptype; //Don't add array type to global list to avoid duplicate type name errors
 	    }
+	    
+  		if (InsideFunction == 0) && (InsideFunctionVarDecl == 1) { //Function parameters
+  		    if (CurrentFunction.ForwardDecl == 0) && (CurrentFunction.Base != nil) { //Check implementation of forward declaration
+  		        TempObject = libgogo.GetParameterAt(fwdParamCount, CurrentFunction);
+  		        CorrectArtificialParameterForced(CurrentFunction, TempObject, CurrentObject.ObjType, CurrentObject.PtrType); //Perform up-conversion if necessary
+  	            if (TempObject.ObjType != CurrentObject.ObjType) || (TempObject.PtrType != CurrentObject.PtrType) {
+  	                tempstr = libgogo.IntToString(fwdParamCount);
+                    SymbolTableError("Parameter", tempstr, "has been forward declared with different type, function", CurrentFunction.Name);
+                }
+  		    }
+  		}
     }
 }
 
@@ -257,7 +269,7 @@ func NewVariable(name string) {
 		        }
 		        GlobalObjects = libgogo.AppendObject(CurrentObject, GlobalObjects);
 		    } else { //Function parameters
-		        if (CurrentFunction.ForwardDecl == 0) && (CurrentFunction.Base != nil) {
+		        if (CurrentFunction.ForwardDecl == 0) && (CurrentFunction.Base != nil) { //Check implementation of forward declaration
 		            fwdParamCount = fwdParamCount + 1; //One more parameter
 		            ParameterCheck_Less(CurrentFunction, fwdParamCount); //Check number of parameters
     		        TempObject = libgogo.GetParameterAt(fwdParamCount, CurrentFunction);
@@ -390,15 +402,9 @@ func AddReturnParameter(CurrentFunction *libgogo.TypeDesc, ReturnValuePseudoObje
     var TempObject *libgogo.ObjectDesc;
     if (CurrentFunction.ForwardDecl == 0) && (CurrentFunction.Base != nil) { //Implementation of forward declared function
         TempObject = libgogo.GetObject("return value", "", CurrentFunction.Fields); //Check if there is a return value
-        if (TempObject == nil) && (ReturnValuePseudoObject != nil) {
-            SymbolTableError("Function has been forward declared with", "no", "return value, function", CurrentFunction.Name);
-        }
-        if (TempObject != nil) && (ReturnValuePseudoObject == nil) {
-            SymbolTableError("Function has been forward declared with", "a", "return value, function", CurrentFunction.Name);
-        }
         if TempObject != nil { //Type check
-            CorrectArtificialParameterIfNecessary(CurrentFunction, TempObject, ReturnValuePseudoObject.ObjType, ReturnValuePseudoObject.PtrType); //Perform up-conversion if necessary
-            if TempObject.ObjType != ReturnValuePseudoObject.ObjType {
+            CorrectArtificialParameterForced(CurrentFunction, TempObject, ReturnValuePseudoObject.ObjType, ReturnValuePseudoObject.PtrType); //Perform up-conversion if necessary
+            if (TempObject.ObjType != ReturnValuePseudoObject.ObjType) || (TempObject.PtrType != ReturnValuePseudoObject.PtrType) {
                 SymbolTableError("Function has been forward declared with", "different", "return value type, function", CurrentFunction.Name);
             }
         }
@@ -410,6 +416,28 @@ func AddReturnParameter(CurrentFunction *libgogo.TypeDesc, ReturnValuePseudoObje
         }
     }
     return ReturnValuePseudoObject;
+}
+
+//
+// Checks if there are sufficient parameters for a previously forward declared function
+//
+func FwdDeclCheckIfNecessary() {
+    if (CurrentFunction.ForwardDecl == 0) && (CurrentFunction.Base != nil) {
+        ParameterCheck_More(CurrentFunction, fwdParamCount); //Check parameter count
+    }
+}
+
+//
+// Fails if the current function declaration has no return value, but is required to have one through previous forward declarations
+//
+func AssertReturnTypeIfNecessary(ReturnValuePseudoObject *libgogo.ObjectDesc) {
+    var TempObject *libgogo.ObjectDesc;
+    if (CurrentFunction.ForwardDecl == 0) && (CurrentFunction.Base != nil) { //Implementation of forward declared function
+        TempObject = libgogo.GetObject("return value", "", CurrentFunction.Fields); //Check if there is a return value
+        if (TempObject != nil) && (ReturnValuePseudoObject == nil) {
+            SymbolTableError("Function has been forward declared with", "a", "return value, function", CurrentFunction.Name);
+        }
+    }
 }
 
 //
@@ -501,6 +529,9 @@ func VariableOrFieldAccess(item *libgogo.Item, packagename string, name string) 
     }
 }
 
+//
+// Checks whether array access is possible to the given item
+//
 func ArrayAccessCheck(item *libgogo.Item, packagename string)  {
     var boolFlag uint64;
     if Compile != 0 {
@@ -519,6 +550,9 @@ func ArrayAccessCheck(item *libgogo.Item, packagename string)  {
     }
 }
 
+//
+// Tries to find a variable based on the information collected in the item given
+//
 func FindIdentifierAndParseSelector(item *libgogo.Item) {
     var boolFlag uint64;
     var tempObject *libgogo.ObjectDesc;
@@ -572,6 +606,9 @@ func FindIdentifierAndParseSelector(item *libgogo.Item) {
     }
 }
 
+//
+// Tries to find a function based on the information collected in the item given; if there is none, an according forward declaration will be made
+//
 func FindIdentifierAndParseSelector_FunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.TypeDesc {
     var boolFlag uint64;
     var tempFcn *libgogo.TypeDesc;

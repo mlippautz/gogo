@@ -239,7 +239,9 @@ func ParseTypeOptional() {
 
     GetNextTokenSafe();
     if tok.id != TOKEN_IDENTIFIER  {
-        //TODO: Check if forward declaration also has no return type
+        if Compile != 0 { //Check if forward declaration also has no return type
+            AssertReturnTypeIfNecessary(ReturnValuePseudoObject);
+        }
         tok.nextToken = tok.id;
     } else {
         typename = tok.strValue;
@@ -253,6 +255,9 @@ func ParseTypeOptional() {
         if Compile != 0 {
             ReturnValuePseudoObject = AddReturnParameter(CurrentFunction, ReturnValuePseudoObject);
         }
+    }
+    if Compile != 0 {
+        FwdDeclCheckIfNecessary();
     }
     PrintDebugString("Leaving ParseTypeOptional()",1000);
 }

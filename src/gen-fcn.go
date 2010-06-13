@@ -114,3 +114,10 @@ func CorrectArtificialParameterIfNecessary(FunctionCalled *libgogo.TypeDesc, Par
         }
     }
 }
+
+func CorrectArtificialParameterForced(FunctionCalled *libgogo.TypeDesc, ParameterLHSObject *libgogo.ObjectDesc, ExprItemType *libgogo.TypeDesc, ExprItemPtrType uint64) {
+    var oldFwdDecl uint64 = FunctionCalled.ForwardDecl;
+    FunctionCalled.ForwardDecl = 1; //Force correction
+    CorrectArtificialParameterIfNecessary(FunctionCalled, ParameterLHSObject, ExprItemType, ExprItemPtrType);
+    FunctionCalled.ForwardDecl = oldFwdDecl;
+}
