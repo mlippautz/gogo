@@ -239,6 +239,7 @@ func ParseTypeOptional() {
 
     GetNextTokenSafe();
     if tok.id != TOKEN_IDENTIFIER  {
+        //TODO: Check if forward declaration also has no return type
         tok.nextToken = tok.id;
     } else {
         typename = tok.strValue;
@@ -250,7 +251,7 @@ func ParseTypeOptional() {
         SetCurrentObjectType(typename, packagename, arraydim);
         ReturnValuePseudoObject = CurrentObject;
         if Compile != 0 {
-            AddReturnParameter(CurrentFunction, ReturnValuePseudoObject);
+            ReturnValuePseudoObject = AddReturnParameter(CurrentFunction, ReturnValuePseudoObject);
         }
     }
     PrintDebugString("Leaving ParseTypeOptional()",1000);
@@ -1092,7 +1093,7 @@ func ParseExpressionList(FunctionCalled *libgogo.TypeDesc, TotalParameterSize ui
         AddArtificialParameterIfNecessary(FunctionCalled, ExprItem);
         ZeroParameterCheck(FunctionCalled);
         ParameterLHSObject = libgogo.GetParameterAt(paramCount, FunctionCalled);
-        CorrectArtificialParameterIfNecessary(FunctionCalled, ParameterLHSObject, ExprItem);
+        CorrectArtificialParameterIfNecessary(FunctionCalled, ParameterLHSObject, ExprItem.Itemtype, ExprItem.PtrType);
         Parameter = ObjectToStackParameter(ParameterLHSObject, FunctionCalled, TotalParameterSize);
         GenerateAssignment(Parameter, ExprItem, boolFlag); //Assignment
         GenerateComment("First parameter expression end");
@@ -1134,7 +1135,7 @@ func ParseExpressionListSub(FunctionCalled *libgogo.TypeDesc, TotalParameterSize
             GenerateComment("Subsequent parameter expression load end");
             AddArtificialParameterIfNecessary(FunctionCalled, ExprItem);
             ParameterLHSObject = libgogo.GetParameterAt(ParameterIndex, FunctionCalled);
-            CorrectArtificialParameterIfNecessary(FunctionCalled, ParameterLHSObject, ExprItem);
+            CorrectArtificialParameterIfNecessary(FunctionCalled, ParameterLHSObject, ExprItem.Itemtype, ExprItem.PtrType);
             Parameter = ObjectToStackParameter(ParameterLHSObject, FunctionCalled, TotalParameterSize);
             GenerateAssignment(Parameter, ExprItem, boolFlag); //Assignment
             GenerateComment("Subsequent parameter expression end");

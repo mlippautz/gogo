@@ -104,13 +104,13 @@ func AddArtificialReturnValueIfNecessary(FunctionCalled *libgogo.TypeDesc, Retur
     return ReturnValue;
 }
 
-func CorrectArtificialParameterIfNecessary(FunctionCalled *libgogo.TypeDesc, ParameterLHSObject *libgogo.ObjectDesc, ExprItem *libgogo.Item) {
+func CorrectArtificialParameterIfNecessary(FunctionCalled *libgogo.TypeDesc, ParameterLHSObject *libgogo.ObjectDesc, ExprItemType *libgogo.TypeDesc, ExprItemPtrType uint64) {
     if FunctionCalled.ForwardDecl == 1 { //Parameter type up-conversion
-        if (ParameterLHSObject.ObjType == byte_t) && (ParameterLHSObject.PtrType == 0) && (ExprItem.Itemtype == uint64_t) && (ExprItem.PtrType == 0) { //If previous forward declaration of this parameter was of type byte, it is possible that is was a byte constant and is now of type uint64 => set to type uint64 in declaration
+        if (ParameterLHSObject.ObjType == byte_t) && (ParameterLHSObject.PtrType == 0) && (ExprItemType == uint64_t) && (ExprItemPtrType == 0) { //If previous forward declaration of this parameter was of type byte, it is possible that is was a byte constant and is now of type uint64 => set to type uint64 in declaration
             ParameterLHSObject.ObjType = uint64_t;
         }
-        if (ParameterLHSObject.ObjType == nil) && (ParameterLHSObject.PtrType == 1) && (ExprItem.PtrType == 1) { //If previous forward declaration of this parameter was of type unspecified pointer, it was nil and is now of type *rhs_type => set to type of RHS in declaration
-            ParameterLHSObject.ObjType = ExprItem.Itemtype;
+        if (ParameterLHSObject.ObjType == nil) && (ParameterLHSObject.PtrType == 1) && (ExprItemPtrType == 1) { //If previous forward declaration of this parameter was of type unspecified pointer, it was nil and is now of type *rhs_type => set to type of RHS in declaration
+            ParameterLHSObject.ObjType = ExprItemType;
         }
     }
 }
