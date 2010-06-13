@@ -242,7 +242,7 @@ func SetCurrentObjectType(typename string, packagename string, arraydim uint64) 
   		if (InsideFunction == 0) && (InsideFunctionVarDecl == 1) { //Function parameters
   		    if (CurrentFunction.ForwardDecl == 0) && (CurrentFunction.Base != nil) { //Check implementation of forward declaration
   		        TempObject = libgogo.GetParameterAt(fwdParamCount, CurrentFunction);
-  		        CorrectArtificialParameterForced(CurrentFunction, TempObject, CurrentObject.ObjType, CurrentObject.PtrType); //Perform up-conversion if necessary
+  		        CorrectArtificialParameterForced(CurrentFunction, TempObject, CurrentObject.ObjType, CurrentObject.PtrType, 0); //Perform up-conversion if necessary
   	            if (TempObject.ObjType != CurrentObject.ObjType) || (TempObject.PtrType != CurrentObject.PtrType) {
   	                tempstr = libgogo.IntToString(fwdParamCount);
                     SymbolTableError("Parameter", tempstr, "has been forward declared with different type, function", CurrentFunction.Name);
@@ -403,7 +403,8 @@ func AddReturnParameter(CurrentFunction *libgogo.TypeDesc, ReturnValuePseudoObje
     if (CurrentFunction.ForwardDecl == 0) && (CurrentFunction.Base != nil) { //Implementation of forward declared function
         TempObject = libgogo.GetObject("return value", "", CurrentFunction.Fields); //Check if there is a return value
         if TempObject != nil { //Type check
-            CorrectArtificialParameterForced(CurrentFunction, TempObject, ReturnValuePseudoObject.ObjType, ReturnValuePseudoObject.PtrType); //Perform up-conversion if necessary
+            //TODO (maybe): Actually required down-conversion
+            //CorrectArtificialParameterForced(CurrentFunction, TempObject, ReturnValuePseudoObject.ObjType, ReturnValuePseudoObject.PtrType, 0); //Perform up-conversion if necessary
             if (TempObject.ObjType != ReturnValuePseudoObject.ObjType) || (TempObject.PtrType != ReturnValuePseudoObject.PtrType) {
                 SymbolTableError("Function has been forward declared with", "different", "return value type, function", CurrentFunction.Name);
             }

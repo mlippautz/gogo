@@ -67,14 +67,13 @@ func GetReturnItem(FunctionCalled *libgogo.TypeDesc, TotalLocalVariableSize uint
     return ReturnItem;
 }
 
-func AddArtificialParameterIfNecessary(FunctionCalled *libgogo.TypeDesc, ExprItem *libgogo.Item) {
+func AddArtificialParameterIfNecessary(FunctionCalled *libgogo.TypeDesc, ExprItem *libgogo.Item, addressOperator uint64) {
     var TempObject *libgogo.ObjectDesc;
-    var boolFlag uint64;
     if (FunctionCalled.ForwardDecl == 1) && (FunctionCalled.Base == nil) { //Create artificial parameter from expression (based on the latter's type) if the function is called the first time without being declared
         TempObject = libgogo.NewObject("Artificial parameter", "", libgogo.CLASS_PARAMETER);
         TempObject.ObjType = ExprItem.Itemtype; //Derive type from expression
         TempObject.PtrType = ExprItem.PtrType; //Derive pointer type from expression
-        if boolFlag != 0 { //& in expression forces pointer type
+        if addressOperator != 0 { //& in expression forces pointer type
             if TempObject.PtrType == 0 {
                 TempObject.PtrType = 1;
             } else {
@@ -104,20 +103,20 @@ func AddArtificialReturnValueIfNecessary(FunctionCalled *libgogo.TypeDesc, Retur
     return ReturnValue;
 }
 
-func CorrectArtificialParameterIfNecessary(FunctionCalled *libgogo.TypeDesc, ParameterLHSObject *libgogo.ObjectDesc, ExprItemType *libgogo.TypeDesc, ExprItemPtrType uint64) {
+func CorrectArtificialParameterIfNecessary(FunctionCalled *libgogo.TypeDesc, ParameterLHSObject *libgogo.ObjectDesc, ExprItemType *libgogo.TypeDesc, ExprItemPtrType uint64, addressOperator uint64) {
     if FunctionCalled.ForwardDecl == 1 { //Parameter type up-conversion
-        if (ParameterLHSObject.ObjType == byte_t) && (ParameterLHSObject.PtrType == 0) && (ExprItemType == uint64_t) && (ExprItemPtrType == 0) { //If previous forward declaration of this parameter was of type byte, it is possible that is was a byte constant and is now of type uint64 => set to type uint64 in declaration
+        if (ParameterLHSObject.ObjType == byte_t) && (ParameterLHSObject.PtrType == 0) && (ExprItemType == uint64_t) && (ExprItemPtrType == 0) && (addressOperator == 0) { //If previous forward declaration of this parameter was of type byte, it is possible that is was a byte constant and is now of type uint64 => set to type uint64 in declaration
             ParameterLHSObject.ObjType = uint64_t;
         }
-        if (ParameterLHSObject.ObjType == nil) && (ParameterLHSObject.PtrType == 1) && (ExprItemPtrType == 1) { //If previous forward declaration of this parameter was of type unspecified pointer, it was nil and is now of type *rhs_type => set to type of RHS in declaration
+        if (ParameterLHSObject.ObjType == nil) && (((ParameterLHSObject.PtrType == 1) && (ExprItemPtrType == 1) && (addressOperator == 0)) || ((ParameterLHSObject.PtrType == 1) && (ExprItemPtrType == 0) && (addressOperator == 1))) { //If previous forward declaration of this parameter was of type unspecified pointer, it was nil and is now of type *rhs_type => set to type of RHS in declaration
             ParameterLHSObject.ObjType = ExprItemType;
         }
     }
 }
 
-func CorrectArtificialParameterForced(FunctionCalled *libgogo.TypeDesc, ParameterLHSObject *libgogo.ObjectDesc, ExprItemType *libgogo.TypeDesc, ExprItemPtrType uint64) {
+func CorrectArtificialParameterForced(FunctionCalled *libgogo.TypeDesc, ParameterLHSObject *libgogo.ObjectDesc, ExprItemType *libgogo.TypeDesc, ExprItemPtrType uint64, addressOperator uint64) {
     var oldFwdDecl uint64 = FunctionCalled.ForwardDecl;
     FunctionCalled.ForwardDecl = 1; //Force correction
-    CorrectArtificialParameterIfNecessary(FunctionCalled, ParameterLHSObject, ExprItemType, ExprItemPtrType);
+    CorrectArtificialParameterIfNecessary(FunctionCalled, ParameterLHSObject, ExprItemType, ExprItemPtrType, addressOperator);
     FunctionCalled.ForwardDecl = oldFwdDecl;
 }
