@@ -1,0 +1,3 @@
+#!/bin/sh
+
+./gogo -c libgogo/convert.go libgogo/convert_amd64.s libgogo/io.go libgogo/io_amd64.s libgogo/list.go libgogo/memmgr.go libgogo/memmgr_amd64.s libgogo/strlist.go libgogo/symbol.go libgogo/symbol_amd64.s libgogo/string.go libgogo/string_amd64.s libgogo/item.go libgogo/item_amd64.s libgogo/libgogo.go
