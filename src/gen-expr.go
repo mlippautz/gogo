@@ -174,6 +174,7 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
                 GenErrorWeak("Relative AND or OR expected.");
             }
         }
+        item.C =0;
         FreeRegisterIfRequired(item);
     }
 }
