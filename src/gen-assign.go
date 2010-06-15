@@ -81,7 +81,11 @@ func GenerateRawAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
             opsize = GetOpSize(RHSItem, "MOV");
             done = PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "", "R", LHSItem.R, 1, 0, 0, ""); //MOV RHSItem.R, (LHSItem.R)
             if done != 0 { //Handle operands > 8 bytes
-                PrintInstruction_Reg_Reg("MOV", done, "R", RHSItem.C, 0, 0, 0, "", "R", LHSItem.C, 1, 0, 0, ""); //MOV RHSItem.C, (LHSItem.C)
+                if LHSItem.C != 0 {
+                    PrintInstruction_Reg_Reg("MOV", done, "R", RHSItem.C, 0, 0, 0, "", "R", LHSItem.C, 1, 0, 0, ""); //MOV RHSItem.C, (LHSItem.C)
+                } else {
+                    PrintInstruction_Reg_Reg("MOV", done, "R", RHSItem.C, 0, 0, 0, "", "R", LHSItem.R, 1, 8, 0, ""); //MOV RHSItem.C, 8(LHSItem.R)
+                }
             }
             done = 1;
         }
@@ -90,7 +94,11 @@ func GenerateRawAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
             opsize = GetOpSize(RHSItem, "MOV");
             done = PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "", "R", LHSItem.R, 1, 0, 0, ""); //MOV RHSItem.R, (LHSItem.R)
             if done != 0 { //Handle operands > 8 bytes
-                PrintInstruction_Reg_Reg("MOV", done, "R", RHSItem.C, 0, 0, 0, "", "R", LHSItem.C, 1, 0, 0, ""); //MOV RHSItem.C, (LHSItem.C)
+                if LHSItem.C != 0 {
+                    PrintInstruction_Reg_Reg("MOV", done, "R", RHSItem.C, 0, 0, 0, "", "R", LHSItem.C, 1, 0, 0, ""); //MOV RHSItem.C, (LHSItem.C)
+                 } else {
+                    PrintInstruction_Reg_Reg("MOV", done, "R", RHSItem.C, 0, 0, 0, "", "R", LHSItem.R, 1, 8, 0, ""); //MOV RHSItem.C, 8(LHSItem.R)
+                 }
             }
             done = 1;
         }
@@ -124,7 +132,11 @@ func GenerateAssignmentWithAmpersandOnRHS(LHSItem *libgogo.Item, RHSItem *libgog
         opsize = GetOpSize(RHSItem, "MOV");
         retVal = PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.R, 0, 0, 0, "", "R", LHSItem.R, 1, 0, 0, ""); //MOV RHSItem.R, (LHSItem.R)
         if retVal != 0 { //Handle operands > 8 bytes
-            PrintInstruction_Reg_Reg("MOV", opsize, "R", RHSItem.C, 0, 0, 0, "", "R", LHSItem.C, 1, 0, 0, ""); //MOV RHSItem.C, (LHSItem.C)
+            if LHSItem.C != 0 {
+                PrintInstruction_Reg_Reg("MOV", retVal, "R", RHSItem.C, 0, 0, 0, "", "R", LHSItem.C, 1, 0, 0, ""); //MOV RHSItem.C, (LHSItem.C)
+            } else {
+                PrintInstruction_Reg_Reg("MOV", retVal, "R", RHSItem.C, 0, 0, 0, "", "R", LHSItem.R, 1, 8, 0, ""); //MOV RHSItem.C, 8(LHSItem.R)
+            }
         }
     }
     FreeRegisterIfRequired(LHSItem);
