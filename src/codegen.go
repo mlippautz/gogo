@@ -125,7 +125,6 @@ func DereferRegisterIfNecessary(item *libgogo.Item) {
 // Derefers the item given if its type is a pointer
 //
 func DereferItemIfNecessary(item *libgogo.Item) {
-    var oldA uint64;
     var opsize uint64;
     var retVal uint64;
     var addReg uint64;
@@ -140,9 +139,8 @@ func DereferItemIfNecessary(item *libgogo.Item) {
                 PrintInstruction_Reg_Reg("MOV", retVal, "R", item.R, 1, 8, 0, "", "R", item.C, 0, 0, 0, ""); //MOV 8(item.R), item.C
             }
         } else { //Item is not a register yet => make it a register by loading its value
-            oldA = item.A; //Save value of A
             MakeRegistered(item, 0); //Don't load address as loading the value automatically derefers the item
-            item.A = oldA; //Restore old value of A
+            item.A = 1;
         }
         item.PtrType = 0; //Item type is no longer a pointer
     }

@@ -28,6 +28,9 @@ func AddSubInstruction(op string, item1 *libgogo.Item, item2 *libgogo.Item, cons
     done = ConstFolding(item1, item2, constvalue);
     
     if (done == 0) && (item2.Mode == libgogo.MODE_CONST) && (item2.A == 0) { //Omit addition/subtraction by zero
+        if calculatewithaddresses == 0 { //Calculate with values
+            DereferRegisterIfNecessary(item1); //Calculate with values
+        }
         GenerateComment("Addition/subtraction by zero omitted");
         done = 1;
     }
