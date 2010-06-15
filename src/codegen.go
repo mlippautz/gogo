@@ -107,14 +107,15 @@ func FreeRegisterIfRequired(item *libgogo.Item) {
 func DereferRegisterIfNecessary(item *libgogo.Item) {
     var opsize uint64;
     var retVal uint64;
+    var addReg uint64;
     if (item.Mode == libgogo.MODE_REG) && (item.A != 0) { //Derefer register if it contains an address
         item.A = 0; //Register will soon contain a value; make sure op size calculation is based on the actual type size, not on the pointer size
         opsize = GetOpSize(item, "MOV");
         retVal = PrintInstruction_Reg_Reg("MOV", opsize, "R", item.R, 1, 0, 0, "", "R", item.R, 0, 0, 0, ""); //MOV (item.R), item.R
         if retVal != 0 {
-            retVal = GetFreeRegister(); //Additional register required
-            OccupyRegister(retVal);
-            item.C = retVal;
+            addReg = GetFreeRegister(); //Additional register required
+            OccupyRegister(addReg);
+            item.C = addReg;
             PrintInstruction_Reg_Reg("MOV", retVal, "R", item.R, 1, 8, 0, "", "R", item.C, 0, 0, 0, ""); //MOV 8(item.R), item.C
         }
     }
@@ -127,14 +128,15 @@ func DereferItemIfNecessary(item *libgogo.Item) {
     var oldA uint64;
     var opsize uint64;
     var retVal uint64;
+    var addReg uint64;
     if item.PtrType == 1 {
         if item.Mode == libgogo.MODE_REG { //Item is already in a register => derefer register
             opsize = GetOpSize(item, "MOV");
             retVal = PrintInstruction_Reg_Reg("MOV", opsize, "R", item.R, 1, 0, 0, "", "R", item.R, 0, 0, 0, ""); //MOV (item.R), item.R
             if retVal != 0 {
-                retVal = GetFreeRegister(); //Additional register required
-                OccupyRegister(retVal);
-                item.C = retVal;
+                addReg = GetFreeRegister(); //Additional register required
+                OccupyRegister(addReg);
+                item.C = addReg;
                 PrintInstruction_Reg_Reg("MOV", retVal, "R", item.R, 1, 8, 0, "", "R", item.C, 0, 0, 0, ""); //MOV 8(item.R), item.C
             }
         } else { //Item is not a register yet => make it a register by loading its value

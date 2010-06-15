@@ -10,6 +10,12 @@
 //
 
 //Symbol table:
+//TYPE,·uint64,8,8
+//TYPE,·byte,1,8
+//TYPE,·string,16,16
+//TYPE,·bool,8,8
+//TYPE,main·foo,32,32
+//TYPE,main·test,360,360
 //FUNC,0,main·init,
 //FUNC,0,main·test,bla:uint64,blub:string
 //FUNC,0,main·foo,return value:uint64
@@ -22,12 +28,6 @@
 //FUNC,0,main·foo_fwd,
 //FUNC,0,main·muh,
 //FUNC,0,main·maeh,y:string,z:string,return value:string
-//TYPE,·uint64,8,8
-//TYPE,·byte,1,8
-//TYPE,·string,16,16
-//TYPE,·bool,8,8
-//TYPE,main·foo,32,32
-//TYPE,main·test,360,360
 
 //--- String buffer start ('Test') at tests/test.go:24:26
 DATA data+712(SB)/1, $84
