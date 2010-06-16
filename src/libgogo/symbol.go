@@ -337,19 +337,6 @@ func FindTypePackageName(packagename string, list *TypeDesc) uint64 {
 }
 
 //
-// Returns the first type from the list which is forward declared
-//
-func GetFirstForwardDeclType(list *TypeDesc) *TypeDesc {
-    var retValue *TypeDesc;
-    for retValue = list; retValue != nil; retValue = retValue.Next {
-        if retValue.ForwardDecl == 1 {
-            break;
-        }
-    }
-    return retValue;
-}
-
-//
 // Returns the (index)th parameter of the given function
 // Note that counting starts at 1, not at 0!
 //
@@ -599,6 +586,9 @@ func SymbolTableTypesToStringList(list *TypeDesc, result *StringList) {
     var temp2 string;
     for t = list; t != nil; t = t.Next {
         temp = "TYPE,";
+        temp2 = IntToString(t.ForwardDecl);
+        StringAppend(&temp, temp2);
+        StringAppend(&temp, ",");
         StringAppend(&temp, t.PackageName);
         StringAppend(&temp, "·");
         StringAppend(&temp, t.Name);

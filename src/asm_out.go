@@ -79,6 +79,9 @@ func PrintFile(Functions *libgogo.TypeDesc, Types *libgogo.TypeDesc) {
 
     libgogo.WriteString(fd, Header);
     libgogo.WriteString(fd, "\n"); //Separator
+    if NeedsLink != 0 {
+        libgogo.WriteString(fd, "__UNLINKED_CODE\n");
+    }
     libgogo.WriteString(fd, "//Symbol table:\n"); //Separator
     libgogo.SymbolTableTypesToStringList(Types, &TypeSymbolTable);
     PrintStringList(fd, &TypeSymbolTable, 1); //Type symbol table

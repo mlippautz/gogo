@@ -44,6 +44,11 @@ var bool_t *libgogo.TypeDesc = nil;
 var nilPtr *libgogo.ObjectDesc = nil;
 
 //
+// Flag indicating whether file needs linking
+//
+var NeedsLink uint64 = 0;
+
+//
 // Initializes the global symbol table (objects and types)
 //
 func InitSymbolTable() {
@@ -102,23 +107,6 @@ func PrintLocalSymbolTable() {
         libgogo.PrintObjects(CurrentFunction.Fields);
         libgogo.PrintString("--- End of parameters, begin of local variables ---\n");
         libgogo.PrintObjects(LocalObjects);
-    }
-}
-
-//
-// Checks for undefined types which were forward declared
-//
-func UndefinedForwardDeclaredTypeCheck() {
-    var temptype *libgogo.TypeDesc;
-    if Compile != 0 {
-		temptype = libgogo.GetFirstForwardDeclType(GlobalTypes);
-		if temptype != nil {
-		    SymbolTableError("undefined", "", "type", temptype.Name);
-		}
-        temptype = libgogo.GetFirstForwardDeclType(GlobalFunctions);
-		if temptype != nil {
-		    SymbolTableError("undefined", "", "function", temptype.Name);
-		}
     }
 }
 
@@ -217,6 +205,7 @@ func SetCurrentObjectType(typename string, packagename string, arraydim uint64) 
 	                }
 	            } else { //Forward declaration
 	                basetype = libgogo.NewType(typename, packagename, 1, 0, nil);
+                    NeedsLink = 1; // We need linking because of a fwd. declared type
 	                GlobalTypes = libgogo.AppendType(basetype, GlobalTypes); //Add forward declared type to global list
 	            }
 	        } else {
@@ -375,7 +364,9 @@ func NewFunction(name string, packagename string, forwarddecl uint64) *libgogo.T
 		NewFct = libgogo.NewType(name, packagename, forwarddecl, 0, nil);
 		if forwarddecl == 0 {
 		    CurrentFunction = NewFct;
-		}
+		} else {
+            NeedsLink = 1; // We need linking because of a fwd declared function
+        }
         TempType = libgogo.GetType(name, packagename, GlobalFunctions, 1);
         if TempType != nil {
             if TempType.ForwardDecl == 1 { //Unset forward declaration
