@@ -87,6 +87,7 @@ func PrintFile(Functions *libgogo.TypeDesc, Types *libgogo.TypeDesc) {
     PrintStringList(fd, &TypeSymbolTable, 1); //Type symbol table
     libgogo.SymbolTableFunctionsToStringList(Functions, &FunctionSymbolTable);
     PrintStringList(fd, &FunctionSymbolTable, 1); //Function symbol table
+    libgogo.WriteString(fd, "//End Symbol table\n");
     libgogo.WriteString(fd, "\n"); //Separator
     PrintStringList(fd, &DataSegmentList, 0);
     libgogo.WriteString(fd, DataSegment); //Data segment

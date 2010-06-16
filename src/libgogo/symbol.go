@@ -560,11 +560,19 @@ func SymbolTableFunctionsToStringList(list *TypeDesc, result *StringList) {
         StringAppend(&temp, t.PackageName);
         StringAppend(&temp, "·");
         StringAppend(&temp, t.Name);
-        StringAppend(&temp, ",");
-        for o = t.Fields; o != nil; o = o.Next {
+        o = t.Fields;
+        if o != nil {
+            StringAppend(&temp, ",");
+        }
+        for ; o != nil; o = o.Next {
             StringAppend(&temp, o.Name);
             StringAppend(&temp, ":");
+            if o.PtrType != 0 {
+                CharAppend(&temp, '*');
+            }
             if o.ObjType != nil {
+                StringAppend(&temp, o.ObjType.PackageName);
+                StringAppend(&temp, "·");
                 StringAppend(&temp, o.ObjType.Name);
             }
             if o.Next != nil {

@@ -15,21 +15,37 @@ type LineDesc struct {
     FunctionName string;
 };
 
+type ParamDesc struct {
+    Name string;
+    TypePackage string;
+    TypeName string;
+    Ptr uint64;
+};
+
 //
 // Function fetches the next line from the assembly file.
 //
 func GetLine(ld *LineDesc) {
     var line string;
+    var i uint64 =0;
     var singleChar byte;
-/*
-    singleChar = GetCharWrapped();
-    if singleChar == '#' {
-        GetCharWrapped(); // Abolish '#'
-        singleChar = GetCharWrapped(); // should be number
+    var cmp uint64;
+
+    for singleChar = GetCharWrapped(); (i<10) && (singleChar!=10) && (singleChar!=0); singleChar = GetCharWrapped() {
+        libgogo.CharAppend(&line, singleChar);
+        i = i +1;
+    }
+    cmp = libgogo.StringCompare(line, "  //--- ##");
+    if cmp == 0 {
+        singleChar = GetCharWrapped(); // should be number; the case of fixing
         ld.NeedsFix = libgogo.ToIntFromByte(singleChar);
         ld.NeedsFix = ld.NeedsFix - 48;
+        ld.PackageName = "";
+        ld.FunctionName = "";
+
         GetCharWrapped(); // Abolish '#'
         GetCharWrapped(); // Abolish '#'
+
         for singleChar = GetCharWrapped(); singleChar != 194 ; singleChar = GetCharWrapped() {
             libgogo.CharAppend(&ld.PackageName, singleChar);
         }
@@ -37,35 +53,33 @@ func GetLine(ld *LineDesc) {
         for singleChar = GetCharWrapped(); (singleChar != '#'); singleChar = GetCharWrapped() {
             libgogo.CharAppend(&ld.FunctionName, singleChar);
         }
-        for singleChar = GetCharWrapped(); (singleChar != 0) && (singleChar != 10); singleChar = GetCharWrapped() { // Dismiss rest of line
+
+        if (singleChar != 10) && (singleChar != 0) {
+            for ; (singleChar != 0) && (singleChar != 10); singleChar = GetCharWrapped() {
+                libgogo.CharAppend(&line, singleChar);
+            }
         }
     } else {
-        libgogo.CharAppend(&line, singleChar);
-        for singleChar = GetCharWrapped(); (singleChar != 0) && (singleChar != 10); singleChar = GetCharWrapped() {
+        for ; (singleChar != 0) && (singleChar != 10); singleChar = GetCharWrapped() {
             libgogo.CharAppend(&line, singleChar);
         }
     }
-*/
 
-    for singleChar = GetCharWrapped(); (singleChar != 0) && (singleChar != 10); singleChar = GetCharWrapped() {
-        libgogo.CharAppend(&line, singleChar);
-    }
-    
     if singleChar == 0 {
         tok.id = TOKEN_EOS;
     }
-
     ld.Line = line;
     ld.Offset = 0;
+
 }
 
 func GetNextSymToken(ld *LineDesc) string {
-    var symtoken string;
+    var symtoken string = "";
     var i uint64;
     var len uint64;
     len = libgogo.StringLength(ld.Line);
     for i = ld.Offset; (i < len) && (ld.Line[i] != ','); i=i+1 {
-        if (ld.Line[i] != '/') && (ld.Line[i] != ' ') {
+        if (ld.Line[i] != '/') {
             libgogo.CharAppend(&symtoken, ld.Line[i]);
         }
     }
@@ -82,6 +96,10 @@ func ParseSymTblLine(ld *LineDesc) {
     strCmp = libgogo.StringCompare(symtype, "TYPE");
     if strCmp == 0 {
         ParseSymTblType(ld);
+    }
+    strCmp = libgogo.StringCompare(symtype, "FUNC");
+    if strCmp == 0 {
+        ParseSymTblFunc(ld);
     }
 }
 
@@ -128,6 +146,79 @@ func GetFuncName(pkgType string) string {
         libgogo.CharAppend(&retStr, pkgType[i]);
     }
     return retStr;
+}
+
+func ParseSymbolParam(pd *ParamDesc, paramType string) {
+    var i uint64 = 0;
+    var strLen uint64;
+
+    pd.Name = "";
+    pd.TypePackage = "";
+    pd.TypeName = "";
+    pd.Ptr = 0;
+
+    strLen = libgogo.StringLength(paramType);
+    if strLen > 0 {
+        for i = 0; paramType[i] != ':' ; i=i+1 {
+            libgogo.CharAppend(&pd.Name, paramType[i]);
+        }
+        i=i+1;
+        if paramType[i] == '*' {
+            pd.Ptr = 1;
+            i=i+1;
+        }
+        for ;paramType[i] != 194; i=i+1 {
+            libgogo.CharAppend(&pd.TypePackage, paramType[i]);
+        }
+        for i=i+2;i < strLen; i=i+1 {
+            libgogo.CharAppend(&pd.TypeName, paramType[i]);
+        }
+    }
+}
+
+//
+// Function parsing the main part of a function in a symbol table and adding it 
+// to the global symbol table.
+//
+func ParseSymTblFunc(ld *LineDesc) {
+    var pd ParamDesc;
+    var func_t *libgogo.TypeDesc = nil;
+    var some_t *libgogo.TypeDesc = nil;
+    var fwdStr string;
+    var fwdNum uint64;
+    var pkgFunc string;
+    var funcName string;
+    var pkgName string;
+    var ind uint64;
+    var paramType string;
+    var tmpParam *libgogo.ObjectDesc;
+
+    fwdStr = GetNextSymToken(ld);
+    fwdNum = libgogo.StringToInt(fwdStr);
+    pkgFunc = GetNextSymToken(ld);
+    ind = libgogo.StringCompare(pkgFunc, "main·init");
+    if ind != 0 {
+        pkgName = GetPackageName(pkgFunc);
+        funcName = GetFuncName(pkgFunc);
+        func_t = NewFunction(funcName, pkgName, fwdNum);
+        paramType = GetNextSymToken(ld);
+        ind = libgogo.StringLength(paramType);
+        for ; ind != 0 ; {
+            ParseSymbolParam(&pd, paramType);
+            tmpParam = libgogo.NewObject(pd.Name, "", libgogo.CLASS_PARAMETER);
+            some_t = libgogo.GetType(pd.TypeName, pd.TypePackage, GlobalTypes, 1);
+            if some_t != nil {
+                tmpParam.ObjType = some_t;
+                tmpParam.PtrType = pd.Ptr;
+                libgogo.AddParameters(tmpParam, func_t);
+            } else {
+                LinkError("unable to find type '",pd.TypePackage,"·",pd.TypeName,"'.");
+            }
+            paramType = GetNextSymToken(ld);
+            ind = libgogo.StringLength(paramType);
+        }
+    }
+
 }
 
 //
@@ -198,8 +289,16 @@ func ParseSymTblType(ld *LineDesc) {
     }
 }
 
-func GetParameterSize(packageName string, functionName string) uint64 {
-    return 48;
+func GetParameterSize(pkgName string, funcName string) uint64 {
+    var size uint64;
+    var func_t *libgogo.TypeDesc = nil;
+    func_t = libgogo.GetType(funcName, pkgName, GlobalFunctions, 1);
+    if func_t != nil {
+        size = libgogo.GetAlignedObjectListSize(func_t.Fields);
+    } else {
+        LinkError("unable to look up function '", pkgName, "·", funcName, "' in symtable.");
+    }
+    return size;
 }
 
 //
@@ -212,7 +311,6 @@ func FixOffset(ld *LineDesc) string {
     var oldsize uint64;
     var numstr string;
     var newLine string;
-
     if ld.NeedsFix == 1 { // Type 1 fix of offsets
         strLen = libgogo.StringLength(ld.Line);
         size = GetParameterSize(ld.PackageName, ld.FunctionName);
@@ -260,15 +358,11 @@ func FixOffset(ld *LineDesc) string {
 // Main linking method
 //
 func Link() {
-    //var newLine string;
+    var newLine string;
     var strCmp uint64;
-    var strLen uint64;
     var symtable uint64 = 0;
     var ld LineDesc;
 
-    InitSymbolTable();
-
-    ld.NeedsFix = 0;
     ResetToken();
     GetLine(&ld);
     for ;tok.id != TOKEN_EOS;{
@@ -276,28 +370,29 @@ func Link() {
         if strCmp == 0 {
             symtable = 1;
             GetLine(&ld); // Proceed to next line
-
         } 
         if symtable != 0 { // Parse symtable entries
-            strLen = libgogo.StringLength(ld.Line);
-            if strLen == 0 {
+            strCmp = libgogo.StringCompare("//End Symbol table", ld.Line);
+            if strCmp == 0 {
                 symtable = 0;
             } else {
                 ParseSymTblLine(&ld);
             }
-        }
-    /* else { // Parse normal lines and fix everything
+        } else { // Parse normal lines and fix everything
             if ld.NeedsFix != 0 {
                 GetLine(&ld);
                 newLine = FixOffset(&ld);
                 libgogo.PrintString(newLine);
                 libgogo.PrintString("\n");
             } else {
-                //libgogo.PrintString(ld.Line);
-                //libgogo.PrintString("\n");
+                strCmp = libgogo.StringCompare(ld.Line, "__UNLINKED_CODE");
+                if strCmp != 0 {
+                    libgogo.PrintString(ld.Line);
+                    libgogo.PrintString("\n");
+                }
             }
 
-        }*/
+        }
         GetLine(&ld);
     }
 }

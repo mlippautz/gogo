@@ -376,7 +376,7 @@ func NewFunction(name string, packagename string, forwarddecl uint64) *libgogo.T
                 CurrentFunction = NewFct;
                 fwdParamCount = 0; //Start over with new parameters
             } else {
-                SymbolTableError("duplicate function", name, "in package", name);
+                SymbolTableError("duplicate function", name, "in package", packagename);
             }
         }
         if DontAppend == 0 {
