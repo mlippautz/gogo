@@ -130,17 +130,30 @@ func GetFuncName(pkgType string) string {
     return retStr;
 }
 
+//
+// Function parsing the main part of a type in a symbol table and adding it 
+// to the global symbol table.
+//
 func ParseSymTblType(ld *LineDesc) {
+    var some_t *libgogo.TypeDesc = nil;
+    var fwdStr string;
+    var fwdNum uint64;
     var pkgType string;
     var pkgName string;
-    var fcnName string;
+    var typeName string;
     var sizeStr string;
     var sizeNum uint64;
     var alignStr string;
     var alignNum uint64;
     var ind uint64;
-    var some_t *libgogo.TypeDesc = nil;
+    var tmp1 uint64;
+    var tmp2 uint64;
+    var tmpStr1 string;
+    var tmpStr2 string;
+    // maybe some more flags, indicators, temps, strings, numbers, ... ?!? ;)
 
+    fwdStr = GetNextSymToken(ld);
+    fwdNum = libgogo.StringToInt(fwdStr);
     pkgType = GetNextSymToken(ld);
     sizeStr = GetNextSymToken(ld);
     sizeNum = libgogo.StringToInt(sizeStr);
@@ -149,9 +162,39 @@ func ParseSymTblType(ld *LineDesc) {
     ind = IsDefaultType(pkgType);
     if ind == 0 { // non-default type, try to add
         pkgName = GetPackageName(pkgType);
-        fcnName = GetFuncName(pkgType);
-        some_t = libgogo.NewType(fcnName, pkgName, sizeNum, alignNum, nil);
-        GlobalTypes = libgogo.AppendType(some_t, GlobalTypes);
+        typeName = GetFuncName(pkgType);
+        some_t = libgogo.GetType(typeName, pkgName, GlobalTypes, 1);
+        if some_t == nil {
+            some_t = libgogo.NewType(typeName, pkgName, fwdNum, sizeNum, nil);
+            GlobalTypes = libgogo.AppendType(some_t, GlobalTypes);
+        } else {
+            /* All kings of fwd declaration combinations need to be checked */
+            if (some_t.ForwardDecl == 0) && (fwdNum == 0) {
+                tmp1 = libgogo.GetTypeSize(some_t);
+                tmp2 = libgogo.GetTypeSizeAligned(some_t);
+                if (sizeNum == tmp1) && (alignNum == tmp2) {
+                    LinkWarn("duplicated type (", pkgType, "). sizes matched.", "", "");
+                } else {
+                    libgogo.StringAppend(&tmpStr1, "new: ");
+                    libgogo.StringAppend(&tmpStr1, sizeStr);
+                    libgogo.StringAppend(&tmpStr1, "; defined: ");
+                    tmpStr2 = libgogo.IntToString(tmp1);
+                    libgogo.StringAppend(&tmpStr1, tmpStr2);
+                    LinkError("duplicate type: ", pkgType, ". Incompatible sizes: ",tmpStr1, ""); 
+                }
+            } 
+            if (some_t.ForwardDecl == 1) && (fwdNum == 0) {
+                /* Fix the params of the fwd. declared type */
+                some_t.ForwardDecl = 0;
+                some_t.Len = sizeNum;
+            } 
+            if (some_t.ForwardDecl == 0) && (fwdNum == 1) {
+                ; // skip since this is useless
+            }
+            if (some_t.ForwardDecl == 1) && (fwdNum == 1) {
+                ; // skip since this is useless
+            }
+        }
     }
 }
 

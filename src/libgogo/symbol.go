@@ -18,7 +18,7 @@ type TypeDesc struct {
     PackageName string;
     ForwardDecl uint64; //If 1, type is forward declared
     Form uint64;
-    Len uint64;
+    Len uint64; // Len is array length if Base != nil, the size of the type otherwise
     Fields *ObjectDesc;
     Base *TypeDesc; //If Form=FORM_FUNCTION, a value unequal nil indicates that the function has been called at least once
     Next *TypeDesc;

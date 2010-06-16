@@ -144,15 +144,32 @@ func GenErrorWeak(msg string) {
 }
 
 //
-// Linker error; Always Fatal since this means someone edited the object file
-// by hand
+// Linker error. Always Fatal.
 //
-func LinkError(msg string) {
+func LinkError(msg1 string, msg2 string, msg3 string, msg4 string, msg5 string) {
     PrintHead();
     libgogo.PrintString(": linker error: ");
-    libgogo.PrintString(msg);
+    libgogo.PrintString(msg1);
+    libgogo.PrintString(msg2);
+    libgogo.PrintString(msg3);
+    libgogo.PrintString(msg4);
+    libgogo.PrintString(msg5);
     libgogo.PrintString("\n");
     libgogo.Exit(5);
+}
+
+//
+// Linker warning
+//
+func LinkWarn(msg1 string, msg2 string, msg3 string, msg4 string, msg5 string) {
+    PrintHead();
+    libgogo.PrintString(": linker warning: ");
+    libgogo.PrintString(msg1);
+    libgogo.PrintString(msg2);
+    libgogo.PrintString(msg3);
+    libgogo.PrintString(msg4);
+    libgogo.PrintString(msg5);
+    libgogo.PrintString("\n");
 }
 
 func SymbolTableError(msg string, position string, msg2 string, identifier string) {
@@ -174,4 +191,3 @@ func SymbolTableError(msg string, position string, msg2 string, identifier strin
     PrintLocalSymbolTable();    
     libgogo.Exit(4);
 }
-
