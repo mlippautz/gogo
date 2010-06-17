@@ -37,9 +37,12 @@ func GetLine(ld *LineDesc) {
     }
     cmp = libgogo.StringCompare(line, "  //--- ##");
     if cmp == 0 {
-        singleChar = GetCharWrapped(); // should be number; the case of fixing
+        // actual singleChar should be the number
         ld.NeedsFix = libgogo.ToIntFromByte(singleChar);
         ld.NeedsFix = ld.NeedsFix - 48;
+        if (ld.NeedsFix != 1) && (ld.NeedsFix != 2) {
+            LinkError("encountered internal error when reading fixups. file edited by hand?", "", "", "", "");
+        }
         ld.PackageName = "";
         ld.FunctionName = "";
 
@@ -311,6 +314,7 @@ func FixOffset(ld *LineDesc) string {
     var oldsize uint64;
     var numstr string;
     var newLine string;
+    
     if ld.NeedsFix == 1 { // Type 1 fix of offsets
         strLen = libgogo.StringLength(ld.Line);
         size = GetParameterSize(ld.PackageName, ld.FunctionName);
@@ -318,7 +322,7 @@ func FixOffset(ld *LineDesc) string {
             libgogo.CharAppend(&newLine, ld.Line[i]);
         }
         libgogo.CharAppend(&newLine, ld.Line[i]);
-        for i = i+1 /*Dismiss '-'*/ ;ld.Line[i]!='(';i=i+1 {
+        for i = i+1  ;ld.Line[i]!='(';i=i+1 {//Dismiss '-'
             libgogo.CharAppend(&numstr, ld.Line[i]);
         }
         oldsize = libgogo.StringToInt(numstr);
@@ -336,8 +340,9 @@ func FixOffset(ld *LineDesc) string {
         for i = 0; ld.Line[i] != '$' ; i = i +1 {
             libgogo.CharAppend(&newLine, ld.Line[i]);
         }
+
         libgogo.CharAppend(&newLine, ld.Line[i]);
-        for i = i+1 /*Dismiss '-'*/ ;ld.Line[i]!=',';i=i+1 {
+        for i = i+1  ;ld.Line[i]!=',';i=i+1 {//Dismiss '-'
             libgogo.CharAppend(&numstr, ld.Line[i]);
         }
         oldsize = libgogo.StringToInt(numstr);
@@ -347,8 +352,8 @@ func FixOffset(ld *LineDesc) string {
         for ; i < strLen; i = i +1 {
             libgogo.CharAppend(&newLine, ld.Line[i]);
         }
-    }
 
+    }
     ld.NeedsFix = 0;
     ld.Line = newLine;
     return newLine;
@@ -382,6 +387,10 @@ func Link() {
             if ld.NeedsFix != 0 {
                 GetLine(&ld);
                 newLine = FixOffset(&ld);
+                //libgogo.PrintString("...");
+                //libgogo.PrintString(ld.Line);
+                //libgogo.PrintString("\n");
+                ld.NeedsFix = 0;
                 libgogo.PrintString(newLine);
                 libgogo.PrintString("\n");
             } else {
