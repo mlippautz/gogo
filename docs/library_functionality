@@ -1,17 +1,17 @@
-libgogo·ToIntFromByte                           |
-libgogo·ToByteFromInt                           |
-libgogo·ToUint64FromBytePtr                     |
-libgogo·ToUint64FromUint64Ptr                   |
-libgogo·ToUint64PtrFromUint64                   |
-libgogo·ToUint64FromStringPtr                   |
+libgogo·ToIntFromByte                           | ok (asm)
+libgogo·ToByteFromInt                           | ok (asm)
+libgogo·ToUint64FromBytePtr                     | ok (asm)
+libgogo·ToUint64FromUint64Ptr                   | ok (asm)
+libgogo·ToUint64PtrFromUint64                   | ok (asm)
+libgogo·ToUint64FromStringPtr                   | ok (asm)
 libgogo·GetStringFromAddress                    |
 libgogo·StringToInt                             |
 libgogo·StringLength                            |
 libgogo·IntToString                             |
 libgogo·CharAppend                              |
-libgogo·Write                                   | seems ok
+libgogo·Write                                   | ok
 libgogo·WriteString                             |
-libgogo·PrintString                             | ok, but escaping doesnt work
+libgogo·PrintString                             | ok
 libgogo·PrintChar                               |
 libgogo·PrintNumber                             | fail
 libgogo·Read                                    |
