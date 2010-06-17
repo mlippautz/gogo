@@ -4,15 +4,15 @@ libgogo·ToUint64FromBytePtr                     | ok (asm)
 libgogo·ToUint64FromUint64Ptr                   | ok (asm)
 libgogo·ToUint64PtrFromUint64                   | ok (asm)
 libgogo·ToUint64FromStringPtr                   | ok (asm)
-libgogo·GetStringFromAddress                    |
+libgogo·GetStringFromAddress                    | ok (asm)
 libgogo·StringToInt                             |
-libgogo·StringLength                            |
+libgogo·StringLength                            | ok (asm)
 libgogo·IntToString                             |
 libgogo·CharAppend                              |
 libgogo·Write                                   | ok
 libgogo·WriteString                             |
 libgogo·PrintString                             | ok
-libgogo·PrintChar                               |
+libgogo·PrintChar                               | ok
 libgogo·PrintNumber                             | fail
 libgogo·Read                                    |
 libgogo·GetChar                                 |
@@ -22,15 +22,15 @@ libgogo·FileClose                               |
 libgogo·InitializeList                          |
 libgogo·Alloc                                   |
 libgogo·AddItem                                 |
-libgogo·CopyMem                                 |
+libgogo·CopyMem                                 | ok (asm)
 libgogo·RemoveItemAt                            |
 libgogo·GetItemAt                               |
-libgogo·ExitError                               |
+libgogo·ExitError                               | ok
 libgogo·GetListItemCount                        |
 libgogo·GetListCapacity                         |
-libgogo·Brk                                     |
-libgogo·GetBrk                                  |
-libgogo·TestMem                                 |
+libgogo·Brk                                     | ok (asm)
+libgogo·GetBrk                                  | ok (asm)
+libgogo·TestMem                                 | ok (asm)
 libgogo·InitMemoryManager                       |
 libgogo·MoreMemory                              |
 libgogo·GetFreeMemory                           |
@@ -39,8 +39,8 @@ libgogo·AddStringItem                           |
 libgogo·GetStringItemAt                         |
 libgogo·GetStringListItemCount                  |
 libgogo·GetStringListCapacity                   |
-libgogo·Uint64ToObjectDescPtr                   |
-libgogo·Uint64ToTypeDescPtr                     |
+libgogo·Uint64ToObjectDescPtr                   | ok (asm)
+libgogo·Uint64ToTypeDescPtr                     | ok (asm)
 libgogo·AppendObject                            |
 libgogo·AppendType                              |
 libgogo·AddFields                               |
@@ -50,7 +50,7 @@ libgogo·GetObject                               |
 libgogo·AddParameters                           |
 libgogo·GetTypeSize                             |
 libgogo·GetObjectSizeAligned                    |
-libgogo·AlignTo64Bit                            |
+libgogo·AlignTo64Bit                            | ok
 libgogo·GetTypeSizeAligned                      |
 libgogo·GetObjectSize                           |
 libgogo·GetObjectOffset                         |
@@ -67,15 +67,15 @@ libgogo·PrintObjects                            |
 libgogo·PrintTypes                              |
 libgogo·PrintFunctions                          |
 libgogo·SymbolTableFunctionsToStringList        |
-libgogo·StringAppend                            |
+libgogo·StringAppend                            | ? (maybe ok)
 libgogo·SymbolTableTypesToStringList            |
-libgogo·StringLength2                           |
-libgogo·GetStringAddress                        |
+libgogo·StringLength2                           | ok (asm)
+libgogo·GetStringAddress                        | ok (asm)
 libgogo·ResetString                             |
-libgogo·SetStringAddressAndLength               |
+libgogo·SetStringAddressAndLength               | ok (asm)
 libgogo·GetMaxStringLength                      |
-libgogo·Uint64ToItemPtr                         |
+libgogo·Uint64ToItemPtr                         | ok (asm)
 libgogo·NewItem                                 |
 libgogo·SetItem                                 |
 libgogo·GetArgv                                 |
-libgogo·Exit                                    |
+libgogo·Exit                                    | ok (asm)
