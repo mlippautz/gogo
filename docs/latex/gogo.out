@@ -8,7 +8,7 @@
 \BOOKMARK [0][-]{chapter.6}{Symbol table}{}
 \BOOKMARK [1][-]{section.6.1}{Supported data types}{chapter.6}
 \BOOKMARK [1][-]{section.6.2}{Local variables and offset calculations}{chapter.6}
-\BOOKMARK [0][-]{chapter.7}{The code generator}{}
+\BOOKMARK [0][-]{chapter.7}{Code generation}{}
 \BOOKMARK [1][-]{section.7.1}{Assembly output}{chapter.7}
 \BOOKMARK [1][-]{section.7.2}{Register allocation}{chapter.7}
 \BOOKMARK [1][-]{section.7.3}{The generation of arithmetical expressions}{chapter.7}

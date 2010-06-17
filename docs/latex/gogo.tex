@@ -152,15 +152,50 @@ go_program = package_stmt import_stmt_list struct_decl_list
     Lorem ipsum dolor sit amet...
 
   \chapter{Symbol table}
-    Lorem ipsum dolor sit amet...		
-
+    In order to be able to lookup local and global variable names as well as function names, a symbol table is required. Based on \cite{wir96}, object and type descriptors were used, each containing the information required for lookup and code generation. Object descriptors are used to store information about variables and parameters whereas type descriptors are used to store information about types and functions.\\
+    The following table summarizes the fields of the object and type descriptors and their respective purpose. Some fields had to be added in order to support forward declarations and the distinction between values and pointers.\\ \\
+      \textbf{ObjectDesc:}\\
+      \begin{tabular}{|c|c|l|}
+        \hline
+        \textbf{Field} & \textbf{Type} & \textbf{Purpose}\\ \hline
+        Name & \texttt{string} & The object's name\\ \hline
+        PackageName & \texttt{string} & The object's package (Go name space)\\ \hline
+        Class & \texttt{uint64} & The descriptors's kind (variable, field, parameter)\\ \hline
+        ObjType & \texttt{*TypeDesc} & The object's type\\ \hline
+        PtrType & \texttt{uint64} & If 1, the object's type is \texttt{*ObjType}; if 0, \texttt{ObjType}\\ \hline
+        Next & \texttt{*ObjType} & Next object (linked list)\\ \hline
+      \end{tabular}\\ \\
+      \textbf{TypeDesc:}\\
+      \begin{tabular}{|c|c|l|}
+        \hline
+        \textbf{Field} & \textbf{Type} & \textbf{Purpose}\\ \hline
+        Name & \texttt{string} & The type's/function's name\\ \hline
+        PackageName & \texttt{string} & The type's/function's package (Go name space)\\ \hline
+        ForwardDecl & \texttt{uint64} & If 1, the type/function has not yet been fully delcared/implemented\\ \hline
+        Form & \texttt{uint64} & The descriptor's kind (simple type, array type, struct type, function)\\ \hline
+        Len & \texttt{uint64} & For simple types: type size in bytes, for arrays: array size\\ \hline
+        Fields & \texttt{*ObjDesc} & For struct types: struct fields, for functions: function parameters\\ \hline
+        Base & \texttt{*TypeDesc} & For array types: the array base type\\ \hline
+        Next & \texttt{*TypeDesc} & Next type/function (linked list)\\ \hline
+      \end{tabular}\\ \\
+    Both symbol table build-up and lookup is integrated into the parser. Whenever sufficient information (variable name, function name, type name; optionally preceeded by a package name) is encountered, a lookup in the symbol table is issued. Declarations issue new symbol table entries with the corresponding descriptor properties as described above.\\
+    Forward declarations are currently only supported for type pointers (as pointers are always 64 bits in size) and functions (as the affected offsets can be fixed by the linker if necessary). Whenever supported forward declarations are encountered, a new symbol table entry is created with \texttt{ForwardDecl} set to 1. Forward declared function can then be called, although forward declared type pointers cannot be dereferred until the size of the type they are pointing to is known (\texttt{ForwardDecl} is 0). When forward declared functions are implemented, the corresponding symbol table entry is modified (\texttt{ForwardDecl} is set to 0) instead of creating a new one.
+      
     \section{Supported data types}
-      Lorem ipsum dolor sit amet...
+      GoGo supports 4 built-in value types and the declaration of new struct and array types as well as pointers to value, struct and array types. The 4 built-in data types are based on the data types supported by the Go compiler and form a minimal subset of them in order to perform basic integer and string operations. The following table lists the built-in value types, together with their purpose and size.\\ \\
+      \begin{tabular}{|c|c|l|}
+        \hline
+        \textbf{Type} & \textbf{Size} & \textbf{Purpose}\\ \hline
+        \texttt{uint64} & 8 bytes (64 bits) & Unsigned integer with the target platform's register size\\ \hline
+        \texttt{byte} & 1 byte (8 bits) & Single ASCII character or unsigned 8 bit integer value\\ \hline
+        \texttt{string} & 16 bytes (see \ref{String constants}) & Character sequences\\ \hline
+        \texttt{bool} & 8 bytes (64 bits) & Internal type used for comparisions and jumps\\ \hline
+      \end{tabular}
 		
     \section{Local variables and offset calculations}
       Lorem ipsum dolor sit amet...
 
-  \chapter{The code generator}
+  \chapter{Code generation}
      Lorem ipsum dolor sit amet...
 
     \section{Assembly output}
@@ -189,7 +224,7 @@ go_program = package_stmt import_stmt_list struct_decl_list
         Besides the compiled functions from the input file, the code segment contains a function called main.init which performs the initialization of global variables. In contrast to local variables which can be initialized directly at point of their declaration, global variables need to be initialized before any other methods are called, thus requiring the main.init function.\\
         Global variables in general are stored in the data segment, called \texttt{data} in the output. They are addressed by their corresponding symbol table offsets relative to the beginning of the data segment. For the special treatment of string constants, please refer to the next section.
 
-    \section{String constants}
+    \section{String constants} \label{String constants}
         Strings in Go are 16 bytes in size, containing an 8 byte address (pointer) to its character buffer and an 8 byte length (of which only 4 bytes are used). This makes string length calculations unnecessary and also explains why strings in Go are read-only and have to be reallocated when being changed.\\
         Whenever a string constant is found in the input code, a new byte array with the string's length is declared and initialized with the string's characters. Next, another 16 bytes are allocated which represent the actual string. Using the main.init function as described in the previous section, the string's length and the previously allocated byte array address are assigned to the according offsets of the string in the data segment. When assigning the string constant (or using it as a parameter), an item representing a data segment variable with the string's address is used, therefore eliminating the need for any further special treatment.
 
@@ -198,17 +233,16 @@ go_program = package_stmt import_stmt_list struct_decl_list
 
     \section{I/O syscalls}
       Besides read and write operations to files (and the console), exiting the program as well as opening and closing files requires the use of syscalls. On Linux 64 bit operating systems with Intel architecture, these syscalls can be invoked by the assembly mnemonic \texttt{SYSCALL} where the register \texttt{RAX} contains the syscall number defining the syscall, and the registers \texttt{RDI}, \texttt{RSI} and \texttt{RDX} contain the first, second and third parameter respectively\cite{var08}.\\
-      The following table lists the syscalls used by libgogo, together with the value of \texttt{RAX} representing the syscall number. The latter were derived from the constants defined in \texttt{/usr/src/linux-headers-2.6.32-22/arch/x86/include/asm/unistd\_64.h} of the current Linux kernel source\cite{var10}. The syscall function prototypes (for semantics and formal parameters) were derived from the corresponding Linux man pages (see \cite{var97} and others).\\
+      The following table lists the syscalls used by libgogo, together with the value of \texttt{RAX} representing the syscall number. The latter were derived from the constants defined in \texttt{/usr/src/linux-headers-2.6.32-22/arch/x86/include/asm/unistd\_64.h} of the current Linux kernel source\cite{var10}. The syscall function prototypes (for semantics and formal parameters) were derived from the corresponding Linux man pages (see \cite{var97} and others).\\ \\
       \begin{tabular}{|c|c|c|}
         \hline
-        Syscall number (\texttt{RAX}) & Syscall function & Purpose\\ \hline
+        \textbf{Syscall number (\texttt{RAX})} & \textbf{Syscall function} & \textbf{Purpose}\\ \hline
         0 & \texttt{sys\_read} & Reads from a file\\ \hline
         1 & \texttt{sys\_write} & Writes to a file\\ \hline
         2 & \texttt{sys\_open} & Opens a file\\ \hline
         3 & \texttt{sys\_close} & Closes a file\\ \hline
         12 & \texttt{sys\_brk} & See next section\\ \hline
         60 & \texttt{sys\_exit} & Exits the program\\ \hline
-        %\caption{List of syscalls used in libgogo, based on \var{var10}}
       \end{tabular}
 
     \section{The memory manager}
@@ -237,4 +271,5 @@ go_program = package_stmt import_stmt_list struct_decl_list
 
   \bibliographystyle{alpha}
   \bibliography{gogo}
+
 \end{document}
