@@ -181,7 +181,7 @@ func GetNextTokenRaw() {
     // string "..."
     if (done != 1) && (singleChar == '"') {
         tok.id = TOKEN_STRING;        
-        for singleChar = GetCharWrapped(); singleChar != '"';singleChar = GetEscapedCharWrapped() {
+        for singleChar = GetEscapedCharWrapped(); singleChar != '"';singleChar = GetEscapedCharWrapped() {
             tmp_TokAppendStr(singleChar);
         }
         if singleChar != '"' {
