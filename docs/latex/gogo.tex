@@ -193,10 +193,13 @@ go_program = package_stmt import_stmt_list struct_decl_list
       \end{tabular}
 		
     \section{Local variables and offset calculations}
-      Lorem ipsum dolor sit amet...
+      In order to be able to distinguish between parameters, local and global variables, a global and a local symbol table as well the function's parameters as third, virtual symbol table are used. Local variables hide global variables of the same name by performing the symbol table lookup for local variables and parameters first and returning the first match if there is any.\\
+      The memory layout for local and global variables as well as parameters is equal: the object's offset address contains the first 64 bits of the object, the next highest address (offset address plus 64 bits) contains the next 64 bits etc. All local and global variable offset addresses are 64 bit aligned. The offset of an object can be calculated by summing the aligned sizes of its predecessors in the corresponding variable list. Doing this, it has to be taken into consideration that pointers always occupy 8 bytes (64 bits), regardless of the type they are actually pointing to.\\
+      Global variables start at offset 0 of the data segment, referred to as \texttt{data+0} in the output. Subsequent global variables use ascending offsets as described above (p.e. referred to as \texttt{data+8} for offset 8). Local variables and parameters are addressed relative to the stack pointer \texttt{SP}, starting at offset \texttt{SP+8} for parameters with ascending offsets as described for global variables (\texttt{SP} is reserved for the saved instruction pointer \texttt{IP}, see \ref{The generation of functions}). Local variables start at offset \texttt{SP-8} in descending order (\texttt{SP-16} for the second 64 bit variable, \texttt{SP-24} for the third etc.) in descending order. Ignoring the sign, the offset relative to SP is still in ascending order, so the offset calculation method as used for global variables and parameters can be used.\\
+      As global and local variables as well as parameters share the same offset calculation as described above, they can be treated equally with no change of the offset calculation mechanism. When printing a reference to a variable address in the output, the relative offset does not need to be changed, only the reference address (the beginning of the data segment, \texttt{data}, or \texttt{SP} respectively) and the offset's sign. This requires the variable's kind (local, global, parameter) to be stored during code generation until both address and offset are needed. This is done by introducing a new field named \texttt{Global} to the \texttt{Item} type (see next section), indicating whether an object is a global or a local variable or a parameter, respectively.
 
   \chapter{Code generation}
-     Lorem ipsum dolor sit amet...
+    Lorem ipsum dolor sit amet...
 
     \section{Assembly output}
       Lorem ipsum dolor sit amet...
@@ -217,7 +220,7 @@ go_program = package_stmt import_stmt_list struct_decl_list
     \section{The generation of loops}
       Lorem ipsum dolor sit amet...
 
-    \section{The generation of functions}
+    \section{The generation of functions} \label{The generation of functions}
       Lorem ipsum dolor sit amet...
 
     \section{Global variable initialization}
