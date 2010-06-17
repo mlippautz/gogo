@@ -9,25 +9,27 @@
 // This code is automatically generated. DO NOT EDIT IT!
 //
 
+__UNLINKED_CODE
 //Symbol table:
-//TYPE,·uint64,8,8
-//TYPE,·byte,1,8
-//TYPE,·string,16,16
-//TYPE,·bool,8,8
-//TYPE,main·foo,32,32
-//TYPE,main·test,360,360
-//FUNC,0,main·init,
-//FUNC,0,main·test,bla:uint64,blub:string
-//FUNC,0,main·foo,return value:uint64
-//FUNC,0,main·bar,a:uint64,return value:uint64
-//FUNC,0,main·foobar,a:uint64,b:uint64,c:uint64,return value:uint64
-//FUNC,0,main·bazz,a:uint64,return value:uint64
-//FUNC,0,main·blub,r:string,return value:string
-//FUNC,0,main·main,
-//FUNC,0,main·bazz_fwd,b:byte,return value:uint64
-//FUNC,0,main·foo_fwd,
-//FUNC,0,main·muh,
-//FUNC,0,main·maeh,y:string,z:string,return value:string
+//TYPE,0,·uint64,8,8
+//TYPE,0,·byte,1,8
+//TYPE,0,·string,16,16
+//TYPE,0,·bool,8,8
+//TYPE,0,main·foo,32,32
+//TYPE,0,main·test,360,360
+//FUNC,0,main·init
+//FUNC,0,main·test,bla:·uint64,blub:·string
+//FUNC,0,main·foo,return value:·uint64
+//FUNC,0,main·bar,a:·uint64,return value:·uint64
+//FUNC,0,main·foobar,a:·uint64,b:·uint64,c:·uint64,return value:·uint64
+//FUNC,0,main·bazz,a:·uint64,return value:·uint64
+//FUNC,0,main·blub,r:·string,return value:·string
+//FUNC,0,main·main
+//FUNC,0,main·bazz_fwd,b:·byte,return value:·uint64
+//FUNC,0,main·foo_fwd
+//FUNC,0,main·muh
+//FUNC,0,main·maeh,y:·string,z:·string,return value:·string
+//End Symbol table
 
 //--- String buffer start ('Test') at tests/test.go:24:26
 DATA data+712(SB)/1, $84
