@@ -73,6 +73,7 @@ func SetStringAddressAndLength(str *string, new_addr uint64, new_length uint64);
 func GetMaxStringLength(length uint64) uint64 {
     var i uint64;
     var j uint64;
+    length = length - 1; //Assure that powers of two will be returned exactly as they are
     for i = 0; length != 0; i = i + 1 { //Calculate number of divisions by 2 required to reach 0 => log2(length), rounded towards +inf
         length = length / 2;
     }
@@ -80,10 +81,7 @@ func GetMaxStringLength(length uint64) uint64 {
     for j = 0; j < i; j = j + 1 { //Multiply by 2 as many times as divided previously => 2^i
         length = length * 2;
     }
-    if length == 1 { //Special case length = 1 => still return 1
-        length = 2;
-    }
-    return length - 1;
+    return length;
 }
 
 //

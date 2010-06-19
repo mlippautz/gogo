@@ -974,7 +974,7 @@ GLOBL data(SB),$6368
 TEXT main·init(SB),0,$0-0
   //--- Assign byte buffer to new string constant start at libgogo/convert.go:74:24
   LEAQ data+8(SB), R8
-  MOVQ R8, data+16(SB)
+  MOVQ R8, (R0)
   //--- Assign byte buffer to new string constant end at libgogo/convert.go:74:24
   //--- Assign string length to new string constant start at libgogo/convert.go:74:24
   MOVQ $0, data+24(SB)
@@ -9091,844 +9091,835 @@ IF_libgogo_string_52_ELSE_END:
   RET
 
 TEXT libgogo·GetMaxStringLength(SB),0,$0-0
-  //--- For start at libgogo/string.go:76:9
-  //--- For [initial assignment] start at libgogo/string.go:76:11
-  //--- Assignment start at libgogo/string.go:76:11
-  //--- Assignment LHS load start at libgogo/string.go:76:11
-  //--- Assignment LHS load end at libgogo/string.go:76:13
-  //--- Assignment RHS load start at libgogo/string.go:76:15
-  //--- Assignment RHS load end at libgogo/string.go:76:15
+  //--- Assignment start at libgogo/string.go:76:14
+  //--- Assignment LHS load start at libgogo/string.go:76:14
+  //--- Assignment LHS load end at libgogo/string.go:76:14
+  //--- Assignment RHS load start at libgogo/string.go:76:22
+  MOVQ 8(SP), R8
+  SUBQ $1, R8
+  //--- Assignment RHS load end at libgogo/string.go:76:25
+  MOVQ R8, 8(SP)
+  //--- Assignment end at libgogo/string.go:76:25
+  //--- For start at libgogo/string.go:77:9
+  //--- For [initial assignment] start at libgogo/string.go:77:11
+  //--- Assignment start at libgogo/string.go:77:11
+  //--- Assignment LHS load start at libgogo/string.go:77:11
+  //--- Assignment LHS load end at libgogo/string.go:77:13
+  //--- Assignment RHS load start at libgogo/string.go:77:15
+  //--- Assignment RHS load end at libgogo/string.go:77:15
   MOVQ $0, -8(SP)
-  //--- Assignment end at libgogo/string.go:76:15
-  //--- For [initial assignment] end at libgogo/string.go:76:15
-FOR_libgogo_string_76_EXPR_START:
-  //--- For [expression] start at libgogo/string.go:76:23
+  //--- Assignment end at libgogo/string.go:77:15
+  //--- For [initial assignment] end at libgogo/string.go:77:15
+FOR_libgogo_string_77_EXPR_START:
+  //--- For [expression] start at libgogo/string.go:77:23
   CMPQ 8(SP), $0
-  JNE FOR_libgogo_string_76_1_END
-  JMP FOR_libgogo_string_76_END
-FOR_libgogo_string_76_1_END:
-  //--- For [expression] end at libgogo/string.go:76:28
-  JMP FOR_libgogo_string_76_BODY
-FOR_libgogo_string_76_EXTENDED_BODY:
-  //--- For [post assignment] start at libgogo/string.go:76:31
-  //--- Assignment start at libgogo/string.go:76:31
-  //--- Assignment LHS load start at libgogo/string.go:76:31
-  //--- Assignment LHS load end at libgogo/string.go:76:33
-  //--- Assignment RHS load start at libgogo/string.go:76:36
+  JNE FOR_libgogo_string_77_1_END
+  JMP FOR_libgogo_string_77_END
+FOR_libgogo_string_77_1_END:
+  //--- For [expression] end at libgogo/string.go:77:28
+  JMP FOR_libgogo_string_77_BODY
+FOR_libgogo_string_77_EXTENDED_BODY:
+  //--- For [post assignment] start at libgogo/string.go:77:31
+  //--- Assignment start at libgogo/string.go:77:31
+  //--- Assignment LHS load start at libgogo/string.go:77:31
+  //--- Assignment LHS load end at libgogo/string.go:77:33
+  //--- Assignment RHS load start at libgogo/string.go:77:36
   MOVQ -8(SP), R8
   ADDQ $1, R8
-  //--- Assignment RHS load end at libgogo/string.go:76:40
+  //--- Assignment RHS load end at libgogo/string.go:77:40
   MOVQ R8, -8(SP)
-  //--- Assignment end at libgogo/string.go:76:40
-  //--- For [post assignment] end at libgogo/string.go:76:40
-  JMP FOR_libgogo_string_76_EXPR_START
-FOR_libgogo_string_76_BODY:
-  //--- Assignment start at libgogo/string.go:77:18
-  //--- Assignment LHS load start at libgogo/string.go:77:18
-  //--- Assignment LHS load end at libgogo/string.go:77:18
-  //--- Assignment RHS load start at libgogo/string.go:77:27
+  //--- Assignment end at libgogo/string.go:77:40
+  //--- For [post assignment] end at libgogo/string.go:77:40
+  JMP FOR_libgogo_string_77_EXPR_START
+FOR_libgogo_string_77_BODY:
+  //--- Assignment start at libgogo/string.go:78:18
+  //--- Assignment LHS load start at libgogo/string.go:78:18
+  //--- Assignment LHS load end at libgogo/string.go:78:18
+  //--- Assignment RHS load start at libgogo/string.go:78:27
   MOVQ 8(SP), AX
   MOVQ $2, R8
   XORQ DX, DX
   DIVQ R8
   MOVQ AX, R8
-  //--- Assignment RHS load end at libgogo/string.go:77:29
+  //--- Assignment RHS load end at libgogo/string.go:78:29
   MOVQ R8, 8(SP)
-  //--- Assignment end at libgogo/string.go:77:29
-  JMP FOR_libgogo_string_76_EXTENDED_BODY
-FOR_libgogo_string_76_END:
-  //--- For end at libgogo/string.go:78:6
-  //--- Assignment start at libgogo/string.go:79:14
-  //--- Assignment LHS load start at libgogo/string.go:79:14
-  //--- Assignment LHS load end at libgogo/string.go:79:14
-  //--- Assignment RHS load start at libgogo/string.go:79:16
-  //--- Assignment RHS load end at libgogo/string.go:79:16
+  //--- Assignment end at libgogo/string.go:78:29
+  JMP FOR_libgogo_string_77_EXTENDED_BODY
+FOR_libgogo_string_77_END:
+  //--- For end at libgogo/string.go:79:6
+  //--- Assignment start at libgogo/string.go:80:14
+  //--- Assignment LHS load start at libgogo/string.go:80:14
+  //--- Assignment LHS load end at libgogo/string.go:80:14
+  //--- Assignment RHS load start at libgogo/string.go:80:16
+  //--- Assignment RHS load end at libgogo/string.go:80:16
   MOVQ $1, 8(SP)
-  //--- Assignment end at libgogo/string.go:79:16
-  //--- For start at libgogo/string.go:80:9
-  //--- For [initial assignment] start at libgogo/string.go:80:11
-  //--- Assignment start at libgogo/string.go:80:11
-  //--- Assignment LHS load start at libgogo/string.go:80:11
-  //--- Assignment LHS load end at libgogo/string.go:80:13
-  //--- Assignment RHS load start at libgogo/string.go:80:15
-  //--- Assignment RHS load end at libgogo/string.go:80:15
+  //--- Assignment end at libgogo/string.go:80:16
+  //--- For start at libgogo/string.go:81:9
+  //--- For [initial assignment] start at libgogo/string.go:81:11
+  //--- Assignment start at libgogo/string.go:81:11
+  //--- Assignment LHS load start at libgogo/string.go:81:11
+  //--- Assignment LHS load end at libgogo/string.go:81:13
+  //--- Assignment RHS load start at libgogo/string.go:81:15
+  //--- Assignment RHS load end at libgogo/string.go:81:15
   MOVQ $0, -16(SP)
-  //--- Assignment end at libgogo/string.go:80:15
-  //--- For [initial assignment] end at libgogo/string.go:80:15
-FOR_libgogo_string_80_EXPR_START:
-  //--- For [expression] start at libgogo/string.go:80:18
+  //--- Assignment end at libgogo/string.go:81:15
+  //--- For [initial assignment] end at libgogo/string.go:81:15
+FOR_libgogo_string_81_EXPR_START:
+  //--- For [expression] start at libgogo/string.go:81:18
   MOVQ -8(SP), R8
   CMPQ -16(SP), R8
-  JL FOR_libgogo_string_80_1_END
-  JMP FOR_libgogo_string_80_END
-FOR_libgogo_string_80_1_END:
-  //--- For [expression] end at libgogo/string.go:80:22
-  JMP FOR_libgogo_string_80_BODY
-FOR_libgogo_string_80_EXTENDED_BODY:
-  //--- For [post assignment] start at libgogo/string.go:80:25
-  //--- Assignment start at libgogo/string.go:80:25
-  //--- Assignment LHS load start at libgogo/string.go:80:25
-  //--- Assignment LHS load end at libgogo/string.go:80:27
-  //--- Assignment RHS load start at libgogo/string.go:80:30
+  JL FOR_libgogo_string_81_1_END
+  JMP FOR_libgogo_string_81_END
+FOR_libgogo_string_81_1_END:
+  //--- For [expression] end at libgogo/string.go:81:22
+  JMP FOR_libgogo_string_81_BODY
+FOR_libgogo_string_81_EXTENDED_BODY:
+  //--- For [post assignment] start at libgogo/string.go:81:25
+  //--- Assignment start at libgogo/string.go:81:25
+  //--- Assignment LHS load start at libgogo/string.go:81:25
+  //--- Assignment LHS load end at libgogo/string.go:81:27
+  //--- Assignment RHS load start at libgogo/string.go:81:30
   MOVQ -16(SP), R8
-  ANDQ $255, R9
-  MOVB -9(SP), R9
-  ADDQ R9, R8
-  //--- Assignment RHS load end at libgogo/string.go:80:34
+  ADDQ $1, R8
+  //--- Assignment RHS load end at libgogo/string.go:81:34
   MOVQ R8, -16(SP)
-  //--- Assignment end at libgogo/string.go:80:34
-  //--- For [post assignment] end at libgogo/string.go:80:34
-  JMP FOR_libgogo_string_80_EXPR_START
-FOR_libgogo_string_80_BODY:
-  //--- Assignment start at libgogo/string.go:81:18
-  //--- Assignment LHS load start at libgogo/string.go:81:18
-  //--- Assignment LHS load end at libgogo/string.go:81:18
-  //--- Assignment RHS load start at libgogo/string.go:81:26
+  //--- Assignment end at libgogo/string.go:81:34
+  //--- For [post assignment] end at libgogo/string.go:81:34
+  JMP FOR_libgogo_string_81_EXPR_START
+FOR_libgogo_string_81_BODY:
+  //--- Assignment start at libgogo/string.go:82:18
+  //--- Assignment LHS load start at libgogo/string.go:82:18
+  //--- Assignment LHS load end at libgogo/string.go:82:18
+  //--- Assignment RHS load start at libgogo/string.go:82:26
   MOVQ 8(SP), AX
   MOVQ $2, R8
   MULQ R8
   MOVQ AX, R8
-  //--- Assignment RHS load end at libgogo/string.go:81:29
+  //--- Assignment RHS load end at libgogo/string.go:82:29
   MOVQ R8, 8(SP)
-  //--- Assignment end at libgogo/string.go:81:29
-  JMP FOR_libgogo_string_80_EXTENDED_BODY
-FOR_libgogo_string_80_END:
-  //--- For end at libgogo/string.go:82:6
-  //--- If start at libgogo/string.go:83:8
-  CMPQ 8(SP), $1
-  JE IF_libgogo_string_83_1_END
-  JMP IF_libgogo_string_83_END
-IF_libgogo_string_83_1_END:
-  //--- Assignment start at libgogo/string.go:84:18
-  //--- Assignment LHS load start at libgogo/string.go:84:18
-  //--- Assignment LHS load end at libgogo/string.go:84:18
-  //--- Assignment RHS load start at libgogo/string.go:84:20
-  //--- Assignment RHS load end at libgogo/string.go:84:20
-  MOVQ $2, 8(SP)
-  //--- Assignment end at libgogo/string.go:84:20
-IF_libgogo_string_83_END:
-IF_libgogo_string_83_ELSE_END:
-  //--- If end at libgogo/string.go:86:12
-  //--- Return value assignment start at libgogo/string.go:86:12
-  //--- Return expression load start at libgogo/string.go:86:12
+  //--- Assignment end at libgogo/string.go:82:29
+  JMP FOR_libgogo_string_81_EXTENDED_BODY
+FOR_libgogo_string_81_END:
+  //--- For end at libgogo/string.go:83:6
+  //--- Return value assignment start at libgogo/string.go:84:12
+  //--- Return expression load start at libgogo/string.go:84:12
+  //--- Return expression load end at libgogo/string.go:84:19
   MOVQ 8(SP), R8
-  SUBQ $1, R8
-  //--- Return expression load end at libgogo/string.go:86:23
   MOVQ R8, 16(SP)
-  //--- Return value assignment end at libgogo/string.go:86:23
+  //--- Return value assignment end at libgogo/string.go:84:19
   RET
 
 TEXT libgogo·CharAppend(SB),0,$0-0
-  //--- Local variable assignment start at libgogo/string.go:94:25
-  //--- Local variable assignment RHS load start at libgogo/string.go:94:25
-  //--- Local variable assignment RHS load end at libgogo/string.go:94:27
+  //--- Local variable assignment start at libgogo/string.go:92:25
+  //--- Local variable assignment RHS load start at libgogo/string.go:92:25
+  //--- Local variable assignment RHS load end at libgogo/string.go:92:27
   MOVB $0, -8(SP)
-  //--- Local variable assignment end at libgogo/string.go:94:27
-  //--- Assignment start at libgogo/string.go:102:14
-  //--- Assignment LHS load start at libgogo/string.go:102:14
-  //--- Assignment LHS load end at libgogo/string.go:102:14
-  //--- Saving registers before function call start at libgogo/string.go:102:32
-  //--- Saving registers before function call end at libgogo/string.go:102:32
-  //--- First parameter expression start at libgogo/string.go:102:32
-  //--- First parameter expression load start at libgogo/string.go:102:32
-  //--- First parameter expression load end at libgogo/string.go:102:32
+  //--- Local variable assignment end at libgogo/string.go:92:27
+  //--- Assignment start at libgogo/string.go:100:14
+  //--- Assignment LHS load start at libgogo/string.go:100:14
+  //--- Assignment LHS load end at libgogo/string.go:100:14
+  //--- Saving registers before function call start at libgogo/string.go:100:32
+  //--- Saving registers before function call end at libgogo/string.go:100:32
+  //--- First parameter expression start at libgogo/string.go:100:32
+  //--- First parameter expression load start at libgogo/string.go:100:32
+  //--- First parameter expression load end at libgogo/string.go:100:32
   MOVQ 8(SP), R8
   MOVQ R8, -80(SP)
-  //--- First parameter expression end at libgogo/string.go:102:32
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:102:32
+  //--- First parameter expression end at libgogo/string.go:100:32
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:100:32
   SUBQ $80, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:102:32
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:100:32
   CALL libgogo·StringLength2(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:102:32
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:100:32
   ADDQ $80, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:102:32
-  //--- Restoring registers after function call start at libgogo/string.go:102:32
-  //--- Restoring registers after function call end at libgogo/string.go:102:32
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:100:32
+  //--- Restoring registers after function call start at libgogo/string.go:100:32
+  //--- Restoring registers after function call end at libgogo/string.go:100:32
   MOVQ -72(SP), R8
   MOVQ R8, -16(SP)
-  //--- Assignment end at libgogo/string.go:102:33
-  //--- Assignment start at libgogo/string.go:103:18
-  //--- Assignment LHS load start at libgogo/string.go:103:18
-  //--- Assignment LHS load end at libgogo/string.go:103:18
-  //--- Assignment RHS load start at libgogo/string.go:103:26
+  //--- Assignment end at libgogo/string.go:100:33
+  //--- Assignment start at libgogo/string.go:101:18
+  //--- Assignment LHS load start at libgogo/string.go:101:18
+  //--- Assignment LHS load end at libgogo/string.go:101:18
+  //--- Assignment RHS load start at libgogo/string.go:101:26
   MOVQ -16(SP), R8
   ADDQ $1, R8
-  //--- Assignment RHS load end at libgogo/string.go:103:29
+  //--- Assignment RHS load end at libgogo/string.go:101:29
   MOVQ R8, -24(SP)
-  //--- Assignment end at libgogo/string.go:103:29
-  //--- Assignment start at libgogo/string.go:104:18
-  //--- Assignment LHS load start at libgogo/string.go:104:18
-  //--- Assignment LHS load end at libgogo/string.go:104:18
-  //--- Saving registers before function call start at libgogo/string.go:104:44
-  //--- Saving registers before function call end at libgogo/string.go:104:44
-  //--- First parameter expression start at libgogo/string.go:104:44
-  //--- First parameter expression load start at libgogo/string.go:104:44
+  //--- Assignment end at libgogo/string.go:101:29
+  //--- Assignment start at libgogo/string.go:102:18
+  //--- Assignment LHS load start at libgogo/string.go:102:18
+  //--- Assignment LHS load end at libgogo/string.go:102:18
+  //--- Saving registers before function call start at libgogo/string.go:102:44
+  //--- Saving registers before function call end at libgogo/string.go:102:44
+  //--- First parameter expression start at libgogo/string.go:102:44
+  //--- First parameter expression load start at libgogo/string.go:102:44
   MOVQ -16(SP), R8
   ADDQ $1, R8
-  //--- First parameter expression load end at libgogo/string.go:104:48
+  //--- First parameter expression load end at libgogo/string.go:102:48
   MOVQ R8, -80(SP)
-  //--- First parameter expression end at libgogo/string.go:104:48
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:104:48
+  //--- First parameter expression end at libgogo/string.go:102:48
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:102:48
   SUBQ $80, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:104:48
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:102:48
   CALL libgogo·GetMaxStringLength(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:104:48
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:102:48
   ADDQ $80, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:104:48
-  //--- Restoring registers after function call start at libgogo/string.go:104:48
-  //--- Restoring registers after function call end at libgogo/string.go:104:48
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:102:48
+  //--- Restoring registers after function call start at libgogo/string.go:102:48
+  //--- Restoring registers after function call end at libgogo/string.go:102:48
   MOVQ -72(SP), R8
   MOVQ R8, -32(SP)
-  //--- Assignment end at libgogo/string.go:104:49
-  //--- Assignment start at libgogo/string.go:105:16
-  //--- Assignment LHS load start at libgogo/string.go:105:16
-  //--- Assignment LHS load end at libgogo/string.go:105:16
-  //--- Saving registers before function call start at libgogo/string.go:105:37
-  //--- Saving registers before function call end at libgogo/string.go:105:37
-  //--- First parameter expression start at libgogo/string.go:105:37
-  //--- First parameter expression load start at libgogo/string.go:105:37
-  //--- First parameter expression load end at libgogo/string.go:105:37
+  //--- Assignment end at libgogo/string.go:102:49
+  //--- Assignment start at libgogo/string.go:103:16
+  //--- Assignment LHS load start at libgogo/string.go:103:16
+  //--- Assignment LHS load end at libgogo/string.go:103:16
+  //--- Saving registers before function call start at libgogo/string.go:103:37
+  //--- Saving registers before function call end at libgogo/string.go:103:37
+  //--- First parameter expression start at libgogo/string.go:103:37
+  //--- First parameter expression load start at libgogo/string.go:103:37
+  //--- First parameter expression load end at libgogo/string.go:103:37
   MOVQ 8(SP), R8
   MOVQ R8, -80(SP)
-  //--- First parameter expression end at libgogo/string.go:105:37
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:105:37
+  //--- First parameter expression end at libgogo/string.go:103:37
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:103:37
   SUBQ $80, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:105:37
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:103:37
   CALL libgogo·GetStringAddress(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:105:37
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:103:37
   ADDQ $80, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:105:37
-  //--- Restoring registers after function call start at libgogo/string.go:105:37
-  //--- Restoring registers after function call end at libgogo/string.go:105:37
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:103:37
+  //--- Restoring registers after function call start at libgogo/string.go:103:37
+  //--- Restoring registers after function call end at libgogo/string.go:103:37
   MOVQ -72(SP), R8
   MOVQ R8, -48(SP)
-  //--- Assignment end at libgogo/string.go:105:38
-  //--- If start at libgogo/string.go:106:8
+  //--- Assignment end at libgogo/string.go:103:38
+  //--- If start at libgogo/string.go:104:8
   MOVQ data+176(SB), R8
   CMPQ -48(SP), R8
-  JL IF_libgogo_string_106_1_END
+  JL IF_libgogo_string_104_1_END
   MOVQ -24(SP), R8
   ADDQ $1, R8
   CMPQ R8, -32(SP)
-  JG IF_libgogo_string_106_1_END
-  JMP IF_libgogo_string_106_END
-IF_libgogo_string_106_1_END:
-  //--- Assignment start at libgogo/string.go:107:22
-  //--- Assignment LHS load start at libgogo/string.go:107:22
-  //--- Assignment LHS load end at libgogo/string.go:107:22
-  //--- Saving registers before function call start at libgogo/string.go:107:52
-  //--- Saving registers before function call end at libgogo/string.go:107:52
-  //--- First parameter expression start at libgogo/string.go:107:52
-  //--- First parameter expression load start at libgogo/string.go:107:52
+  JG IF_libgogo_string_104_1_END
+  JMP IF_libgogo_string_104_END
+IF_libgogo_string_104_1_END:
+  //--- Assignment start at libgogo/string.go:105:22
+  //--- Assignment LHS load start at libgogo/string.go:105:22
+  //--- Assignment LHS load end at libgogo/string.go:105:22
+  //--- Saving registers before function call start at libgogo/string.go:105:52
+  //--- Saving registers before function call end at libgogo/string.go:105:52
+  //--- First parameter expression start at libgogo/string.go:105:52
+  //--- First parameter expression load start at libgogo/string.go:105:52
   MOVQ -24(SP), R8
   ADDQ $1, R8
-  //--- First parameter expression load end at libgogo/string.go:107:56
+  //--- First parameter expression load end at libgogo/string.go:105:56
   MOVQ R8, -80(SP)
-  //--- First parameter expression end at libgogo/string.go:107:56
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:107:56
+  //--- First parameter expression end at libgogo/string.go:105:56
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:105:56
   SUBQ $80, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:107:56
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:105:56
   CALL libgogo·GetMaxStringLength(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:107:56
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:105:56
   ADDQ $80, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:107:56
-  //--- Restoring registers after function call start at libgogo/string.go:107:56
-  //--- Restoring registers after function call end at libgogo/string.go:107:56
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:105:56
+  //--- Restoring registers after function call start at libgogo/string.go:105:56
+  //--- Restoring registers after function call end at libgogo/string.go:105:56
   MOVQ -72(SP), R8
   MOVQ R8, -32(SP)
-  //--- Assignment end at libgogo/string.go:107:57
-  //--- Assignment start at libgogo/string.go:108:20
-  //--- Assignment LHS load start at libgogo/string.go:108:20
-  //--- Assignment LHS load end at libgogo/string.go:108:20
-  //--- Saving registers before function call start at libgogo/string.go:108:37
-  //--- Saving registers before function call end at libgogo/string.go:108:37
-  //--- First parameter expression start at libgogo/string.go:108:37
-  //--- First parameter expression load start at libgogo/string.go:108:37
-  //--- First parameter expression load end at libgogo/string.go:108:37
+  //--- Assignment end at libgogo/string.go:105:57
+  //--- Assignment start at libgogo/string.go:106:20
+  //--- Assignment LHS load start at libgogo/string.go:106:20
+  //--- Assignment LHS load end at libgogo/string.go:106:20
+  //--- Saving registers before function call start at libgogo/string.go:106:37
+  //--- Saving registers before function call end at libgogo/string.go:106:37
+  //--- First parameter expression start at libgogo/string.go:106:37
+  //--- First parameter expression load start at libgogo/string.go:106:37
+  //--- First parameter expression load end at libgogo/string.go:106:37
   MOVQ -32(SP), R8
   MOVQ R8, -80(SP)
-  //--- First parameter expression end at libgogo/string.go:108:37
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:108:37
+  //--- First parameter expression end at libgogo/string.go:106:37
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:106:37
   SUBQ $80, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:108:37
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:106:37
   CALL libgogo·Alloc(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:108:37
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:106:37
   ADDQ $80, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:108:37
-  //--- Restoring registers after function call start at libgogo/string.go:108:37
-  //--- Restoring registers after function call end at libgogo/string.go:108:37
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:106:37
+  //--- Restoring registers after function call start at libgogo/string.go:106:37
+  //--- Restoring registers after function call end at libgogo/string.go:106:37
   MOVQ -72(SP), R8
   MOVQ R8, -40(SP)
-  //--- Assignment end at libgogo/string.go:108:38
-  //--- If start at libgogo/string.go:109:12
+  //--- Assignment end at libgogo/string.go:106:38
+  //--- If start at libgogo/string.go:107:12
   CMPQ -16(SP), $0
-  JG IF_libgogo_string_109_1_END
-  JMP IF_libgogo_string_109_END
-IF_libgogo_string_109_1_END:
-  //--- Saving registers before function call start at libgogo/string.go:110:30
-  //--- Saving registers before function call end at libgogo/string.go:110:30
-  //--- First parameter expression start at libgogo/string.go:110:30
-  //--- First parameter expression load start at libgogo/string.go:110:30
-  //--- First parameter expression load end at libgogo/string.go:110:30
+  JG IF_libgogo_string_107_1_END
+  JMP IF_libgogo_string_107_END
+IF_libgogo_string_107_1_END:
+  //--- Saving registers before function call start at libgogo/string.go:108:30
+  //--- Saving registers before function call end at libgogo/string.go:108:30
+  //--- First parameter expression start at libgogo/string.go:108:30
+  //--- First parameter expression load start at libgogo/string.go:108:30
+  //--- First parameter expression load end at libgogo/string.go:108:30
   MOVQ -48(SP), R8
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:110:30
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:108:30
   MOVQ R8, -100064(SP)
-  //--- First parameter expression end at libgogo/string.go:110:30
-  //--- Subsequent parameter expression start at libgogo/string.go:110:30
-  //--- Subsequent parameter expression load start at libgogo/string.go:110:30
-  //--- Subsequent parameter expression load end at libgogo/string.go:110:40
+  //--- First parameter expression end at libgogo/string.go:108:30
+  //--- Subsequent parameter expression start at libgogo/string.go:108:30
+  //--- Subsequent parameter expression load start at libgogo/string.go:108:30
+  //--- Subsequent parameter expression load end at libgogo/string.go:108:40
   MOVQ -40(SP), R8
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:110:40
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:108:40
   MOVQ R8, -100056(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:110:40
-  //--- Subsequent parameter expression start at libgogo/string.go:110:40
-  //--- Subsequent parameter expression load start at libgogo/string.go:110:40
-  //--- Subsequent parameter expression load end at libgogo/string.go:110:48
+  //--- Subsequent parameter expression end at libgogo/string.go:108:40
+  //--- Subsequent parameter expression start at libgogo/string.go:108:40
+  //--- Subsequent parameter expression load start at libgogo/string.go:108:40
+  //--- Subsequent parameter expression load end at libgogo/string.go:108:48
   MOVQ -16(SP), R8
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:110:48
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:108:48
   MOVQ R8, -100048(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:110:48
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:110:48
-  //--- ##2##libgogo·CopyMem## at libgogo/string.go:110:48
+  //--- Subsequent parameter expression end at libgogo/string.go:108:48
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:108:48
+  //--- ##2##libgogo·CopyMem## at libgogo/string.go:108:48
   SUBQ $64, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:110:48
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:108:48
   CALL libgogo·CopyMem(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:110:48
-  //--- ##2##libgogo·CopyMem## at libgogo/string.go:110:48
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:108:48
+  //--- ##2##libgogo·CopyMem## at libgogo/string.go:108:48
   ADDQ $64, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:110:48
-  //--- Restoring registers after function call start at libgogo/string.go:110:48
-  //--- Restoring registers after function call end at libgogo/string.go:110:48
-IF_libgogo_string_109_END:
-IF_libgogo_string_109_ELSE_END:
-  //--- If end at libgogo/string.go:112:6
-  JMP IF_libgogo_string_106_ELSE_END
-IF_libgogo_string_106_END:
-  //--- Else start at libgogo/string.go:112:12
-  //--- Assignment start at libgogo/string.go:113:20
-  //--- Assignment LHS load start at libgogo/string.go:113:20
-  //--- Assignment LHS load end at libgogo/string.go:113:20
-  //--- Assignment RHS load start at libgogo/string.go:113:29
-  //--- Assignment RHS load end at libgogo/string.go:113:29
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:108:48
+  //--- Restoring registers after function call start at libgogo/string.go:108:48
+  //--- Restoring registers after function call end at libgogo/string.go:108:48
+IF_libgogo_string_107_END:
+IF_libgogo_string_107_ELSE_END:
+  //--- If end at libgogo/string.go:110:6
+  JMP IF_libgogo_string_104_ELSE_END
+IF_libgogo_string_104_END:
+  //--- Else start at libgogo/string.go:110:12
+  //--- Assignment start at libgogo/string.go:111:20
+  //--- Assignment LHS load start at libgogo/string.go:111:20
+  //--- Assignment LHS load end at libgogo/string.go:111:20
+  //--- Assignment RHS load start at libgogo/string.go:111:29
+  //--- Assignment RHS load end at libgogo/string.go:111:29
   MOVQ -48(SP), R8
   MOVQ R8, -40(SP)
-  //--- Assignment end at libgogo/string.go:113:29
-  //--- Else end at libgogo/string.go:114:6
-IF_libgogo_string_106_ELSE_END:
-  //--- Assignment start at libgogo/string.go:115:17
-  //--- Assignment LHS load start at libgogo/string.go:115:17
-  //--- Assignment LHS load end at libgogo/string.go:115:17
-  //--- Saving registers before function call start at libgogo/string.go:115:39
-  //--- Saving registers before function call end at libgogo/string.go:115:39
-  //--- First parameter expression start at libgogo/string.go:115:39
-  //--- First parameter expression load start at libgogo/string.go:115:39
-  //--- First parameter expression load end at libgogo/string.go:115:43
+  //--- Assignment end at libgogo/string.go:111:29
+  //--- Else end at libgogo/string.go:112:6
+IF_libgogo_string_104_ELSE_END:
+  //--- Assignment start at libgogo/string.go:113:17
+  //--- Assignment LHS load start at libgogo/string.go:113:17
+  //--- Assignment LHS load end at libgogo/string.go:113:17
+  //--- Saving registers before function call start at libgogo/string.go:113:39
+  //--- Saving registers before function call end at libgogo/string.go:113:39
+  //--- First parameter expression start at libgogo/string.go:113:39
+  //--- First parameter expression load start at libgogo/string.go:113:39
+  //--- First parameter expression load end at libgogo/string.go:113:43
   LEAQ 16(SP), R8
   MOVQ R8, -80(SP)
-  //--- First parameter expression end at libgogo/string.go:115:43
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:115:43
+  //--- First parameter expression end at libgogo/string.go:113:43
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:113:43
   SUBQ $80, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:115:43
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:113:43
   CALL libgogo·ToUint64FromBytePtr(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:115:43
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:113:43
   ADDQ $80, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:115:43
-  //--- Restoring registers after function call start at libgogo/string.go:115:43
-  //--- Restoring registers after function call end at libgogo/string.go:115:43
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:113:43
+  //--- Restoring registers after function call start at libgogo/string.go:113:43
+  //--- Restoring registers after function call end at libgogo/string.go:113:43
   MOVQ -72(SP), R8
   MOVQ R8, -56(SP)
-  //--- Assignment end at libgogo/string.go:115:44
-  //--- Saving registers before function call start at libgogo/string.go:116:23
-  //--- Saving registers before function call end at libgogo/string.go:116:23
-  //--- First parameter expression start at libgogo/string.go:116:23
-  //--- First parameter expression load start at libgogo/string.go:116:23
-  //--- First parameter expression load end at libgogo/string.go:116:23
+  //--- Assignment end at libgogo/string.go:113:44
+  //--- Saving registers before function call start at libgogo/string.go:114:23
+  //--- Saving registers before function call end at libgogo/string.go:114:23
+  //--- First parameter expression start at libgogo/string.go:114:23
+  //--- First parameter expression load start at libgogo/string.go:114:23
+  //--- First parameter expression load end at libgogo/string.go:114:23
   MOVQ -56(SP), R8
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:116:23
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:114:23
   MOVQ R8, -100064(SP)
-  //--- First parameter expression end at libgogo/string.go:116:23
-  //--- Subsequent parameter expression start at libgogo/string.go:116:23
-  //--- Subsequent parameter expression load start at libgogo/string.go:116:23
+  //--- First parameter expression end at libgogo/string.go:114:23
+  //--- Subsequent parameter expression start at libgogo/string.go:114:23
+  //--- Subsequent parameter expression load start at libgogo/string.go:114:23
   MOVQ -40(SP), R8
   ADDQ -16(SP), R8
-  //--- Subsequent parameter expression load end at libgogo/string.go:116:42
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:116:42
+  //--- Subsequent parameter expression load end at libgogo/string.go:114:42
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:114:42
   MOVQ R8, -100056(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:116:42
-  //--- Subsequent parameter expression start at libgogo/string.go:116:42
-  //--- Subsequent parameter expression load start at libgogo/string.go:116:42
-  //--- Subsequent parameter expression load end at libgogo/string.go:116:45
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:116:45
+  //--- Subsequent parameter expression end at libgogo/string.go:114:42
+  //--- Subsequent parameter expression start at libgogo/string.go:114:42
+  //--- Subsequent parameter expression load start at libgogo/string.go:114:42
+  //--- Subsequent parameter expression load end at libgogo/string.go:114:45
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:114:45
   MOVQ $1, -100048(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:116:45
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:116:45
-  //--- ##2##libgogo·CopyMem## at libgogo/string.go:116:45
+  //--- Subsequent parameter expression end at libgogo/string.go:114:45
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:114:45
+  //--- ##2##libgogo·CopyMem## at libgogo/string.go:114:45
   SUBQ $64, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:116:45
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:114:45
   CALL libgogo·CopyMem(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:116:45
-  //--- ##2##libgogo·CopyMem## at libgogo/string.go:116:45
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:114:45
+  //--- ##2##libgogo·CopyMem## at libgogo/string.go:114:45
   ADDQ $64, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:116:45
-  //--- Restoring registers after function call start at libgogo/string.go:116:45
-  //--- Restoring registers after function call end at libgogo/string.go:116:45
-  //--- Assignment start at libgogo/string.go:117:21
-  //--- Assignment LHS load start at libgogo/string.go:117:21
-  //--- Assignment LHS load end at libgogo/string.go:117:21
-  //--- Saving registers before function call start at libgogo/string.go:117:43
-  //--- Saving registers before function call end at libgogo/string.go:117:43
-  //--- First parameter expression start at libgogo/string.go:117:43
-  //--- First parameter expression load start at libgogo/string.go:117:43
-  //--- First parameter expression load end at libgogo/string.go:117:51
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:114:45
+  //--- Restoring registers after function call start at libgogo/string.go:114:45
+  //--- Restoring registers after function call end at libgogo/string.go:114:45
+  //--- Assignment start at libgogo/string.go:115:21
+  //--- Assignment LHS load start at libgogo/string.go:115:21
+  //--- Assignment LHS load end at libgogo/string.go:115:21
+  //--- Saving registers before function call start at libgogo/string.go:115:43
+  //--- Saving registers before function call end at libgogo/string.go:115:43
+  //--- First parameter expression start at libgogo/string.go:115:43
+  //--- First parameter expression load start at libgogo/string.go:115:43
+  //--- First parameter expression load end at libgogo/string.go:115:51
   LEAQ -8(SP), R8
   MOVQ R8, -80(SP)
-  //--- First parameter expression end at libgogo/string.go:117:51
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:117:51
+  //--- First parameter expression end at libgogo/string.go:115:51
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:115:51
   SUBQ $80, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:117:51
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:115:51
   CALL libgogo·ToUint64FromBytePtr(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:117:51
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:115:51
   ADDQ $80, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:117:51
-  //--- Restoring registers after function call start at libgogo/string.go:117:51
-  //--- Restoring registers after function call end at libgogo/string.go:117:51
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:115:51
+  //--- Restoring registers after function call start at libgogo/string.go:115:51
+  //--- Restoring registers after function call end at libgogo/string.go:115:51
   MOVQ -72(SP), R8
   MOVQ R8, -64(SP)
-  //--- Assignment end at libgogo/string.go:117:52
-  //--- Saving registers before function call start at libgogo/string.go:118:27
-  //--- Saving registers before function call end at libgogo/string.go:118:27
-  //--- First parameter expression start at libgogo/string.go:118:27
-  //--- First parameter expression load start at libgogo/string.go:118:27
-  //--- First parameter expression load end at libgogo/string.go:118:27
+  //--- Assignment end at libgogo/string.go:115:52
+  //--- Saving registers before function call start at libgogo/string.go:116:27
+  //--- Saving registers before function call end at libgogo/string.go:116:27
+  //--- First parameter expression start at libgogo/string.go:116:27
+  //--- First parameter expression load start at libgogo/string.go:116:27
+  //--- First parameter expression load end at libgogo/string.go:116:27
   MOVQ -64(SP), R8
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:118:27
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:116:27
   MOVQ R8, -100064(SP)
-  //--- First parameter expression end at libgogo/string.go:118:27
-  //--- Subsequent parameter expression start at libgogo/string.go:118:27
-  //--- Subsequent parameter expression load start at libgogo/string.go:118:27
+  //--- First parameter expression end at libgogo/string.go:116:27
+  //--- Subsequent parameter expression start at libgogo/string.go:116:27
+  //--- Subsequent parameter expression load start at libgogo/string.go:116:27
   MOVQ -40(SP), R8
   ADDQ -16(SP), R8
   ADDQ $1, R8
-  //--- Subsequent parameter expression load end at libgogo/string.go:118:48
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:118:48
+  //--- Subsequent parameter expression load end at libgogo/string.go:116:48
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:116:48
   MOVQ R8, -100056(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:118:48
-  //--- Subsequent parameter expression start at libgogo/string.go:118:48
-  //--- Subsequent parameter expression load start at libgogo/string.go:118:48
-  //--- Subsequent parameter expression load end at libgogo/string.go:118:51
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:118:51
+  //--- Subsequent parameter expression end at libgogo/string.go:116:48
+  //--- Subsequent parameter expression start at libgogo/string.go:116:48
+  //--- Subsequent parameter expression load start at libgogo/string.go:116:48
+  //--- Subsequent parameter expression load end at libgogo/string.go:116:51
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:116:51
   MOVQ $1, -100048(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:118:51
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:118:51
-  //--- ##2##libgogo·CopyMem## at libgogo/string.go:118:51
+  //--- Subsequent parameter expression end at libgogo/string.go:116:51
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:116:51
+  //--- ##2##libgogo·CopyMem## at libgogo/string.go:116:51
   SUBQ $64, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:118:51
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:116:51
   CALL libgogo·CopyMem(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:118:51
-  //--- ##2##libgogo·CopyMem## at libgogo/string.go:118:51
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:116:51
+  //--- ##2##libgogo·CopyMem## at libgogo/string.go:116:51
   ADDQ $64, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:118:51
-  //--- Restoring registers after function call start at libgogo/string.go:118:51
-  //--- Restoring registers after function call end at libgogo/string.go:118:51
-  //--- Saving registers before function call start at libgogo/string.go:119:35
-  //--- Saving registers before function call end at libgogo/string.go:119:35
-  //--- First parameter expression start at libgogo/string.go:119:35
-  //--- First parameter expression load start at libgogo/string.go:119:35
-  //--- First parameter expression load end at libgogo/string.go:119:35
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:116:51
+  //--- Restoring registers after function call start at libgogo/string.go:116:51
+  //--- Restoring registers after function call end at libgogo/string.go:116:51
+  //--- Saving registers before function call start at libgogo/string.go:117:35
+  //--- Saving registers before function call end at libgogo/string.go:117:35
+  //--- First parameter expression start at libgogo/string.go:117:35
+  //--- First parameter expression load start at libgogo/string.go:117:35
+  //--- First parameter expression load end at libgogo/string.go:117:35
   MOVQ 8(SP), R8
   MOVQ R8, -88(SP)
-  //--- First parameter expression end at libgogo/string.go:119:35
-  //--- Subsequent parameter expression start at libgogo/string.go:119:35
-  //--- Subsequent parameter expression load start at libgogo/string.go:119:35
-  //--- Subsequent parameter expression load end at libgogo/string.go:119:45
+  //--- First parameter expression end at libgogo/string.go:117:35
+  //--- Subsequent parameter expression start at libgogo/string.go:117:35
+  //--- Subsequent parameter expression load start at libgogo/string.go:117:35
+  //--- Subsequent parameter expression load end at libgogo/string.go:117:45
   MOVQ -40(SP), R8
   MOVQ R8, -80(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:119:45
-  //--- Subsequent parameter expression start at libgogo/string.go:119:45
-  //--- Subsequent parameter expression load start at libgogo/string.go:119:45
-  //--- Subsequent parameter expression load end at libgogo/string.go:119:57
+  //--- Subsequent parameter expression end at libgogo/string.go:117:45
+  //--- Subsequent parameter expression start at libgogo/string.go:117:45
+  //--- Subsequent parameter expression load start at libgogo/string.go:117:45
+  //--- Subsequent parameter expression load end at libgogo/string.go:117:57
   MOVQ -24(SP), R8
   MOVQ R8, -72(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:119:57
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:119:57
+  //--- Subsequent parameter expression end at libgogo/string.go:117:57
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:117:57
   SUBQ $88, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:119:57
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:117:57
   CALL libgogo·SetStringAddressAndLength(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:119:57
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:117:57
   ADDQ $88, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:119:57
-  //--- Restoring registers after function call start at libgogo/string.go:119:57
-  //--- Restoring registers after function call end at libgogo/string.go:119:57
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:117:57
+  //--- Restoring registers after function call start at libgogo/string.go:117:57
+  //--- Restoring registers after function call end at libgogo/string.go:117:57
   RET
 
 TEXT libgogo·StringAppend(SB),0,$0-0
-  //--- Local variable assignment start at libgogo/string.go:127:25
-  //--- Local variable assignment RHS load start at libgogo/string.go:127:25
-  //--- Local variable assignment RHS load end at libgogo/string.go:127:27
+  //--- Local variable assignment start at libgogo/string.go:125:25
+  //--- Local variable assignment RHS load start at libgogo/string.go:125:25
+  //--- Local variable assignment RHS load end at libgogo/string.go:125:27
   MOVB $0, -8(SP)
-  //--- Local variable assignment end at libgogo/string.go:127:27
-  //--- Assignment start at libgogo/string.go:136:14
-  //--- Assignment LHS load start at libgogo/string.go:136:14
-  //--- Assignment LHS load end at libgogo/string.go:136:14
-  //--- Saving registers before function call start at libgogo/string.go:136:32
-  //--- Saving registers before function call end at libgogo/string.go:136:32
-  //--- First parameter expression start at libgogo/string.go:136:32
-  //--- First parameter expression load start at libgogo/string.go:136:32
-  //--- First parameter expression load end at libgogo/string.go:136:32
+  //--- Local variable assignment end at libgogo/string.go:125:27
+  //--- Assignment start at libgogo/string.go:134:14
+  //--- Assignment LHS load start at libgogo/string.go:134:14
+  //--- Assignment LHS load end at libgogo/string.go:134:14
+  //--- Saving registers before function call start at libgogo/string.go:134:32
+  //--- Saving registers before function call end at libgogo/string.go:134:32
+  //--- First parameter expression start at libgogo/string.go:134:32
+  //--- First parameter expression load start at libgogo/string.go:134:32
+  //--- First parameter expression load end at libgogo/string.go:134:32
   MOVQ 8(SP), R8
   MOVQ R8, -88(SP)
-  //--- First parameter expression end at libgogo/string.go:136:32
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:136:32
+  //--- First parameter expression end at libgogo/string.go:134:32
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:134:32
   SUBQ $88, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:136:32
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:134:32
   CALL libgogo·StringLength2(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:136:32
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:134:32
   ADDQ $88, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:136:32
-  //--- Restoring registers after function call start at libgogo/string.go:136:32
-  //--- Restoring registers after function call end at libgogo/string.go:136:32
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:134:32
+  //--- Restoring registers after function call start at libgogo/string.go:134:32
+  //--- Restoring registers after function call end at libgogo/string.go:134:32
   MOVQ -80(SP), R8
   MOVQ R8, -16(SP)
-  //--- Assignment end at libgogo/string.go:136:33
-  //--- Assignment start at libgogo/string.go:137:18
-  //--- Assignment LHS load start at libgogo/string.go:137:18
-  //--- Assignment LHS load end at libgogo/string.go:137:18
-  //--- Saving registers before function call start at libgogo/string.go:137:44
-  //--- Saving registers before function call end at libgogo/string.go:137:44
-  //--- First parameter expression start at libgogo/string.go:137:44
-  //--- First parameter expression load start at libgogo/string.go:137:44
+  //--- Assignment end at libgogo/string.go:134:33
+  //--- Assignment start at libgogo/string.go:135:18
+  //--- Assignment LHS load start at libgogo/string.go:135:18
+  //--- Assignment LHS load end at libgogo/string.go:135:18
+  //--- Saving registers before function call start at libgogo/string.go:135:44
+  //--- Saving registers before function call end at libgogo/string.go:135:44
+  //--- First parameter expression start at libgogo/string.go:135:44
+  //--- First parameter expression load start at libgogo/string.go:135:44
   MOVQ -16(SP), R8
   ADDQ $1, R8
-  //--- First parameter expression load end at libgogo/string.go:137:48
+  //--- First parameter expression load end at libgogo/string.go:135:48
   MOVQ R8, -88(SP)
-  //--- First parameter expression end at libgogo/string.go:137:48
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:137:48
+  //--- First parameter expression end at libgogo/string.go:135:48
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:135:48
   SUBQ $88, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:137:48
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:135:48
   CALL libgogo·GetMaxStringLength(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:137:48
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:135:48
   ADDQ $88, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:137:48
-  //--- Restoring registers after function call start at libgogo/string.go:137:48
-  //--- Restoring registers after function call end at libgogo/string.go:137:48
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:135:48
+  //--- Restoring registers after function call start at libgogo/string.go:135:48
+  //--- Restoring registers after function call end at libgogo/string.go:135:48
   MOVQ -80(SP), R8
   MOVQ R8, -40(SP)
-  //--- Assignment end at libgogo/string.go:137:49
-  //--- Assignment start at libgogo/string.go:138:20
-  //--- Assignment LHS load start at libgogo/string.go:138:20
-  //--- Assignment LHS load end at libgogo/string.go:138:20
-  //--- Saving registers before function call start at libgogo/string.go:138:44
-  //--- Saving registers before function call end at libgogo/string.go:138:44
-  //--- First parameter expression start at libgogo/string.go:138:44
-  //--- First parameter expression load start at libgogo/string.go:138:44
-  //--- First parameter expression load end at libgogo/string.go:138:44
+  //--- Assignment end at libgogo/string.go:135:49
+  //--- Assignment start at libgogo/string.go:136:20
+  //--- Assignment LHS load start at libgogo/string.go:136:20
+  //--- Assignment LHS load end at libgogo/string.go:136:20
+  //--- Saving registers before function call start at libgogo/string.go:136:44
+  //--- Saving registers before function call end at libgogo/string.go:136:44
+  //--- First parameter expression start at libgogo/string.go:136:44
+  //--- First parameter expression load start at libgogo/string.go:136:44
+  //--- First parameter expression load end at libgogo/string.go:136:44
   MOVQ 16(SP), R8
   MOVQ 24(SP), R9
   MOVQ R8, -96(SP)
   MOVQ R9, -88(SP)
-  //--- First parameter expression end at libgogo/string.go:138:44
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:138:44
+  //--- First parameter expression end at libgogo/string.go:136:44
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:136:44
   SUBQ $96, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:138:44
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:136:44
   CALL libgogo·StringLength(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:138:44
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:136:44
   ADDQ $96, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:138:44
-  //--- Restoring registers after function call start at libgogo/string.go:138:44
-  //--- Restoring registers after function call end at libgogo/string.go:138:44
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:136:44
+  //--- Restoring registers after function call start at libgogo/string.go:136:44
+  //--- Restoring registers after function call end at libgogo/string.go:136:44
   MOVQ -80(SP), R8
   MOVQ R8, -24(SP)
-  //--- Assignment end at libgogo/string.go:138:45
-  //--- Assignment start at libgogo/string.go:139:18
-  //--- Assignment LHS load start at libgogo/string.go:139:18
-  //--- Assignment LHS load end at libgogo/string.go:139:18
-  //--- Assignment RHS load start at libgogo/string.go:139:26
+  //--- Assignment end at libgogo/string.go:136:45
+  //--- Assignment start at libgogo/string.go:137:18
+  //--- Assignment LHS load start at libgogo/string.go:137:18
+  //--- Assignment LHS load end at libgogo/string.go:137:18
+  //--- Assignment RHS load start at libgogo/string.go:137:26
   MOVQ -16(SP), R8
   ADDQ -24(SP), R8
-  //--- Assignment RHS load end at libgogo/string.go:139:40
+  //--- Assignment RHS load end at libgogo/string.go:137:40
   MOVQ R8, -32(SP)
-  //--- Assignment end at libgogo/string.go:139:40
-  //--- Assignment start at libgogo/string.go:140:16
-  //--- Assignment LHS load start at libgogo/string.go:140:16
-  //--- Assignment LHS load end at libgogo/string.go:140:16
-  //--- Saving registers before function call start at libgogo/string.go:140:37
-  //--- Saving registers before function call end at libgogo/string.go:140:37
-  //--- First parameter expression start at libgogo/string.go:140:37
-  //--- First parameter expression load start at libgogo/string.go:140:37
-  //--- First parameter expression load end at libgogo/string.go:140:37
+  //--- Assignment end at libgogo/string.go:137:40
+  //--- Assignment start at libgogo/string.go:138:16
+  //--- Assignment LHS load start at libgogo/string.go:138:16
+  //--- Assignment LHS load end at libgogo/string.go:138:16
+  //--- Saving registers before function call start at libgogo/string.go:138:37
+  //--- Saving registers before function call end at libgogo/string.go:138:37
+  //--- First parameter expression start at libgogo/string.go:138:37
+  //--- First parameter expression load start at libgogo/string.go:138:37
+  //--- First parameter expression load end at libgogo/string.go:138:37
   MOVQ 8(SP), R8
   MOVQ R8, -88(SP)
-  //--- First parameter expression end at libgogo/string.go:140:37
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:140:37
+  //--- First parameter expression end at libgogo/string.go:138:37
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:138:37
   SUBQ $88, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:140:37
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:138:37
   CALL libgogo·GetStringAddress(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:140:37
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:138:37
   ADDQ $88, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:140:37
-  //--- Restoring registers after function call start at libgogo/string.go:140:37
-  //--- Restoring registers after function call end at libgogo/string.go:140:37
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:138:37
+  //--- Restoring registers after function call start at libgogo/string.go:138:37
+  //--- Restoring registers after function call end at libgogo/string.go:138:37
   MOVQ -80(SP), R8
   MOVQ R8, -56(SP)
-  //--- Assignment end at libgogo/string.go:140:38
-  //--- If start at libgogo/string.go:141:8
+  //--- Assignment end at libgogo/string.go:138:38
+  //--- If start at libgogo/string.go:139:8
   MOVQ data+176(SB), R8
   CMPQ -56(SP), R8
-  JL IF_libgogo_string_141_1_END
+  JL IF_libgogo_string_139_1_END
   MOVQ -32(SP), R8
   ADDQ $1, R8
   CMPQ R8, -40(SP)
-  JG IF_libgogo_string_141_1_END
-  JMP IF_libgogo_string_141_END
-IF_libgogo_string_141_1_END:
-  //--- Assignment start at libgogo/string.go:142:22
-  //--- Assignment LHS load start at libgogo/string.go:142:22
-  //--- Assignment LHS load end at libgogo/string.go:142:22
-  //--- Saving registers before function call start at libgogo/string.go:142:52
-  //--- Saving registers before function call end at libgogo/string.go:142:52
-  //--- First parameter expression start at libgogo/string.go:142:52
-  //--- First parameter expression load start at libgogo/string.go:142:52
+  JG IF_libgogo_string_139_1_END
+  JMP IF_libgogo_string_139_END
+IF_libgogo_string_139_1_END:
+  //--- Assignment start at libgogo/string.go:140:22
+  //--- Assignment LHS load start at libgogo/string.go:140:22
+  //--- Assignment LHS load end at libgogo/string.go:140:22
+  //--- Saving registers before function call start at libgogo/string.go:140:52
+  //--- Saving registers before function call end at libgogo/string.go:140:52
+  //--- First parameter expression start at libgogo/string.go:140:52
+  //--- First parameter expression load start at libgogo/string.go:140:52
   MOVQ -32(SP), R8
   ADDQ $1, R8
-  //--- First parameter expression load end at libgogo/string.go:142:56
+  //--- First parameter expression load end at libgogo/string.go:140:56
   MOVQ R8, -88(SP)
-  //--- First parameter expression end at libgogo/string.go:142:56
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:142:56
+  //--- First parameter expression end at libgogo/string.go:140:56
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:140:56
   SUBQ $88, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:142:56
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:140:56
   CALL libgogo·GetMaxStringLength(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:142:56
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:140:56
   ADDQ $88, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:142:56
-  //--- Restoring registers after function call start at libgogo/string.go:142:56
-  //--- Restoring registers after function call end at libgogo/string.go:142:56
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:140:56
+  //--- Restoring registers after function call start at libgogo/string.go:140:56
+  //--- Restoring registers after function call end at libgogo/string.go:140:56
   MOVQ -80(SP), R8
   MOVQ R8, -40(SP)
-  //--- Assignment end at libgogo/string.go:142:57
-  //--- Assignment start at libgogo/string.go:143:20
-  //--- Assignment LHS load start at libgogo/string.go:143:20
-  //--- Assignment LHS load end at libgogo/string.go:143:20
-  //--- Saving registers before function call start at libgogo/string.go:143:37
-  //--- Saving registers before function call end at libgogo/string.go:143:37
-  //--- First parameter expression start at libgogo/string.go:143:37
-  //--- First parameter expression load start at libgogo/string.go:143:37
-  //--- First parameter expression load end at libgogo/string.go:143:37
+  //--- Assignment end at libgogo/string.go:140:57
+  //--- Assignment start at libgogo/string.go:141:20
+  //--- Assignment LHS load start at libgogo/string.go:141:20
+  //--- Assignment LHS load end at libgogo/string.go:141:20
+  //--- Saving registers before function call start at libgogo/string.go:141:37
+  //--- Saving registers before function call end at libgogo/string.go:141:37
+  //--- First parameter expression start at libgogo/string.go:141:37
+  //--- First parameter expression load start at libgogo/string.go:141:37
+  //--- First parameter expression load end at libgogo/string.go:141:37
   MOVQ -40(SP), R8
   MOVQ R8, -88(SP)
-  //--- First parameter expression end at libgogo/string.go:143:37
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:143:37
+  //--- First parameter expression end at libgogo/string.go:141:37
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:141:37
   SUBQ $88, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:143:37
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:141:37
   CALL libgogo·Alloc(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:143:37
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:141:37
   ADDQ $88, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:143:37
-  //--- Restoring registers after function call start at libgogo/string.go:143:37
-  //--- Restoring registers after function call end at libgogo/string.go:143:37
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:141:37
+  //--- Restoring registers after function call start at libgogo/string.go:141:37
+  //--- Restoring registers after function call end at libgogo/string.go:141:37
   MOVQ -80(SP), R8
   MOVQ R8, -48(SP)
-  //--- Assignment end at libgogo/string.go:143:38
-  //--- If start at libgogo/string.go:144:12
+  //--- Assignment end at libgogo/string.go:141:38
+  //--- If start at libgogo/string.go:142:12
   CMPQ -16(SP), $0
-  JG IF_libgogo_string_144_1_END
-  JMP IF_libgogo_string_144_END
-IF_libgogo_string_144_1_END:
-  //--- Saving registers before function call start at libgogo/string.go:145:30
-  //--- Saving registers before function call end at libgogo/string.go:145:30
-  //--- First parameter expression start at libgogo/string.go:145:30
-  //--- First parameter expression load start at libgogo/string.go:145:30
-  //--- First parameter expression load end at libgogo/string.go:145:30
+  JG IF_libgogo_string_142_1_END
+  JMP IF_libgogo_string_142_END
+IF_libgogo_string_142_1_END:
+  //--- Saving registers before function call start at libgogo/string.go:143:30
+  //--- Saving registers before function call end at libgogo/string.go:143:30
+  //--- First parameter expression start at libgogo/string.go:143:30
+  //--- First parameter expression load start at libgogo/string.go:143:30
+  //--- First parameter expression load end at libgogo/string.go:143:30
   MOVQ -56(SP), R8
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:145:30
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:143:30
   MOVQ R8, -100072(SP)
-  //--- First parameter expression end at libgogo/string.go:145:30
-  //--- Subsequent parameter expression start at libgogo/string.go:145:30
-  //--- Subsequent parameter expression load start at libgogo/string.go:145:30
-  //--- Subsequent parameter expression load end at libgogo/string.go:145:40
+  //--- First parameter expression end at libgogo/string.go:143:30
+  //--- Subsequent parameter expression start at libgogo/string.go:143:30
+  //--- Subsequent parameter expression load start at libgogo/string.go:143:30
+  //--- Subsequent parameter expression load end at libgogo/string.go:143:40
   MOVQ -48(SP), R8
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:145:40
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:143:40
   MOVQ R8, -100064(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:145:40
-  //--- Subsequent parameter expression start at libgogo/string.go:145:40
-  //--- Subsequent parameter expression load start at libgogo/string.go:145:40
-  //--- Subsequent parameter expression load end at libgogo/string.go:145:48
+  //--- Subsequent parameter expression end at libgogo/string.go:143:40
+  //--- Subsequent parameter expression start at libgogo/string.go:143:40
+  //--- Subsequent parameter expression load start at libgogo/string.go:143:40
+  //--- Subsequent parameter expression load end at libgogo/string.go:143:48
   MOVQ -16(SP), R8
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:145:48
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:143:48
   MOVQ R8, -100056(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:145:48
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:145:48
-  //--- ##2##libgogo·CopyMem## at libgogo/string.go:145:48
+  //--- Subsequent parameter expression end at libgogo/string.go:143:48
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:143:48
+  //--- ##2##libgogo·CopyMem## at libgogo/string.go:143:48
   SUBQ $72, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:145:48
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:143:48
   CALL libgogo·CopyMem(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:145:48
-  //--- ##2##libgogo·CopyMem## at libgogo/string.go:145:48
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:143:48
+  //--- ##2##libgogo·CopyMem## at libgogo/string.go:143:48
   ADDQ $72, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:145:48
-  //--- Restoring registers after function call start at libgogo/string.go:145:48
-  //--- Restoring registers after function call end at libgogo/string.go:145:48
-IF_libgogo_string_144_END:
-IF_libgogo_string_144_ELSE_END:
-  //--- If end at libgogo/string.go:147:6
-  JMP IF_libgogo_string_141_ELSE_END
-IF_libgogo_string_141_END:
-  //--- Else start at libgogo/string.go:147:12
-  //--- Assignment start at libgogo/string.go:148:20
-  //--- Assignment LHS load start at libgogo/string.go:148:20
-  //--- Assignment LHS load end at libgogo/string.go:148:20
-  //--- Assignment RHS load start at libgogo/string.go:148:29
-  //--- Assignment RHS load end at libgogo/string.go:148:29
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:143:48
+  //--- Restoring registers after function call start at libgogo/string.go:143:48
+  //--- Restoring registers after function call end at libgogo/string.go:143:48
+IF_libgogo_string_142_END:
+IF_libgogo_string_142_ELSE_END:
+  //--- If end at libgogo/string.go:145:6
+  JMP IF_libgogo_string_139_ELSE_END
+IF_libgogo_string_139_END:
+  //--- Else start at libgogo/string.go:145:12
+  //--- Assignment start at libgogo/string.go:146:20
+  //--- Assignment LHS load start at libgogo/string.go:146:20
+  //--- Assignment LHS load end at libgogo/string.go:146:20
+  //--- Assignment RHS load start at libgogo/string.go:146:29
+  //--- Assignment RHS load end at libgogo/string.go:146:29
   MOVQ -56(SP), R8
   MOVQ R8, -48(SP)
-  //--- Assignment end at libgogo/string.go:148:29
-  //--- Else end at libgogo/string.go:149:6
-IF_libgogo_string_141_ELSE_END:
-  //--- Assignment start at libgogo/string.go:150:19
-  //--- Assignment LHS load start at libgogo/string.go:150:19
-  //--- Assignment LHS load end at libgogo/string.go:150:19
-  //--- Saving registers before function call start at libgogo/string.go:150:38
-  //--- Saving registers before function call end at libgogo/string.go:150:38
-  //--- First parameter expression start at libgogo/string.go:150:38
-  //--- First parameter expression load start at libgogo/string.go:150:38
-  //--- First parameter expression load end at libgogo/string.go:150:48
+  //--- Assignment end at libgogo/string.go:146:29
+  //--- Else end at libgogo/string.go:147:6
+IF_libgogo_string_139_ELSE_END:
+  //--- Assignment start at libgogo/string.go:148:19
+  //--- Assignment LHS load start at libgogo/string.go:148:19
+  //--- Assignment LHS load end at libgogo/string.go:148:19
+  //--- Saving registers before function call start at libgogo/string.go:148:38
+  //--- Saving registers before function call end at libgogo/string.go:148:38
+  //--- First parameter expression start at libgogo/string.go:148:38
+  //--- First parameter expression load start at libgogo/string.go:148:38
+  //--- First parameter expression load end at libgogo/string.go:148:48
   LEAQ 16(SP), R8
   MOVQ R8, -88(SP)
-  //--- First parameter expression end at libgogo/string.go:150:48
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:150:48
+  //--- First parameter expression end at libgogo/string.go:148:48
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:148:48
   SUBQ $88, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:150:48
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:148:48
   CALL libgogo·GetStringAddress(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:150:48
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:148:48
   ADDQ $88, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:150:48
-  //--- Restoring registers after function call start at libgogo/string.go:150:48
-  //--- Restoring registers after function call end at libgogo/string.go:150:48
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:148:48
+  //--- Restoring registers after function call start at libgogo/string.go:148:48
+  //--- Restoring registers after function call end at libgogo/string.go:148:48
   MOVQ -80(SP), R8
   MOVQ R8, -64(SP)
-  //--- Assignment end at libgogo/string.go:150:49
-  //--- Saving registers before function call start at libgogo/string.go:151:25
-  //--- Saving registers before function call end at libgogo/string.go:151:25
-  //--- First parameter expression start at libgogo/string.go:151:25
-  //--- First parameter expression load start at libgogo/string.go:151:25
-  //--- First parameter expression load end at libgogo/string.go:151:25
+  //--- Assignment end at libgogo/string.go:148:49
+  //--- Saving registers before function call start at libgogo/string.go:149:25
+  //--- Saving registers before function call end at libgogo/string.go:149:25
+  //--- First parameter expression start at libgogo/string.go:149:25
+  //--- First parameter expression load start at libgogo/string.go:149:25
+  //--- First parameter expression load end at libgogo/string.go:149:25
   MOVQ -64(SP), R8
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:151:25
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:149:25
   MOVQ R8, -100072(SP)
-  //--- First parameter expression end at libgogo/string.go:151:25
-  //--- Subsequent parameter expression start at libgogo/string.go:151:25
-  //--- Subsequent parameter expression load start at libgogo/string.go:151:25
+  //--- First parameter expression end at libgogo/string.go:149:25
+  //--- Subsequent parameter expression start at libgogo/string.go:149:25
+  //--- Subsequent parameter expression load start at libgogo/string.go:149:25
   MOVQ -48(SP), R8
   ADDQ -16(SP), R8
-  //--- Subsequent parameter expression load end at libgogo/string.go:151:44
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:151:44
+  //--- Subsequent parameter expression load end at libgogo/string.go:149:44
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:149:44
   MOVQ R8, -100064(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:151:44
-  //--- Subsequent parameter expression start at libgogo/string.go:151:44
-  //--- Subsequent parameter expression load start at libgogo/string.go:151:44
-  //--- Subsequent parameter expression load end at libgogo/string.go:151:58
+  //--- Subsequent parameter expression end at libgogo/string.go:149:44
+  //--- Subsequent parameter expression start at libgogo/string.go:149:44
+  //--- Subsequent parameter expression load start at libgogo/string.go:149:44
+  //--- Subsequent parameter expression load end at libgogo/string.go:149:58
   MOVQ -24(SP), R8
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:151:58
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:149:58
   MOVQ R8, -100056(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:151:58
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:151:58
-  //--- ##2##libgogo·CopyMem## at libgogo/string.go:151:58
+  //--- Subsequent parameter expression end at libgogo/string.go:149:58
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:149:58
+  //--- ##2##libgogo·CopyMem## at libgogo/string.go:149:58
   SUBQ $72, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:151:58
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:149:58
   CALL libgogo·CopyMem(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:151:58
-  //--- ##2##libgogo·CopyMem## at libgogo/string.go:151:58
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:149:58
+  //--- ##2##libgogo·CopyMem## at libgogo/string.go:149:58
   ADDQ $72, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:151:58
-  //--- Restoring registers after function call start at libgogo/string.go:151:58
-  //--- Restoring registers after function call end at libgogo/string.go:151:58
-  //--- Assignment start at libgogo/string.go:152:21
-  //--- Assignment LHS load start at libgogo/string.go:152:21
-  //--- Assignment LHS load end at libgogo/string.go:152:21
-  //--- Saving registers before function call start at libgogo/string.go:152:43
-  //--- Saving registers before function call end at libgogo/string.go:152:43
-  //--- First parameter expression start at libgogo/string.go:152:43
-  //--- First parameter expression load start at libgogo/string.go:152:43
-  //--- First parameter expression load end at libgogo/string.go:152:51
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:149:58
+  //--- Restoring registers after function call start at libgogo/string.go:149:58
+  //--- Restoring registers after function call end at libgogo/string.go:149:58
+  //--- Assignment start at libgogo/string.go:150:21
+  //--- Assignment LHS load start at libgogo/string.go:150:21
+  //--- Assignment LHS load end at libgogo/string.go:150:21
+  //--- Saving registers before function call start at libgogo/string.go:150:43
+  //--- Saving registers before function call end at libgogo/string.go:150:43
+  //--- First parameter expression start at libgogo/string.go:150:43
+  //--- First parameter expression load start at libgogo/string.go:150:43
+  //--- First parameter expression load end at libgogo/string.go:150:51
   LEAQ -8(SP), R8
   MOVQ R8, -88(SP)
-  //--- First parameter expression end at libgogo/string.go:152:51
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:152:51
+  //--- First parameter expression end at libgogo/string.go:150:51
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:150:51
   SUBQ $88, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:152:51
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:150:51
   CALL libgogo·ToUint64FromBytePtr(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:152:51
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:150:51
   ADDQ $88, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:152:51
-  //--- Restoring registers after function call start at libgogo/string.go:152:51
-  //--- Restoring registers after function call end at libgogo/string.go:152:51
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:150:51
+  //--- Restoring registers after function call start at libgogo/string.go:150:51
+  //--- Restoring registers after function call end at libgogo/string.go:150:51
   MOVQ -80(SP), R8
   MOVQ R8, -72(SP)
-  //--- Assignment end at libgogo/string.go:152:52
-  //--- Saving registers before function call start at libgogo/string.go:153:27
-  //--- Saving registers before function call end at libgogo/string.go:153:27
-  //--- First parameter expression start at libgogo/string.go:153:27
-  //--- First parameter expression load start at libgogo/string.go:153:27
-  //--- First parameter expression load end at libgogo/string.go:153:27
+  //--- Assignment end at libgogo/string.go:150:52
+  //--- Saving registers before function call start at libgogo/string.go:151:27
+  //--- Saving registers before function call end at libgogo/string.go:151:27
+  //--- First parameter expression start at libgogo/string.go:151:27
+  //--- First parameter expression load start at libgogo/string.go:151:27
+  //--- First parameter expression load end at libgogo/string.go:151:27
   MOVQ -72(SP), R8
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:153:27
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:151:27
   MOVQ R8, -100072(SP)
-  //--- First parameter expression end at libgogo/string.go:153:27
-  //--- Subsequent parameter expression start at libgogo/string.go:153:27
-  //--- Subsequent parameter expression load start at libgogo/string.go:153:27
+  //--- First parameter expression end at libgogo/string.go:151:27
+  //--- Subsequent parameter expression start at libgogo/string.go:151:27
+  //--- Subsequent parameter expression load start at libgogo/string.go:151:27
   MOVQ -48(SP), R8
   ADDQ -16(SP), R8
   ADDQ -24(SP), R8
   ADDQ $1, R8
-  //--- Subsequent parameter expression load end at libgogo/string.go:153:65
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:153:65
+  //--- Subsequent parameter expression load end at libgogo/string.go:151:65
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:151:65
   MOVQ R8, -100064(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:153:65
-  //--- Subsequent parameter expression start at libgogo/string.go:153:65
-  //--- Subsequent parameter expression load start at libgogo/string.go:153:65
-  //--- Subsequent parameter expression load end at libgogo/string.go:153:68
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:153:68
+  //--- Subsequent parameter expression end at libgogo/string.go:151:65
+  //--- Subsequent parameter expression start at libgogo/string.go:151:65
+  //--- Subsequent parameter expression load start at libgogo/string.go:151:65
+  //--- Subsequent parameter expression load end at libgogo/string.go:151:68
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:151:68
   MOVQ $1, -100056(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:153:68
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:153:68
-  //--- ##2##libgogo·CopyMem## at libgogo/string.go:153:68
+  //--- Subsequent parameter expression end at libgogo/string.go:151:68
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:151:68
+  //--- ##2##libgogo·CopyMem## at libgogo/string.go:151:68
   SUBQ $72, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:153:68
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:151:68
   CALL libgogo·CopyMem(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:153:68
-  //--- ##2##libgogo·CopyMem## at libgogo/string.go:153:68
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:151:68
+  //--- ##2##libgogo·CopyMem## at libgogo/string.go:151:68
   ADDQ $72, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:153:68
-  //--- Restoring registers after function call start at libgogo/string.go:153:68
-  //--- Restoring registers after function call end at libgogo/string.go:153:68
-  //--- Saving registers before function call start at libgogo/string.go:154:35
-  //--- Saving registers before function call end at libgogo/string.go:154:35
-  //--- First parameter expression start at libgogo/string.go:154:35
-  //--- First parameter expression load start at libgogo/string.go:154:35
-  //--- First parameter expression load end at libgogo/string.go:154:35
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:151:68
+  //--- Restoring registers after function call start at libgogo/string.go:151:68
+  //--- Restoring registers after function call end at libgogo/string.go:151:68
+  //--- Saving registers before function call start at libgogo/string.go:152:35
+  //--- Saving registers before function call end at libgogo/string.go:152:35
+  //--- First parameter expression start at libgogo/string.go:152:35
+  //--- First parameter expression load start at libgogo/string.go:152:35
+  //--- First parameter expression load end at libgogo/string.go:152:35
   MOVQ 8(SP), R8
   MOVQ R8, -96(SP)
-  //--- First parameter expression end at libgogo/string.go:154:35
-  //--- Subsequent parameter expression start at libgogo/string.go:154:35
-  //--- Subsequent parameter expression load start at libgogo/string.go:154:35
-  //--- Subsequent parameter expression load end at libgogo/string.go:154:45
+  //--- First parameter expression end at libgogo/string.go:152:35
+  //--- Subsequent parameter expression start at libgogo/string.go:152:35
+  //--- Subsequent parameter expression load start at libgogo/string.go:152:35
+  //--- Subsequent parameter expression load end at libgogo/string.go:152:45
   MOVQ -48(SP), R8
   MOVQ R8, -88(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:154:45
-  //--- Subsequent parameter expression start at libgogo/string.go:154:45
-  //--- Subsequent parameter expression load start at libgogo/string.go:154:45
-  //--- Subsequent parameter expression load end at libgogo/string.go:154:57
+  //--- Subsequent parameter expression end at libgogo/string.go:152:45
+  //--- Subsequent parameter expression start at libgogo/string.go:152:45
+  //--- Subsequent parameter expression load start at libgogo/string.go:152:45
+  //--- Subsequent parameter expression load end at libgogo/string.go:152:57
   MOVQ -32(SP), R8
   MOVQ R8, -80(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:154:57
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:154:57
+  //--- Subsequent parameter expression end at libgogo/string.go:152:57
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:152:57
   SUBQ $96, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:154:57
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:152:57
   CALL libgogo·SetStringAddressAndLength(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:154:57
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:152:57
   ADDQ $96, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:154:57
-  //--- Restoring registers after function call start at libgogo/string.go:154:57
-  //--- Restoring registers after function call end at libgogo/string.go:154:57
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:152:57
+  //--- Restoring registers after function call start at libgogo/string.go:152:57
+  //--- Restoring registers after function call end at libgogo/string.go:152:57
   RET
 
 // Copyright 2010 The GoGo Authors. All rights reserved.
