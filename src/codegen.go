@@ -61,28 +61,51 @@ func FreeRegister(index uint64) {
 //
 // Saves the currently used registers to the stack
 //
-func SaveUsedRegisters() {
+func SaveUsedRegisters(LocalVariableOffset uint64) uint64 {
     var i uint64;
+    var counter uint64 = 0;
+    var LHSItem *libgogo.Item;
+    
+    GenerateComment("Saving registers before function call start");
     for i = 0; i < NumRegisters; i = i + 1 {
         if FreeRegisters[i] == 0 {
-            PrintInstruction_Reg("PUSH", 8, "R", i + 8, 0, 0, 0, "");
+            LHSItem = libgogo.NewItem();
+            libgogo.SetItem(LHSItem, libgogo.MODE_VAR, uint64_t, 0, LocalVariableOffset + counter * 8, 0, 0); //Local variable with additional offset
+            PrintInstruction_Reg_Var("MOV", "R", i + 8, "", 0, LHSItem); //Save register i + 8
+            counter = counter + 1;
         }
     }
+    GenerateComment("Saving registers before function call end");
+    return counter * 8; //Number of registers times 64 bit is new offset
 }
 
 //
 // Restores the currently used registers from the stack
 //
-func RestoreUsedRegisters() {
+func RestoreUsedRegisters(LocalVariableOffset uint64, RegisterOffset uint64) {
     var i uint64;
+    var counter uint64 = RegisterOffset / 8;
+    var RHSItem *libgogo.Item;
+    
+    GenerateComment("Restoring registers after function call start");
     for i = NumRegisters - 1; i >= 0; i = i - 1 { //Reverse order (stack!)
         if FreeRegisters[i] == 0 {
-            PrintInstruction_Reg("POP", 8, "R", i + 8, 0, 0, 0, "");
+            if counter == 0 {
+                GenErrorWeak("Internal error: number of registers to restore does not match (too large)");
+            }
+            RHSItem = libgogo.NewItem();
+            libgogo.SetItem(RHSItem, libgogo.MODE_VAR, uint64_t, 0, LocalVariableOffset - counter * 8, 0, 0); //Local variable with additional offset
+            PrintInstruction_Var_Reg("MOV", RHSItem, "R", i + 8, "", 0); //Restore register i + 8
+            counter = counter - 1;
         }
-        if i == 0 { //Break on i = 0 as i-1 on uint64 yields to underflow
+        if i == 0 { //Break on i = 0 as i-1 on uint64 yields an underflow
             break;
         }
     }
+    if counter > 0 {
+        GenErrorWeak("Internal error: number of registers to restore does not match (too small)");
+    }
+    GenerateComment("Restoring registers after function call end");
 }
 
 //

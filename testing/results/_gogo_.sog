@@ -323,6 +323,8 @@ TEXT main·bazz(SB),0,$0-0
   //--- Local variable assignment RHS load end at tests/test.go:64:24
   MOVQ $3, -16(SP)
   //--- Local variable assignment end at tests/test.go:64:24
+  //--- Saving registers before function call start at tests/test.go:65:10
+  //--- Saving registers before function call end at tests/test.go:65:10
   //--- Stack pointer offset before function call for local variables start at tests/test.go:65:10
   SUBQ $24, SP
   //--- Stack pointer offset before function call for local variables end at tests/test.go:65:10
@@ -330,9 +332,13 @@ TEXT main·bazz(SB),0,$0-0
   //--- Stack pointer offset after function call for local variables start at tests/test.go:65:10
   ADDQ $24, SP
   //--- Stack pointer offset after function call for local variables end at tests/test.go:65:10
+  //--- Restoring registers after function call start at tests/test.go:65:10
+  //--- Restoring registers after function call end at tests/test.go:65:10
   //--- Assignment start at tests/test.go:66:11
   //--- Assignment LHS load start at tests/test.go:66:11
   //--- Assignment LHS load end at tests/test.go:66:11
+  //--- Saving registers before function call start at tests/test.go:66:19
+  //--- Saving registers before function call end at tests/test.go:66:19
   //--- First parameter expression start at tests/test.go:66:19
   //--- First parameter expression load start at tests/test.go:66:19
   //--- First parameter expression load end at tests/test.go:66:19
@@ -346,12 +352,16 @@ TEXT main·bazz(SB),0,$0-0
   //--- Stack pointer offset after function call for local variables start at tests/test.go:66:19
   ADDQ $32, SP
   //--- Stack pointer offset after function call for local variables end at tests/test.go:66:19
+  //--- Restoring registers after function call start at tests/test.go:66:19
+  //--- Restoring registers after function call end at tests/test.go:66:19
   MOVQ -24(SP), R8
   MOVQ R8, -16(SP)
   //--- Assignment end at tests/test.go:66:20
   //--- Assignment start at tests/test.go:67:11
   //--- Assignment LHS load start at tests/test.go:67:11
   //--- Assignment LHS load end at tests/test.go:67:11
+  //--- Saving registers before function call start at tests/test.go:67:20
+  //--- Saving registers before function call end at tests/test.go:67:20
   //--- First parameter expression start at tests/test.go:67:20
   //--- First parameter expression load start at tests/test.go:67:20
   //--- First parameter expression load end at tests/test.go:67:20
@@ -376,6 +386,8 @@ TEXT main·bazz(SB),0,$0-0
   //--- Stack pointer offset after function call for local variables start at tests/test.go:67:28
   ADDQ $48, SP
   //--- Stack pointer offset after function call for local variables end at tests/test.go:67:28
+  //--- Restoring registers after function call start at tests/test.go:67:28
+  //--- Restoring registers after function call end at tests/test.go:67:28
   MOVQ -24(SP), R8
   MOVQ R8, -8(SP)
   //--- Assignment end at tests/test.go:67:29
@@ -418,6 +430,8 @@ TEXT main·main(SB),0,$0-0
   //--- Assignment start at tests/test.go:80:11
   //--- Assignment LHS load start at tests/test.go:80:11
   //--- Assignment LHS load end at tests/test.go:80:11
+  //--- Saving registers before function call start at tests/test.go:80:18
+  //--- Saving registers before function call end at tests/test.go:80:18
   //--- First parameter expression start at tests/test.go:80:18
   //--- First parameter expression load start at tests/test.go:80:18
   //--- First parameter expression load end at tests/test.go:80:18
@@ -430,12 +444,16 @@ TEXT main·main(SB),0,$0-0
   //--- Stack pointer offset after function call for local variables start at tests/test.go:80:18
   ADDQ $56, SP
   //--- Stack pointer offset after function call for local variables end at tests/test.go:80:18
+  //--- Restoring registers after function call start at tests/test.go:80:18
+  //--- Restoring registers after function call end at tests/test.go:80:18
   MOVQ -48(SP), R8
   MOVQ R8, -8(SP)
   //--- Assignment end at tests/test.go:80:19
   //--- Assignment start at tests/test.go:81:9
   //--- Assignment LHS load start at tests/test.go:81:9
   //--- Assignment LHS load end at tests/test.go:81:9
+  //--- Saving registers before function call start at tests/test.go:81:16
+  //--- Saving registers before function call end at tests/test.go:81:16
   //--- First parameter expression start at tests/test.go:81:16
   //--- First parameter expression load start at tests/test.go:81:16
   //--- First parameter expression load end at tests/test.go:81:16
@@ -451,6 +469,8 @@ TEXT main·main(SB),0,$0-0
   //--- Stack pointer offset after function call for local variables start at tests/test.go:81:16
   ADDQ $72, SP
   //--- Stack pointer offset after function call for local variables end at tests/test.go:81:16
+  //--- Restoring registers after function call start at tests/test.go:81:16
+  //--- Restoring registers after function call end at tests/test.go:81:16
   MOVQ -56(SP), R8
   MOVQ -48(SP), R9
   MOVQ R8, -40(SP)
@@ -459,6 +479,8 @@ TEXT main·main(SB),0,$0-0
   //--- Assignment start at tests/test.go:82:11
   //--- Assignment LHS load start at tests/test.go:82:11
   //--- Assignment LHS load end at tests/test.go:82:11
+  //--- Saving registers before function call start at tests/test.go:82:22
+  //--- Saving registers before function call end at tests/test.go:82:22
   //--- First parameter expression start at tests/test.go:82:22
   //--- First parameter expression load start at tests/test.go:82:22
   //--- First parameter expression load end at tests/test.go:82:22
@@ -474,6 +496,8 @@ TEXT main·main(SB),0,$0-0
   //--- ##2##main·bazz_fwd## at tests/test.go:82:22
   ADDQ $40, SP
   //--- Stack pointer offset after function call for local variables end at tests/test.go:82:22
+  //--- Restoring registers after function call start at tests/test.go:82:22
+  //--- Restoring registers after function call end at tests/test.go:82:22
   //--- ##1##main·bazz_fwd## at tests/test.go:82:22
   MOVQ -100032(SP), R8
   MOVQ R8, -8(SP)
@@ -484,6 +508,8 @@ TEXT main·foo_fwd(SB),0,$0-0
   //--- Assignment start at tests/test.go:87:11
   //--- Assignment LHS load start at tests/test.go:87:11
   //--- Assignment LHS load end at tests/test.go:87:11
+  //--- Saving registers before function call start at tests/test.go:87:22
+  //--- Saving registers before function call end at tests/test.go:87:22
   //--- First parameter expression start at tests/test.go:87:22
   //--- First parameter expression load start at tests/test.go:87:22
   //--- First parameter expression load end at tests/test.go:87:22
@@ -499,6 +525,8 @@ TEXT main·foo_fwd(SB),0,$0-0
   //--- ##2##main·bazz_fwd## at tests/test.go:87:22
   ADDQ $8, SP
   //--- Stack pointer offset after function call for local variables end at tests/test.go:87:22
+  //--- Restoring registers after function call start at tests/test.go:87:22
+  //--- Restoring registers after function call end at tests/test.go:87:22
   //--- ##1##main·bazz_fwd## at tests/test.go:87:22
   MOVQ -100000(SP), R8
   MOVQ R8, -8(SP)
@@ -519,6 +547,8 @@ TEXT main·muh(SB),0,$0-0
   //--- Assignment start at tests/test.go:96:9
   //--- Assignment LHS load start at tests/test.go:96:9
   //--- Assignment LHS load end at tests/test.go:96:9
+  //--- Saving registers before function call start at tests/test.go:96:16
+  //--- Saving registers before function call end at tests/test.go:96:16
   //--- First parameter expression start at tests/test.go:96:16
   //--- First parameter expression load start at tests/test.go:96:16
   //--- First parameter expression load end at tests/test.go:96:16
@@ -548,6 +578,8 @@ TEXT main·muh(SB),0,$0-0
   //--- ##2##main·maeh## at tests/test.go:96:19
   ADDQ $16, SP
   //--- Stack pointer offset after function call for local variables end at tests/test.go:96:19
+  //--- Restoring registers after function call start at tests/test.go:96:19
+  //--- Restoring registers after function call end at tests/test.go:96:19
   //--- ##1##main·maeh## at tests/test.go:96:19
   MOVQ -99984(SP), R8
   //--- ##1##main·maeh## at tests/test.go:96:19

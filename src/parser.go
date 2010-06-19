@@ -1049,15 +1049,17 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
     var paramCount uint64 = 0;
     var TotalParameterSize uint64;
     var TotalLocalVariableSize uint64;
+    var RegisterStackOffset uint64;
     var ReturnItem *libgogo.Item;
     
     PrintDebugString("Entering ParseFunctionCall()",1000);
     AssertNextToken(TOKEN_LBRAC);
     GetNextTokenSafe();
     if Compile != 0 {
-        SaveUsedRegisters();
         TotalParameterSize = libgogo.GetAlignedObjectListSize(FunctionCalled.Fields); //Get total size of parameters of function called
         TotalLocalVariableSize = libgogo.GetAlignedObjectListSize(LocalObjects); //Get total size of local variables of current function
+        RegisterStackOffset = SaveUsedRegisters(TotalLocalVariableSize); //Save registers...
+        TotalLocalVariableSize = TotalLocalVariableSize + RegisterStackOffset; //...and correct stack offset for paramters accordingly
     }
     if tok.id != TOKEN_RBRAC {
         tok.nextToken = tok.id;
@@ -1072,7 +1074,7 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
         ParameterCheck_More(FunctionCalled, paramCount);
         TotalParameterSize = libgogo.GetAlignedObjectListSize(FunctionCalled.Fields); //Recalculate sizes as function may have been forward declared
         PrintActualFunctionCall(FunctionCalled, TotalLocalVariableSize, TotalParameterSize);
-        RestoreUsedRegisters();
+        RestoreUsedRegisters(TotalLocalVariableSize, RegisterStackOffset);
     }
     PrintDebugString("Leaving ParseFunctionCall()",1000);
     ReturnItem = GetReturnItem(FunctionCalled, TotalLocalVariableSize, TotalParameterSize);
