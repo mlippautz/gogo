@@ -148,6 +148,6 @@ func StringAppend(str *string, append_str string) {
     append_addr = GetStringAddress(&append_str);
     CopyMem(append_addr, new_addr + strlen, strappendlen); //Copy the second string to its according position at the end of the new string
     nullByte_addr = ToUint64FromBytePtr(&nullByte);
-    CopyMem(nullByte_addr, new_addr + strlen + strappendlen + 1, 1); //Append the end of string constant
+    CopyMem(nullByte_addr, new_addr + strlen + strappendlen, 1); //Append the end of string constant
     SetStringAddressAndLength(str, new_addr, new_length); //Update the string in order to point to the new character sequence with the new length
 }

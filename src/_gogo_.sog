@@ -21,6 +21,9 @@ __UNLINKED_CODE
 //TYPE,0,libgogo·ObjectDesc,64,64
 //TYPE,0,libgogo·Item,72,72
 //FUNC,0,main·init
+//FUNC,0,main·main
+//FUNC,1,main·StringAppend,Artificial parameter:*·string,Artificial parameter:·string
+//FUNC,1,main·PrintString,Artificial parameter:·string
 //FUNC,0,libgogo·ToIntFromByte,b:·byte,return value:·uint64
 //FUNC,0,libgogo·ToByteFromInt,i:·uint64,return value:·byte
 //FUNC,0,libgogo·ToUint64FromBytePtr,char:*·byte,return value:·uint64
@@ -98,1453 +101,1596 @@ __UNLINKED_CODE
 //FUNC,0,libgogo·SetStringAddressAndLength,str:*·string,new_addr:·uint64,new_length:·uint64
 //FUNC,0,libgogo·GetMaxStringLength,length:·uint64,return value:·uint64
 //FUNC,0,libgogo·Uint64ToItemPtr,adr:·uint64,return value:*libgogo·Item
+//FUNC,0,libgogo·ItemPtrToUint64,item:*libgogo·Item,return value:·uint64
 //FUNC,0,libgogo·NewItem,return value:*libgogo·Item
 //FUNC,0,libgogo·SetItem,item:*libgogo·Item,mode:·uint64,itemtype:*libgogo·TypeDesc,ptrtype:·uint64,a:·uint64,r:·uint64,global:·uint64
 //FUNC,0,libgogo·GetArgv
 //FUNC,0,libgogo·Exit,code:·uint64
 //End Symbol table
 
-//--- String buffer start ('') at libgogo/convert.go:74:24
+//--- String buffer start ('') at test.go:4:22
 DATA data+8(SB)/1, $0
+//--- String buffer end at test.go:4:22
+//--- String buffer start ('Hello') at test.go:5:29
+DATA data+32(SB)/1, $72
+DATA data+33(SB)/1, $101
+DATA data+34(SB)/1, $108
+DATA data+35(SB)/1, $108
+DATA data+36(SB)/1, $111
+DATA data+37(SB)/1, $0
+//--- String buffer end at test.go:5:29
+//--- String buffer start (' world!\n') at test.go:6:33
+DATA data+56(SB)/1, $32
+DATA data+57(SB)/1, $119
+DATA data+58(SB)/1, $111
+DATA data+59(SB)/1, $114
+DATA data+60(SB)/1, $108
+DATA data+61(SB)/1, $100
+DATA data+62(SB)/1, $33
+DATA data+63(SB)/1, $10
+DATA data+64(SB)/1, $0
+//--- String buffer end at test.go:6:33
+//--- String buffer start ('') at libgogo/convert.go:74:24
+DATA data+88(SB)/1, $0
 //--- String buffer end at libgogo/convert.go:74:24
 //--- String buffer start ('Tried to GetItemAt(') at libgogo/list.go:77:42
-DATA data+32(SB)/1, $84
-DATA data+33(SB)/1, $114
-DATA data+34(SB)/1, $105
-DATA data+35(SB)/1, $101
-DATA data+36(SB)/1, $100
-DATA data+37(SB)/1, $32
-DATA data+38(SB)/1, $116
-DATA data+39(SB)/1, $111
-DATA data+40(SB)/1, $32
-DATA data+41(SB)/1, $71
-DATA data+42(SB)/1, $101
-DATA data+43(SB)/1, $116
-DATA data+44(SB)/1, $73
-DATA data+45(SB)/1, $116
-DATA data+46(SB)/1, $101
-DATA data+47(SB)/1, $109
-DATA data+48(SB)/1, $65
-DATA data+49(SB)/1, $116
-DATA data+50(SB)/1, $40
-DATA data+51(SB)/1, $0
+DATA data+112(SB)/1, $84
+DATA data+113(SB)/1, $114
+DATA data+114(SB)/1, $105
+DATA data+115(SB)/1, $101
+DATA data+116(SB)/1, $100
+DATA data+117(SB)/1, $32
+DATA data+118(SB)/1, $116
+DATA data+119(SB)/1, $111
+DATA data+120(SB)/1, $32
+DATA data+121(SB)/1, $71
+DATA data+122(SB)/1, $101
+DATA data+123(SB)/1, $116
+DATA data+124(SB)/1, $73
+DATA data+125(SB)/1, $116
+DATA data+126(SB)/1, $101
+DATA data+127(SB)/1, $109
+DATA data+128(SB)/1, $65
+DATA data+129(SB)/1, $116
+DATA data+130(SB)/1, $40
+DATA data+131(SB)/1, $0
 //--- String buffer end at libgogo/list.go:77:42
 //--- String buffer start (') from a list with only ') at libgogo/list.go:79:47
-DATA data+72(SB)/1, $41
-DATA data+73(SB)/1, $32
-DATA data+74(SB)/1, $102
-DATA data+75(SB)/1, $114
-DATA data+76(SB)/1, $111
-DATA data+77(SB)/1, $109
-DATA data+78(SB)/1, $32
-DATA data+79(SB)/1, $97
-DATA data+80(SB)/1, $32
-DATA data+81(SB)/1, $108
-DATA data+82(SB)/1, $105
-DATA data+83(SB)/1, $115
-DATA data+84(SB)/1, $116
-DATA data+85(SB)/1, $32
-DATA data+86(SB)/1, $119
-DATA data+87(SB)/1, $105
-DATA data+88(SB)/1, $116
-DATA data+89(SB)/1, $104
-DATA data+90(SB)/1, $32
-DATA data+91(SB)/1, $111
-DATA data+92(SB)/1, $110
-DATA data+93(SB)/1, $108
-DATA data+94(SB)/1, $121
-DATA data+95(SB)/1, $32
-DATA data+96(SB)/1, $0
+DATA data+152(SB)/1, $41
+DATA data+153(SB)/1, $32
+DATA data+154(SB)/1, $102
+DATA data+155(SB)/1, $114
+DATA data+156(SB)/1, $111
+DATA data+157(SB)/1, $109
+DATA data+158(SB)/1, $32
+DATA data+159(SB)/1, $97
+DATA data+160(SB)/1, $32
+DATA data+161(SB)/1, $108
+DATA data+162(SB)/1, $105
+DATA data+163(SB)/1, $115
+DATA data+164(SB)/1, $116
+DATA data+165(SB)/1, $32
+DATA data+166(SB)/1, $119
+DATA data+167(SB)/1, $105
+DATA data+168(SB)/1, $116
+DATA data+169(SB)/1, $104
+DATA data+170(SB)/1, $32
+DATA data+171(SB)/1, $111
+DATA data+172(SB)/1, $110
+DATA data+173(SB)/1, $108
+DATA data+174(SB)/1, $121
+DATA data+175(SB)/1, $32
+DATA data+176(SB)/1, $0
 //--- String buffer end at libgogo/list.go:79:47
 //--- String buffer start (' items - out of bounds error') at libgogo/list.go:81:49
-DATA data+120(SB)/1, $32
-DATA data+121(SB)/1, $105
-DATA data+122(SB)/1, $116
-DATA data+123(SB)/1, $101
-DATA data+124(SB)/1, $109
-DATA data+125(SB)/1, $115
-DATA data+126(SB)/1, $32
-DATA data+127(SB)/1, $45
-DATA data+128(SB)/1, $32
-DATA data+129(SB)/1, $111
-DATA data+130(SB)/1, $117
-DATA data+131(SB)/1, $116
-DATA data+132(SB)/1, $32
-DATA data+133(SB)/1, $111
-DATA data+134(SB)/1, $102
-DATA data+135(SB)/1, $32
-DATA data+136(SB)/1, $98
-DATA data+137(SB)/1, $111
-DATA data+138(SB)/1, $117
-DATA data+139(SB)/1, $110
-DATA data+140(SB)/1, $100
-DATA data+141(SB)/1, $115
-DATA data+142(SB)/1, $32
-DATA data+143(SB)/1, $101
-DATA data+144(SB)/1, $114
-DATA data+145(SB)/1, $114
-DATA data+146(SB)/1, $111
-DATA data+147(SB)/1, $114
-DATA data+148(SB)/1, $0
+DATA data+200(SB)/1, $32
+DATA data+201(SB)/1, $105
+DATA data+202(SB)/1, $116
+DATA data+203(SB)/1, $101
+DATA data+204(SB)/1, $109
+DATA data+205(SB)/1, $115
+DATA data+206(SB)/1, $32
+DATA data+207(SB)/1, $45
+DATA data+208(SB)/1, $32
+DATA data+209(SB)/1, $111
+DATA data+210(SB)/1, $117
+DATA data+211(SB)/1, $116
+DATA data+212(SB)/1, $32
+DATA data+213(SB)/1, $111
+DATA data+214(SB)/1, $102
+DATA data+215(SB)/1, $32
+DATA data+216(SB)/1, $98
+DATA data+217(SB)/1, $111
+DATA data+218(SB)/1, $117
+DATA data+219(SB)/1, $110
+DATA data+220(SB)/1, $100
+DATA data+221(SB)/1, $115
+DATA data+222(SB)/1, $32
+DATA data+223(SB)/1, $101
+DATA data+224(SB)/1, $114
+DATA data+225(SB)/1, $114
+DATA data+226(SB)/1, $111
+DATA data+227(SB)/1, $114
+DATA data+228(SB)/1, $0
 //--- String buffer end at libgogo/list.go:81:49
 //--- String buffer start ('GetBrk failed\n') at libgogo/memmgr.go:53:36
-DATA data+200(SB)/1, $71
-DATA data+201(SB)/1, $101
-DATA data+202(SB)/1, $116
-DATA data+203(SB)/1, $66
-DATA data+204(SB)/1, $114
-DATA data+205(SB)/1, $107
-DATA data+206(SB)/1, $32
-DATA data+207(SB)/1, $102
-DATA data+208(SB)/1, $97
-DATA data+209(SB)/1, $105
-DATA data+210(SB)/1, $108
-DATA data+211(SB)/1, $101
-DATA data+212(SB)/1, $100
-DATA data+213(SB)/1, $10
-DATA data+214(SB)/1, $0
+DATA data+280(SB)/1, $71
+DATA data+281(SB)/1, $101
+DATA data+282(SB)/1, $116
+DATA data+283(SB)/1, $66
+DATA data+284(SB)/1, $114
+DATA data+285(SB)/1, $107
+DATA data+286(SB)/1, $32
+DATA data+287(SB)/1, $102
+DATA data+288(SB)/1, $97
+DATA data+289(SB)/1, $105
+DATA data+290(SB)/1, $108
+DATA data+291(SB)/1, $101
+DATA data+292(SB)/1, $100
+DATA data+293(SB)/1, $10
+DATA data+294(SB)/1, $0
 //--- String buffer end at libgogo/memmgr.go:53:36
 //--- String buffer start ('Brk failed while allocating ') at libgogo/memmgr.go:70:51
-DATA data+232(SB)/1, $66
-DATA data+233(SB)/1, $114
-DATA data+234(SB)/1, $107
-DATA data+235(SB)/1, $32
-DATA data+236(SB)/1, $102
-DATA data+237(SB)/1, $97
-DATA data+238(SB)/1, $105
-DATA data+239(SB)/1, $108
-DATA data+240(SB)/1, $101
-DATA data+241(SB)/1, $100
-DATA data+242(SB)/1, $32
-DATA data+243(SB)/1, $119
-DATA data+244(SB)/1, $104
-DATA data+245(SB)/1, $105
-DATA data+246(SB)/1, $108
-DATA data+247(SB)/1, $101
-DATA data+248(SB)/1, $32
-DATA data+249(SB)/1, $97
-DATA data+250(SB)/1, $108
-DATA data+251(SB)/1, $108
-DATA data+252(SB)/1, $111
-DATA data+253(SB)/1, $99
-DATA data+254(SB)/1, $97
-DATA data+255(SB)/1, $116
-DATA data+256(SB)/1, $105
-DATA data+257(SB)/1, $110
-DATA data+258(SB)/1, $103
-DATA data+259(SB)/1, $32
-DATA data+260(SB)/1, $0
+DATA data+312(SB)/1, $66
+DATA data+313(SB)/1, $114
+DATA data+314(SB)/1, $107
+DATA data+315(SB)/1, $32
+DATA data+316(SB)/1, $102
+DATA data+317(SB)/1, $97
+DATA data+318(SB)/1, $105
+DATA data+319(SB)/1, $108
+DATA data+320(SB)/1, $101
+DATA data+321(SB)/1, $100
+DATA data+322(SB)/1, $32
+DATA data+323(SB)/1, $119
+DATA data+324(SB)/1, $104
+DATA data+325(SB)/1, $105
+DATA data+326(SB)/1, $108
+DATA data+327(SB)/1, $101
+DATA data+328(SB)/1, $32
+DATA data+329(SB)/1, $97
+DATA data+330(SB)/1, $108
+DATA data+331(SB)/1, $108
+DATA data+332(SB)/1, $111
+DATA data+333(SB)/1, $99
+DATA data+334(SB)/1, $97
+DATA data+335(SB)/1, $116
+DATA data+336(SB)/1, $105
+DATA data+337(SB)/1, $110
+DATA data+338(SB)/1, $103
+DATA data+339(SB)/1, $32
+DATA data+340(SB)/1, $0
 //--- String buffer end at libgogo/memmgr.go:70:51
 //--- String buffer start (' bytes. Errno: ') at libgogo/memmgr.go:72:38
-DATA data+280(SB)/1, $32
-DATA data+281(SB)/1, $98
-DATA data+282(SB)/1, $121
-DATA data+283(SB)/1, $116
-DATA data+284(SB)/1, $101
-DATA data+285(SB)/1, $115
-DATA data+286(SB)/1, $46
-DATA data+287(SB)/1, $32
-DATA data+288(SB)/1, $69
-DATA data+289(SB)/1, $114
-DATA data+290(SB)/1, $114
-DATA data+291(SB)/1, $110
-DATA data+292(SB)/1, $111
-DATA data+293(SB)/1, $58
-DATA data+294(SB)/1, $32
-DATA data+295(SB)/1, $0
+DATA data+360(SB)/1, $32
+DATA data+361(SB)/1, $98
+DATA data+362(SB)/1, $121
+DATA data+363(SB)/1, $116
+DATA data+364(SB)/1, $101
+DATA data+365(SB)/1, $115
+DATA data+366(SB)/1, $46
+DATA data+367(SB)/1, $32
+DATA data+368(SB)/1, $69
+DATA data+369(SB)/1, $114
+DATA data+370(SB)/1, $114
+DATA data+371(SB)/1, $110
+DATA data+372(SB)/1, $111
+DATA data+373(SB)/1, $58
+DATA data+374(SB)/1, $32
+DATA data+375(SB)/1, $0
 //--- String buffer end at libgogo/memmgr.go:72:38
 //--- String buffer start ('\n') at libgogo/memmgr.go:74:23
-DATA data+312(SB)/1, $10
-DATA data+313(SB)/1, $0
+DATA data+392(SB)/1, $10
+DATA data+393(SB)/1, $0
 //--- String buffer end at libgogo/memmgr.go:74:23
 //--- String buffer start ('Failed to write to newly allocated memory at ') at libgogo/memmgr.go:78:68
-DATA data+336(SB)/1, $70
-DATA data+337(SB)/1, $97
-DATA data+338(SB)/1, $105
-DATA data+339(SB)/1, $108
-DATA data+340(SB)/1, $101
-DATA data+341(SB)/1, $100
-DATA data+342(SB)/1, $32
-DATA data+343(SB)/1, $116
-DATA data+344(SB)/1, $111
-DATA data+345(SB)/1, $32
-DATA data+346(SB)/1, $119
-DATA data+347(SB)/1, $114
-DATA data+348(SB)/1, $105
-DATA data+349(SB)/1, $116
-DATA data+350(SB)/1, $101
-DATA data+351(SB)/1, $32
-DATA data+352(SB)/1, $116
-DATA data+353(SB)/1, $111
-DATA data+354(SB)/1, $32
-DATA data+355(SB)/1, $110
-DATA data+356(SB)/1, $101
-DATA data+357(SB)/1, $119
-DATA data+358(SB)/1, $108
-DATA data+359(SB)/1, $121
-DATA data+360(SB)/1, $32
-DATA data+361(SB)/1, $97
-DATA data+362(SB)/1, $108
-DATA data+363(SB)/1, $108
-DATA data+364(SB)/1, $111
-DATA data+365(SB)/1, $99
-DATA data+366(SB)/1, $97
-DATA data+367(SB)/1, $116
-DATA data+368(SB)/1, $101
-DATA data+369(SB)/1, $100
-DATA data+370(SB)/1, $32
-DATA data+371(SB)/1, $109
-DATA data+372(SB)/1, $101
-DATA data+373(SB)/1, $109
-DATA data+374(SB)/1, $111
-DATA data+375(SB)/1, $114
-DATA data+376(SB)/1, $121
-DATA data+377(SB)/1, $32
-DATA data+378(SB)/1, $97
-DATA data+379(SB)/1, $116
-DATA data+380(SB)/1, $32
-DATA data+381(SB)/1, $0
+DATA data+416(SB)/1, $70
+DATA data+417(SB)/1, $97
+DATA data+418(SB)/1, $105
+DATA data+419(SB)/1, $108
+DATA data+420(SB)/1, $101
+DATA data+421(SB)/1, $100
+DATA data+422(SB)/1, $32
+DATA data+423(SB)/1, $116
+DATA data+424(SB)/1, $111
+DATA data+425(SB)/1, $32
+DATA data+426(SB)/1, $119
+DATA data+427(SB)/1, $114
+DATA data+428(SB)/1, $105
+DATA data+429(SB)/1, $116
+DATA data+430(SB)/1, $101
+DATA data+431(SB)/1, $32
+DATA data+432(SB)/1, $116
+DATA data+433(SB)/1, $111
+DATA data+434(SB)/1, $32
+DATA data+435(SB)/1, $110
+DATA data+436(SB)/1, $101
+DATA data+437(SB)/1, $119
+DATA data+438(SB)/1, $108
+DATA data+439(SB)/1, $121
+DATA data+440(SB)/1, $32
+DATA data+441(SB)/1, $97
+DATA data+442(SB)/1, $108
+DATA data+443(SB)/1, $108
+DATA data+444(SB)/1, $111
+DATA data+445(SB)/1, $99
+DATA data+446(SB)/1, $97
+DATA data+447(SB)/1, $116
+DATA data+448(SB)/1, $101
+DATA data+449(SB)/1, $100
+DATA data+450(SB)/1, $32
+DATA data+451(SB)/1, $109
+DATA data+452(SB)/1, $101
+DATA data+453(SB)/1, $109
+DATA data+454(SB)/1, $111
+DATA data+455(SB)/1, $114
+DATA data+456(SB)/1, $121
+DATA data+457(SB)/1, $32
+DATA data+458(SB)/1, $97
+DATA data+459(SB)/1, $116
+DATA data+460(SB)/1, $32
+DATA data+461(SB)/1, $0
 //--- String buffer end at libgogo/memmgr.go:78:68
 //--- String buffer start ('\n') at libgogo/memmgr.go:80:23
-DATA data+400(SB)/1, $10
-DATA data+401(SB)/1, $0
+DATA data+480(SB)/1, $10
+DATA data+481(SB)/1, $0
 //--- String buffer end at libgogo/memmgr.go:80:23
 //--- String buffer start ('') at libgogo/symbol.go:120:32
-DATA data+496(SB)/1, $0
+DATA data+576(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:120:32
 //--- String buffer start ('Object ') at libgogo/symbol.go:402:30
-DATA data+520(SB)/1, $79
-DATA data+521(SB)/1, $98
-DATA data+522(SB)/1, $106
-DATA data+523(SB)/1, $101
-DATA data+524(SB)/1, $99
-DATA data+525(SB)/1, $116
-DATA data+526(SB)/1, $32
-DATA data+527(SB)/1, $0
+DATA data+600(SB)/1, $79
+DATA data+601(SB)/1, $98
+DATA data+602(SB)/1, $106
+DATA data+603(SB)/1, $101
+DATA data+604(SB)/1, $99
+DATA data+605(SB)/1, $116
+DATA data+606(SB)/1, $32
+DATA data+607(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:402:30
 //--- String buffer start (' (type: ') at libgogo/symbol.go:409:31
-DATA data+544(SB)/1, $32
-DATA data+545(SB)/1, $40
-DATA data+546(SB)/1, $116
-DATA data+547(SB)/1, $121
-DATA data+548(SB)/1, $112
-DATA data+549(SB)/1, $101
-DATA data+550(SB)/1, $58
-DATA data+551(SB)/1, $32
-DATA data+552(SB)/1, $0
+DATA data+624(SB)/1, $32
+DATA data+625(SB)/1, $40
+DATA data+626(SB)/1, $116
+DATA data+627(SB)/1, $121
+DATA data+628(SB)/1, $112
+DATA data+629(SB)/1, $101
+DATA data+630(SB)/1, $58
+DATA data+631(SB)/1, $32
+DATA data+632(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:409:31
 //--- String buffer start ('pointer to ') at libgogo/symbol.go:411:38
-DATA data+576(SB)/1, $112
-DATA data+577(SB)/1, $111
-DATA data+578(SB)/1, $105
-DATA data+579(SB)/1, $110
-DATA data+580(SB)/1, $116
-DATA data+581(SB)/1, $101
-DATA data+582(SB)/1, $114
-DATA data+583(SB)/1, $32
-DATA data+584(SB)/1, $116
-DATA data+585(SB)/1, $111
-DATA data+586(SB)/1, $32
-DATA data+587(SB)/1, $0
+DATA data+656(SB)/1, $112
+DATA data+657(SB)/1, $111
+DATA data+658(SB)/1, $105
+DATA data+659(SB)/1, $110
+DATA data+660(SB)/1, $116
+DATA data+661(SB)/1, $101
+DATA data+662(SB)/1, $114
+DATA data+663(SB)/1, $32
+DATA data+664(SB)/1, $116
+DATA data+665(SB)/1, $111
+DATA data+666(SB)/1, $32
+DATA data+667(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:411:38
 //--- String buffer start ('array of ') at libgogo/symbol.go:415:40
-DATA data+608(SB)/1, $97
-DATA data+609(SB)/1, $114
-DATA data+610(SB)/1, $114
-DATA data+611(SB)/1, $97
-DATA data+612(SB)/1, $121
-DATA data+613(SB)/1, $32
-DATA data+614(SB)/1, $111
-DATA data+615(SB)/1, $102
-DATA data+616(SB)/1, $32
-DATA data+617(SB)/1, $0
+DATA data+688(SB)/1, $97
+DATA data+689(SB)/1, $114
+DATA data+690(SB)/1, $114
+DATA data+691(SB)/1, $97
+DATA data+692(SB)/1, $121
+DATA data+693(SB)/1, $32
+DATA data+694(SB)/1, $111
+DATA data+695(SB)/1, $102
+DATA data+696(SB)/1, $32
+DATA data+697(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:415:40
 //--- String buffer start (' of length ') at libgogo/symbol.go:417:42
-DATA data+640(SB)/1, $32
-DATA data+641(SB)/1, $111
-DATA data+642(SB)/1, $102
-DATA data+643(SB)/1, $32
-DATA data+644(SB)/1, $108
-DATA data+645(SB)/1, $101
-DATA data+646(SB)/1, $110
-DATA data+647(SB)/1, $103
-DATA data+648(SB)/1, $116
-DATA data+649(SB)/1, $104
-DATA data+650(SB)/1, $32
-DATA data+651(SB)/1, $0
+DATA data+720(SB)/1, $32
+DATA data+721(SB)/1, $111
+DATA data+722(SB)/1, $102
+DATA data+723(SB)/1, $32
+DATA data+724(SB)/1, $108
+DATA data+725(SB)/1, $101
+DATA data+726(SB)/1, $110
+DATA data+727(SB)/1, $103
+DATA data+728(SB)/1, $116
+DATA data+729(SB)/1, $104
+DATA data+730(SB)/1, $32
+DATA data+731(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:417:42
 //--- String buffer start (', internally named ') at libgogo/symbol.go:419:50
-DATA data+672(SB)/1, $44
-DATA data+673(SB)/1, $32
-DATA data+674(SB)/1, $105
-DATA data+675(SB)/1, $110
-DATA data+676(SB)/1, $116
-DATA data+677(SB)/1, $101
-DATA data+678(SB)/1, $114
-DATA data+679(SB)/1, $110
-DATA data+680(SB)/1, $97
-DATA data+681(SB)/1, $108
-DATA data+682(SB)/1, $108
-DATA data+683(SB)/1, $121
-DATA data+684(SB)/1, $32
-DATA data+685(SB)/1, $110
-DATA data+686(SB)/1, $97
-DATA data+687(SB)/1, $109
-DATA data+688(SB)/1, $101
-DATA data+689(SB)/1, $100
-DATA data+690(SB)/1, $32
-DATA data+691(SB)/1, $0
+DATA data+752(SB)/1, $44
+DATA data+753(SB)/1, $32
+DATA data+754(SB)/1, $105
+DATA data+755(SB)/1, $110
+DATA data+756(SB)/1, $116
+DATA data+757(SB)/1, $101
+DATA data+758(SB)/1, $114
+DATA data+759(SB)/1, $110
+DATA data+760(SB)/1, $97
+DATA data+761(SB)/1, $108
+DATA data+762(SB)/1, $108
+DATA data+763(SB)/1, $121
+DATA data+764(SB)/1, $32
+DATA data+765(SB)/1, $110
+DATA data+766(SB)/1, $97
+DATA data+767(SB)/1, $109
+DATA data+768(SB)/1, $101
+DATA data+769(SB)/1, $100
+DATA data+770(SB)/1, $32
+DATA data+771(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:419:50
 //--- String buffer start ('<unknown>') at libgogo/symbol.go:428:36
-DATA data+712(SB)/1, $60
-DATA data+713(SB)/1, $117
-DATA data+714(SB)/1, $110
-DATA data+715(SB)/1, $107
-DATA data+716(SB)/1, $110
-DATA data+717(SB)/1, $111
-DATA data+718(SB)/1, $119
-DATA data+719(SB)/1, $110
-DATA data+720(SB)/1, $62
-DATA data+721(SB)/1, $0
+DATA data+792(SB)/1, $60
+DATA data+793(SB)/1, $117
+DATA data+794(SB)/1, $110
+DATA data+795(SB)/1, $107
+DATA data+796(SB)/1, $110
+DATA data+797(SB)/1, $111
+DATA data+798(SB)/1, $119
+DATA data+799(SB)/1, $110
+DATA data+800(SB)/1, $62
+DATA data+801(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:428:36
 //--- String buffer start (', size: ') at libgogo/symbol.go:430:31
-DATA data+744(SB)/1, $44
-DATA data+745(SB)/1, $32
-DATA data+746(SB)/1, $115
-DATA data+747(SB)/1, $105
-DATA data+748(SB)/1, $122
-DATA data+749(SB)/1, $101
-DATA data+750(SB)/1, $58
-DATA data+751(SB)/1, $32
-DATA data+752(SB)/1, $0
+DATA data+824(SB)/1, $44
+DATA data+825(SB)/1, $32
+DATA data+826(SB)/1, $115
+DATA data+827(SB)/1, $105
+DATA data+828(SB)/1, $122
+DATA data+829(SB)/1, $101
+DATA data+830(SB)/1, $58
+DATA data+831(SB)/1, $32
+DATA data+832(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:430:31
 //--- String buffer start (', offset: ') at libgogo/symbol.go:433:33
-DATA data+776(SB)/1, $44
-DATA data+777(SB)/1, $32
-DATA data+778(SB)/1, $111
-DATA data+779(SB)/1, $102
-DATA data+780(SB)/1, $102
-DATA data+781(SB)/1, $115
-DATA data+782(SB)/1, $101
-DATA data+783(SB)/1, $116
-DATA data+784(SB)/1, $58
-DATA data+785(SB)/1, $32
-DATA data+786(SB)/1, $0
+DATA data+856(SB)/1, $44
+DATA data+857(SB)/1, $32
+DATA data+858(SB)/1, $111
+DATA data+859(SB)/1, $102
+DATA data+860(SB)/1, $102
+DATA data+861(SB)/1, $115
+DATA data+862(SB)/1, $101
+DATA data+863(SB)/1, $116
+DATA data+864(SB)/1, $58
+DATA data+865(SB)/1, $32
+DATA data+866(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:433:33
 //--- String buffer start (')\n') at libgogo/symbol.go:436:26
-DATA data+808(SB)/1, $41
-DATA data+809(SB)/1, $10
-DATA data+810(SB)/1, $0
-//--- String buffer end at libgogo/symbol.go:436:26
-//--- String buffer start ('Type ') at libgogo/symbol.go:449:28
-DATA data+832(SB)/1, $84
-DATA data+833(SB)/1, $121
-DATA data+834(SB)/1, $112
-DATA data+835(SB)/1, $101
-DATA data+836(SB)/1, $32
-DATA data+837(SB)/1, $0
-//--- String buffer end at libgogo/symbol.go:449:28
-//--- String buffer start (' (size: ') at libgogo/symbol.go:456:31
-DATA data+856(SB)/1, $32
-DATA data+857(SB)/1, $40
-DATA data+858(SB)/1, $115
-DATA data+859(SB)/1, $105
-DATA data+860(SB)/1, $122
-DATA data+861(SB)/1, $101
-DATA data+862(SB)/1, $58
-DATA data+863(SB)/1, $32
-DATA data+864(SB)/1, $0
-//--- String buffer end at libgogo/symbol.go:456:31
-//--- String buffer start (')\n') at libgogo/symbol.go:459:26
 DATA data+888(SB)/1, $41
 DATA data+889(SB)/1, $10
 DATA data+890(SB)/1, $0
-//--- String buffer end at libgogo/symbol.go:459:26
-//--- String buffer start ('  ') at libgogo/symbol.go:461:29
-DATA data+912(SB)/1, $32
-DATA data+913(SB)/1, $32
-DATA data+914(SB)/1, $0
-//--- String buffer end at libgogo/symbol.go:461:29
-//--- String buffer start (' (type: ') at libgogo/symbol.go:463:35
+//--- String buffer end at libgogo/symbol.go:436:26
+//--- String buffer start ('Type ') at libgogo/symbol.go:449:28
+DATA data+912(SB)/1, $84
+DATA data+913(SB)/1, $121
+DATA data+914(SB)/1, $112
+DATA data+915(SB)/1, $101
+DATA data+916(SB)/1, $32
+DATA data+917(SB)/1, $0
+//--- String buffer end at libgogo/symbol.go:449:28
+//--- String buffer start (' (size: ') at libgogo/symbol.go:456:31
 DATA data+936(SB)/1, $32
 DATA data+937(SB)/1, $40
-DATA data+938(SB)/1, $116
-DATA data+939(SB)/1, $121
-DATA data+940(SB)/1, $112
+DATA data+938(SB)/1, $115
+DATA data+939(SB)/1, $105
+DATA data+940(SB)/1, $122
 DATA data+941(SB)/1, $101
 DATA data+942(SB)/1, $58
 DATA data+943(SB)/1, $32
 DATA data+944(SB)/1, $0
+//--- String buffer end at libgogo/symbol.go:456:31
+//--- String buffer start (')\n') at libgogo/symbol.go:459:26
+DATA data+968(SB)/1, $41
+DATA data+969(SB)/1, $10
+DATA data+970(SB)/1, $0
+//--- String buffer end at libgogo/symbol.go:459:26
+//--- String buffer start ('  ') at libgogo/symbol.go:461:29
+DATA data+992(SB)/1, $32
+DATA data+993(SB)/1, $32
+DATA data+994(SB)/1, $0
+//--- String buffer end at libgogo/symbol.go:461:29
+//--- String buffer start (' (type: ') at libgogo/symbol.go:463:35
+DATA data+1016(SB)/1, $32
+DATA data+1017(SB)/1, $40
+DATA data+1018(SB)/1, $116
+DATA data+1019(SB)/1, $121
+DATA data+1020(SB)/1, $112
+DATA data+1021(SB)/1, $101
+DATA data+1022(SB)/1, $58
+DATA data+1023(SB)/1, $32
+DATA data+1024(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:463:35
 //--- String buffer start ('pointer to ') at libgogo/symbol.go:465:42
-DATA data+968(SB)/1, $112
-DATA data+969(SB)/1, $111
-DATA data+970(SB)/1, $105
-DATA data+971(SB)/1, $110
-DATA data+972(SB)/1, $116
-DATA data+973(SB)/1, $101
-DATA data+974(SB)/1, $114
-DATA data+975(SB)/1, $32
-DATA data+976(SB)/1, $116
-DATA data+977(SB)/1, $111
-DATA data+978(SB)/1, $32
-DATA data+979(SB)/1, $0
+DATA data+1048(SB)/1, $112
+DATA data+1049(SB)/1, $111
+DATA data+1050(SB)/1, $105
+DATA data+1051(SB)/1, $110
+DATA data+1052(SB)/1, $116
+DATA data+1053(SB)/1, $101
+DATA data+1054(SB)/1, $114
+DATA data+1055(SB)/1, $32
+DATA data+1056(SB)/1, $116
+DATA data+1057(SB)/1, $111
+DATA data+1058(SB)/1, $32
+DATA data+1059(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:465:42
 //--- String buffer start ('array of ') at libgogo/symbol.go:469:44
-DATA data+1000(SB)/1, $97
-DATA data+1001(SB)/1, $114
-DATA data+1002(SB)/1, $114
-DATA data+1003(SB)/1, $97
-DATA data+1004(SB)/1, $121
-DATA data+1005(SB)/1, $32
-DATA data+1006(SB)/1, $111
-DATA data+1007(SB)/1, $102
-DATA data+1008(SB)/1, $32
-DATA data+1009(SB)/1, $0
+DATA data+1080(SB)/1, $97
+DATA data+1081(SB)/1, $114
+DATA data+1082(SB)/1, $114
+DATA data+1083(SB)/1, $97
+DATA data+1084(SB)/1, $121
+DATA data+1085(SB)/1, $32
+DATA data+1086(SB)/1, $111
+DATA data+1087(SB)/1, $102
+DATA data+1088(SB)/1, $32
+DATA data+1089(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:469:44
 //--- String buffer start (' of length ') at libgogo/symbol.go:471:46
-DATA data+1032(SB)/1, $32
-DATA data+1033(SB)/1, $111
-DATA data+1034(SB)/1, $102
-DATA data+1035(SB)/1, $32
-DATA data+1036(SB)/1, $108
-DATA data+1037(SB)/1, $101
-DATA data+1038(SB)/1, $110
-DATA data+1039(SB)/1, $103
-DATA data+1040(SB)/1, $116
-DATA data+1041(SB)/1, $104
-DATA data+1042(SB)/1, $32
-DATA data+1043(SB)/1, $0
+DATA data+1112(SB)/1, $32
+DATA data+1113(SB)/1, $111
+DATA data+1114(SB)/1, $102
+DATA data+1115(SB)/1, $32
+DATA data+1116(SB)/1, $108
+DATA data+1117(SB)/1, $101
+DATA data+1118(SB)/1, $110
+DATA data+1119(SB)/1, $103
+DATA data+1120(SB)/1, $116
+DATA data+1121(SB)/1, $104
+DATA data+1122(SB)/1, $32
+DATA data+1123(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:471:46
 //--- String buffer start (', internally named ') at libgogo/symbol.go:473:54
-DATA data+1064(SB)/1, $44
-DATA data+1065(SB)/1, $32
-DATA data+1066(SB)/1, $105
-DATA data+1067(SB)/1, $110
-DATA data+1068(SB)/1, $116
-DATA data+1069(SB)/1, $101
-DATA data+1070(SB)/1, $114
-DATA data+1071(SB)/1, $110
-DATA data+1072(SB)/1, $97
-DATA data+1073(SB)/1, $108
-DATA data+1074(SB)/1, $108
-DATA data+1075(SB)/1, $121
-DATA data+1076(SB)/1, $32
-DATA data+1077(SB)/1, $110
-DATA data+1078(SB)/1, $97
-DATA data+1079(SB)/1, $109
-DATA data+1080(SB)/1, $101
-DATA data+1081(SB)/1, $100
-DATA data+1082(SB)/1, $32
-DATA data+1083(SB)/1, $0
+DATA data+1144(SB)/1, $44
+DATA data+1145(SB)/1, $32
+DATA data+1146(SB)/1, $105
+DATA data+1147(SB)/1, $110
+DATA data+1148(SB)/1, $116
+DATA data+1149(SB)/1, $101
+DATA data+1150(SB)/1, $114
+DATA data+1151(SB)/1, $110
+DATA data+1152(SB)/1, $97
+DATA data+1153(SB)/1, $108
+DATA data+1154(SB)/1, $108
+DATA data+1155(SB)/1, $121
+DATA data+1156(SB)/1, $32
+DATA data+1157(SB)/1, $110
+DATA data+1158(SB)/1, $97
+DATA data+1159(SB)/1, $109
+DATA data+1160(SB)/1, $101
+DATA data+1161(SB)/1, $100
+DATA data+1162(SB)/1, $32
+DATA data+1163(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:473:54
 //--- String buffer start ('<unknown>') at libgogo/symbol.go:482:40
-DATA data+1104(SB)/1, $60
-DATA data+1105(SB)/1, $117
-DATA data+1106(SB)/1, $110
-DATA data+1107(SB)/1, $107
-DATA data+1108(SB)/1, $110
-DATA data+1109(SB)/1, $111
-DATA data+1110(SB)/1, $119
-DATA data+1111(SB)/1, $110
-DATA data+1112(SB)/1, $62
-DATA data+1113(SB)/1, $0
+DATA data+1184(SB)/1, $60
+DATA data+1185(SB)/1, $117
+DATA data+1186(SB)/1, $110
+DATA data+1187(SB)/1, $107
+DATA data+1188(SB)/1, $110
+DATA data+1189(SB)/1, $111
+DATA data+1190(SB)/1, $119
+DATA data+1191(SB)/1, $110
+DATA data+1192(SB)/1, $62
+DATA data+1193(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:482:40
 //--- String buffer start (', size: ') at libgogo/symbol.go:484:35
-DATA data+1136(SB)/1, $44
-DATA data+1137(SB)/1, $32
-DATA data+1138(SB)/1, $115
-DATA data+1139(SB)/1, $105
-DATA data+1140(SB)/1, $122
-DATA data+1141(SB)/1, $101
-DATA data+1142(SB)/1, $58
-DATA data+1143(SB)/1, $32
-DATA data+1144(SB)/1, $0
+DATA data+1216(SB)/1, $44
+DATA data+1217(SB)/1, $32
+DATA data+1218(SB)/1, $115
+DATA data+1219(SB)/1, $105
+DATA data+1220(SB)/1, $122
+DATA data+1221(SB)/1, $101
+DATA data+1222(SB)/1, $58
+DATA data+1223(SB)/1, $32
+DATA data+1224(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:484:35
 //--- String buffer start (', offset: ') at libgogo/symbol.go:487:37
-DATA data+1168(SB)/1, $44
-DATA data+1169(SB)/1, $32
-DATA data+1170(SB)/1, $111
-DATA data+1171(SB)/1, $102
-DATA data+1172(SB)/1, $102
-DATA data+1173(SB)/1, $115
-DATA data+1174(SB)/1, $101
-DATA data+1175(SB)/1, $116
-DATA data+1176(SB)/1, $58
-DATA data+1177(SB)/1, $32
-DATA data+1178(SB)/1, $0
+DATA data+1248(SB)/1, $44
+DATA data+1249(SB)/1, $32
+DATA data+1250(SB)/1, $111
+DATA data+1251(SB)/1, $102
+DATA data+1252(SB)/1, $102
+DATA data+1253(SB)/1, $115
+DATA data+1254(SB)/1, $101
+DATA data+1255(SB)/1, $116
+DATA data+1256(SB)/1, $58
+DATA data+1257(SB)/1, $32
+DATA data+1258(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:487:37
 //--- String buffer start (')\n') at libgogo/symbol.go:490:30
-DATA data+1200(SB)/1, $41
-DATA data+1201(SB)/1, $10
-DATA data+1202(SB)/1, $0
+DATA data+1280(SB)/1, $41
+DATA data+1281(SB)/1, $10
+DATA data+1282(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:490:30
 //--- String buffer start ('Function ') at libgogo/symbol.go:504:32
-DATA data+1224(SB)/1, $70
-DATA data+1225(SB)/1, $117
-DATA data+1226(SB)/1, $110
-DATA data+1227(SB)/1, $99
-DATA data+1228(SB)/1, $116
-DATA data+1229(SB)/1, $105
-DATA data+1230(SB)/1, $111
-DATA data+1231(SB)/1, $110
-DATA data+1232(SB)/1, $32
-DATA data+1233(SB)/1, $0
+DATA data+1304(SB)/1, $70
+DATA data+1305(SB)/1, $117
+DATA data+1306(SB)/1, $110
+DATA data+1307(SB)/1, $99
+DATA data+1308(SB)/1, $116
+DATA data+1309(SB)/1, $105
+DATA data+1310(SB)/1, $111
+DATA data+1311(SB)/1, $110
+DATA data+1312(SB)/1, $32
+DATA data+1313(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:504:32
 //--- String buffer start (' (number of parameters: ') at libgogo/symbol.go:508:47
-DATA data+1256(SB)/1, $32
-DATA data+1257(SB)/1, $40
-DATA data+1258(SB)/1, $110
-DATA data+1259(SB)/1, $117
-DATA data+1260(SB)/1, $109
-DATA data+1261(SB)/1, $98
-DATA data+1262(SB)/1, $101
-DATA data+1263(SB)/1, $114
-DATA data+1264(SB)/1, $32
-DATA data+1265(SB)/1, $111
-DATA data+1266(SB)/1, $102
-DATA data+1267(SB)/1, $32
-DATA data+1268(SB)/1, $112
-DATA data+1269(SB)/1, $97
-DATA data+1270(SB)/1, $114
-DATA data+1271(SB)/1, $97
-DATA data+1272(SB)/1, $109
-DATA data+1273(SB)/1, $101
-DATA data+1274(SB)/1, $116
-DATA data+1275(SB)/1, $101
-DATA data+1276(SB)/1, $114
-DATA data+1277(SB)/1, $115
-DATA data+1278(SB)/1, $58
-DATA data+1279(SB)/1, $32
-DATA data+1280(SB)/1, $0
-//--- String buffer end at libgogo/symbol.go:508:47
-//--- String buffer start (')\n') at libgogo/symbol.go:510:26
-DATA data+1304(SB)/1, $41
-DATA data+1305(SB)/1, $10
-DATA data+1306(SB)/1, $0
-//--- String buffer end at libgogo/symbol.go:510:26
-//--- String buffer start ('  ') at libgogo/symbol.go:512:29
-DATA data+1328(SB)/1, $32
-DATA data+1329(SB)/1, $32
-DATA data+1330(SB)/1, $0
-//--- String buffer end at libgogo/symbol.go:512:29
-//--- String buffer start (' (type: ') at libgogo/symbol.go:514:35
-DATA data+1352(SB)/1, $32
-DATA data+1353(SB)/1, $40
+DATA data+1336(SB)/1, $32
+DATA data+1337(SB)/1, $40
+DATA data+1338(SB)/1, $110
+DATA data+1339(SB)/1, $117
+DATA data+1340(SB)/1, $109
+DATA data+1341(SB)/1, $98
+DATA data+1342(SB)/1, $101
+DATA data+1343(SB)/1, $114
+DATA data+1344(SB)/1, $32
+DATA data+1345(SB)/1, $111
+DATA data+1346(SB)/1, $102
+DATA data+1347(SB)/1, $32
+DATA data+1348(SB)/1, $112
+DATA data+1349(SB)/1, $97
+DATA data+1350(SB)/1, $114
+DATA data+1351(SB)/1, $97
+DATA data+1352(SB)/1, $109
+DATA data+1353(SB)/1, $101
 DATA data+1354(SB)/1, $116
-DATA data+1355(SB)/1, $121
-DATA data+1356(SB)/1, $112
-DATA data+1357(SB)/1, $101
+DATA data+1355(SB)/1, $101
+DATA data+1356(SB)/1, $114
+DATA data+1357(SB)/1, $115
 DATA data+1358(SB)/1, $58
 DATA data+1359(SB)/1, $32
 DATA data+1360(SB)/1, $0
+//--- String buffer end at libgogo/symbol.go:508:47
+//--- String buffer start (')\n') at libgogo/symbol.go:510:26
+DATA data+1384(SB)/1, $41
+DATA data+1385(SB)/1, $10
+DATA data+1386(SB)/1, $0
+//--- String buffer end at libgogo/symbol.go:510:26
+//--- String buffer start ('  ') at libgogo/symbol.go:512:29
+DATA data+1408(SB)/1, $32
+DATA data+1409(SB)/1, $32
+DATA data+1410(SB)/1, $0
+//--- String buffer end at libgogo/symbol.go:512:29
+//--- String buffer start (' (type: ') at libgogo/symbol.go:514:35
+DATA data+1432(SB)/1, $32
+DATA data+1433(SB)/1, $40
+DATA data+1434(SB)/1, $116
+DATA data+1435(SB)/1, $121
+DATA data+1436(SB)/1, $112
+DATA data+1437(SB)/1, $101
+DATA data+1438(SB)/1, $58
+DATA data+1439(SB)/1, $32
+DATA data+1440(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:514:35
 //--- String buffer start ('pointer to ') at libgogo/symbol.go:516:42
-DATA data+1384(SB)/1, $112
-DATA data+1385(SB)/1, $111
-DATA data+1386(SB)/1, $105
-DATA data+1387(SB)/1, $110
-DATA data+1388(SB)/1, $116
-DATA data+1389(SB)/1, $101
-DATA data+1390(SB)/1, $114
-DATA data+1391(SB)/1, $32
-DATA data+1392(SB)/1, $116
-DATA data+1393(SB)/1, $111
-DATA data+1394(SB)/1, $32
-DATA data+1395(SB)/1, $0
+DATA data+1464(SB)/1, $112
+DATA data+1465(SB)/1, $111
+DATA data+1466(SB)/1, $105
+DATA data+1467(SB)/1, $110
+DATA data+1468(SB)/1, $116
+DATA data+1469(SB)/1, $101
+DATA data+1470(SB)/1, $114
+DATA data+1471(SB)/1, $32
+DATA data+1472(SB)/1, $116
+DATA data+1473(SB)/1, $111
+DATA data+1474(SB)/1, $32
+DATA data+1475(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:516:42
 //--- String buffer start ('array of ') at libgogo/symbol.go:520:44
-DATA data+1416(SB)/1, $97
-DATA data+1417(SB)/1, $114
-DATA data+1418(SB)/1, $114
-DATA data+1419(SB)/1, $97
-DATA data+1420(SB)/1, $121
-DATA data+1421(SB)/1, $32
-DATA data+1422(SB)/1, $111
-DATA data+1423(SB)/1, $102
-DATA data+1424(SB)/1, $32
-DATA data+1425(SB)/1, $0
+DATA data+1496(SB)/1, $97
+DATA data+1497(SB)/1, $114
+DATA data+1498(SB)/1, $114
+DATA data+1499(SB)/1, $97
+DATA data+1500(SB)/1, $121
+DATA data+1501(SB)/1, $32
+DATA data+1502(SB)/1, $111
+DATA data+1503(SB)/1, $102
+DATA data+1504(SB)/1, $32
+DATA data+1505(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:520:44
 //--- String buffer start (' of length ') at libgogo/symbol.go:522:46
-DATA data+1448(SB)/1, $32
-DATA data+1449(SB)/1, $111
-DATA data+1450(SB)/1, $102
-DATA data+1451(SB)/1, $32
-DATA data+1452(SB)/1, $108
-DATA data+1453(SB)/1, $101
-DATA data+1454(SB)/1, $110
-DATA data+1455(SB)/1, $103
-DATA data+1456(SB)/1, $116
-DATA data+1457(SB)/1, $104
-DATA data+1458(SB)/1, $32
-DATA data+1459(SB)/1, $0
+DATA data+1528(SB)/1, $32
+DATA data+1529(SB)/1, $111
+DATA data+1530(SB)/1, $102
+DATA data+1531(SB)/1, $32
+DATA data+1532(SB)/1, $108
+DATA data+1533(SB)/1, $101
+DATA data+1534(SB)/1, $110
+DATA data+1535(SB)/1, $103
+DATA data+1536(SB)/1, $116
+DATA data+1537(SB)/1, $104
+DATA data+1538(SB)/1, $32
+DATA data+1539(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:522:46
 //--- String buffer start (', internally named ') at libgogo/symbol.go:524:54
-DATA data+1480(SB)/1, $44
-DATA data+1481(SB)/1, $32
-DATA data+1482(SB)/1, $105
-DATA data+1483(SB)/1, $110
-DATA data+1484(SB)/1, $116
-DATA data+1485(SB)/1, $101
-DATA data+1486(SB)/1, $114
-DATA data+1487(SB)/1, $110
-DATA data+1488(SB)/1, $97
-DATA data+1489(SB)/1, $108
-DATA data+1490(SB)/1, $108
-DATA data+1491(SB)/1, $121
-DATA data+1492(SB)/1, $32
-DATA data+1493(SB)/1, $110
-DATA data+1494(SB)/1, $97
-DATA data+1495(SB)/1, $109
-DATA data+1496(SB)/1, $101
-DATA data+1497(SB)/1, $100
-DATA data+1498(SB)/1, $32
-DATA data+1499(SB)/1, $0
+DATA data+1560(SB)/1, $44
+DATA data+1561(SB)/1, $32
+DATA data+1562(SB)/1, $105
+DATA data+1563(SB)/1, $110
+DATA data+1564(SB)/1, $116
+DATA data+1565(SB)/1, $101
+DATA data+1566(SB)/1, $114
+DATA data+1567(SB)/1, $110
+DATA data+1568(SB)/1, $97
+DATA data+1569(SB)/1, $108
+DATA data+1570(SB)/1, $108
+DATA data+1571(SB)/1, $121
+DATA data+1572(SB)/1, $32
+DATA data+1573(SB)/1, $110
+DATA data+1574(SB)/1, $97
+DATA data+1575(SB)/1, $109
+DATA data+1576(SB)/1, $101
+DATA data+1577(SB)/1, $100
+DATA data+1578(SB)/1, $32
+DATA data+1579(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:524:54
 //--- String buffer start ('<unknown>') at libgogo/symbol.go:533:40
-DATA data+1520(SB)/1, $60
-DATA data+1521(SB)/1, $117
-DATA data+1522(SB)/1, $110
-DATA data+1523(SB)/1, $107
-DATA data+1524(SB)/1, $110
-DATA data+1525(SB)/1, $111
-DATA data+1526(SB)/1, $119
-DATA data+1527(SB)/1, $110
-DATA data+1528(SB)/1, $62
-DATA data+1529(SB)/1, $0
+DATA data+1600(SB)/1, $60
+DATA data+1601(SB)/1, $117
+DATA data+1602(SB)/1, $110
+DATA data+1603(SB)/1, $107
+DATA data+1604(SB)/1, $110
+DATA data+1605(SB)/1, $111
+DATA data+1606(SB)/1, $119
+DATA data+1607(SB)/1, $110
+DATA data+1608(SB)/1, $62
+DATA data+1609(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:533:40
 //--- String buffer start (', size: ') at libgogo/symbol.go:535:35
-DATA data+1552(SB)/1, $44
-DATA data+1553(SB)/1, $32
-DATA data+1554(SB)/1, $115
-DATA data+1555(SB)/1, $105
-DATA data+1556(SB)/1, $122
-DATA data+1557(SB)/1, $101
-DATA data+1558(SB)/1, $58
-DATA data+1559(SB)/1, $32
-DATA data+1560(SB)/1, $0
+DATA data+1632(SB)/1, $44
+DATA data+1633(SB)/1, $32
+DATA data+1634(SB)/1, $115
+DATA data+1635(SB)/1, $105
+DATA data+1636(SB)/1, $122
+DATA data+1637(SB)/1, $101
+DATA data+1638(SB)/1, $58
+DATA data+1639(SB)/1, $32
+DATA data+1640(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:535:35
 //--- String buffer start (', offset: ') at libgogo/symbol.go:538:37
-DATA data+1584(SB)/1, $44
-DATA data+1585(SB)/1, $32
-DATA data+1586(SB)/1, $111
-DATA data+1587(SB)/1, $102
-DATA data+1588(SB)/1, $102
-DATA data+1589(SB)/1, $115
-DATA data+1590(SB)/1, $101
-DATA data+1591(SB)/1, $116
-DATA data+1592(SB)/1, $58
-DATA data+1593(SB)/1, $32
-DATA data+1594(SB)/1, $0
+DATA data+1664(SB)/1, $44
+DATA data+1665(SB)/1, $32
+DATA data+1666(SB)/1, $111
+DATA data+1667(SB)/1, $102
+DATA data+1668(SB)/1, $102
+DATA data+1669(SB)/1, $115
+DATA data+1670(SB)/1, $101
+DATA data+1671(SB)/1, $116
+DATA data+1672(SB)/1, $58
+DATA data+1673(SB)/1, $32
+DATA data+1674(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:538:37
 //--- String buffer start (')\n') at libgogo/symbol.go:541:30
-DATA data+1616(SB)/1, $41
-DATA data+1617(SB)/1, $10
-DATA data+1618(SB)/1, $0
+DATA data+1696(SB)/1, $41
+DATA data+1697(SB)/1, $10
+DATA data+1698(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:541:30
 //--- String buffer start ('FUNC,') at libgogo/symbol.go:556:23
-DATA data+1640(SB)/1, $70
-DATA data+1641(SB)/1, $85
-DATA data+1642(SB)/1, $78
-DATA data+1643(SB)/1, $67
-DATA data+1644(SB)/1, $44
-DATA data+1645(SB)/1, $0
+DATA data+1720(SB)/1, $70
+DATA data+1721(SB)/1, $85
+DATA data+1722(SB)/1, $78
+DATA data+1723(SB)/1, $67
+DATA data+1724(SB)/1, $44
+DATA data+1725(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:556:23
 //--- String buffer start (',') at libgogo/symbol.go:559:32
-DATA data+1664(SB)/1, $44
-DATA data+1665(SB)/1, $0
+DATA data+1744(SB)/1, $44
+DATA data+1745(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:559:32
 //--- String buffer start ('·') at libgogo/symbol.go:561:33
-DATA data+1688(SB)/1, $194
-DATA data+1689(SB)/1, $183
-DATA data+1690(SB)/1, $0
+DATA data+1768(SB)/1, $194
+DATA data+1769(SB)/1, $183
+DATA data+1770(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:561:33
 //--- String buffer start (',') at libgogo/symbol.go:565:36
-DATA data+1712(SB)/1, $44
-DATA data+1713(SB)/1, $0
+DATA data+1792(SB)/1, $44
+DATA data+1793(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:565:36
 //--- String buffer start (':') at libgogo/symbol.go:569:36
-DATA data+1736(SB)/1, $58
-DATA data+1737(SB)/1, $0
+DATA data+1816(SB)/1, $58
+DATA data+1817(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:569:36
 //--- String buffer start ('·') at libgogo/symbol.go:575:41
-DATA data+1760(SB)/1, $194
-DATA data+1761(SB)/1, $183
-DATA data+1762(SB)/1, $0
+DATA data+1840(SB)/1, $194
+DATA data+1841(SB)/1, $183
+DATA data+1842(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:575:41
 //--- String buffer start (',') at libgogo/symbol.go:579:40
-DATA data+1784(SB)/1, $44
-DATA data+1785(SB)/1, $0
+DATA data+1864(SB)/1, $44
+DATA data+1865(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:579:40
 //--- String buffer start ('TYPE,') at libgogo/symbol.go:596:23
-DATA data+1808(SB)/1, $84
-DATA data+1809(SB)/1, $89
-DATA data+1810(SB)/1, $80
-DATA data+1811(SB)/1, $69
-DATA data+1812(SB)/1, $44
-DATA data+1813(SB)/1, $0
+DATA data+1888(SB)/1, $84
+DATA data+1889(SB)/1, $89
+DATA data+1890(SB)/1, $80
+DATA data+1891(SB)/1, $69
+DATA data+1892(SB)/1, $44
+DATA data+1893(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:596:23
 //--- String buffer start (',') at libgogo/symbol.go:599:32
-DATA data+1832(SB)/1, $44
-DATA data+1833(SB)/1, $0
+DATA data+1912(SB)/1, $44
+DATA data+1913(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:599:32
 //--- String buffer start ('·') at libgogo/symbol.go:601:33
-DATA data+1856(SB)/1, $194
-DATA data+1857(SB)/1, $183
-DATA data+1858(SB)/1, $0
+DATA data+1936(SB)/1, $194
+DATA data+1937(SB)/1, $183
+DATA data+1938(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:601:33
 //--- String buffer start (',') at libgogo/symbol.go:603:32
-DATA data+1880(SB)/1, $44
-DATA data+1881(SB)/1, $0
+DATA data+1960(SB)/1, $44
+DATA data+1961(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:603:32
 //--- String buffer start (',') at libgogo/symbol.go:607:32
-DATA data+1904(SB)/1, $44
-DATA data+1905(SB)/1, $0
+DATA data+1984(SB)/1, $44
+DATA data+1985(SB)/1, $0
 //--- String buffer end at libgogo/symbol.go:607:32
-//--- String buffer start ('') at libgogo/item.go:68:32
-DATA data+2016(SB)/1, $0
-//--- String buffer end at libgogo/item.go:68:32
+//--- String buffer start ('') at libgogo/item.go:75:32
+DATA data+2104(SB)/1, $0
+//--- String buffer end at libgogo/item.go:75:32
 //--- String buffer start ('#') at libgogo/libgogo.go:25:26
-DATA data+6128(SB)/1, $35
-DATA data+6129(SB)/1, $0
+DATA data+6216(SB)/1, $35
+DATA data+6217(SB)/1, $0
 //--- String buffer end at libgogo/libgogo.go:25:26
 //--- String buffer start ('/proc/self/cmdline') at libgogo/libgogo.go:27:39
-DATA data+6152(SB)/1, $47
-DATA data+6153(SB)/1, $112
-DATA data+6154(SB)/1, $114
-DATA data+6155(SB)/1, $111
-DATA data+6156(SB)/1, $99
-DATA data+6157(SB)/1, $47
-DATA data+6158(SB)/1, $115
-DATA data+6159(SB)/1, $101
-DATA data+6160(SB)/1, $108
-DATA data+6161(SB)/1, $102
-DATA data+6162(SB)/1, $47
-DATA data+6163(SB)/1, $99
-DATA data+6164(SB)/1, $109
-DATA data+6165(SB)/1, $100
-DATA data+6166(SB)/1, $108
-DATA data+6167(SB)/1, $105
-DATA data+6168(SB)/1, $110
-DATA data+6169(SB)/1, $101
-DATA data+6170(SB)/1, $0
+DATA data+6240(SB)/1, $47
+DATA data+6241(SB)/1, $112
+DATA data+6242(SB)/1, $114
+DATA data+6243(SB)/1, $111
+DATA data+6244(SB)/1, $99
+DATA data+6245(SB)/1, $47
+DATA data+6246(SB)/1, $115
+DATA data+6247(SB)/1, $101
+DATA data+6248(SB)/1, $108
+DATA data+6249(SB)/1, $102
+DATA data+6250(SB)/1, $47
+DATA data+6251(SB)/1, $99
+DATA data+6252(SB)/1, $109
+DATA data+6253(SB)/1, $100
+DATA data+6254(SB)/1, $108
+DATA data+6255(SB)/1, $105
+DATA data+6256(SB)/1, $110
+DATA data+6257(SB)/1, $101
+DATA data+6258(SB)/1, $0
 //--- String buffer end at libgogo/libgogo.go:27:39
 //--- String buffer start ('Error opening /proc/self/cmdline. Currently GoGo is only supported on systems with /proc enabled.') at libgogo/libgogo.go:29:118
-DATA data+6192(SB)/1, $69
-DATA data+6193(SB)/1, $114
-DATA data+6194(SB)/1, $114
-DATA data+6195(SB)/1, $111
-DATA data+6196(SB)/1, $114
-DATA data+6197(SB)/1, $32
-DATA data+6198(SB)/1, $111
-DATA data+6199(SB)/1, $112
-DATA data+6200(SB)/1, $101
-DATA data+6201(SB)/1, $110
-DATA data+6202(SB)/1, $105
-DATA data+6203(SB)/1, $110
-DATA data+6204(SB)/1, $103
-DATA data+6205(SB)/1, $32
-DATA data+6206(SB)/1, $47
-DATA data+6207(SB)/1, $112
-DATA data+6208(SB)/1, $114
-DATA data+6209(SB)/1, $111
-DATA data+6210(SB)/1, $99
-DATA data+6211(SB)/1, $47
-DATA data+6212(SB)/1, $115
-DATA data+6213(SB)/1, $101
-DATA data+6214(SB)/1, $108
-DATA data+6215(SB)/1, $102
-DATA data+6216(SB)/1, $47
-DATA data+6217(SB)/1, $99
-DATA data+6218(SB)/1, $109
-DATA data+6219(SB)/1, $100
-DATA data+6220(SB)/1, $108
-DATA data+6221(SB)/1, $105
-DATA data+6222(SB)/1, $110
-DATA data+6223(SB)/1, $101
-DATA data+6224(SB)/1, $46
-DATA data+6225(SB)/1, $32
-DATA data+6226(SB)/1, $67
-DATA data+6227(SB)/1, $117
-DATA data+6228(SB)/1, $114
-DATA data+6229(SB)/1, $114
-DATA data+6230(SB)/1, $101
-DATA data+6231(SB)/1, $110
-DATA data+6232(SB)/1, $116
-DATA data+6233(SB)/1, $108
-DATA data+6234(SB)/1, $121
-DATA data+6235(SB)/1, $32
-DATA data+6236(SB)/1, $71
-DATA data+6237(SB)/1, $111
-DATA data+6238(SB)/1, $71
-DATA data+6239(SB)/1, $111
-DATA data+6240(SB)/1, $32
-DATA data+6241(SB)/1, $105
-DATA data+6242(SB)/1, $115
-DATA data+6243(SB)/1, $32
-DATA data+6244(SB)/1, $111
-DATA data+6245(SB)/1, $110
-DATA data+6246(SB)/1, $108
-DATA data+6247(SB)/1, $121
-DATA data+6248(SB)/1, $32
-DATA data+6249(SB)/1, $115
-DATA data+6250(SB)/1, $117
-DATA data+6251(SB)/1, $112
-DATA data+6252(SB)/1, $112
-DATA data+6253(SB)/1, $111
-DATA data+6254(SB)/1, $114
-DATA data+6255(SB)/1, $116
-DATA data+6256(SB)/1, $101
-DATA data+6257(SB)/1, $100
-DATA data+6258(SB)/1, $32
-DATA data+6259(SB)/1, $111
-DATA data+6260(SB)/1, $110
-DATA data+6261(SB)/1, $32
-DATA data+6262(SB)/1, $115
-DATA data+6263(SB)/1, $121
-DATA data+6264(SB)/1, $115
-DATA data+6265(SB)/1, $116
-DATA data+6266(SB)/1, $101
-DATA data+6267(SB)/1, $109
-DATA data+6268(SB)/1, $115
-DATA data+6269(SB)/1, $32
-DATA data+6270(SB)/1, $119
-DATA data+6271(SB)/1, $105
-DATA data+6272(SB)/1, $116
-DATA data+6273(SB)/1, $104
-DATA data+6274(SB)/1, $32
-DATA data+6275(SB)/1, $47
-DATA data+6276(SB)/1, $112
-DATA data+6277(SB)/1, $114
-DATA data+6278(SB)/1, $111
-DATA data+6279(SB)/1, $99
-DATA data+6280(SB)/1, $32
-DATA data+6281(SB)/1, $101
-DATA data+6282(SB)/1, $110
-DATA data+6283(SB)/1, $97
-DATA data+6284(SB)/1, $98
-DATA data+6285(SB)/1, $108
-DATA data+6286(SB)/1, $101
-DATA data+6287(SB)/1, $100
-DATA data+6288(SB)/1, $46
-DATA data+6289(SB)/1, $0
+DATA data+6280(SB)/1, $69
+DATA data+6281(SB)/1, $114
+DATA data+6282(SB)/1, $114
+DATA data+6283(SB)/1, $111
+DATA data+6284(SB)/1, $114
+DATA data+6285(SB)/1, $32
+DATA data+6286(SB)/1, $111
+DATA data+6287(SB)/1, $112
+DATA data+6288(SB)/1, $101
+DATA data+6289(SB)/1, $110
+DATA data+6290(SB)/1, $105
+DATA data+6291(SB)/1, $110
+DATA data+6292(SB)/1, $103
+DATA data+6293(SB)/1, $32
+DATA data+6294(SB)/1, $47
+DATA data+6295(SB)/1, $112
+DATA data+6296(SB)/1, $114
+DATA data+6297(SB)/1, $111
+DATA data+6298(SB)/1, $99
+DATA data+6299(SB)/1, $47
+DATA data+6300(SB)/1, $115
+DATA data+6301(SB)/1, $101
+DATA data+6302(SB)/1, $108
+DATA data+6303(SB)/1, $102
+DATA data+6304(SB)/1, $47
+DATA data+6305(SB)/1, $99
+DATA data+6306(SB)/1, $109
+DATA data+6307(SB)/1, $100
+DATA data+6308(SB)/1, $108
+DATA data+6309(SB)/1, $105
+DATA data+6310(SB)/1, $110
+DATA data+6311(SB)/1, $101
+DATA data+6312(SB)/1, $46
+DATA data+6313(SB)/1, $32
+DATA data+6314(SB)/1, $67
+DATA data+6315(SB)/1, $117
+DATA data+6316(SB)/1, $114
+DATA data+6317(SB)/1, $114
+DATA data+6318(SB)/1, $101
+DATA data+6319(SB)/1, $110
+DATA data+6320(SB)/1, $116
+DATA data+6321(SB)/1, $108
+DATA data+6322(SB)/1, $121
+DATA data+6323(SB)/1, $32
+DATA data+6324(SB)/1, $71
+DATA data+6325(SB)/1, $111
+DATA data+6326(SB)/1, $71
+DATA data+6327(SB)/1, $111
+DATA data+6328(SB)/1, $32
+DATA data+6329(SB)/1, $105
+DATA data+6330(SB)/1, $115
+DATA data+6331(SB)/1, $32
+DATA data+6332(SB)/1, $111
+DATA data+6333(SB)/1, $110
+DATA data+6334(SB)/1, $108
+DATA data+6335(SB)/1, $121
+DATA data+6336(SB)/1, $32
+DATA data+6337(SB)/1, $115
+DATA data+6338(SB)/1, $117
+DATA data+6339(SB)/1, $112
+DATA data+6340(SB)/1, $112
+DATA data+6341(SB)/1, $111
+DATA data+6342(SB)/1, $114
+DATA data+6343(SB)/1, $116
+DATA data+6344(SB)/1, $101
+DATA data+6345(SB)/1, $100
+DATA data+6346(SB)/1, $32
+DATA data+6347(SB)/1, $111
+DATA data+6348(SB)/1, $110
+DATA data+6349(SB)/1, $32
+DATA data+6350(SB)/1, $115
+DATA data+6351(SB)/1, $121
+DATA data+6352(SB)/1, $115
+DATA data+6353(SB)/1, $116
+DATA data+6354(SB)/1, $101
+DATA data+6355(SB)/1, $109
+DATA data+6356(SB)/1, $115
+DATA data+6357(SB)/1, $32
+DATA data+6358(SB)/1, $119
+DATA data+6359(SB)/1, $105
+DATA data+6360(SB)/1, $116
+DATA data+6361(SB)/1, $104
+DATA data+6362(SB)/1, $32
+DATA data+6363(SB)/1, $47
+DATA data+6364(SB)/1, $112
+DATA data+6365(SB)/1, $114
+DATA data+6366(SB)/1, $111
+DATA data+6367(SB)/1, $99
+DATA data+6368(SB)/1, $32
+DATA data+6369(SB)/1, $101
+DATA data+6370(SB)/1, $110
+DATA data+6371(SB)/1, $97
+DATA data+6372(SB)/1, $98
+DATA data+6373(SB)/1, $108
+DATA data+6374(SB)/1, $101
+DATA data+6375(SB)/1, $100
+DATA data+6376(SB)/1, $46
+DATA data+6377(SB)/1, $0
 //--- String buffer end at libgogo/libgogo.go:29:118
 //--- String buffer start ('Error closing file /proc/self/cmdline') at libgogo/libgogo.go:42:58
-DATA data+6312(SB)/1, $69
-DATA data+6313(SB)/1, $114
-DATA data+6314(SB)/1, $114
-DATA data+6315(SB)/1, $111
-DATA data+6316(SB)/1, $114
-DATA data+6317(SB)/1, $32
-DATA data+6318(SB)/1, $99
-DATA data+6319(SB)/1, $108
-DATA data+6320(SB)/1, $111
-DATA data+6321(SB)/1, $115
-DATA data+6322(SB)/1, $105
-DATA data+6323(SB)/1, $110
-DATA data+6324(SB)/1, $103
-DATA data+6325(SB)/1, $32
-DATA data+6326(SB)/1, $102
-DATA data+6327(SB)/1, $105
-DATA data+6328(SB)/1, $108
-DATA data+6329(SB)/1, $101
-DATA data+6330(SB)/1, $32
-DATA data+6331(SB)/1, $47
-DATA data+6332(SB)/1, $112
-DATA data+6333(SB)/1, $114
-DATA data+6334(SB)/1, $111
-DATA data+6335(SB)/1, $99
-DATA data+6336(SB)/1, $47
-DATA data+6337(SB)/1, $115
-DATA data+6338(SB)/1, $101
-DATA data+6339(SB)/1, $108
-DATA data+6340(SB)/1, $102
-DATA data+6341(SB)/1, $47
-DATA data+6342(SB)/1, $99
-DATA data+6343(SB)/1, $109
-DATA data+6344(SB)/1, $100
-DATA data+6345(SB)/1, $108
-DATA data+6346(SB)/1, $105
-DATA data+6347(SB)/1, $110
-DATA data+6348(SB)/1, $101
-DATA data+6349(SB)/1, $0
+DATA data+6400(SB)/1, $69
+DATA data+6401(SB)/1, $114
+DATA data+6402(SB)/1, $114
+DATA data+6403(SB)/1, $111
+DATA data+6404(SB)/1, $114
+DATA data+6405(SB)/1, $32
+DATA data+6406(SB)/1, $99
+DATA data+6407(SB)/1, $108
+DATA data+6408(SB)/1, $111
+DATA data+6409(SB)/1, $115
+DATA data+6410(SB)/1, $105
+DATA data+6411(SB)/1, $110
+DATA data+6412(SB)/1, $103
+DATA data+6413(SB)/1, $32
+DATA data+6414(SB)/1, $102
+DATA data+6415(SB)/1, $105
+DATA data+6416(SB)/1, $108
+DATA data+6417(SB)/1, $101
+DATA data+6418(SB)/1, $32
+DATA data+6419(SB)/1, $47
+DATA data+6420(SB)/1, $112
+DATA data+6421(SB)/1, $114
+DATA data+6422(SB)/1, $111
+DATA data+6423(SB)/1, $99
+DATA data+6424(SB)/1, $47
+DATA data+6425(SB)/1, $115
+DATA data+6426(SB)/1, $101
+DATA data+6427(SB)/1, $108
+DATA data+6428(SB)/1, $102
+DATA data+6429(SB)/1, $47
+DATA data+6430(SB)/1, $99
+DATA data+6431(SB)/1, $109
+DATA data+6432(SB)/1, $100
+DATA data+6433(SB)/1, $108
+DATA data+6434(SB)/1, $105
+DATA data+6435(SB)/1, $110
+DATA data+6436(SB)/1, $101
+DATA data+6437(SB)/1, $0
 //--- String buffer end at libgogo/libgogo.go:42:58
-GLOBL data(SB),$6368
+GLOBL data(SB),$6456
 
 TEXT main·init(SB),0,$0-0
-  //--- Assign byte buffer to new string constant start at libgogo/convert.go:74:24
+  //--- Assign byte buffer to new string constant start at test.go:4:22
   LEAQ data+8(SB), R8
-  MOVQ R8, (R0)
+  MOVQ R8, data+16(SB)
+  //--- Assign byte buffer to new string constant end at test.go:4:22
+  //--- Assign string length to new string constant start at test.go:4:22
+  MOVQ $0, data+24(SB)
+  //--- Assign string length to new string constant end at test.go:4:22
+  //--- Assign byte buffer to new string constant start at test.go:5:29
+  LEAQ data+32(SB), R8
+  MOVQ R8, data+40(SB)
+  //--- Assign byte buffer to new string constant end at test.go:5:29
+  //--- Assign string length to new string constant start at test.go:5:29
+  MOVQ $5, data+48(SB)
+  //--- Assign string length to new string constant end at test.go:5:29
+  //--- Assign byte buffer to new string constant start at test.go:6:33
+  LEAQ data+56(SB), R8
+  MOVQ R8, data+72(SB)
+  //--- Assign byte buffer to new string constant end at test.go:6:33
+  //--- Assign string length to new string constant start at test.go:6:33
+  MOVQ $8, data+80(SB)
+  //--- Assign string length to new string constant end at test.go:6:33
+  //--- Assign byte buffer to new string constant start at libgogo/convert.go:74:24
+  LEAQ data+88(SB), R8
+  MOVQ R8, data+96(SB)
   //--- Assign byte buffer to new string constant end at libgogo/convert.go:74:24
   //--- Assign string length to new string constant start at libgogo/convert.go:74:24
-  MOVQ $0, data+24(SB)
+  MOVQ $0, data+104(SB)
   //--- Assign string length to new string constant end at libgogo/convert.go:74:24
   //--- Assign byte buffer to new string constant start at libgogo/list.go:77:42
-  LEAQ data+32(SB), R8
-  MOVQ R8, data+56(SB)
+  LEAQ data+112(SB), R8
+  MOVQ R8, data+136(SB)
   //--- Assign byte buffer to new string constant end at libgogo/list.go:77:42
   //--- Assign string length to new string constant start at libgogo/list.go:77:42
-  MOVQ $19, data+64(SB)
+  MOVQ $19, data+144(SB)
   //--- Assign string length to new string constant end at libgogo/list.go:77:42
   //--- Assign byte buffer to new string constant start at libgogo/list.go:79:47
-  LEAQ data+72(SB), R8
-  MOVQ R8, data+104(SB)
+  LEAQ data+152(SB), R8
+  MOVQ R8, data+184(SB)
   //--- Assign byte buffer to new string constant end at libgogo/list.go:79:47
   //--- Assign string length to new string constant start at libgogo/list.go:79:47
-  MOVQ $24, data+112(SB)
+  MOVQ $24, data+192(SB)
   //--- Assign string length to new string constant end at libgogo/list.go:79:47
   //--- Assign byte buffer to new string constant start at libgogo/list.go:81:49
-  LEAQ data+120(SB), R8
-  MOVQ R8, data+152(SB)
+  LEAQ data+200(SB), R8
+  MOVQ R8, data+232(SB)
   //--- Assign byte buffer to new string constant end at libgogo/list.go:81:49
   //--- Assign string length to new string constant start at libgogo/list.go:81:49
-  MOVQ $28, data+160(SB)
+  MOVQ $28, data+240(SB)
   //--- Assign string length to new string constant end at libgogo/list.go:81:49
   //--- Global variable assignment start at libgogo/memmgr.go:14:23
   //--- Global variable assignment RHS load start at libgogo/memmgr.go:14:23
   //--- Global variable assignment RHS load end at libgogo/memmgr.go:14:28
-  MOVQ $1024, data+168(SB)
+  MOVQ $1024, data+248(SB)
   //--- Global variable assignment end at libgogo/memmgr.go:14:28
   //--- Global variable assignment start at libgogo/memmgr.go:22:24
   //--- Global variable assignment RHS load start at libgogo/memmgr.go:22:24
   //--- Global variable assignment RHS load end at libgogo/memmgr.go:22:26
-  MOVQ $0, data+176(SB)
+  MOVQ $0, data+256(SB)
   //--- Global variable assignment end at libgogo/memmgr.go:22:26
   //--- Global variable assignment start at libgogo/memmgr.go:23:23
   //--- Global variable assignment RHS load start at libgogo/memmgr.go:23:23
   //--- Global variable assignment RHS load end at libgogo/memmgr.go:23:25
-  MOVQ $0, data+184(SB)
+  MOVQ $0, data+264(SB)
   //--- Global variable assignment end at libgogo/memmgr.go:23:25
   //--- Global variable assignment start at libgogo/memmgr.go:24:22
   //--- Global variable assignment RHS load start at libgogo/memmgr.go:24:22
   //--- Global variable assignment RHS load end at libgogo/memmgr.go:24:24
-  MOVQ $0, data+192(SB)
+  MOVQ $0, data+272(SB)
   //--- Global variable assignment end at libgogo/memmgr.go:24:24
   //--- Assign byte buffer to new string constant start at libgogo/memmgr.go:53:36
-  LEAQ data+200(SB), R8
-  MOVQ R8, data+216(SB)
-  //--- Assign byte buffer to new string constant end at libgogo/memmgr.go:53:36
-  //--- Assign string length to new string constant start at libgogo/memmgr.go:53:36
-  MOVQ $14, data+224(SB)
-  //--- Assign string length to new string constant end at libgogo/memmgr.go:53:36
-  //--- Assign byte buffer to new string constant start at libgogo/memmgr.go:70:51
-  LEAQ data+232(SB), R8
-  MOVQ R8, data+264(SB)
-  //--- Assign byte buffer to new string constant end at libgogo/memmgr.go:70:51
-  //--- Assign string length to new string constant start at libgogo/memmgr.go:70:51
-  MOVQ $28, data+272(SB)
-  //--- Assign string length to new string constant end at libgogo/memmgr.go:70:51
-  //--- Assign byte buffer to new string constant start at libgogo/memmgr.go:72:38
   LEAQ data+280(SB), R8
   MOVQ R8, data+296(SB)
+  //--- Assign byte buffer to new string constant end at libgogo/memmgr.go:53:36
+  //--- Assign string length to new string constant start at libgogo/memmgr.go:53:36
+  MOVQ $14, data+304(SB)
+  //--- Assign string length to new string constant end at libgogo/memmgr.go:53:36
+  //--- Assign byte buffer to new string constant start at libgogo/memmgr.go:70:51
+  LEAQ data+312(SB), R8
+  MOVQ R8, data+344(SB)
+  //--- Assign byte buffer to new string constant end at libgogo/memmgr.go:70:51
+  //--- Assign string length to new string constant start at libgogo/memmgr.go:70:51
+  MOVQ $28, data+352(SB)
+  //--- Assign string length to new string constant end at libgogo/memmgr.go:70:51
+  //--- Assign byte buffer to new string constant start at libgogo/memmgr.go:72:38
+  LEAQ data+360(SB), R8
+  MOVQ R8, data+376(SB)
   //--- Assign byte buffer to new string constant end at libgogo/memmgr.go:72:38
   //--- Assign string length to new string constant start at libgogo/memmgr.go:72:38
-  MOVQ $15, data+304(SB)
+  MOVQ $15, data+384(SB)
   //--- Assign string length to new string constant end at libgogo/memmgr.go:72:38
   //--- Assign byte buffer to new string constant start at libgogo/memmgr.go:74:23
-  LEAQ data+312(SB), R8
-  MOVQ R8, data+320(SB)
+  LEAQ data+392(SB), R8
+  MOVQ R8, data+400(SB)
   //--- Assign byte buffer to new string constant end at libgogo/memmgr.go:74:23
   //--- Assign string length to new string constant start at libgogo/memmgr.go:74:23
-  MOVQ $1, data+328(SB)
+  MOVQ $1, data+408(SB)
   //--- Assign string length to new string constant end at libgogo/memmgr.go:74:23
   //--- Assign byte buffer to new string constant start at libgogo/memmgr.go:78:68
-  LEAQ data+336(SB), R8
-  MOVQ R8, data+384(SB)
+  LEAQ data+416(SB), R8
+  MOVQ R8, data+464(SB)
   //--- Assign byte buffer to new string constant end at libgogo/memmgr.go:78:68
   //--- Assign string length to new string constant start at libgogo/memmgr.go:78:68
-  MOVQ $45, data+392(SB)
+  MOVQ $45, data+472(SB)
   //--- Assign string length to new string constant end at libgogo/memmgr.go:78:68
   //--- Assign byte buffer to new string constant start at libgogo/memmgr.go:80:23
-  LEAQ data+400(SB), R8
-  MOVQ R8, data+408(SB)
+  LEAQ data+480(SB), R8
+  MOVQ R8, data+488(SB)
   //--- Assign byte buffer to new string constant end at libgogo/memmgr.go:80:23
   //--- Assign string length to new string constant start at libgogo/memmgr.go:80:23
-  MOVQ $1, data+416(SB)
+  MOVQ $1, data+496(SB)
   //--- Assign string length to new string constant end at libgogo/memmgr.go:80:23
   //--- Global variable assignment start at libgogo/symbol.go:30:26
   //--- Global variable assignment RHS load start at libgogo/symbol.go:30:26
   //--- Global variable assignment RHS load end at libgogo/symbol.go:30:29
-  MOVQ $64, data+424(SB)
+  MOVQ $64, data+504(SB)
   //--- Global variable assignment end at libgogo/symbol.go:30:29
   //--- Global variable assignment start at libgogo/symbol.go:31:24
   //--- Global variable assignment RHS load start at libgogo/symbol.go:31:24
   //--- Global variable assignment RHS load end at libgogo/symbol.go:31:27
-  MOVQ $80, data+432(SB)
+  MOVQ $80, data+512(SB)
   //--- Global variable assignment end at libgogo/symbol.go:31:27
   //--- Global variable assignment start at libgogo/symbol.go:36:24
   //--- Global variable assignment RHS load start at libgogo/symbol.go:36:24
   //--- Global variable assignment RHS load end at libgogo/symbol.go:36:26
-  MOVQ $1, data+440(SB)
+  MOVQ $1, data+520(SB)
   //--- Global variable assignment end at libgogo/symbol.go:36:26
   //--- Global variable assignment start at libgogo/symbol.go:37:26
   //--- Global variable assignment RHS load start at libgogo/symbol.go:37:26
   //--- Global variable assignment RHS load end at libgogo/symbol.go:37:28
-  MOVQ $2, data+448(SB)
+  MOVQ $2, data+528(SB)
   //--- Global variable assignment end at libgogo/symbol.go:37:28
   //--- Global variable assignment start at libgogo/symbol.go:38:30
   //--- Global variable assignment RHS load start at libgogo/symbol.go:38:30
   //--- Global variable assignment RHS load end at libgogo/symbol.go:38:32
-  MOVQ $3, data+456(SB)
+  MOVQ $3, data+536(SB)
   //--- Global variable assignment end at libgogo/symbol.go:38:32
   //--- Global variable assignment start at libgogo/symbol.go:43:26
   //--- Global variable assignment RHS load start at libgogo/symbol.go:43:26
   //--- Global variable assignment RHS load end at libgogo/symbol.go:43:28
-  MOVQ $1, data+464(SB)
+  MOVQ $1, data+544(SB)
   //--- Global variable assignment end at libgogo/symbol.go:43:28
   //--- Global variable assignment start at libgogo/symbol.go:44:26
   //--- Global variable assignment RHS load start at libgogo/symbol.go:44:26
   //--- Global variable assignment RHS load end at libgogo/symbol.go:44:28
-  MOVQ $2, data+472(SB)
+  MOVQ $2, data+552(SB)
   //--- Global variable assignment end at libgogo/symbol.go:44:28
   //--- Global variable assignment start at libgogo/symbol.go:45:25
   //--- Global variable assignment RHS load start at libgogo/symbol.go:45:25
   //--- Global variable assignment RHS load end at libgogo/symbol.go:45:27
-  MOVQ $3, data+480(SB)
+  MOVQ $3, data+560(SB)
   //--- Global variable assignment end at libgogo/symbol.go:45:27
   //--- Global variable assignment start at libgogo/symbol.go:46:28
   //--- Global variable assignment RHS load start at libgogo/symbol.go:46:28
   //--- Global variable assignment RHS load end at libgogo/symbol.go:46:30
-  MOVQ $4, data+488(SB)
+  MOVQ $4, data+568(SB)
   //--- Global variable assignment end at libgogo/symbol.go:46:30
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:120:32
-  LEAQ data+496(SB), R8
-  MOVQ R8, data+504(SB)
+  LEAQ data+576(SB), R8
+  MOVQ R8, data+584(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:120:32
   //--- Assign string length to new string constant start at libgogo/symbol.go:120:32
-  MOVQ $0, data+512(SB)
+  MOVQ $0, data+592(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:120:32
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:402:30
-  LEAQ data+520(SB), R8
-  MOVQ R8, data+528(SB)
+  LEAQ data+600(SB), R8
+  MOVQ R8, data+608(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:402:30
   //--- Assign string length to new string constant start at libgogo/symbol.go:402:30
-  MOVQ $7, data+536(SB)
+  MOVQ $7, data+616(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:402:30
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:409:31
-  LEAQ data+544(SB), R8
-  MOVQ R8, data+560(SB)
+  LEAQ data+624(SB), R8
+  MOVQ R8, data+640(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:409:31
   //--- Assign string length to new string constant start at libgogo/symbol.go:409:31
-  MOVQ $8, data+568(SB)
+  MOVQ $8, data+648(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:409:31
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:411:38
-  LEAQ data+576(SB), R8
-  MOVQ R8, data+592(SB)
+  LEAQ data+656(SB), R8
+  MOVQ R8, data+672(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:411:38
   //--- Assign string length to new string constant start at libgogo/symbol.go:411:38
-  MOVQ $11, data+600(SB)
+  MOVQ $11, data+680(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:411:38
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:415:40
-  LEAQ data+608(SB), R8
-  MOVQ R8, data+624(SB)
+  LEAQ data+688(SB), R8
+  MOVQ R8, data+704(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:415:40
   //--- Assign string length to new string constant start at libgogo/symbol.go:415:40
-  MOVQ $9, data+632(SB)
+  MOVQ $9, data+712(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:415:40
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:417:42
-  LEAQ data+640(SB), R8
-  MOVQ R8, data+656(SB)
+  LEAQ data+720(SB), R8
+  MOVQ R8, data+736(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:417:42
   //--- Assign string length to new string constant start at libgogo/symbol.go:417:42
-  MOVQ $11, data+664(SB)
+  MOVQ $11, data+744(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:417:42
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:419:50
-  LEAQ data+672(SB), R8
-  MOVQ R8, data+696(SB)
+  LEAQ data+752(SB), R8
+  MOVQ R8, data+776(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:419:50
   //--- Assign string length to new string constant start at libgogo/symbol.go:419:50
-  MOVQ $19, data+704(SB)
+  MOVQ $19, data+784(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:419:50
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:428:36
-  LEAQ data+712(SB), R8
-  MOVQ R8, data+728(SB)
+  LEAQ data+792(SB), R8
+  MOVQ R8, data+808(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:428:36
   //--- Assign string length to new string constant start at libgogo/symbol.go:428:36
-  MOVQ $9, data+736(SB)
+  MOVQ $9, data+816(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:428:36
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:430:31
-  LEAQ data+744(SB), R8
-  MOVQ R8, data+760(SB)
+  LEAQ data+824(SB), R8
+  MOVQ R8, data+840(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:430:31
   //--- Assign string length to new string constant start at libgogo/symbol.go:430:31
-  MOVQ $8, data+768(SB)
+  MOVQ $8, data+848(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:430:31
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:433:33
-  LEAQ data+776(SB), R8
-  MOVQ R8, data+792(SB)
-  //--- Assign byte buffer to new string constant end at libgogo/symbol.go:433:33
-  //--- Assign string length to new string constant start at libgogo/symbol.go:433:33
-  MOVQ $10, data+800(SB)
-  //--- Assign string length to new string constant end at libgogo/symbol.go:433:33
-  //--- Assign byte buffer to new string constant start at libgogo/symbol.go:436:26
-  LEAQ data+808(SB), R8
-  MOVQ R8, data+816(SB)
-  //--- Assign byte buffer to new string constant end at libgogo/symbol.go:436:26
-  //--- Assign string length to new string constant start at libgogo/symbol.go:436:26
-  MOVQ $2, data+824(SB)
-  //--- Assign string length to new string constant end at libgogo/symbol.go:436:26
-  //--- Assign byte buffer to new string constant start at libgogo/symbol.go:449:28
-  LEAQ data+832(SB), R8
-  MOVQ R8, data+840(SB)
-  //--- Assign byte buffer to new string constant end at libgogo/symbol.go:449:28
-  //--- Assign string length to new string constant start at libgogo/symbol.go:449:28
-  MOVQ $5, data+848(SB)
-  //--- Assign string length to new string constant end at libgogo/symbol.go:449:28
-  //--- Assign byte buffer to new string constant start at libgogo/symbol.go:456:31
   LEAQ data+856(SB), R8
   MOVQ R8, data+872(SB)
-  //--- Assign byte buffer to new string constant end at libgogo/symbol.go:456:31
-  //--- Assign string length to new string constant start at libgogo/symbol.go:456:31
-  MOVQ $8, data+880(SB)
-  //--- Assign string length to new string constant end at libgogo/symbol.go:456:31
-  //--- Assign byte buffer to new string constant start at libgogo/symbol.go:459:26
+  //--- Assign byte buffer to new string constant end at libgogo/symbol.go:433:33
+  //--- Assign string length to new string constant start at libgogo/symbol.go:433:33
+  MOVQ $10, data+880(SB)
+  //--- Assign string length to new string constant end at libgogo/symbol.go:433:33
+  //--- Assign byte buffer to new string constant start at libgogo/symbol.go:436:26
   LEAQ data+888(SB), R8
   MOVQ R8, data+896(SB)
-  //--- Assign byte buffer to new string constant end at libgogo/symbol.go:459:26
-  //--- Assign string length to new string constant start at libgogo/symbol.go:459:26
+  //--- Assign byte buffer to new string constant end at libgogo/symbol.go:436:26
+  //--- Assign string length to new string constant start at libgogo/symbol.go:436:26
   MOVQ $2, data+904(SB)
-  //--- Assign string length to new string constant end at libgogo/symbol.go:459:26
-  //--- Assign byte buffer to new string constant start at libgogo/symbol.go:461:29
+  //--- Assign string length to new string constant end at libgogo/symbol.go:436:26
+  //--- Assign byte buffer to new string constant start at libgogo/symbol.go:449:28
   LEAQ data+912(SB), R8
   MOVQ R8, data+920(SB)
-  //--- Assign byte buffer to new string constant end at libgogo/symbol.go:461:29
-  //--- Assign string length to new string constant start at libgogo/symbol.go:461:29
-  MOVQ $2, data+928(SB)
-  //--- Assign string length to new string constant end at libgogo/symbol.go:461:29
-  //--- Assign byte buffer to new string constant start at libgogo/symbol.go:463:35
+  //--- Assign byte buffer to new string constant end at libgogo/symbol.go:449:28
+  //--- Assign string length to new string constant start at libgogo/symbol.go:449:28
+  MOVQ $5, data+928(SB)
+  //--- Assign string length to new string constant end at libgogo/symbol.go:449:28
+  //--- Assign byte buffer to new string constant start at libgogo/symbol.go:456:31
   LEAQ data+936(SB), R8
   MOVQ R8, data+952(SB)
+  //--- Assign byte buffer to new string constant end at libgogo/symbol.go:456:31
+  //--- Assign string length to new string constant start at libgogo/symbol.go:456:31
+  MOVQ $8, data+960(SB)
+  //--- Assign string length to new string constant end at libgogo/symbol.go:456:31
+  //--- Assign byte buffer to new string constant start at libgogo/symbol.go:459:26
+  LEAQ data+968(SB), R8
+  MOVQ R8, data+976(SB)
+  //--- Assign byte buffer to new string constant end at libgogo/symbol.go:459:26
+  //--- Assign string length to new string constant start at libgogo/symbol.go:459:26
+  MOVQ $2, data+984(SB)
+  //--- Assign string length to new string constant end at libgogo/symbol.go:459:26
+  //--- Assign byte buffer to new string constant start at libgogo/symbol.go:461:29
+  LEAQ data+992(SB), R8
+  MOVQ R8, data+1000(SB)
+  //--- Assign byte buffer to new string constant end at libgogo/symbol.go:461:29
+  //--- Assign string length to new string constant start at libgogo/symbol.go:461:29
+  MOVQ $2, data+1008(SB)
+  //--- Assign string length to new string constant end at libgogo/symbol.go:461:29
+  //--- Assign byte buffer to new string constant start at libgogo/symbol.go:463:35
+  LEAQ data+1016(SB), R8
+  MOVQ R8, data+1032(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:463:35
   //--- Assign string length to new string constant start at libgogo/symbol.go:463:35
-  MOVQ $8, data+960(SB)
+  MOVQ $8, data+1040(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:463:35
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:465:42
-  LEAQ data+968(SB), R8
-  MOVQ R8, data+984(SB)
+  LEAQ data+1048(SB), R8
+  MOVQ R8, data+1064(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:465:42
   //--- Assign string length to new string constant start at libgogo/symbol.go:465:42
-  MOVQ $11, data+992(SB)
+  MOVQ $11, data+1072(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:465:42
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:469:44
-  LEAQ data+1000(SB), R8
-  MOVQ R8, data+1016(SB)
+  LEAQ data+1080(SB), R8
+  MOVQ R8, data+1096(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:469:44
   //--- Assign string length to new string constant start at libgogo/symbol.go:469:44
-  MOVQ $9, data+1024(SB)
+  MOVQ $9, data+1104(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:469:44
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:471:46
-  LEAQ data+1032(SB), R8
-  MOVQ R8, data+1048(SB)
+  LEAQ data+1112(SB), R8
+  MOVQ R8, data+1128(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:471:46
   //--- Assign string length to new string constant start at libgogo/symbol.go:471:46
-  MOVQ $11, data+1056(SB)
+  MOVQ $11, data+1136(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:471:46
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:473:54
-  LEAQ data+1064(SB), R8
-  MOVQ R8, data+1088(SB)
+  LEAQ data+1144(SB), R8
+  MOVQ R8, data+1168(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:473:54
   //--- Assign string length to new string constant start at libgogo/symbol.go:473:54
-  MOVQ $19, data+1096(SB)
+  MOVQ $19, data+1176(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:473:54
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:482:40
-  LEAQ data+1104(SB), R8
-  MOVQ R8, data+1120(SB)
+  LEAQ data+1184(SB), R8
+  MOVQ R8, data+1200(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:482:40
   //--- Assign string length to new string constant start at libgogo/symbol.go:482:40
-  MOVQ $9, data+1128(SB)
+  MOVQ $9, data+1208(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:482:40
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:484:35
-  LEAQ data+1136(SB), R8
-  MOVQ R8, data+1152(SB)
+  LEAQ data+1216(SB), R8
+  MOVQ R8, data+1232(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:484:35
   //--- Assign string length to new string constant start at libgogo/symbol.go:484:35
-  MOVQ $8, data+1160(SB)
+  MOVQ $8, data+1240(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:484:35
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:487:37
-  LEAQ data+1168(SB), R8
-  MOVQ R8, data+1184(SB)
+  LEAQ data+1248(SB), R8
+  MOVQ R8, data+1264(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:487:37
   //--- Assign string length to new string constant start at libgogo/symbol.go:487:37
-  MOVQ $10, data+1192(SB)
+  MOVQ $10, data+1272(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:487:37
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:490:30
-  LEAQ data+1200(SB), R8
-  MOVQ R8, data+1208(SB)
+  LEAQ data+1280(SB), R8
+  MOVQ R8, data+1288(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:490:30
   //--- Assign string length to new string constant start at libgogo/symbol.go:490:30
-  MOVQ $2, data+1216(SB)
+  MOVQ $2, data+1296(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:490:30
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:504:32
-  LEAQ data+1224(SB), R8
-  MOVQ R8, data+1240(SB)
+  LEAQ data+1304(SB), R8
+  MOVQ R8, data+1320(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:504:32
   //--- Assign string length to new string constant start at libgogo/symbol.go:504:32
-  MOVQ $9, data+1248(SB)
+  MOVQ $9, data+1328(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:504:32
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:508:47
-  LEAQ data+1256(SB), R8
-  MOVQ R8, data+1288(SB)
+  LEAQ data+1336(SB), R8
+  MOVQ R8, data+1368(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:508:47
   //--- Assign string length to new string constant start at libgogo/symbol.go:508:47
-  MOVQ $24, data+1296(SB)
+  MOVQ $24, data+1376(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:508:47
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:510:26
-  LEAQ data+1304(SB), R8
-  MOVQ R8, data+1312(SB)
+  LEAQ data+1384(SB), R8
+  MOVQ R8, data+1392(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:510:26
   //--- Assign string length to new string constant start at libgogo/symbol.go:510:26
-  MOVQ $2, data+1320(SB)
+  MOVQ $2, data+1400(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:510:26
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:512:29
-  LEAQ data+1328(SB), R8
-  MOVQ R8, data+1336(SB)
+  LEAQ data+1408(SB), R8
+  MOVQ R8, data+1416(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:512:29
   //--- Assign string length to new string constant start at libgogo/symbol.go:512:29
-  MOVQ $2, data+1344(SB)
+  MOVQ $2, data+1424(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:512:29
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:514:35
-  LEAQ data+1352(SB), R8
-  MOVQ R8, data+1368(SB)
+  LEAQ data+1432(SB), R8
+  MOVQ R8, data+1448(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:514:35
   //--- Assign string length to new string constant start at libgogo/symbol.go:514:35
-  MOVQ $8, data+1376(SB)
+  MOVQ $8, data+1456(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:514:35
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:516:42
-  LEAQ data+1384(SB), R8
-  MOVQ R8, data+1400(SB)
+  LEAQ data+1464(SB), R8
+  MOVQ R8, data+1480(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:516:42
   //--- Assign string length to new string constant start at libgogo/symbol.go:516:42
-  MOVQ $11, data+1408(SB)
+  MOVQ $11, data+1488(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:516:42
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:520:44
-  LEAQ data+1416(SB), R8
-  MOVQ R8, data+1432(SB)
+  LEAQ data+1496(SB), R8
+  MOVQ R8, data+1512(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:520:44
   //--- Assign string length to new string constant start at libgogo/symbol.go:520:44
-  MOVQ $9, data+1440(SB)
+  MOVQ $9, data+1520(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:520:44
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:522:46
-  LEAQ data+1448(SB), R8
-  MOVQ R8, data+1464(SB)
+  LEAQ data+1528(SB), R8
+  MOVQ R8, data+1544(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:522:46
   //--- Assign string length to new string constant start at libgogo/symbol.go:522:46
-  MOVQ $11, data+1472(SB)
+  MOVQ $11, data+1552(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:522:46
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:524:54
-  LEAQ data+1480(SB), R8
-  MOVQ R8, data+1504(SB)
+  LEAQ data+1560(SB), R8
+  MOVQ R8, data+1584(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:524:54
   //--- Assign string length to new string constant start at libgogo/symbol.go:524:54
-  MOVQ $19, data+1512(SB)
+  MOVQ $19, data+1592(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:524:54
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:533:40
-  LEAQ data+1520(SB), R8
-  MOVQ R8, data+1536(SB)
+  LEAQ data+1600(SB), R8
+  MOVQ R8, data+1616(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:533:40
   //--- Assign string length to new string constant start at libgogo/symbol.go:533:40
-  MOVQ $9, data+1544(SB)
+  MOVQ $9, data+1624(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:533:40
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:535:35
-  LEAQ data+1552(SB), R8
-  MOVQ R8, data+1568(SB)
+  LEAQ data+1632(SB), R8
+  MOVQ R8, data+1648(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:535:35
   //--- Assign string length to new string constant start at libgogo/symbol.go:535:35
-  MOVQ $8, data+1576(SB)
+  MOVQ $8, data+1656(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:535:35
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:538:37
-  LEAQ data+1584(SB), R8
-  MOVQ R8, data+1600(SB)
+  LEAQ data+1664(SB), R8
+  MOVQ R8, data+1680(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:538:37
   //--- Assign string length to new string constant start at libgogo/symbol.go:538:37
-  MOVQ $10, data+1608(SB)
+  MOVQ $10, data+1688(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:538:37
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:541:30
-  LEAQ data+1616(SB), R8
-  MOVQ R8, data+1624(SB)
+  LEAQ data+1696(SB), R8
+  MOVQ R8, data+1704(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:541:30
   //--- Assign string length to new string constant start at libgogo/symbol.go:541:30
-  MOVQ $2, data+1632(SB)
+  MOVQ $2, data+1712(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:541:30
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:556:23
-  LEAQ data+1640(SB), R8
-  MOVQ R8, data+1648(SB)
+  LEAQ data+1720(SB), R8
+  MOVQ R8, data+1728(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:556:23
   //--- Assign string length to new string constant start at libgogo/symbol.go:556:23
-  MOVQ $5, data+1656(SB)
+  MOVQ $5, data+1736(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:556:23
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:559:32
-  LEAQ data+1664(SB), R8
-  MOVQ R8, data+1672(SB)
+  LEAQ data+1744(SB), R8
+  MOVQ R8, data+1752(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:559:32
   //--- Assign string length to new string constant start at libgogo/symbol.go:559:32
-  MOVQ $1, data+1680(SB)
+  MOVQ $1, data+1760(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:559:32
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:561:33
-  LEAQ data+1688(SB), R8
-  MOVQ R8, data+1696(SB)
+  LEAQ data+1768(SB), R8
+  MOVQ R8, data+1776(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:561:33
   //--- Assign string length to new string constant start at libgogo/symbol.go:561:33
-  MOVQ $2, data+1704(SB)
+  MOVQ $2, data+1784(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:561:33
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:565:36
-  LEAQ data+1712(SB), R8
-  MOVQ R8, data+1720(SB)
+  LEAQ data+1792(SB), R8
+  MOVQ R8, data+1800(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:565:36
   //--- Assign string length to new string constant start at libgogo/symbol.go:565:36
-  MOVQ $1, data+1728(SB)
+  MOVQ $1, data+1808(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:565:36
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:569:36
-  LEAQ data+1736(SB), R8
-  MOVQ R8, data+1744(SB)
+  LEAQ data+1816(SB), R8
+  MOVQ R8, data+1824(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:569:36
   //--- Assign string length to new string constant start at libgogo/symbol.go:569:36
-  MOVQ $1, data+1752(SB)
+  MOVQ $1, data+1832(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:569:36
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:575:41
-  LEAQ data+1760(SB), R8
-  MOVQ R8, data+1768(SB)
+  LEAQ data+1840(SB), R8
+  MOVQ R8, data+1848(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:575:41
   //--- Assign string length to new string constant start at libgogo/symbol.go:575:41
-  MOVQ $2, data+1776(SB)
+  MOVQ $2, data+1856(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:575:41
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:579:40
-  LEAQ data+1784(SB), R8
-  MOVQ R8, data+1792(SB)
+  LEAQ data+1864(SB), R8
+  MOVQ R8, data+1872(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:579:40
   //--- Assign string length to new string constant start at libgogo/symbol.go:579:40
-  MOVQ $1, data+1800(SB)
+  MOVQ $1, data+1880(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:579:40
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:596:23
-  LEAQ data+1808(SB), R8
-  MOVQ R8, data+1816(SB)
+  LEAQ data+1888(SB), R8
+  MOVQ R8, data+1896(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:596:23
   //--- Assign string length to new string constant start at libgogo/symbol.go:596:23
-  MOVQ $5, data+1824(SB)
+  MOVQ $5, data+1904(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:596:23
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:599:32
-  LEAQ data+1832(SB), R8
-  MOVQ R8, data+1840(SB)
+  LEAQ data+1912(SB), R8
+  MOVQ R8, data+1920(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:599:32
   //--- Assign string length to new string constant start at libgogo/symbol.go:599:32
-  MOVQ $1, data+1848(SB)
+  MOVQ $1, data+1928(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:599:32
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:601:33
-  LEAQ data+1856(SB), R8
-  MOVQ R8, data+1864(SB)
+  LEAQ data+1936(SB), R8
+  MOVQ R8, data+1944(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:601:33
   //--- Assign string length to new string constant start at libgogo/symbol.go:601:33
-  MOVQ $2, data+1872(SB)
+  MOVQ $2, data+1952(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:601:33
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:603:32
-  LEAQ data+1880(SB), R8
-  MOVQ R8, data+1888(SB)
+  LEAQ data+1960(SB), R8
+  MOVQ R8, data+1968(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:603:32
   //--- Assign string length to new string constant start at libgogo/symbol.go:603:32
-  MOVQ $1, data+1896(SB)
+  MOVQ $1, data+1976(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:603:32
   //--- Assign byte buffer to new string constant start at libgogo/symbol.go:607:32
-  LEAQ data+1904(SB), R8
-  MOVQ R8, data+1912(SB)
+  LEAQ data+1984(SB), R8
+  MOVQ R8, data+1992(SB)
   //--- Assign byte buffer to new string constant end at libgogo/symbol.go:607:32
   //--- Assign string length to new string constant start at libgogo/symbol.go:607:32
-  MOVQ $1, data+1920(SB)
+  MOVQ $1, data+2000(SB)
   //--- Assign string length to new string constant end at libgogo/symbol.go:607:32
   //--- Global variable assignment start at libgogo/item.go:21:24
   //--- Global variable assignment RHS load start at libgogo/item.go:21:24
   //--- Global variable assignment RHS load end at libgogo/item.go:21:27
-  MOVQ $72, data+1928(SB)
+  MOVQ $72, data+2008(SB)
   //--- Global variable assignment end at libgogo/item.go:21:27
   //--- Global variable assignment start at libgogo/item.go:26:23
   //--- Global variable assignment RHS load start at libgogo/item.go:26:23
   //--- Global variable assignment RHS load end at libgogo/item.go:26:25
-  MOVQ $1, data+1936(SB)
+  MOVQ $1, data+2016(SB)
   //--- Global variable assignment end at libgogo/item.go:26:25
   //--- Global variable assignment start at libgogo/item.go:27:25
   //--- Global variable assignment RHS load start at libgogo/item.go:27:25
   //--- Global variable assignment RHS load end at libgogo/item.go:27:27
-  MOVQ $2, data+1944(SB)
+  MOVQ $2, data+2024(SB)
   //--- Global variable assignment end at libgogo/item.go:27:27
   //--- Global variable assignment start at libgogo/item.go:28:23
   //--- Global variable assignment RHS load start at libgogo/item.go:28:23
   //--- Global variable assignment RHS load end at libgogo/item.go:28:25
-  MOVQ $3, data+1952(SB)
+  MOVQ $3, data+2032(SB)
   //--- Global variable assignment end at libgogo/item.go:28:25
   //--- Global variable assignment start at libgogo/item.go:29:24
   //--- Global variable assignment RHS load start at libgogo/item.go:29:24
   //--- Global variable assignment RHS load end at libgogo/item.go:29:26
-  MOVQ $4, data+1960(SB)
+  MOVQ $4, data+2040(SB)
   //--- Global variable assignment end at libgogo/item.go:29:26
-  //--- Global variable assignment start at libgogo/item.go:34:21
-  //--- Global variable assignment RHS load start at libgogo/item.go:34:21
-  //--- Global variable assignment RHS load end at libgogo/item.go:34:23
-  MOVQ $0, data+1968(SB)
-  //--- Global variable assignment end at libgogo/item.go:34:23
-  //--- Global variable assignment start at libgogo/item.go:35:22
-  //--- Global variable assignment RHS load start at libgogo/item.go:35:22
-  //--- Global variable assignment RHS load end at libgogo/item.go:35:24
-  MOVQ $1, data+1976(SB)
-  //--- Global variable assignment end at libgogo/item.go:35:24
-  //--- Global variable assignment start at libgogo/item.go:36:21
-  //--- Global variable assignment RHS load start at libgogo/item.go:36:21
-  //--- Global variable assignment RHS load end at libgogo/item.go:36:23
-  MOVQ $2, data+1984(SB)
-  //--- Global variable assignment end at libgogo/item.go:36:23
-  //--- Global variable assignment start at libgogo/item.go:37:22
-  //--- Global variable assignment RHS load start at libgogo/item.go:37:22
-  //--- Global variable assignment RHS load end at libgogo/item.go:37:24
-  MOVQ $3, data+1992(SB)
-  //--- Global variable assignment end at libgogo/item.go:37:24
+  //--- Global variable assignment start at libgogo/item.go:30:25
+  //--- Global variable assignment RHS load start at libgogo/item.go:30:25
+  //--- Global variable assignment RHS load end at libgogo/item.go:30:27
+  MOVQ $5, data+2048(SB)
+  //--- Global variable assignment end at libgogo/item.go:30:27
+  //--- Global variable assignment start at libgogo/item.go:35:21
+  //--- Global variable assignment RHS load start at libgogo/item.go:35:21
+  //--- Global variable assignment RHS load end at libgogo/item.go:35:23
+  MOVQ $0, data+2056(SB)
+  //--- Global variable assignment end at libgogo/item.go:35:23
+  //--- Global variable assignment start at libgogo/item.go:36:22
+  //--- Global variable assignment RHS load start at libgogo/item.go:36:22
+  //--- Global variable assignment RHS load end at libgogo/item.go:36:24
+  MOVQ $1, data+2064(SB)
+  //--- Global variable assignment end at libgogo/item.go:36:24
+  //--- Global variable assignment start at libgogo/item.go:37:21
+  //--- Global variable assignment RHS load start at libgogo/item.go:37:21
+  //--- Global variable assignment RHS load end at libgogo/item.go:37:23
+  MOVQ $2, data+2072(SB)
+  //--- Global variable assignment end at libgogo/item.go:37:23
   //--- Global variable assignment start at libgogo/item.go:38:22
   //--- Global variable assignment RHS load start at libgogo/item.go:38:22
   //--- Global variable assignment RHS load end at libgogo/item.go:38:24
-  MOVQ $4, data+2000(SB)
+  MOVQ $3, data+2080(SB)
   //--- Global variable assignment end at libgogo/item.go:38:24
-  //--- Global variable assignment start at libgogo/item.go:39:21
-  //--- Global variable assignment RHS load start at libgogo/item.go:39:21
-  //--- Global variable assignment RHS load end at libgogo/item.go:39:23
-  MOVQ $5, data+2008(SB)
-  //--- Global variable assignment end at libgogo/item.go:39:23
-  //--- Assign byte buffer to new string constant start at libgogo/item.go:68:32
-  LEAQ data+2016(SB), R9
-  MOVQ R9, data+2024(SB)
-  //--- Assign byte buffer to new string constant end at libgogo/item.go:68:32
-  //--- Assign string length to new string constant start at libgogo/item.go:68:32
-  MOVQ $0, data+2032(SB)
-  //--- Assign string length to new string constant end at libgogo/item.go:68:32
+  //--- Global variable assignment start at libgogo/item.go:39:22
+  //--- Global variable assignment RHS load start at libgogo/item.go:39:22
+  //--- Global variable assignment RHS load end at libgogo/item.go:39:24
+  MOVQ $4, data+2088(SB)
+  //--- Global variable assignment end at libgogo/item.go:39:24
+  //--- Global variable assignment start at libgogo/item.go:40:21
+  //--- Global variable assignment RHS load start at libgogo/item.go:40:21
+  //--- Global variable assignment RHS load end at libgogo/item.go:40:23
+  MOVQ $5, data+2096(SB)
+  //--- Global variable assignment end at libgogo/item.go:40:23
+  //--- Assign byte buffer to new string constant start at libgogo/item.go:75:32
+  LEAQ data+2104(SB), R9
+  MOVQ R9, data+2112(SB)
+  //--- Assign byte buffer to new string constant end at libgogo/item.go:75:32
+  //--- Assign string length to new string constant start at libgogo/item.go:75:32
+  MOVQ $0, data+2120(SB)
+  //--- Assign string length to new string constant end at libgogo/item.go:75:32
   //--- Global variable assignment start at libgogo/libgogo.go:16:19
   //--- Global variable assignment RHS load start at libgogo/libgogo.go:16:19
   //--- Global variable assignment RHS load end at libgogo/libgogo.go:16:21
-  MOVQ $0, data+6120(SB)
+  MOVQ $0, data+6208(SB)
   //--- Global variable assignment end at libgogo/libgogo.go:16:21
   //--- Assign byte buffer to new string constant start at libgogo/libgogo.go:25:26
-  LEAQ data+6128(SB), R8
-  MOVQ R8, data+6136(SB)
+  LEAQ data+6216(SB), R8
+  MOVQ R8, data+6224(SB)
   //--- Assign byte buffer to new string constant end at libgogo/libgogo.go:25:26
   //--- Assign string length to new string constant start at libgogo/libgogo.go:25:26
-  MOVQ $1, data+6144(SB)
+  MOVQ $1, data+6232(SB)
   //--- Assign string length to new string constant end at libgogo/libgogo.go:25:26
   //--- Assign byte buffer to new string constant start at libgogo/libgogo.go:27:39
-  LEAQ data+6152(SB), R8
-  MOVQ R8, data+6176(SB)
+  LEAQ data+6240(SB), R8
+  MOVQ R8, data+6264(SB)
   //--- Assign byte buffer to new string constant end at libgogo/libgogo.go:27:39
   //--- Assign string length to new string constant start at libgogo/libgogo.go:27:39
-  MOVQ $18, data+6184(SB)
+  MOVQ $18, data+6272(SB)
   //--- Assign string length to new string constant end at libgogo/libgogo.go:27:39
   //--- Assign byte buffer to new string constant start at libgogo/libgogo.go:29:118
-  LEAQ data+6192(SB), R8
-  MOVQ R8, data+6296(SB)
+  LEAQ data+6280(SB), R8
+  MOVQ R8, data+6384(SB)
   //--- Assign byte buffer to new string constant end at libgogo/libgogo.go:29:118
   //--- Assign string length to new string constant start at libgogo/libgogo.go:29:118
-  MOVQ $97, data+6304(SB)
+  MOVQ $97, data+6392(SB)
   //--- Assign string length to new string constant end at libgogo/libgogo.go:29:118
   //--- Assign byte buffer to new string constant start at libgogo/libgogo.go:42:58
-  LEAQ data+6312(SB), R8
-  MOVQ R8, data+6352(SB)
+  LEAQ data+6400(SB), R8
+  MOVQ R8, data+6440(SB)
   //--- Assign byte buffer to new string constant end at libgogo/libgogo.go:42:58
   //--- Assign string length to new string constant start at libgogo/libgogo.go:42:58
-  MOVQ $37, data+6360(SB)
+  MOVQ $37, data+6448(SB)
   //--- Assign string length to new string constant end at libgogo/libgogo.go:42:58
+  RET
+
+TEXT main·main(SB),0,$0-0
+  //--- Local variable assignment start at test.go:4:20
+  //--- Local variable assignment RHS load start at test.go:4:20
+  //--- Local variable assignment RHS load end at test.go:4:23
+  MOVQ data+16(SB), R8
+  MOVQ data+24(SB), R9
+  MOVQ R8, -16(SP)
+  MOVQ R9, -8(SP)
+  //--- Local variable assignment end at test.go:4:23
+  //--- Saving registers before function call start at test.go:5:20
+  //--- Saving registers before function call end at test.go:5:20
+  //--- First parameter expression start at test.go:5:20
+  //--- First parameter expression load start at test.go:5:20
+  //--- First parameter expression load end at test.go:5:21
+  LEAQ -16(SP), R8
+  //--- ##1##main·StringAppend## at test.go:5:21
+  MOVQ R8, -100016(SP)
+  //--- First parameter expression end at test.go:5:21
+  //--- Subsequent parameter expression start at test.go:5:21
+  //--- Subsequent parameter expression load start at test.go:5:21
+  //--- Subsequent parameter expression load end at test.go:5:30
+  MOVQ data+40(SB), R8
+  MOVQ data+48(SB), R9
+  //--- ##1##main·StringAppend## at test.go:5:30
+  MOVQ R8, -100008(SP)
+  //--- ##1##main·StringAppend## at test.go:5:30
+  MOVQ R9, -100000(SP)
+  //--- Subsequent parameter expression end at test.go:5:30
+  //--- Stack pointer offset before function call for local variables start at test.go:5:30
+  //--- ##2##main·StringAppend## at test.go:5:30
+  SUBQ $16, SP
+  //--- Stack pointer offset before function call for local variables end at test.go:5:30
+  CALL main·StringAppend(SB)
+  //--- Stack pointer offset after function call for local variables start at test.go:5:30
+  //--- ##2##main·StringAppend## at test.go:5:30
+  ADDQ $16, SP
+  //--- Stack pointer offset after function call for local variables end at test.go:5:30
+  //--- Restoring registers after function call start at test.go:5:30
+  //--- Restoring registers after function call end at test.go:5:30
+  //--- Saving registers before function call start at test.go:6:20
+  //--- Saving registers before function call end at test.go:6:20
+  //--- First parameter expression start at test.go:6:20
+  //--- First parameter expression load start at test.go:6:20
+  //--- First parameter expression load end at test.go:6:21
+  LEAQ -16(SP), R8
+  //--- ##1##main·StringAppend## at test.go:6:21
+  MOVQ R8, -100016(SP)
+  //--- First parameter expression end at test.go:6:21
+  //--- Subsequent parameter expression start at test.go:6:21
+  //--- Subsequent parameter expression load start at test.go:6:21
+  //--- Subsequent parameter expression load end at test.go:6:34
+  MOVQ data+72(SB), R8
+  MOVQ data+80(SB), R9
+  //--- ##1##main·StringAppend## at test.go:6:34
+  MOVQ R8, -100008(SP)
+  //--- ##1##main·StringAppend## at test.go:6:34
+  MOVQ R9, -100000(SP)
+  //--- Subsequent parameter expression end at test.go:6:34
+  //--- Stack pointer offset before function call for local variables start at test.go:6:34
+  //--- ##2##main·StringAppend## at test.go:6:34
+  SUBQ $16, SP
+  //--- Stack pointer offset before function call for local variables end at test.go:6:34
+  CALL main·StringAppend(SB)
+  //--- Stack pointer offset after function call for local variables start at test.go:6:34
+  //--- ##2##main·StringAppend## at test.go:6:34
+  ADDQ $16, SP
+  //--- Stack pointer offset after function call for local variables end at test.go:6:34
+  //--- Restoring registers after function call start at test.go:6:34
+  //--- Restoring registers after function call end at test.go:6:34
+  //--- Saving registers before function call start at test.go:7:19
+  //--- Saving registers before function call end at test.go:7:19
+  //--- First parameter expression start at test.go:7:19
+  //--- First parameter expression load start at test.go:7:19
+  //--- First parameter expression load end at test.go:7:19
+  MOVQ -16(SP), R8
+  MOVQ -8(SP), R9
+  //--- ##1##main·PrintString## at test.go:7:19
+  MOVQ R8, -100016(SP)
+  //--- ##1##main·PrintString## at test.go:7:19
+  MOVQ R9, -100008(SP)
+  //--- First parameter expression end at test.go:7:19
+  //--- Stack pointer offset before function call for local variables start at test.go:7:19
+  //--- ##2##main·PrintString## at test.go:7:19
+  SUBQ $16, SP
+  //--- Stack pointer offset before function call for local variables end at test.go:7:19
+  CALL main·PrintString(SB)
+  //--- Stack pointer offset after function call for local variables start at test.go:7:19
+  //--- ##2##main·PrintString## at test.go:7:19
+  ADDQ $16, SP
+  //--- Stack pointer offset after function call for local variables end at test.go:7:19
+  //--- Restoring registers after function call start at test.go:7:19
+  //--- Restoring registers after function call end at test.go:7:19
   RET
 
 TEXT libgogo·StringToInt(SB),0,$0-0
@@ -1679,8 +1825,8 @@ TEXT libgogo·IntToString(SB),0,$0-0
   //--- Local variable assignment start at libgogo/convert.go:74:22
   //--- Local variable assignment RHS load start at libgogo/convert.go:74:22
   //--- Local variable assignment RHS load end at libgogo/convert.go:74:25
-  MOVQ data+16(SB), R8
-  MOVQ data+24(SB), R9
+  MOVQ data+96(SB), R8
+  MOVQ data+104(SB), R9
   MOVQ R8, -16(SP)
   MOVQ R9, -8(SP)
   //--- Local variable assignment end at libgogo/convert.go:74:25
@@ -2746,8 +2892,8 @@ IF_libgogo_list_76_1_END:
   //--- First parameter expression start at libgogo/list.go:77:42
   //--- First parameter expression load start at libgogo/list.go:77:42
   //--- First parameter expression load end at libgogo/list.go:77:43
-  MOVQ data+56(SB), R8
-  MOVQ data+64(SB), R9
+  MOVQ data+136(SB), R8
+  MOVQ data+144(SB), R9
   MOVQ R8, -24(SP)
   MOVQ R9, -16(SP)
   //--- First parameter expression end at libgogo/list.go:77:43
@@ -2782,8 +2928,8 @@ IF_libgogo_list_76_1_END:
   //--- First parameter expression start at libgogo/list.go:79:47
   //--- First parameter expression load start at libgogo/list.go:79:47
   //--- First parameter expression load end at libgogo/list.go:79:48
-  MOVQ data+104(SB), R8
-  MOVQ data+112(SB), R9
+  MOVQ data+184(SB), R8
+  MOVQ data+192(SB), R9
   MOVQ R8, -24(SP)
   MOVQ R9, -16(SP)
   //--- First parameter expression end at libgogo/list.go:79:48
@@ -2820,8 +2966,8 @@ IF_libgogo_list_76_1_END:
   //--- First parameter expression start at libgogo/list.go:81:49
   //--- First parameter expression load start at libgogo/list.go:81:49
   //--- First parameter expression load end at libgogo/list.go:81:50
-  MOVQ data+152(SB), R8
-  MOVQ data+160(SB), R9
+  MOVQ data+232(SB), R8
+  MOVQ data+240(SB), R9
   //--- ##1##libgogo·ExitError## at libgogo/list.go:81:50
   MOVQ R8, -100008(SP)
   //--- ##1##libgogo·ExitError## at libgogo/list.go:81:50
@@ -2925,10 +3071,10 @@ TEXT libgogo·InitMemoryManager(SB),0,$0-0
   //--- Restoring registers after function call start at libgogo/memmgr.go:51:25
   //--- Restoring registers after function call end at libgogo/memmgr.go:51:25
   MOVQ -8(SP), R8
-  MOVQ R8, data+176(SB)
+  MOVQ R8, data+256(SB)
   //--- Assignment end at libgogo/memmgr.go:51:26
   //--- If start at libgogo/memmgr.go:52:8
-  CMPQ data+176(SB), $0
+  CMPQ data+256(SB), $0
   JE IF_libgogo_memmgr_52_1_END
   JMP IF_libgogo_memmgr_52_END
 IF_libgogo_memmgr_52_1_END:
@@ -2937,8 +3083,8 @@ IF_libgogo_memmgr_52_1_END:
   //--- First parameter expression start at libgogo/memmgr.go:53:36
   //--- First parameter expression load start at libgogo/memmgr.go:53:36
   //--- First parameter expression load end at libgogo/memmgr.go:53:37
-  MOVQ data+216(SB), R8
-  MOVQ data+224(SB), R9
+  MOVQ data+296(SB), R8
+  MOVQ data+304(SB), R9
   //--- ##1##libgogo·ExitError## at libgogo/memmgr.go:53:37
   MOVQ R8, -100000(SP)
   //--- ##1##libgogo·ExitError## at libgogo/memmgr.go:53:37
@@ -2968,26 +3114,26 @@ IF_libgogo_memmgr_52_ELSE_END:
   //--- Assignment LHS load start at libgogo/memmgr.go:55:17
   //--- Assignment LHS load end at libgogo/memmgr.go:55:17
   //--- Assignment RHS load start at libgogo/memmgr.go:55:28
-  MOVQ data+176(SB), R8
+  MOVQ data+256(SB), R8
   ADDQ $1, R8
   //--- Assignment RHS load end at libgogo/memmgr.go:55:31
-  MOVQ R8, data+176(SB)
+  MOVQ R8, data+256(SB)
   //--- Assignment end at libgogo/memmgr.go:55:31
   //--- Assignment start at libgogo/memmgr.go:56:15
   //--- Assignment LHS load start at libgogo/memmgr.go:56:15
   //--- Assignment LHS load end at libgogo/memmgr.go:56:15
   //--- Assignment RHS load start at libgogo/memmgr.go:56:25
   //--- Assignment RHS load end at libgogo/memmgr.go:56:25
-  MOVQ data+176(SB), R8
-  MOVQ R8, data+192(SB)
+  MOVQ data+256(SB), R8
+  MOVQ R8, data+272(SB)
   //--- Assignment end at libgogo/memmgr.go:56:25
   //--- Assignment start at libgogo/memmgr.go:57:16
   //--- Assignment LHS load start at libgogo/memmgr.go:57:16
   //--- Assignment LHS load end at libgogo/memmgr.go:57:16
   //--- Assignment RHS load start at libgogo/memmgr.go:57:24
   //--- Assignment RHS load end at libgogo/memmgr.go:57:24
-  MOVQ data+192(SB), R8
-  MOVQ R8, data+184(SB)
+  MOVQ data+272(SB), R8
+  MOVQ R8, data+264(SB)
   //--- Assignment end at libgogo/memmgr.go:57:24
   //--- Saving registers before function call start at libgogo/memmgr.go:58:17
   //--- Saving registers before function call end at libgogo/memmgr.go:58:17
@@ -3009,10 +3155,10 @@ TEXT libgogo·MoreMemory(SB),0,$0-0
   //--- Assignment LHS load start at libgogo/memmgr.go:67:15
   //--- Assignment LHS load end at libgogo/memmgr.go:67:15
   //--- Assignment RHS load start at libgogo/memmgr.go:67:24
-  MOVQ data+192(SB), R8
-  ADDQ data+168(SB), R8
+  MOVQ data+272(SB), R8
+  ADDQ data+248(SB), R8
   //--- Assignment RHS load end at libgogo/memmgr.go:67:34
-  MOVQ R8, data+192(SB)
+  MOVQ R8, data+272(SB)
   //--- Assignment end at libgogo/memmgr.go:67:34
   //--- Assignment start at libgogo/memmgr.go:68:13
   //--- Assignment LHS load start at libgogo/memmgr.go:68:13
@@ -3022,7 +3168,7 @@ TEXT libgogo·MoreMemory(SB),0,$0-0
   //--- First parameter expression start at libgogo/memmgr.go:68:25
   //--- First parameter expression load start at libgogo/memmgr.go:68:25
   //--- First parameter expression load end at libgogo/memmgr.go:68:25
-  MOVQ data+192(SB), R8
+  MOVQ data+272(SB), R8
   MOVQ R8, -24(SP)
   //--- First parameter expression end at libgogo/memmgr.go:68:25
   //--- Stack pointer offset before function call for local variables start at libgogo/memmgr.go:68:25
@@ -3047,8 +3193,8 @@ IF_libgogo_memmgr_69_1_END:
   //--- First parameter expression start at libgogo/memmgr.go:70:51
   //--- First parameter expression load start at libgogo/memmgr.go:70:51
   //--- First parameter expression load end at libgogo/memmgr.go:70:52
-  MOVQ data+264(SB), R8
-  MOVQ data+272(SB), R9
+  MOVQ data+344(SB), R8
+  MOVQ data+352(SB), R9
   MOVQ R8, -24(SP)
   MOVQ R9, -16(SP)
   //--- First parameter expression end at libgogo/memmgr.go:70:52
@@ -3066,7 +3212,7 @@ IF_libgogo_memmgr_69_1_END:
   //--- First parameter expression start at libgogo/memmgr.go:71:30
   //--- First parameter expression load start at libgogo/memmgr.go:71:30
   //--- First parameter expression load end at libgogo/memmgr.go:71:30
-  MOVQ data+168(SB), R8
+  MOVQ data+248(SB), R8
   MOVQ R8, -16(SP)
   //--- First parameter expression end at libgogo/memmgr.go:71:30
   //--- Stack pointer offset before function call for local variables start at libgogo/memmgr.go:71:30
@@ -3083,8 +3229,8 @@ IF_libgogo_memmgr_69_1_END:
   //--- First parameter expression start at libgogo/memmgr.go:72:38
   //--- First parameter expression load start at libgogo/memmgr.go:72:38
   //--- First parameter expression load end at libgogo/memmgr.go:72:39
-  MOVQ data+296(SB), R8
-  MOVQ data+304(SB), R9
+  MOVQ data+376(SB), R8
+  MOVQ data+384(SB), R9
   MOVQ R8, -24(SP)
   MOVQ R9, -16(SP)
   //--- First parameter expression end at libgogo/memmgr.go:72:39
@@ -3119,8 +3265,8 @@ IF_libgogo_memmgr_69_1_END:
   //--- First parameter expression start at libgogo/memmgr.go:74:23
   //--- First parameter expression load start at libgogo/memmgr.go:74:23
   //--- First parameter expression load end at libgogo/memmgr.go:74:24
-  MOVQ data+320(SB), R8
-  MOVQ data+328(SB), R9
+  MOVQ data+400(SB), R8
+  MOVQ data+408(SB), R9
   //--- ##1##libgogo·ExitError## at libgogo/memmgr.go:74:24
   MOVQ R8, -100008(SP)
   //--- ##1##libgogo·ExitError## at libgogo/memmgr.go:74:24
@@ -3153,8 +3299,8 @@ IF_libgogo_memmgr_69_ELSE_END:
   //--- Saving registers before function call end at libgogo/memmgr.go:76:29
   //--- First parameter expression start at libgogo/memmgr.go:76:29
   //--- First parameter expression load start at libgogo/memmgr.go:76:29
-  MOVQ data+192(SB), R8
-  SUBQ data+168(SB), R8
+  MOVQ data+272(SB), R8
+  SUBQ data+248(SB), R8
   ADDQ $1, R8
   //--- First parameter expression load end at libgogo/memmgr.go:76:44
   MOVQ R8, -24(SP)
@@ -3181,8 +3327,8 @@ IF_libgogo_memmgr_77_1_END:
   //--- First parameter expression start at libgogo/memmgr.go:78:68
   //--- First parameter expression load start at libgogo/memmgr.go:78:68
   //--- First parameter expression load end at libgogo/memmgr.go:78:69
-  MOVQ data+384(SB), R8
-  MOVQ data+392(SB), R9
+  MOVQ data+464(SB), R8
+  MOVQ data+472(SB), R9
   MOVQ R8, -24(SP)
   MOVQ R9, -16(SP)
   //--- First parameter expression end at libgogo/memmgr.go:78:69
@@ -3199,8 +3345,8 @@ IF_libgogo_memmgr_77_1_END:
   //--- Saving registers before function call end at libgogo/memmgr.go:79:29
   //--- First parameter expression start at libgogo/memmgr.go:79:29
   //--- First parameter expression load start at libgogo/memmgr.go:79:29
-  MOVQ data+192(SB), R8
-  SUBQ data+168(SB), R8
+  MOVQ data+272(SB), R8
+  SUBQ data+248(SB), R8
   ADDQ $1, R8
   //--- First parameter expression load end at libgogo/memmgr.go:79:44
   MOVQ R8, -16(SP)
@@ -3219,8 +3365,8 @@ IF_libgogo_memmgr_77_1_END:
   //--- First parameter expression start at libgogo/memmgr.go:80:23
   //--- First parameter expression load start at libgogo/memmgr.go:80:23
   //--- First parameter expression load end at libgogo/memmgr.go:80:24
-  MOVQ data+408(SB), R8
-  MOVQ data+416(SB), R9
+  MOVQ data+488(SB), R8
+  MOVQ data+496(SB), R9
   //--- ##1##libgogo·ExitError## at libgogo/memmgr.go:80:24
   MOVQ R8, -100008(SP)
   //--- ##1##libgogo·ExitError## at libgogo/memmgr.go:80:24
@@ -3250,9 +3396,9 @@ IF_libgogo_memmgr_77_ELSE_END:
 
 TEXT libgogo·Alloc(SB),0,$0-0
   //--- If start at libgogo/memmgr.go:90:8
-  CMPQ data+184(SB), $0
+  CMPQ data+264(SB), $0
   JNE IF_libgogo_memmgr_90_1_END
-  CMPQ data+192(SB), $0
+  CMPQ data+272(SB), $0
   JE IF_libgogo_memmgr_90_2_END
 IF_libgogo_memmgr_90_1_END:
   JMP IF_libgogo_memmgr_90_END
@@ -3274,9 +3420,9 @@ IF_libgogo_memmgr_90_ELSE_END:
   //--- For start at libgogo/memmgr.go:93:9
 FOR_libgogo_memmgr_93_EXPR_START:
   //--- For [expression] start at libgogo/memmgr.go:93:20
-  MOVQ data+184(SB), R8
+  MOVQ data+264(SB), R8
   ADDQ 8(SP), R8
-  CMPQ R8, data+192(SB)
+  CMPQ R8, data+272(SB)
   JGE FOR_libgogo_memmgr_93_1_END
   JMP FOR_libgogo_memmgr_93_END
 FOR_libgogo_memmgr_93_1_END:
@@ -3300,17 +3446,17 @@ FOR_libgogo_memmgr_93_END:
   //--- Assignment LHS load end at libgogo/memmgr.go:97:12
   //--- Assignment RHS load start at libgogo/memmgr.go:97:21
   //--- Assignment RHS load end at libgogo/memmgr.go:97:21
-  MOVQ data+184(SB), R8
+  MOVQ data+264(SB), R8
   MOVQ R8, -8(SP)
   //--- Assignment end at libgogo/memmgr.go:97:21
   //--- Assignment start at libgogo/memmgr.go:98:16
   //--- Assignment LHS load start at libgogo/memmgr.go:98:16
   //--- Assignment LHS load end at libgogo/memmgr.go:98:16
   //--- Assignment RHS load start at libgogo/memmgr.go:98:26
-  MOVQ data+184(SB), R8
+  MOVQ data+264(SB), R8
   ADDQ 8(SP), R8
   //--- Assignment RHS load end at libgogo/memmgr.go:98:32
-  MOVQ R8, data+184(SB)
+  MOVQ R8, data+264(SB)
   //--- Assignment end at libgogo/memmgr.go:98:32
   //--- Return value assignment start at libgogo/memmgr.go:99:12
   //--- Return expression load start at libgogo/memmgr.go:99:12
@@ -3323,8 +3469,8 @@ FOR_libgogo_memmgr_93_END:
 TEXT libgogo·GetFreeMemory(SB),0,$0-0
   //--- Return value assignment start at libgogo/memmgr.go:106:12
   //--- Return expression load start at libgogo/memmgr.go:106:12
-  MOVQ data+192(SB), R8
-  SUBQ data+184(SB), R8
+  MOVQ data+272(SB), R8
+  SUBQ data+264(SB), R8
   //--- Return expression load end at libgogo/memmgr.go:106:31
   MOVQ R8, 8(SP)
   //--- Return value assignment end at libgogo/memmgr.go:106:31
@@ -3789,7 +3935,7 @@ TEXT libgogo·AddFields(SB),0,$0-0
   //--- Assignment LHS load end at libgogo/symbol.go:98:20
   //--- Assignment RHS load start at libgogo/symbol.go:98:32
   //--- Assignment RHS load end at libgogo/symbol.go:98:32
-  MOVQ data+472(SB), R9
+  MOVQ data+552(SB), R9
   MOVQ R9, (R8)
   //--- Assignment end at libgogo/symbol.go:98:32
   //--- Assignment start at libgogo/symbol.go:99:22
@@ -3916,8 +4062,8 @@ TEXT libgogo·GetField(SB),0,$0-0
   //--- Subsequent parameter expression start at libgogo/symbol.go:120:29
   //--- Subsequent parameter expression load start at libgogo/symbol.go:120:29
   //--- Subsequent parameter expression load end at libgogo/symbol.go:120:33
-  MOVQ data+504(SB), R8
-  MOVQ data+512(SB), R9
+  MOVQ data+584(SB), R8
+  MOVQ data+592(SB), R9
   //--- ##1##libgogo·GetObject## at libgogo/symbol.go:120:33
   MOVQ R8, -99992(SP)
   //--- ##1##libgogo·GetObject## at libgogo/symbol.go:120:33
@@ -3963,7 +4109,7 @@ TEXT libgogo·AddParameters(SB),0,$0-0
   //--- Assignment LHS load end at libgogo/symbol.go:128:16
   //--- Assignment RHS load start at libgogo/symbol.go:128:30
   //--- Assignment RHS load end at libgogo/symbol.go:128:30
-  MOVQ data+488(SB), R9
+  MOVQ data+568(SB), R9
   MOVQ R9, (R8)
   //--- Assignment end at libgogo/symbol.go:128:30
   //--- Assignment start at libgogo/symbol.go:129:18
@@ -4041,7 +4187,7 @@ IF_libgogo_symbol_142_1_END:
   MOVQ 8(SP), R8
   ADDQ $40, R8
   MOVQ (R8), R8
-  CMPQ R8, data+464(SB)
+  CMPQ R8, data+544(SB)
   JE IF_libgogo_symbol_143_1_END
   JMP IF_libgogo_symbol_143_END
 IF_libgogo_symbol_143_1_END:
@@ -4062,7 +4208,7 @@ IF_libgogo_symbol_143_ELSE_END:
   MOVQ 8(SP), R8
   ADDQ $40, R8
   MOVQ (R8), R8
-  CMPQ R8, data+472(SB)
+  CMPQ R8, data+552(SB)
   JE IF_libgogo_symbol_146_1_END
   JMP IF_libgogo_symbol_146_END
 IF_libgogo_symbol_146_1_END:
@@ -4150,7 +4296,7 @@ IF_libgogo_symbol_146_ELSE_END:
   MOVQ 8(SP), R8
   ADDQ $40, R8
   MOVQ (R8), R8
-  CMPQ R8, data+480(SB)
+  CMPQ R8, data+560(SB)
   JE IF_libgogo_symbol_152_1_END
   JMP IF_libgogo_symbol_152_END
 IF_libgogo_symbol_152_1_END:
@@ -5415,7 +5561,7 @@ TEXT libgogo·NewObject(SB),0,$0-0
   //--- First parameter expression start at libgogo/symbol.go:360:29
   //--- First parameter expression load start at libgogo/symbol.go:360:29
   //--- First parameter expression load end at libgogo/symbol.go:360:29
-  MOVQ data+424(SB), R8
+  MOVQ data+504(SB), R8
   MOVQ R8, -32(SP)
   //--- First parameter expression end at libgogo/symbol.go:360:29
   //--- Stack pointer offset before function call for local variables start at libgogo/symbol.go:360:29
@@ -5533,7 +5679,7 @@ TEXT libgogo·NewType(SB),0,$0-0
   //--- First parameter expression start at libgogo/symbol.go:377:27
   //--- First parameter expression load start at libgogo/symbol.go:377:27
   //--- First parameter expression load end at libgogo/symbol.go:377:27
-  MOVQ data+432(SB), R8
+  MOVQ data+512(SB), R8
   MOVQ R8, -32(SP)
   //--- First parameter expression end at libgogo/symbol.go:377:27
   //--- Stack pointer offset before function call for local variables start at libgogo/symbol.go:377:27
@@ -5619,7 +5765,7 @@ IF_libgogo_symbol_382_1_END:
   //--- Assignment LHS load end at libgogo/symbol.go:383:24
   //--- Assignment RHS load start at libgogo/symbol.go:383:35
   //--- Assignment RHS load end at libgogo/symbol.go:383:35
-  MOVQ data+480(SB), R9
+  MOVQ data+560(SB), R9
   MOVQ R9, (R8)
   //--- Assignment end at libgogo/symbol.go:383:35
   JMP IF_libgogo_symbol_382_ELSE_END
@@ -5632,7 +5778,7 @@ IF_libgogo_symbol_382_END:
   //--- Assignment LHS load end at libgogo/symbol.go:385:24
   //--- Assignment RHS load start at libgogo/symbol.go:385:36
   //--- Assignment RHS load end at libgogo/symbol.go:385:36
-  MOVQ data+464(SB), R9
+  MOVQ data+544(SB), R9
   MOVQ R9, (R8)
   //--- Assignment end at libgogo/symbol.go:385:36
   //--- Else end at libgogo/symbol.go:386:6
@@ -5727,8 +5873,8 @@ FOR_libgogo_symbol_401_BODY:
   //--- First parameter expression start at libgogo/symbol.go:402:30
   //--- First parameter expression load start at libgogo/symbol.go:402:30
   //--- First parameter expression load end at libgogo/symbol.go:402:31
-  MOVQ data+528(SB), R8
-  MOVQ data+536(SB), R9
+  MOVQ data+608(SB), R8
+  MOVQ data+616(SB), R9
   MOVQ R8, -40(SP)
   MOVQ R9, -32(SP)
   //--- First parameter expression end at libgogo/symbol.go:402:31
@@ -5844,8 +5990,8 @@ IF_libgogo_symbol_404_ELSE_END:
   //--- First parameter expression start at libgogo/symbol.go:409:31
   //--- First parameter expression load start at libgogo/symbol.go:409:31
   //--- First parameter expression load end at libgogo/symbol.go:409:32
-  MOVQ data+560(SB), R8
-  MOVQ data+568(SB), R9
+  MOVQ data+640(SB), R8
+  MOVQ data+648(SB), R9
   MOVQ R8, -40(SP)
   MOVQ R9, -32(SP)
   //--- First parameter expression end at libgogo/symbol.go:409:32
@@ -5871,8 +6017,8 @@ IF_libgogo_symbol_410_1_END:
   //--- First parameter expression start at libgogo/symbol.go:411:38
   //--- First parameter expression load start at libgogo/symbol.go:411:38
   //--- First parameter expression load end at libgogo/symbol.go:411:39
-  MOVQ data+592(SB), R8
-  MOVQ data+600(SB), R9
+  MOVQ data+672(SB), R8
+  MOVQ data+680(SB), R9
   MOVQ R8, -40(SP)
   MOVQ R9, -32(SP)
   //--- First parameter expression end at libgogo/symbol.go:411:39
@@ -5911,8 +6057,8 @@ IF_libgogo_symbol_414_1_END:
   //--- First parameter expression start at libgogo/symbol.go:415:40
   //--- First parameter expression load start at libgogo/symbol.go:415:40
   //--- First parameter expression load end at libgogo/symbol.go:415:41
-  MOVQ data+624(SB), R8
-  MOVQ data+632(SB), R9
+  MOVQ data+704(SB), R8
+  MOVQ data+712(SB), R9
   MOVQ R8, -40(SP)
   MOVQ R9, -32(SP)
   //--- First parameter expression end at libgogo/symbol.go:415:41
@@ -5955,8 +6101,8 @@ IF_libgogo_symbol_414_1_END:
   //--- First parameter expression start at libgogo/symbol.go:417:42
   //--- First parameter expression load start at libgogo/symbol.go:417:42
   //--- First parameter expression load end at libgogo/symbol.go:417:43
-  MOVQ data+656(SB), R8
-  MOVQ data+664(SB), R9
+  MOVQ data+736(SB), R8
+  MOVQ data+744(SB), R9
   MOVQ R8, -40(SP)
   MOVQ R9, -32(SP)
   //--- First parameter expression end at libgogo/symbol.go:417:43
@@ -5995,8 +6141,8 @@ IF_libgogo_symbol_414_1_END:
   //--- First parameter expression start at libgogo/symbol.go:419:50
   //--- First parameter expression load start at libgogo/symbol.go:419:50
   //--- First parameter expression load end at libgogo/symbol.go:419:51
-  MOVQ data+696(SB), R8
-  MOVQ data+704(SB), R9
+  MOVQ data+776(SB), R8
+  MOVQ data+784(SB), R9
   MOVQ R8, -40(SP)
   MOVQ R9, -32(SP)
   //--- First parameter expression end at libgogo/symbol.go:419:51
@@ -6124,8 +6270,8 @@ IF_libgogo_symbol_413_END:
   //--- First parameter expression start at libgogo/symbol.go:428:36
   //--- First parameter expression load start at libgogo/symbol.go:428:36
   //--- First parameter expression load end at libgogo/symbol.go:428:37
-  MOVQ data+728(SB), R8
-  MOVQ data+736(SB), R9
+  MOVQ data+808(SB), R8
+  MOVQ data+816(SB), R9
   MOVQ R8, -40(SP)
   MOVQ R9, -32(SP)
   //--- First parameter expression end at libgogo/symbol.go:428:37
@@ -6145,8 +6291,8 @@ IF_libgogo_symbol_413_ELSE_END:
   //--- First parameter expression start at libgogo/symbol.go:430:31
   //--- First parameter expression load start at libgogo/symbol.go:430:31
   //--- First parameter expression load end at libgogo/symbol.go:430:32
-  MOVQ data+760(SB), R8
-  MOVQ data+768(SB), R9
+  MOVQ data+840(SB), R8
+  MOVQ data+848(SB), R9
   MOVQ R8, -40(SP)
   MOVQ R9, -32(SP)
   //--- First parameter expression end at libgogo/symbol.go:430:32
@@ -6204,8 +6350,8 @@ IF_libgogo_symbol_413_ELSE_END:
   //--- First parameter expression start at libgogo/symbol.go:433:33
   //--- First parameter expression load start at libgogo/symbol.go:433:33
   //--- First parameter expression load end at libgogo/symbol.go:433:34
-  MOVQ data+792(SB), R8
-  MOVQ data+800(SB), R9
+  MOVQ data+872(SB), R8
+  MOVQ data+880(SB), R9
   MOVQ R8, -40(SP)
   MOVQ R9, -32(SP)
   //--- First parameter expression end at libgogo/symbol.go:433:34
@@ -6269,8 +6415,8 @@ IF_libgogo_symbol_413_ELSE_END:
   //--- First parameter expression start at libgogo/symbol.go:436:26
   //--- First parameter expression load start at libgogo/symbol.go:436:26
   //--- First parameter expression load end at libgogo/symbol.go:436:27
-  MOVQ data+816(SB), R8
-  MOVQ data+824(SB), R9
+  MOVQ data+896(SB), R8
+  MOVQ data+904(SB), R9
   MOVQ R8, -40(SP)
   MOVQ R9, -32(SP)
   //--- First parameter expression end at libgogo/symbol.go:436:27
@@ -6330,8 +6476,8 @@ FOR_libgogo_symbol_448_BODY:
   //--- First parameter expression start at libgogo/symbol.go:449:28
   //--- First parameter expression load start at libgogo/symbol.go:449:28
   //--- First parameter expression load end at libgogo/symbol.go:449:29
-  MOVQ data+840(SB), R8
-  MOVQ data+848(SB), R9
+  MOVQ data+920(SB), R8
+  MOVQ data+928(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:449:29
@@ -6447,8 +6593,8 @@ IF_libgogo_symbol_451_ELSE_END:
   //--- First parameter expression start at libgogo/symbol.go:456:31
   //--- First parameter expression load start at libgogo/symbol.go:456:31
   //--- First parameter expression load end at libgogo/symbol.go:456:32
-  MOVQ data+872(SB), R8
-  MOVQ data+880(SB), R9
+  MOVQ data+952(SB), R8
+  MOVQ data+960(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:456:32
@@ -6506,8 +6652,8 @@ IF_libgogo_symbol_451_ELSE_END:
   //--- First parameter expression start at libgogo/symbol.go:459:26
   //--- First parameter expression load start at libgogo/symbol.go:459:26
   //--- First parameter expression load end at libgogo/symbol.go:459:27
-  MOVQ data+896(SB), R8
-  MOVQ data+904(SB), R9
+  MOVQ data+976(SB), R8
+  MOVQ data+984(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:459:27
@@ -6563,8 +6709,8 @@ FOR_libgogo_symbol_460_BODY:
   //--- First parameter expression start at libgogo/symbol.go:461:29
   //--- First parameter expression load start at libgogo/symbol.go:461:29
   //--- First parameter expression load end at libgogo/symbol.go:461:30
-  MOVQ data+920(SB), R8
-  MOVQ data+928(SB), R9
+  MOVQ data+1000(SB), R8
+  MOVQ data+1008(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:461:30
@@ -6603,8 +6749,8 @@ FOR_libgogo_symbol_460_BODY:
   //--- First parameter expression start at libgogo/symbol.go:463:35
   //--- First parameter expression load start at libgogo/symbol.go:463:35
   //--- First parameter expression load end at libgogo/symbol.go:463:36
-  MOVQ data+952(SB), R8
-  MOVQ data+960(SB), R9
+  MOVQ data+1032(SB), R8
+  MOVQ data+1040(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:463:36
@@ -6630,8 +6776,8 @@ IF_libgogo_symbol_464_1_END:
   //--- First parameter expression start at libgogo/symbol.go:465:42
   //--- First parameter expression load start at libgogo/symbol.go:465:42
   //--- First parameter expression load end at libgogo/symbol.go:465:43
-  MOVQ data+984(SB), R8
-  MOVQ data+992(SB), R9
+  MOVQ data+1064(SB), R8
+  MOVQ data+1072(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:465:43
@@ -6670,8 +6816,8 @@ IF_libgogo_symbol_468_1_END:
   //--- First parameter expression start at libgogo/symbol.go:469:44
   //--- First parameter expression load start at libgogo/symbol.go:469:44
   //--- First parameter expression load end at libgogo/symbol.go:469:45
-  MOVQ data+1016(SB), R8
-  MOVQ data+1024(SB), R9
+  MOVQ data+1096(SB), R8
+  MOVQ data+1104(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:469:45
@@ -6714,8 +6860,8 @@ IF_libgogo_symbol_468_1_END:
   //--- First parameter expression start at libgogo/symbol.go:471:46
   //--- First parameter expression load start at libgogo/symbol.go:471:46
   //--- First parameter expression load end at libgogo/symbol.go:471:47
-  MOVQ data+1048(SB), R8
-  MOVQ data+1056(SB), R9
+  MOVQ data+1128(SB), R8
+  MOVQ data+1136(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:471:47
@@ -6754,8 +6900,8 @@ IF_libgogo_symbol_468_1_END:
   //--- First parameter expression start at libgogo/symbol.go:473:54
   //--- First parameter expression load start at libgogo/symbol.go:473:54
   //--- First parameter expression load end at libgogo/symbol.go:473:55
-  MOVQ data+1088(SB), R8
-  MOVQ data+1096(SB), R9
+  MOVQ data+1168(SB), R8
+  MOVQ data+1176(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:473:55
@@ -6883,8 +7029,8 @@ IF_libgogo_symbol_467_END:
   //--- First parameter expression start at libgogo/symbol.go:482:40
   //--- First parameter expression load start at libgogo/symbol.go:482:40
   //--- First parameter expression load end at libgogo/symbol.go:482:41
-  MOVQ data+1120(SB), R8
-  MOVQ data+1128(SB), R9
+  MOVQ data+1200(SB), R8
+  MOVQ data+1208(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:482:41
@@ -6904,8 +7050,8 @@ IF_libgogo_symbol_467_ELSE_END:
   //--- First parameter expression start at libgogo/symbol.go:484:35
   //--- First parameter expression load start at libgogo/symbol.go:484:35
   //--- First parameter expression load end at libgogo/symbol.go:484:36
-  MOVQ data+1152(SB), R8
-  MOVQ data+1160(SB), R9
+  MOVQ data+1232(SB), R8
+  MOVQ data+1240(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:484:36
@@ -6963,8 +7109,8 @@ IF_libgogo_symbol_467_ELSE_END:
   //--- First parameter expression start at libgogo/symbol.go:487:37
   //--- First parameter expression load start at libgogo/symbol.go:487:37
   //--- First parameter expression load end at libgogo/symbol.go:487:38
-  MOVQ data+1184(SB), R8
-  MOVQ data+1192(SB), R9
+  MOVQ data+1264(SB), R8
+  MOVQ data+1272(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:487:38
@@ -7030,8 +7176,8 @@ IF_libgogo_symbol_467_ELSE_END:
   //--- First parameter expression start at libgogo/symbol.go:490:30
   //--- First parameter expression load start at libgogo/symbol.go:490:30
   //--- First parameter expression load end at libgogo/symbol.go:490:31
-  MOVQ data+1208(SB), R8
-  MOVQ data+1216(SB), R9
+  MOVQ data+1288(SB), R8
+  MOVQ data+1296(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:490:31
@@ -7094,8 +7240,8 @@ FOR_libgogo_symbol_503_BODY:
   //--- First parameter expression start at libgogo/symbol.go:504:32
   //--- First parameter expression load start at libgogo/symbol.go:504:32
   //--- First parameter expression load end at libgogo/symbol.go:504:33
-  MOVQ data+1240(SB), R8
-  MOVQ data+1248(SB), R9
+  MOVQ data+1320(SB), R8
+  MOVQ data+1328(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:504:33
@@ -7171,8 +7317,8 @@ FOR_libgogo_symbol_503_BODY:
   //--- First parameter expression start at libgogo/symbol.go:508:47
   //--- First parameter expression load start at libgogo/symbol.go:508:47
   //--- First parameter expression load end at libgogo/symbol.go:508:48
-  MOVQ data+1288(SB), R8
-  MOVQ data+1296(SB), R9
+  MOVQ data+1368(SB), R8
+  MOVQ data+1376(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:508:48
@@ -7209,8 +7355,8 @@ FOR_libgogo_symbol_503_BODY:
   //--- First parameter expression start at libgogo/symbol.go:510:26
   //--- First parameter expression load start at libgogo/symbol.go:510:26
   //--- First parameter expression load end at libgogo/symbol.go:510:27
-  MOVQ data+1312(SB), R8
-  MOVQ data+1320(SB), R9
+  MOVQ data+1392(SB), R8
+  MOVQ data+1400(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:510:27
@@ -7266,8 +7412,8 @@ FOR_libgogo_symbol_511_BODY:
   //--- First parameter expression start at libgogo/symbol.go:512:29
   //--- First parameter expression load start at libgogo/symbol.go:512:29
   //--- First parameter expression load end at libgogo/symbol.go:512:30
-  MOVQ data+1336(SB), R8
-  MOVQ data+1344(SB), R9
+  MOVQ data+1416(SB), R8
+  MOVQ data+1424(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:512:30
@@ -7306,8 +7452,8 @@ FOR_libgogo_symbol_511_BODY:
   //--- First parameter expression start at libgogo/symbol.go:514:35
   //--- First parameter expression load start at libgogo/symbol.go:514:35
   //--- First parameter expression load end at libgogo/symbol.go:514:36
-  MOVQ data+1368(SB), R8
-  MOVQ data+1376(SB), R9
+  MOVQ data+1448(SB), R8
+  MOVQ data+1456(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:514:36
@@ -7333,8 +7479,8 @@ IF_libgogo_symbol_515_1_END:
   //--- First parameter expression start at libgogo/symbol.go:516:42
   //--- First parameter expression load start at libgogo/symbol.go:516:42
   //--- First parameter expression load end at libgogo/symbol.go:516:43
-  MOVQ data+1400(SB), R8
-  MOVQ data+1408(SB), R9
+  MOVQ data+1480(SB), R8
+  MOVQ data+1488(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:516:43
@@ -7373,8 +7519,8 @@ IF_libgogo_symbol_519_1_END:
   //--- First parameter expression start at libgogo/symbol.go:520:44
   //--- First parameter expression load start at libgogo/symbol.go:520:44
   //--- First parameter expression load end at libgogo/symbol.go:520:45
-  MOVQ data+1432(SB), R8
-  MOVQ data+1440(SB), R9
+  MOVQ data+1512(SB), R8
+  MOVQ data+1520(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:520:45
@@ -7417,8 +7563,8 @@ IF_libgogo_symbol_519_1_END:
   //--- First parameter expression start at libgogo/symbol.go:522:46
   //--- First parameter expression load start at libgogo/symbol.go:522:46
   //--- First parameter expression load end at libgogo/symbol.go:522:47
-  MOVQ data+1464(SB), R8
-  MOVQ data+1472(SB), R9
+  MOVQ data+1544(SB), R8
+  MOVQ data+1552(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:522:47
@@ -7457,8 +7603,8 @@ IF_libgogo_symbol_519_1_END:
   //--- First parameter expression start at libgogo/symbol.go:524:54
   //--- First parameter expression load start at libgogo/symbol.go:524:54
   //--- First parameter expression load end at libgogo/symbol.go:524:55
-  MOVQ data+1504(SB), R8
-  MOVQ data+1512(SB), R9
+  MOVQ data+1584(SB), R8
+  MOVQ data+1592(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:524:55
@@ -7586,8 +7732,8 @@ IF_libgogo_symbol_518_END:
   //--- First parameter expression start at libgogo/symbol.go:533:40
   //--- First parameter expression load start at libgogo/symbol.go:533:40
   //--- First parameter expression load end at libgogo/symbol.go:533:41
-  MOVQ data+1536(SB), R8
-  MOVQ data+1544(SB), R9
+  MOVQ data+1616(SB), R8
+  MOVQ data+1624(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:533:41
@@ -7607,8 +7753,8 @@ IF_libgogo_symbol_518_ELSE_END:
   //--- First parameter expression start at libgogo/symbol.go:535:35
   //--- First parameter expression load start at libgogo/symbol.go:535:35
   //--- First parameter expression load end at libgogo/symbol.go:535:36
-  MOVQ data+1568(SB), R8
-  MOVQ data+1576(SB), R9
+  MOVQ data+1648(SB), R8
+  MOVQ data+1656(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:535:36
@@ -7666,8 +7812,8 @@ IF_libgogo_symbol_518_ELSE_END:
   //--- First parameter expression start at libgogo/symbol.go:538:37
   //--- First parameter expression load start at libgogo/symbol.go:538:37
   //--- First parameter expression load end at libgogo/symbol.go:538:38
-  MOVQ data+1600(SB), R8
-  MOVQ data+1608(SB), R9
+  MOVQ data+1680(SB), R8
+  MOVQ data+1688(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:538:38
@@ -7733,8 +7879,8 @@ IF_libgogo_symbol_518_ELSE_END:
   //--- First parameter expression start at libgogo/symbol.go:541:30
   //--- First parameter expression load start at libgogo/symbol.go:541:30
   //--- First parameter expression load end at libgogo/symbol.go:541:31
-  MOVQ data+1624(SB), R8
-  MOVQ data+1632(SB), R9
+  MOVQ data+1704(SB), R8
+  MOVQ data+1712(SB), R9
   MOVQ R8, -48(SP)
   MOVQ R9, -40(SP)
   //--- First parameter expression end at libgogo/symbol.go:541:31
@@ -7797,8 +7943,8 @@ FOR_libgogo_symbol_555_BODY:
   //--- Assignment LHS load end at libgogo/symbol.go:556:16
   //--- Assignment RHS load start at libgogo/symbol.go:556:23
   //--- Assignment RHS load end at libgogo/symbol.go:556:24
-  MOVQ data+1648(SB), R8
-  MOVQ data+1656(SB), R9
+  MOVQ data+1728(SB), R8
+  MOVQ data+1736(SB), R9
   MOVQ R8, -32(SP)
   MOVQ R9, -24(SP)
   //--- Assignment end at libgogo/symbol.go:556:24
@@ -7871,8 +8017,8 @@ FOR_libgogo_symbol_555_BODY:
   //--- Subsequent parameter expression start at libgogo/symbol.go:559:28
   //--- Subsequent parameter expression load start at libgogo/symbol.go:559:28
   //--- Subsequent parameter expression load end at libgogo/symbol.go:559:33
-  MOVQ data+1672(SB), R8
-  MOVQ data+1680(SB), R9
+  MOVQ data+1752(SB), R8
+  MOVQ data+1760(SB), R9
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:559:33
   MOVQ R8, -100040(SP)
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:559:33
@@ -7933,8 +8079,8 @@ FOR_libgogo_symbol_555_BODY:
   //--- Subsequent parameter expression start at libgogo/symbol.go:561:28
   //--- Subsequent parameter expression load start at libgogo/symbol.go:561:28
   //--- Subsequent parameter expression load end at libgogo/symbol.go:561:34
-  MOVQ data+1696(SB), R8
-  MOVQ data+1704(SB), R9
+  MOVQ data+1776(SB), R8
+  MOVQ data+1784(SB), R9
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:561:34
   MOVQ R8, -100040(SP)
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:561:34
@@ -8012,8 +8158,8 @@ IF_libgogo_symbol_564_1_END:
   //--- Subsequent parameter expression start at libgogo/symbol.go:565:32
   //--- Subsequent parameter expression load start at libgogo/symbol.go:565:32
   //--- Subsequent parameter expression load end at libgogo/symbol.go:565:37
-  MOVQ data+1720(SB), R8
-  MOVQ data+1728(SB), R9
+  MOVQ data+1800(SB), R8
+  MOVQ data+1808(SB), R9
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:565:37
   MOVQ R8, -100040(SP)
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:565:37
@@ -8103,8 +8249,8 @@ FOR_libgogo_symbol_567_BODY:
   //--- Subsequent parameter expression start at libgogo/symbol.go:569:32
   //--- Subsequent parameter expression load start at libgogo/symbol.go:569:32
   //--- Subsequent parameter expression load end at libgogo/symbol.go:569:37
-  MOVQ data+1744(SB), R8
-  MOVQ data+1752(SB), R9
+  MOVQ data+1824(SB), R8
+  MOVQ data+1832(SB), R9
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:569:37
   MOVQ R8, -100040(SP)
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:569:37
@@ -8212,8 +8358,8 @@ IF_libgogo_symbol_573_1_END:
   //--- Subsequent parameter expression start at libgogo/symbol.go:575:36
   //--- Subsequent parameter expression load start at libgogo/symbol.go:575:36
   //--- Subsequent parameter expression load end at libgogo/symbol.go:575:42
-  MOVQ data+1768(SB), R8
-  MOVQ data+1776(SB), R9
+  MOVQ data+1848(SB), R8
+  MOVQ data+1856(SB), R9
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:575:42
   MOVQ R8, -100040(SP)
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:575:42
@@ -8287,8 +8433,8 @@ IF_libgogo_symbol_578_1_END:
   //--- Subsequent parameter expression start at libgogo/symbol.go:579:36
   //--- Subsequent parameter expression load start at libgogo/symbol.go:579:36
   //--- Subsequent parameter expression load end at libgogo/symbol.go:579:41
-  MOVQ data+1792(SB), R8
-  MOVQ data+1800(SB), R9
+  MOVQ data+1872(SB), R8
+  MOVQ data+1880(SB), R9
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:579:41
   MOVQ R8, -100040(SP)
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:579:41
@@ -8383,8 +8529,8 @@ FOR_libgogo_symbol_595_BODY:
   //--- Assignment LHS load end at libgogo/symbol.go:596:16
   //--- Assignment RHS load start at libgogo/symbol.go:596:23
   //--- Assignment RHS load end at libgogo/symbol.go:596:24
-  MOVQ data+1816(SB), R8
-  MOVQ data+1824(SB), R9
+  MOVQ data+1896(SB), R8
+  MOVQ data+1904(SB), R9
   MOVQ R8, -24(SP)
   MOVQ R9, -16(SP)
   //--- Assignment end at libgogo/symbol.go:596:24
@@ -8457,8 +8603,8 @@ FOR_libgogo_symbol_595_BODY:
   //--- Subsequent parameter expression start at libgogo/symbol.go:599:28
   //--- Subsequent parameter expression load start at libgogo/symbol.go:599:28
   //--- Subsequent parameter expression load end at libgogo/symbol.go:599:33
-  MOVQ data+1840(SB), R8
-  MOVQ data+1848(SB), R9
+  MOVQ data+1920(SB), R8
+  MOVQ data+1928(SB), R9
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:599:33
   MOVQ R8, -100040(SP)
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:599:33
@@ -8519,8 +8665,8 @@ FOR_libgogo_symbol_595_BODY:
   //--- Subsequent parameter expression start at libgogo/symbol.go:601:28
   //--- Subsequent parameter expression load start at libgogo/symbol.go:601:28
   //--- Subsequent parameter expression load end at libgogo/symbol.go:601:34
-  MOVQ data+1864(SB), R8
-  MOVQ data+1872(SB), R9
+  MOVQ data+1944(SB), R8
+  MOVQ data+1952(SB), R9
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:601:34
   MOVQ R8, -100040(SP)
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:601:34
@@ -8581,8 +8727,8 @@ FOR_libgogo_symbol_595_BODY:
   //--- Subsequent parameter expression start at libgogo/symbol.go:603:28
   //--- Subsequent parameter expression load start at libgogo/symbol.go:603:28
   //--- Subsequent parameter expression load end at libgogo/symbol.go:603:33
-  MOVQ data+1888(SB), R8
-  MOVQ data+1896(SB), R9
+  MOVQ data+1968(SB), R8
+  MOVQ data+1976(SB), R9
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:603:33
   MOVQ R8, -100040(SP)
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:603:33
@@ -8689,8 +8835,8 @@ FOR_libgogo_symbol_595_BODY:
   //--- Subsequent parameter expression start at libgogo/symbol.go:607:28
   //--- Subsequent parameter expression load start at libgogo/symbol.go:607:28
   //--- Subsequent parameter expression load end at libgogo/symbol.go:607:33
-  MOVQ data+1912(SB), R8
-  MOVQ data+1920(SB), R9
+  MOVQ data+1992(SB), R8
+  MOVQ data+2000(SB), R9
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:607:33
   MOVQ R8, -100040(SP)
   //--- ##1##libgogo·StringAppend## at libgogo/symbol.go:607:33
@@ -9295,7 +9441,7 @@ TEXT libgogo·CharAppend(SB),0,$0-0
   MOVQ R8, -48(SP)
   //--- Assignment end at libgogo/string.go:103:38
   //--- If start at libgogo/string.go:104:8
-  MOVQ data+176(SB), R8
+  MOVQ data+256(SB), R8
   CMPQ -48(SP), R8
   JL IF_libgogo_string_104_1_END
   MOVQ -24(SP), R8
@@ -9663,7 +9809,7 @@ TEXT libgogo·StringAppend(SB),0,$0-0
   MOVQ R8, -56(SP)
   //--- Assignment end at libgogo/string.go:138:38
   //--- If start at libgogo/string.go:139:8
-  MOVQ data+176(SB), R8
+  MOVQ data+256(SB), R8
   CMPQ -56(SP), R8
   JL IF_libgogo_string_139_1_END
   MOVQ -32(SP), R8
@@ -9869,28 +10015,27 @@ IF_libgogo_string_139_ELSE_END:
   MOVQ -48(SP), R8
   ADDQ -16(SP), R8
   ADDQ -24(SP), R8
-  ADDQ $1, R8
-  //--- Subsequent parameter expression load end at libgogo/string.go:151:65
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:151:65
+  //--- Subsequent parameter expression load end at libgogo/string.go:151:61
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:151:61
   MOVQ R8, -100064(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:151:65
-  //--- Subsequent parameter expression start at libgogo/string.go:151:65
-  //--- Subsequent parameter expression load start at libgogo/string.go:151:65
-  //--- Subsequent parameter expression load end at libgogo/string.go:151:68
-  //--- ##1##libgogo·CopyMem## at libgogo/string.go:151:68
+  //--- Subsequent parameter expression end at libgogo/string.go:151:61
+  //--- Subsequent parameter expression start at libgogo/string.go:151:61
+  //--- Subsequent parameter expression load start at libgogo/string.go:151:61
+  //--- Subsequent parameter expression load end at libgogo/string.go:151:64
+  //--- ##1##libgogo·CopyMem## at libgogo/string.go:151:64
   MOVQ $1, -100056(SP)
-  //--- Subsequent parameter expression end at libgogo/string.go:151:68
-  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:151:68
-  //--- ##2##libgogo·CopyMem## at libgogo/string.go:151:68
+  //--- Subsequent parameter expression end at libgogo/string.go:151:64
+  //--- Stack pointer offset before function call for local variables start at libgogo/string.go:151:64
+  //--- ##2##libgogo·CopyMem## at libgogo/string.go:151:64
   SUBQ $72, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:151:68
+  //--- Stack pointer offset before function call for local variables end at libgogo/string.go:151:64
   CALL libgogo·CopyMem(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:151:68
-  //--- ##2##libgogo·CopyMem## at libgogo/string.go:151:68
+  //--- Stack pointer offset after function call for local variables start at libgogo/string.go:151:64
+  //--- ##2##libgogo·CopyMem## at libgogo/string.go:151:64
   ADDQ $72, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:151:68
-  //--- Restoring registers after function call start at libgogo/string.go:151:68
-  //--- Restoring registers after function call end at libgogo/string.go:151:68
+  //--- Stack pointer offset after function call for local variables end at libgogo/string.go:151:64
+  //--- Restoring registers after function call start at libgogo/string.go:151:64
+  //--- Restoring registers after function call end at libgogo/string.go:151:64
   //--- Saving registers before function call start at libgogo/string.go:152:35
   //--- Saving registers before function call end at libgogo/string.go:152:35
   //--- First parameter expression start at libgogo/string.go:152:35
@@ -9957,142 +10102,152 @@ TEXT libgogo·SetStringAddressAndLength(SB),$0-24 //SetStringAddressAndLength: 3
   MOVQ CX, 8(AX) //Set string length
   RET
 TEXT libgogo·NewItem(SB),0,$0-0
-  //--- Assignment start at libgogo/item.go:52:11
-  //--- Assignment LHS load start at libgogo/item.go:52:11
-  //--- Assignment LHS load end at libgogo/item.go:52:11
-  //--- Saving registers before function call start at libgogo/item.go:52:27
-  //--- Saving registers before function call end at libgogo/item.go:52:27
-  //--- First parameter expression start at libgogo/item.go:52:27
-  //--- First parameter expression load start at libgogo/item.go:52:27
-  //--- First parameter expression load end at libgogo/item.go:52:27
-  MOVQ data+1928(SB), R8
+  //--- Assignment start at libgogo/item.go:58:11
+  //--- Assignment LHS load start at libgogo/item.go:58:11
+  //--- Assignment LHS load end at libgogo/item.go:58:11
+  //--- Saving registers before function call start at libgogo/item.go:58:27
+  //--- Saving registers before function call end at libgogo/item.go:58:27
+  //--- First parameter expression start at libgogo/item.go:58:27
+  //--- First parameter expression load start at libgogo/item.go:58:27
+  //--- First parameter expression load end at libgogo/item.go:58:27
+  MOVQ data+2008(SB), R8
   MOVQ R8, -32(SP)
-  //--- First parameter expression end at libgogo/item.go:52:27
-  //--- Stack pointer offset before function call for local variables start at libgogo/item.go:52:27
+  //--- First parameter expression end at libgogo/item.go:58:27
+  //--- Stack pointer offset before function call for local variables start at libgogo/item.go:58:27
   SUBQ $32, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/item.go:52:27
+  //--- Stack pointer offset before function call for local variables end at libgogo/item.go:58:27
   CALL libgogo·Alloc(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/item.go:52:27
+  //--- Stack pointer offset after function call for local variables start at libgogo/item.go:58:27
   ADDQ $32, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/item.go:52:27
-  //--- Restoring registers after function call start at libgogo/item.go:52:27
-  //--- Restoring registers after function call end at libgogo/item.go:52:27
+  //--- Stack pointer offset after function call for local variables end at libgogo/item.go:58:27
+  //--- Restoring registers after function call start at libgogo/item.go:58:27
+  //--- Restoring registers after function call end at libgogo/item.go:58:27
   MOVQ -24(SP), R8
   MOVQ R8, -8(SP)
-  //--- Assignment end at libgogo/item.go:52:28
-  //--- Assignment start at libgogo/item.go:53:12
-  //--- Assignment LHS load start at libgogo/item.go:53:12
-  //--- Assignment LHS load end at libgogo/item.go:53:12
-  //--- Saving registers before function call start at libgogo/item.go:53:32
-  //--- Saving registers before function call end at libgogo/item.go:53:32
-  //--- First parameter expression start at libgogo/item.go:53:32
-  //--- First parameter expression load start at libgogo/item.go:53:32
-  //--- First parameter expression load end at libgogo/item.go:53:32
+  //--- Assignment end at libgogo/item.go:58:28
+  //--- Assignment start at libgogo/item.go:59:12
+  //--- Assignment LHS load start at libgogo/item.go:59:12
+  //--- Assignment LHS load end at libgogo/item.go:59:12
+  //--- Saving registers before function call start at libgogo/item.go:59:32
+  //--- Saving registers before function call end at libgogo/item.go:59:32
+  //--- First parameter expression start at libgogo/item.go:59:32
+  //--- First parameter expression load start at libgogo/item.go:59:32
+  //--- First parameter expression load end at libgogo/item.go:59:32
   MOVQ -8(SP), R8
   MOVQ R8, -32(SP)
-  //--- First parameter expression end at libgogo/item.go:53:32
-  //--- Stack pointer offset before function call for local variables start at libgogo/item.go:53:32
+  //--- First parameter expression end at libgogo/item.go:59:32
+  //--- Stack pointer offset before function call for local variables start at libgogo/item.go:59:32
   SUBQ $32, SP
-  //--- Stack pointer offset before function call for local variables end at libgogo/item.go:53:32
+  //--- Stack pointer offset before function call for local variables end at libgogo/item.go:59:32
   CALL libgogo·Uint64ToItemPtr(SB)
-  //--- Stack pointer offset after function call for local variables start at libgogo/item.go:53:32
+  //--- Stack pointer offset after function call for local variables start at libgogo/item.go:59:32
   ADDQ $32, SP
-  //--- Stack pointer offset after function call for local variables end at libgogo/item.go:53:32
-  //--- Restoring registers after function call start at libgogo/item.go:53:32
-  //--- Restoring registers after function call end at libgogo/item.go:53:32
+  //--- Stack pointer offset after function call for local variables end at libgogo/item.go:59:32
+  //--- Restoring registers after function call start at libgogo/item.go:59:32
+  //--- Restoring registers after function call end at libgogo/item.go:59:32
   MOVQ -24(SP), R8
   MOVQ R8, -16(SP)
-  //--- Assignment end at libgogo/item.go:53:33
-  //--- Return value assignment start at libgogo/item.go:54:12
-  //--- Return expression load start at libgogo/item.go:54:12
-  //--- Return expression load end at libgogo/item.go:54:17
+  //--- Assignment end at libgogo/item.go:59:33
+  //--- Assignment start at libgogo/item.go:60:17
+  //--- Assignment LHS load start at libgogo/item.go:60:17
+  MOVQ -16(SP), R8
+  //--- Addition/subtraction by zero omitted at libgogo/item.go:60:17
+  //--- Assignment LHS load end at libgogo/item.go:60:17
+  //--- Assignment RHS load start at libgogo/item.go:60:28
+  //--- Assignment RHS load end at libgogo/item.go:60:28
+  MOVQ data+2048(SB), R9
+  MOVQ R9, (R8)
+  //--- Assignment end at libgogo/item.go:60:28
+  //--- Return value assignment start at libgogo/item.go:61:12
+  //--- Return expression load start at libgogo/item.go:61:12
+  //--- Return expression load end at libgogo/item.go:61:17
   MOVQ -16(SP), R8
   MOVQ R8, 8(SP)
-  //--- Return value assignment end at libgogo/item.go:54:17
+  //--- Return value assignment end at libgogo/item.go:61:17
   RET
 
 TEXT libgogo·SetItem(SB),0,$0-0
-  //--- Assignment start at libgogo/item.go:61:17
-  //--- Assignment LHS load start at libgogo/item.go:61:17
+  //--- Assignment start at libgogo/item.go:68:17
+  //--- Assignment LHS load start at libgogo/item.go:68:17
   MOVQ 8(SP), R8
-  //--- Addition/subtraction by zero omitted at libgogo/item.go:61:17
-  //--- Assignment LHS load end at libgogo/item.go:61:17
-  //--- Assignment RHS load start at libgogo/item.go:61:22
-  //--- Assignment RHS load end at libgogo/item.go:61:22
+  //--- Addition/subtraction by zero omitted at libgogo/item.go:68:17
+  //--- Assignment LHS load end at libgogo/item.go:68:17
+  //--- Assignment RHS load start at libgogo/item.go:68:22
+  //--- Assignment RHS load end at libgogo/item.go:68:22
   MOVQ 16(SP), R9
   MOVQ R9, (R8)
-  //--- Assignment end at libgogo/item.go:61:22
-  //--- Assignment start at libgogo/item.go:62:21
-  //--- Assignment LHS load start at libgogo/item.go:62:21
+  //--- Assignment end at libgogo/item.go:68:22
+  //--- Assignment start at libgogo/item.go:69:21
+  //--- Assignment LHS load start at libgogo/item.go:69:21
   MOVQ 8(SP), R8
   ADDQ $8, R8
-  //--- Assignment LHS load end at libgogo/item.go:62:21
-  //--- Assignment RHS load start at libgogo/item.go:62:30
-  //--- Assignment RHS load end at libgogo/item.go:62:30
+  //--- Assignment LHS load end at libgogo/item.go:69:21
+  //--- Assignment RHS load start at libgogo/item.go:69:30
+  //--- Assignment RHS load end at libgogo/item.go:69:30
   MOVQ 24(SP), R9
   MOVQ R9, (R8)
-  //--- Assignment end at libgogo/item.go:62:30
-  //--- Assignment start at libgogo/item.go:63:20
-  //--- Assignment LHS load start at libgogo/item.go:63:20
+  //--- Assignment end at libgogo/item.go:69:30
+  //--- Assignment start at libgogo/item.go:70:20
+  //--- Assignment LHS load start at libgogo/item.go:70:20
   MOVQ 8(SP), R8
   ADDQ $16, R8
-  //--- Assignment LHS load end at libgogo/item.go:63:20
-  //--- Assignment RHS load start at libgogo/item.go:63:28
-  //--- Assignment RHS load end at libgogo/item.go:63:28
+  //--- Assignment LHS load end at libgogo/item.go:70:20
+  //--- Assignment RHS load start at libgogo/item.go:70:28
+  //--- Assignment RHS load end at libgogo/item.go:70:28
   MOVQ 32(SP), R9
   MOVQ R9, (R8)
-  //--- Assignment end at libgogo/item.go:63:28
-  //--- Assignment start at libgogo/item.go:64:14
-  //--- Assignment LHS load start at libgogo/item.go:64:14
+  //--- Assignment end at libgogo/item.go:70:28
+  //--- Assignment start at libgogo/item.go:71:14
+  //--- Assignment LHS load start at libgogo/item.go:71:14
   MOVQ 8(SP), R8
   ADDQ $24, R8
-  //--- Assignment LHS load end at libgogo/item.go:64:14
-  //--- Assignment RHS load start at libgogo/item.go:64:16
-  //--- Assignment RHS load end at libgogo/item.go:64:16
+  //--- Assignment LHS load end at libgogo/item.go:71:14
+  //--- Assignment RHS load start at libgogo/item.go:71:16
+  //--- Assignment RHS load end at libgogo/item.go:71:16
   MOVQ 40(SP), R9
   MOVQ R9, (R8)
-  //--- Assignment end at libgogo/item.go:64:16
-  //--- Assignment start at libgogo/item.go:65:14
-  //--- Assignment LHS load start at libgogo/item.go:65:14
+  //--- Assignment end at libgogo/item.go:71:16
+  //--- Assignment start at libgogo/item.go:72:14
+  //--- Assignment LHS load start at libgogo/item.go:72:14
   MOVQ 8(SP), R8
   ADDQ $40, R8
-  //--- Assignment LHS load end at libgogo/item.go:65:14
-  //--- Assignment RHS load start at libgogo/item.go:65:16
-  //--- Assignment RHS load end at libgogo/item.go:65:16
+  //--- Assignment LHS load end at libgogo/item.go:72:14
+  //--- Assignment RHS load start at libgogo/item.go:72:16
+  //--- Assignment RHS load end at libgogo/item.go:72:16
   MOVQ $0, (R8)
-  //--- Assignment end at libgogo/item.go:65:16
-  //--- Assignment start at libgogo/item.go:66:14
-  //--- Assignment LHS load start at libgogo/item.go:66:14
+  //--- Assignment end at libgogo/item.go:72:16
+  //--- Assignment start at libgogo/item.go:73:14
+  //--- Assignment LHS load start at libgogo/item.go:73:14
   MOVQ 8(SP), R8
   ADDQ $32, R8
-  //--- Assignment LHS load end at libgogo/item.go:66:14
-  //--- Assignment RHS load start at libgogo/item.go:66:16
-  //--- Assignment RHS load end at libgogo/item.go:66:16
+  //--- Assignment LHS load end at libgogo/item.go:73:14
+  //--- Assignment RHS load start at libgogo/item.go:73:16
+  //--- Assignment RHS load end at libgogo/item.go:73:16
   MOVQ 48(SP), R9
   MOVQ R9, (R8)
-  //--- Assignment end at libgogo/item.go:66:16
-  //--- Assignment start at libgogo/item.go:67:19
-  //--- Assignment LHS load start at libgogo/item.go:67:19
+  //--- Assignment end at libgogo/item.go:73:16
+  //--- Assignment start at libgogo/item.go:74:19
+  //--- Assignment LHS load start at libgogo/item.go:74:19
   MOVQ 8(SP), R8
   ADDQ $48, R8
-  //--- Assignment LHS load end at libgogo/item.go:67:19
-  //--- Assignment RHS load start at libgogo/item.go:67:26
-  //--- Assignment RHS load end at libgogo/item.go:67:26
+  //--- Assignment LHS load end at libgogo/item.go:74:19
+  //--- Assignment RHS load start at libgogo/item.go:74:26
+  //--- Assignment RHS load end at libgogo/item.go:74:26
   MOVQ 56(SP), R9
   MOVQ R9, (R8)
-  //--- Assignment end at libgogo/item.go:67:26
-  //--- Assignment start at libgogo/item.go:68:30
-  //--- Assignment LHS load start at libgogo/item.go:68:30
+  //--- Assignment end at libgogo/item.go:74:26
+  //--- Assignment start at libgogo/item.go:75:30
+  //--- Assignment LHS load start at libgogo/item.go:75:30
   MOVQ 8(SP), R8
   ADDQ $56, R8
-  //--- Assignment LHS load end at libgogo/item.go:68:30
-  //--- Assignment RHS load start at libgogo/item.go:68:32
-  //--- Assignment RHS load end at libgogo/item.go:68:33
-  MOVQ data+2024(SB), R9
-  MOVQ data+2032(SB), R10
+  //--- Assignment LHS load end at libgogo/item.go:75:30
+  //--- Assignment RHS load start at libgogo/item.go:75:32
+  //--- Assignment RHS load end at libgogo/item.go:75:33
+  MOVQ data+2112(SB), R9
+  MOVQ data+2120(SB), R10
   MOVQ R9, (R8)
   MOVQ R10, 8(R8)
-  //--- Assignment end at libgogo/item.go:68:33
+  //--- Assignment end at libgogo/item.go:75:33
   RET
 
 // Copyright 2010 The GoGo Authors. All rights reserved.
@@ -10103,12 +10258,17 @@ TEXT libgogo·Uint64ToItemPtr(SB),$0-16 //Uint64ToItemPtr: 1 parameter, 1 return
   MOVQ 8(SP), AX //Move address to AX (first parameter => SP+64bit)
   MOVQ AX, 16(SP) //Move address from BX to return value (return value after one parameter => SP+2*64bit)
   RET
+
+TEXT libgogo·ItemPtrToUint64(SB),$0-16 //ItemPtrToUint64: 1 parameter, 1 return value
+  MOVQ 8(SP), AX //Move address to AX (first parameter => SP+64bit)
+  MOVQ AX, 16(SP) //Move address from AX to return value (return value after one parameter => SP+2*64bit)
+  RET
 TEXT libgogo·GetArgv(SB),0,$0-0
   //--- Local variable assignment start at libgogo/libgogo.go:25:23
   //--- Local variable assignment RHS load start at libgogo/libgogo.go:25:23
   //--- Local variable assignment RHS load end at libgogo/libgogo.go:25:27
-  MOVQ data+6136(SB), R8
-  MOVQ data+6144(SB), R9
+  MOVQ data+6224(SB), R8
+  MOVQ data+6232(SB), R9
   MOVQ R8, -32(SP)
   MOVQ R9, -24(SP)
   //--- Local variable assignment end at libgogo/libgogo.go:25:27
@@ -10120,8 +10280,8 @@ TEXT libgogo·GetArgv(SB),0,$0-0
   //--- First parameter expression start at libgogo/libgogo.go:27:39
   //--- First parameter expression load start at libgogo/libgogo.go:27:39
   //--- First parameter expression load end at libgogo/libgogo.go:27:40
-  MOVQ data+6176(SB), R8
-  MOVQ data+6184(SB), R9
+  MOVQ data+6264(SB), R8
+  MOVQ data+6272(SB), R9
   MOVQ R8, -64(SP)
   MOVQ R9, -56(SP)
   //--- First parameter expression end at libgogo/libgogo.go:27:40
@@ -10152,8 +10312,8 @@ IF_libgogo_libgogo_28_1_END:
   //--- First parameter expression start at libgogo/libgogo.go:29:118
   //--- First parameter expression load start at libgogo/libgogo.go:29:118
   //--- First parameter expression load end at libgogo/libgogo.go:29:119
-  MOVQ data+6296(SB), R8
-  MOVQ data+6304(SB), R9
+  MOVQ data+6384(SB), R8
+  MOVQ data+6392(SB), R9
   //--- ##1##libgogo·ExitError## at libgogo/libgogo.go:29:119
   MOVQ R8, -100032(SP)
   //--- ##1##libgogo·ExitError## at libgogo/libgogo.go:29:119
@@ -10280,10 +10440,10 @@ IF_libgogo_libgogo_33_1_END:
   //--- Assignment LHS load start at libgogo/libgogo.go:34:20
   //--- Assignment LHS load end at libgogo/libgogo.go:34:20
   //--- Assignment RHS load start at libgogo/libgogo.go:34:26
-  MOVQ data+6120(SB), R8
+  MOVQ data+6208(SB), R8
   ADDQ $1, R8
   //--- Assignment RHS load end at libgogo/libgogo.go:34:29
-  MOVQ R8, data+6120(SB)
+  MOVQ R8, data+6208(SB)
   //--- Assignment end at libgogo/libgogo.go:34:29
   JMP IF_libgogo_libgogo_33_ELSE_END
 IF_libgogo_libgogo_33_END:
@@ -10292,11 +10452,11 @@ IF_libgogo_libgogo_33_END:
   //--- Saving registers before function call end at libgogo/libgogo.go:36:26
   //--- First parameter expression start at libgogo/libgogo.go:36:26
   //--- First parameter expression load start at libgogo/libgogo.go:36:26
-  MOVQ data+6120(SB), AX
+  MOVQ data+6208(SB), AX
   MOVQ $16, R8
   MULQ R8
   MOVQ AX, R8
-  LEAQ data+2040(SB), R9
+  LEAQ data+2128(SB), R9
   ADDQ R8, R9
   //--- First parameter expression load end at libgogo/libgogo.go:36:36
   MOVQ R9, -48(SP)
@@ -10357,8 +10517,8 @@ IF_libgogo_libgogo_41_1_END:
   //--- First parameter expression start at libgogo/libgogo.go:42:58
   //--- First parameter expression load start at libgogo/libgogo.go:42:58
   //--- First parameter expression load end at libgogo/libgogo.go:42:59
-  MOVQ data+6352(SB), R8
-  MOVQ data+6360(SB), R9
+  MOVQ data+6440(SB), R8
+  MOVQ data+6448(SB), R9
   //--- ##1##libgogo·ExitError## at libgogo/libgogo.go:42:59
   MOVQ R8, -100032(SP)
   //--- ##1##libgogo·ExitError## at libgogo/libgogo.go:42:59
