@@ -6,7 +6,7 @@
 // GoGo Memory manager functions (ASM)
 //
 
-TEXT ·Brk(SB),0,$0-0 //Brk: 1 parameter, 1 return value
+TEXT ·Brk(SB),$0-16 //Brk: 1 parameter, 1 return value
   MOVQ $12, AX //sys_brk (1 parameter)
   MOVQ 8(SP), DI //brk (first parameter => SP+8*64bit)
   SYSCALL //Linux syscall
@@ -20,7 +20,7 @@ BRK_SUCCESS:
   MOVQ $0, 16(SP) //Return 0 to indicate success (return value after one parameters => SP+2*64bit)
   RET
 
-TEXT ·GetBrk(SB),0,$0-0 //GetBrk: no parameters, 1 return value
+TEXT ·GetBrk(SB),$0-8 //GetBrk: no parameters, 1 return value
   MOVQ $12, AX //sys_brk (1 parameter)
   MOVQ $0, DI //brk (first parameter => SP+64bit)
   SYSCALL //Linux syscall
@@ -33,7 +33,7 @@ GETBRK_SUCCESS:
   MOVQ AX, 8(SP) //First return value of syscall is in AX (return value after no parameters => SP+1*64bit)
   RET
 
-TEXT ·TestMem(SB),0,$0-0 //Write: 1 parameter, 1 return value
+TEXT ·TestMem(SB),$0-16 //Write: 1 parameter, 1 return value
   MOVQ 8(SP), AX //Move address to AX (first parameter => SP+64bit)
   MOVQ $1234567890, (AX) //Move some value to address
   MOVQ (AX), BX //Move value back to BX
