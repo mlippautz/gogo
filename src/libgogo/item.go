@@ -27,6 +27,7 @@ var MODE_VAR uint64 = 1;
 var MODE_CONST uint64 = 2;
 var MODE_REG uint64 = 3;
 var MODE_COND uint64 = 4;
+var MODE_UNDEF uint64 = 5;
 
 //
 // Relation types
@@ -44,6 +45,11 @@ var REL_GT uint64 = 5;
 func Uint64ToItemPtr(adr uint64) *Item;
 
 //
+//
+//
+func ItemPtrToUint64(item *Item) uint64;
+
+//
 // Creates a new, uninitialized item
 //
 func NewItem() *Item {
@@ -51,6 +57,7 @@ func NewItem() *Item {
     var item *Item;
     adr = Alloc(ITEM_SIZE);
     item = Uint64ToItemPtr(adr);
+    item.Mode = MODE_UNDEF;
     return item;
 }
 

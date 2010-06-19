@@ -12,6 +12,9 @@ import "./libgogo/_obj/libgogo"
 
 func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item, address uint64) {
     if Compile != 0 {
+        if (LHSItem.Mode == libgogo.MODE_UNDEF) || (RHSItem.Mode == libgogo.MODE_UNDEF) {
+            GenErrorWeak("internal compiler error. stopping code generation.");
+        }
         if address == 0 { //LHS = RHS
             GenerateRawAssignment(LHSItem, RHSItem);
         } else { //LHS = &RHS
@@ -27,6 +30,7 @@ func GenerateAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item, address ui
 func GenerateRawAssignment(LHSItem *libgogo.Item, RHSItem *libgogo.Item) {
     var done uint64 = 0;
     var opsize uint64;
+
     if LHSItem.PtrType == 1 { //Pointer assignment
         if RHSItem.PtrType != 1 {
             SymbolTableError("Cannot assign a value type to a pointer", "", "type:", RHSItem.Itemtype.Name);
