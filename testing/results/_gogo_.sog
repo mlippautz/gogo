@@ -136,8 +136,9 @@ TEXT main·test(SB),0,$0-0
   ADDQ R8, R9
   ADDQ $8, R9
   //--- Assignment RHS load end at tests/test.go:30:28
-  MOVQ (R9), R9
-  MOVQ 8(R9), R8
+  MOVQ R9, BX
+  MOVQ (BX), R9
+  MOVQ 8(BX), R8
   MOVQ R9, -32(SP)
   MOVQ R8, -24(SP)
   //--- Assignment end at tests/test.go:30:28
