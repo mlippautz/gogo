@@ -7,38 +7,6 @@ package main
 import "./libgogo/_obj/libgogo"
 
 //
-// Struct holding the information about a file that is compiled
-//
-type FileInfo struct {
-    filename string;
-    lineCounter uint64;
-    charCounter uint64;
-    fd uint64;
-};
-
-//
-// Fileinformation for all files that are compiled in this run
-// Is limited by 32 to reduce memory consumption, but to allow
-// self compilation via "./gogo libgogo/*.go *.go"
-//
-var fileInfo [32]FileInfo;
-var fileInfoLen uint64 = 0;
-var curFileIndex uint64 = 0;
-
-//
-// Compiler flag
-//
-var Compile uint64 = 0;
-
-//
-// A very basic debug flag
-// Set to 1000 to enable all parsing strings
-// Set to 100 to enable all symbol tables
-// Set to 10 to enable asm debugging
-//
-var DEBUG_LEVEL uint64 = 10;
-
-//
 // Entry point of the compiler
 //
 func main() {
@@ -52,8 +20,8 @@ func main() {
 
     ParseOption();
 
-    if libgogo.Argc > 34 {
-        libgogo.ExitError("Cannot compile more than 32 files at once",1);
+    if libgogo.Argc > 40 {
+        libgogo.ExitError("Cannot compile more than 38 files at once",1);
     }
 
     InitSymbolTable(); //Initialize symbol table

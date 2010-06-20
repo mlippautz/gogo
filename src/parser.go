@@ -8,15 +8,6 @@ import "./libgogo/_obj/libgogo"
 
 var Operators libgogo.Stack;
 
-var InsideFunction uint64 = 0;
-var InsideStructDecl uint64 = 0;
-var InsideFunctionVarDecl uint64 = 0;
-
-//
-// Package name of currently processed file
-//
-var CurrentPackage string = "<no package>";
-
 //
 // Pseudo object representing a function's return value
 //
@@ -527,9 +518,8 @@ func ParseBinaryArithOp() uint64 {
 //
 //
 //
-func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
+func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) {
     var doneFlag uint64 = 1;
-    var boolFlag uint64;
 
     GetNextTokenSafe();
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
@@ -548,7 +538,7 @@ func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
         }
         doneFlag = 0;
     }
-    if (doneFlag) == 1 && (tok.id == TOKEN_LBRAC) {
+    if (doneFlag == 1) && (tok.id == TOKEN_LBRAC) {
         ParseExpression(item, ed);
         AssertNextTokenWeak(TOKEN_RBRAC);
         doneFlag = 0;
@@ -565,16 +555,12 @@ func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     }
 
     if doneFlag != 0 {
-        boolFlag = 1;
         tok.nextToken = tok.id;
         // Fix (?) empty factor, which should not be possible.
         ParseErrorWeak(tok.id, 0, 0, 0);
         ParserSync();
-    } else {
-        boolFlag = 0;
     }
     PrintDebugString("Leaving ParseFactor()",1000);
-    return boolFlag;
 }
 
 func ParseSimpleSelector() uint64 {
@@ -609,12 +595,8 @@ func ParseSelector(item *libgogo.Item, packagename string) {
 }
 
 func ParseSelector_FunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.TypeDesc {
-   //var boolFlag uint64;
-   PrintDebugString("Entering ParseSelector_FunctionCall()",1000);
-    /*for boolFlag = ParseSelectorSub_FunctionCall(FunctionCalled);
-        boolFlag == 0; 
-        boolFlag = ParseSelectorSub_FunctionCall(FunctionCalled) {
-    }*/ ParseSelectorSub_FunctionCall(FunctionCalled);
+    PrintDebugString("Entering ParseSelector_FunctionCall()",1000);
+    ParseSelectorSub_FunctionCall(FunctionCalled);
     PrintDebugString("Leaving ParseSelector_FunctionCall()",1000);
     if ReturnedFunction != nil {
         FunctionCalled = ReturnedFunction;
@@ -674,8 +656,7 @@ func ParseSelectorSub(item *libgogo.Item, packagename string) uint64 {
     return boolFlag;
 }
 
-func ParseSelectorSub_FunctionCall(FunctionCalled *libgogo.TypeDesc) uint64 {
-    var boolFlag uint64;
+func ParseSelectorSub_FunctionCall(FunctionCalled *libgogo.TypeDesc) {
     PrintDebugString("Entering ParseSelectorSub_FunctionCall()",1000);
     GetNextTokenSafe();
     ReturnedFunction = nil; //No new FunctionCalled pointer by default
@@ -684,16 +665,13 @@ func ParseSelectorSub_FunctionCall(FunctionCalled *libgogo.TypeDesc) uint64 {
         if Compile != 0 {
             ReturnedFunction = ApplyFunctionSelector(FunctionCalled, tok.strValue);
         }
-        boolFlag = 0;
     } else {
         tok.nextToken = tok.id;
         if Compile != 0 {
             ReturnedFunction = PackageFunctionToNameFunction(FunctionCalled);
 	    }
-        boolFlag = 1;
     }
     PrintDebugString("Leaving ParseSelectorSub_FunctionCall()",1000);
-    return boolFlag;
 }
 
 //
@@ -984,8 +962,7 @@ func IsFunction() uint64 {
     return returnValue;
 }
 
-func ParseAssignment(semicolon uint64) uint64 {
-    var boolFlag uint64;
+func ParseAssignment(semicolon uint64) {
     var exprIndicator uint64;
     var funcIndicator uint64;
     var LHSItem *libgogo.Item;
@@ -1036,14 +1013,11 @@ func ParseAssignment(semicolon uint64) uint64 {
         if semicolon != 0 {
             AssertNextTokenWeak(TOKEN_SEMICOLON);
         }
-        boolFlag = 0;
     } else {
         tok.nextToken = tok.id;
-        boolFlag = 1;
     }
     GenerateComment("Assignment end");
     PrintDebugString("Leaving ParseAssignment()",1000);
-    return boolFlag;
 }
 
 func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {

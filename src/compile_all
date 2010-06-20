@@ -1,0 +1,39 @@
+#!/bin/sh
+
+./gogo -c \
+libgogo/convert.go \
+libgogo/convert_amd64.s \
+libgogo/io.go \
+libgogo/io_amd64.s \
+libgogo/list.go \
+libgogo/memmgr.go \
+libgogo/memmgr_amd64.s \
+libgogo/strlist.go \
+libgogo/symbol.go \
+libgogo/symbol_amd64.s \
+libgogo/string.go \
+libgogo/string_amd64.s \
+libgogo/item.go \
+libgogo/item_amd64.s \
+libgogo/libgogo.go \
+libgogo/libgogo_amd64.s \
+libgogo/stack.go \
+globals.go \
+token.go \
+symtable.go \
+parser.go \
+gogo.go \
+asm_out.go \
+codegen.go \
+gen-arith.go \
+gen-assign.go \
+gen-cond.go \
+gen-const.go \
+gen-expr.go \
+gen-fcn.go \
+gen-for.go \
+gen-if.go \
+linker.go \
+parse-utils.go \
+scanner.go \
+utils.go
