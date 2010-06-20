@@ -51,7 +51,7 @@ func PrintActualFunctionCall(FunctionCalled *libgogo.TypeDesc, TotalLocalVariabl
     }
 }
 
-func GetReturnItem(FunctionCalled *libgogo.TypeDesc, TotalLocalVariableSize uint64, TotalParameterSize uint64) *libgogo.Item {
+func GetReturnItem(FunctionCalled *libgogo.TypeDesc, TotalLocalVariableSize uint64, TotalParameterSize uint64, SavedRegisterOffset uint64) *libgogo.Item {
     var ReturnObject *libgogo.ObjectDesc;
     var ReturnItem *libgogo.Item;
     ReturnObject = libgogo.GetObject("return value", "", FunctionCalled.Fields); //Find return value
@@ -63,6 +63,7 @@ func GetReturnItem(FunctionCalled *libgogo.TypeDesc, TotalLocalVariableSize uint
         } else {
             ReturnItem = ObjectToStackParameter(ReturnObject, FunctionCalled, TotalParameterSize + TotalLocalVariableSize);
         }
+        ReturnItem.A = ReturnItem.A + SavedRegisterOffset;
     }
     return ReturnItem;
 }
@@ -84,7 +85,7 @@ func AddArtificialParameterIfNecessary(FunctionCalled *libgogo.TypeDesc, ExprIte
     }
 }
 
-func AddArtificialReturnValueIfNecessary(FunctionCalled *libgogo.TypeDesc, ReturnValue *libgogo.Item, ForwardDeclExpectedReturnType *libgogo.TypeDesc, ForwardDeclExpectedReturnPtrType uint64) *libgogo.Item {
+func AddArtificialReturnValueIfNecessary(FunctionCalled *libgogo.TypeDesc, ReturnValue *libgogo.Item, ForwardDeclExpectedReturnType *libgogo.TypeDesc, ForwardDeclExpectedReturnPtrType uint64, SavedRegisterOffset uint64) *libgogo.Item {
     var TotalLocalVariableSize uint64;
     var TempObject *libgogo.ObjectDesc;
     if (FunctionCalled.ForwardDecl == 1) && (FunctionCalled.Base == nil) { //Create artifical return value if function is called the first time
@@ -96,6 +97,7 @@ func AddArtificialReturnValueIfNecessary(FunctionCalled *libgogo.TypeDesc, Retur
             FunctionCalled.Len = FunctionCalled.Len - 1; //Don't count parameter as input parameter
             TotalLocalVariableSize = libgogo.GetAlignedObjectListSize(LocalObjects); //Take local variable size into consideration for offset below
             ReturnValue = ObjectToStackParameter(TempObject, FunctionCalled, TotalLocalVariableSize);
+            ReturnValue.A = ReturnValue.A + SavedRegisterOffset;
         } else { //No return type expected
             ReturnValue = nil;
         }

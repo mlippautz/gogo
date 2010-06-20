@@ -28,6 +28,11 @@ var ReturnValuePseudoObject *libgogo.ObjectDesc = nil;
 var ReturnedFunction *libgogo.TypeDesc = nil;
 
 //
+// Temporary offset used in ParseFunctionCall(Statement) which cannot be assigned through return values
+//
+var CurrentFunctionSavedRegisterOffset uint64;
+
+//
 // Main parsing function. Corresponds to the EBNF main structure called 
 // go_program.
 //
@@ -1059,6 +1064,7 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
         TotalParameterSize = libgogo.GetAlignedObjectListSize(FunctionCalled.Fields); //Get total size of parameters of function called
         TotalLocalVariableSize = libgogo.GetAlignedObjectListSize(LocalObjects); //Get total size of local variables of current function
         RegisterStackOffset = SaveUsedRegisters(TotalLocalVariableSize); //Save registers...
+        CurrentFunctionSavedRegisterOffset = RegisterStackOffset; //Save in order to reuse in ParseFunctionCallStatement
         TotalLocalVariableSize = TotalLocalVariableSize + RegisterStackOffset; //...and correct stack offset for paramters accordingly
     }
     if tok.id != TOKEN_RBRAC {
@@ -1077,7 +1083,7 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
         RestoreUsedRegisters(TotalLocalVariableSize, RegisterStackOffset);
     }
     PrintDebugString("Leaving ParseFunctionCall()",1000);
-    ReturnItem = GetReturnItem(FunctionCalled, TotalLocalVariableSize, TotalParameterSize);
+    ReturnItem = GetReturnItem(FunctionCalled, TotalLocalVariableSize, TotalParameterSize, RegisterStackOffset);
     return ReturnItem;
 }
 
@@ -1164,9 +1170,10 @@ func ParseFunctionCallStatement(ForwardDeclExpectedReturnType *libgogo.TypeDesc,
     AssertNextToken(TOKEN_IDENTIFIER);
     FunctionCalled = libgogo.NewType("", "", 0, 0, nil);
     FunctionCalled = FindIdentifierAndParseSelector_FunctionCall(FunctionCalled);
-    ReturnValue = ParseFunctionCall(FunctionCalled);
+    CurrentFunctionSavedRegisterOffset = 0;
+    ReturnValue = ParseFunctionCall(FunctionCalled); //Sets CurrentFunctionSavedRegisterOffset
     if Compile != 0 {
-        ReturnValue = AddArtificialReturnValueIfNecessary(FunctionCalled, ReturnValue, ForwardDeclExpectedReturnType, ForwardDeclExpectedReturnPtrType);
+        ReturnValue = AddArtificialReturnValueIfNecessary(FunctionCalled, ReturnValue, ForwardDeclExpectedReturnType, ForwardDeclExpectedReturnPtrType,  CurrentFunctionSavedRegisterOffset);
         FunctionCalled.Base = FunctionCalled; //Abuse Base field to indicate that the function has been called at least once
     }
     PrintDebugString("Leaving ParseFunctionCallStatement()",1000);

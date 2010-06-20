@@ -15,6 +15,7 @@ __UNLINKED_CODE
 //TYPE,0,·byte,1,8
 //TYPE,0,·string,16,16
 //TYPE,0,·bool,8,8
+//TYPE,0,main·FibHolder,24,24
 //TYPE,0,libgogo·List,32,32
 //TYPE,0,libgogo·StringList,32,32
 //TYPE,0,libgogo·TypeDesc,80,80
@@ -108,7 +109,7 @@ __UNLINKED_CODE
 //FUNC,0,libgogo·Exit,code:·uint64
 //End Symbol table
 
-//--- String buffer start ('Fibonacci\n') at fib.go:12:38
+//--- String buffer start ('Fibonacci\n') at fib_ultimate.go:21:38
 DATA data+8(SB)/1, $70
 DATA data+9(SB)/1, $105
 DATA data+10(SB)/1, $98
@@ -120,8 +121,8 @@ DATA data+15(SB)/1, $99
 DATA data+16(SB)/1, $105
 DATA data+17(SB)/1, $10
 DATA data+18(SB)/1, $0
-//--- String buffer end at fib.go:12:38
-//--- String buffer start ('=========\n') at fib.go:13:38
+//--- String buffer end at fib_ultimate.go:21:38
+//--- String buffer start ('=========\n') at fib_ultimate.go:22:38
 DATA data+40(SB)/1, $61
 DATA data+41(SB)/1, $61
 DATA data+42(SB)/1, $61
@@ -133,8 +134,8 @@ DATA data+47(SB)/1, $61
 DATA data+48(SB)/1, $61
 DATA data+49(SB)/1, $10
 DATA data+50(SB)/1, $0
-//--- String buffer end at fib.go:13:38
-//--- String buffer start ('Rekursiv(11): ') at fib.go:14:41
+//--- String buffer end at fib_ultimate.go:22:38
+//--- String buffer start ('Rekursiv(11): ') at fib_ultimate.go:23:41
 DATA data+72(SB)/1, $82
 DATA data+73(SB)/1, $101
 DATA data+74(SB)/1, $107
@@ -150,12 +151,12 @@ DATA data+83(SB)/1, $41
 DATA data+84(SB)/1, $58
 DATA data+85(SB)/1, $32
 DATA data+86(SB)/1, $0
-//--- String buffer end at fib.go:14:41
-//--- String buffer start ('\n') at fib.go:17:29
+//--- String buffer end at fib_ultimate.go:23:41
+//--- String buffer start ('\n') at fib_ultimate.go:26:29
 DATA data+104(SB)/1, $10
 DATA data+105(SB)/1, $0
-//--- String buffer end at fib.go:17:29
-//--- String buffer start ('Iterativ(11): ') at fib.go:18:41
+//--- String buffer end at fib_ultimate.go:26:29
+//--- String buffer start ('Iterativ(93): ') at fib_ultimate.go:27:41
 DATA data+128(SB)/1, $73
 DATA data+129(SB)/1, $116
 DATA data+130(SB)/1, $101
@@ -165,17 +166,17 @@ DATA data+133(SB)/1, $116
 DATA data+134(SB)/1, $105
 DATA data+135(SB)/1, $118
 DATA data+136(SB)/1, $40
-DATA data+137(SB)/1, $49
-DATA data+138(SB)/1, $49
+DATA data+137(SB)/1, $57
+DATA data+138(SB)/1, $51
 DATA data+139(SB)/1, $41
 DATA data+140(SB)/1, $58
 DATA data+141(SB)/1, $32
 DATA data+142(SB)/1, $0
-//--- String buffer end at fib.go:18:41
-//--- String buffer start ('\n') at fib.go:21:29
+//--- String buffer end at fib_ultimate.go:27:41
+//--- String buffer start ('\n') at fib_ultimate.go:30:29
 DATA data+160(SB)/1, $10
 DATA data+161(SB)/1, $0
-//--- String buffer end at fib.go:21:29
+//--- String buffer end at fib_ultimate.go:30:29
 //--- String buffer start ('') at libgogo/convert.go:74:24
 DATA data+184(SB)/1, $0
 //--- String buffer end at libgogo/convert.go:74:24
@@ -1044,48 +1045,48 @@ DATA data+6533(SB)/1, $0
 GLOBL data(SB),$6552
 
 TEXT main·init(SB),0,$0-0
-  //--- Assign byte buffer to new string constant start at fib.go:12:38
+  //--- Assign byte buffer to new string constant start at fib_ultimate.go:21:38
   LEAQ data+8(SB), R8
   MOVQ R8, data+24(SB)
-  //--- Assign byte buffer to new string constant end at fib.go:12:38
-  //--- Assign string length to new string constant start at fib.go:12:38
+  //--- Assign byte buffer to new string constant end at fib_ultimate.go:21:38
+  //--- Assign string length to new string constant start at fib_ultimate.go:21:38
   MOVQ $10, data+32(SB)
-  //--- Assign string length to new string constant end at fib.go:12:38
-  //--- Assign byte buffer to new string constant start at fib.go:13:38
+  //--- Assign string length to new string constant end at fib_ultimate.go:21:38
+  //--- Assign byte buffer to new string constant start at fib_ultimate.go:22:38
   LEAQ data+40(SB), R8
   MOVQ R8, data+56(SB)
-  //--- Assign byte buffer to new string constant end at fib.go:13:38
-  //--- Assign string length to new string constant start at fib.go:13:38
+  //--- Assign byte buffer to new string constant end at fib_ultimate.go:22:38
+  //--- Assign string length to new string constant start at fib_ultimate.go:22:38
   MOVQ $10, data+64(SB)
-  //--- Assign string length to new string constant end at fib.go:13:38
-  //--- Assign byte buffer to new string constant start at fib.go:14:41
+  //--- Assign string length to new string constant end at fib_ultimate.go:22:38
+  //--- Assign byte buffer to new string constant start at fib_ultimate.go:23:41
   LEAQ data+72(SB), R8
   MOVQ R8, data+88(SB)
-  //--- Assign byte buffer to new string constant end at fib.go:14:41
-  //--- Assign string length to new string constant start at fib.go:14:41
+  //--- Assign byte buffer to new string constant end at fib_ultimate.go:23:41
+  //--- Assign string length to new string constant start at fib_ultimate.go:23:41
   MOVQ $14, data+96(SB)
-  //--- Assign string length to new string constant end at fib.go:14:41
-  //--- Assign byte buffer to new string constant start at fib.go:17:29
+  //--- Assign string length to new string constant end at fib_ultimate.go:23:41
+  //--- Assign byte buffer to new string constant start at fib_ultimate.go:26:29
   LEAQ data+104(SB), R8
   MOVQ R8, data+112(SB)
-  //--- Assign byte buffer to new string constant end at fib.go:17:29
-  //--- Assign string length to new string constant start at fib.go:17:29
+  //--- Assign byte buffer to new string constant end at fib_ultimate.go:26:29
+  //--- Assign string length to new string constant start at fib_ultimate.go:26:29
   MOVQ $1, data+120(SB)
-  //--- Assign string length to new string constant end at fib.go:17:29
-  //--- Assign byte buffer to new string constant start at fib.go:18:41
+  //--- Assign string length to new string constant end at fib_ultimate.go:26:29
+  //--- Assign byte buffer to new string constant start at fib_ultimate.go:27:41
   LEAQ data+128(SB), R8
   MOVQ R8, data+144(SB)
-  //--- Assign byte buffer to new string constant end at fib.go:18:41
-  //--- Assign string length to new string constant start at fib.go:18:41
+  //--- Assign byte buffer to new string constant end at fib_ultimate.go:27:41
+  //--- Assign string length to new string constant start at fib_ultimate.go:27:41
   MOVQ $14, data+152(SB)
-  //--- Assign string length to new string constant end at fib.go:18:41
-  //--- Assign byte buffer to new string constant start at fib.go:21:29
+  //--- Assign string length to new string constant end at fib_ultimate.go:27:41
+  //--- Assign byte buffer to new string constant start at fib_ultimate.go:30:29
   LEAQ data+160(SB), R8
   MOVQ R8, data+168(SB)
-  //--- Assign byte buffer to new string constant end at fib.go:21:29
-  //--- Assign string length to new string constant start at fib.go:21:29
+  //--- Assign byte buffer to new string constant end at fib_ultimate.go:30:29
+  //--- Assign string length to new string constant start at fib_ultimate.go:30:29
   MOVQ $1, data+176(SB)
-  //--- Assign string length to new string constant end at fib.go:21:29
+  //--- Assign string length to new string constant end at fib_ultimate.go:30:29
   //--- Assign byte buffer to new string constant start at libgogo/convert.go:74:24
   LEAQ data+184(SB), R8
   MOVQ R8, data+192(SB)
@@ -1667,494 +1668,524 @@ TEXT main·init(SB),0,$0-0
   RET
 
 TEXT main·main(SB),0,$0-0
-  //--- Assignment start at fib.go:10:14
-  //--- Assignment LHS load start at fib.go:10:14
-  //--- Assignment LHS load end at fib.go:10:14
-  //--- Saving registers before function call start at fib.go:10:22
-  //--- Saving registers before function call end at fib.go:10:22
-  //--- First parameter expression start at fib.go:10:22
-  //--- First parameter expression load start at fib.go:10:22
-  //--- First parameter expression load end at fib.go:10:22
-  //--- ##1##main·fib1## at fib.go:10:22
-  MOVB $11, -100040(SP)
-  //--- First parameter expression end at fib.go:10:22
-  //--- Stack pointer offset before function call for local variables start at fib.go:10:22
-  //--- ##2##main·fib1## at fib.go:10:22
-  SUBQ $40, SP
-  //--- Stack pointer offset before function call for local variables end at fib.go:10:22
+  //--- Assignment start at fib_ultimate.go:16:13
+  //--- Assignment LHS load start at fib_ultimate.go:16:13
+  //--- Assignment LHS load end at fib_ultimate.go:16:13
+  //--- Assignment RHS load start at fib_ultimate.go:16:15
+  //--- Assignment RHS load end at fib_ultimate.go:16:15
+  MOVQ $0, -72(SP)
+  //--- Assignment end at fib_ultimate.go:16:15
+  //--- Assignment start at fib_ultimate.go:17:20
+  //--- Assignment LHS load start at fib_ultimate.go:17:20
+  MOVQ -72(SP), AX
+  MOVQ $8, R8
+  MULQ R8
+  MOVQ AX, R8
+  LEAQ -56(SP), R9
+  ADDQ R8, R9
+  //--- Assignment LHS load end at fib_ultimate.go:17:29
+  //--- Saving registers before function call start at fib_ultimate.go:17:37
+  MOVQ R9, -80(SP)
+  //--- Saving registers before function call end at fib_ultimate.go:17:37
+  //--- First parameter expression start at fib_ultimate.go:17:37
+  //--- First parameter expression load start at fib_ultimate.go:17:37
+  //--- First parameter expression load end at fib_ultimate.go:17:37
+  //--- ##1##main·fib1## at fib_ultimate.go:17:37
+  MOVB $11, -100080(SP)
+  //--- First parameter expression end at fib_ultimate.go:17:37
+  //--- Stack pointer offset before function call for local variables start at fib_ultimate.go:17:37
+  //--- ##2##main·fib1## at fib_ultimate.go:17:37
+  SUBQ $80, SP
+  //--- Stack pointer offset before function call for local variables end at fib_ultimate.go:17:37
   CALL main·fib1(SB)
-  //--- Stack pointer offset after function call for local variables start at fib.go:10:22
-  //--- ##2##main·fib1## at fib.go:10:22
-  ADDQ $40, SP
-  //--- Stack pointer offset after function call for local variables end at fib.go:10:22
-  //--- Restoring registers after function call start at fib.go:10:22
-  //--- Restoring registers after function call end at fib.go:10:22
-  //--- ##1##main·fib1## at fib.go:10:22
-  MOVQ -100032(SP), R8
-  MOVQ R8, -16(SP)
-  //--- Assignment end at fib.go:10:23
-  //--- Assignment start at fib.go:11:14
-  //--- Assignment LHS load start at fib.go:11:14
-  //--- Assignment LHS load end at fib.go:11:14
-  //--- Saving registers before function call start at fib.go:11:22
-  //--- Saving registers before function call end at fib.go:11:22
-  //--- First parameter expression start at fib.go:11:22
-  //--- First parameter expression load start at fib.go:11:22
-  //--- First parameter expression load end at fib.go:11:22
-  //--- ##1##main·fib2## at fib.go:11:22
-  MOVB $11, -100040(SP)
-  //--- First parameter expression end at fib.go:11:22
-  //--- Stack pointer offset before function call for local variables start at fib.go:11:22
-  //--- ##2##main·fib2## at fib.go:11:22
-  SUBQ $40, SP
-  //--- Stack pointer offset before function call for local variables end at fib.go:11:22
+  //--- Stack pointer offset after function call for local variables start at fib_ultimate.go:17:37
+  //--- ##2##main·fib1## at fib_ultimate.go:17:37
+  ADDQ $80, SP
+  //--- Stack pointer offset after function call for local variables end at fib_ultimate.go:17:37
+  //--- Restoring registers after function call start at fib_ultimate.go:17:37
+  MOVQ -80(SP), R9
+  //--- Restoring registers after function call end at fib_ultimate.go:17:37
+  //--- ##1##main·fib1## at fib_ultimate.go:17:37
+  MOVQ -100072(SP), R8
+  MOVQ R8, (R9)
+  //--- Assignment end at fib_ultimate.go:17:38
+  //--- Assignment start at fib_ultimate.go:18:13
+  //--- Assignment LHS load start at fib_ultimate.go:18:13
+  //--- Assignment LHS load end at fib_ultimate.go:18:13
+  //--- Assignment RHS load start at fib_ultimate.go:18:15
+  //--- Assignment RHS load end at fib_ultimate.go:18:15
+  MOVQ $1, -72(SP)
+  //--- Assignment end at fib_ultimate.go:18:15
+  //--- Assignment start at fib_ultimate.go:19:20
+  //--- Assignment LHS load start at fib_ultimate.go:19:20
+  MOVQ -72(SP), AX
+  MOVQ $8, R8
+  MULQ R8
+  MOVQ AX, R8
+  LEAQ -56(SP), R9
+  ADDQ R8, R9
+  //--- Assignment LHS load end at fib_ultimate.go:19:29
+  //--- Saving registers before function call start at fib_ultimate.go:19:37
+  MOVQ R9, -80(SP)
+  //--- Saving registers before function call end at fib_ultimate.go:19:37
+  //--- First parameter expression start at fib_ultimate.go:19:37
+  //--- First parameter expression load start at fib_ultimate.go:19:37
+  //--- First parameter expression load end at fib_ultimate.go:19:37
+  //--- ##1##main·fib2## at fib_ultimate.go:19:37
+  MOVB $93, -100080(SP)
+  //--- First parameter expression end at fib_ultimate.go:19:37
+  //--- Stack pointer offset before function call for local variables start at fib_ultimate.go:19:37
+  //--- ##2##main·fib2## at fib_ultimate.go:19:37
+  SUBQ $80, SP
+  //--- Stack pointer offset before function call for local variables end at fib_ultimate.go:19:37
   CALL main·fib2(SB)
-  //--- Stack pointer offset after function call for local variables start at fib.go:11:22
-  //--- ##2##main·fib2## at fib.go:11:22
-  ADDQ $40, SP
-  //--- Stack pointer offset after function call for local variables end at fib.go:11:22
-  //--- Restoring registers after function call start at fib.go:11:22
-  //--- Restoring registers after function call end at fib.go:11:22
-  //--- ##1##main·fib2## at fib.go:11:22
-  MOVQ -100032(SP), R8
-  MOVQ R8, -24(SP)
-  //--- Assignment end at fib.go:11:23
-  //--- Saving registers before function call start at fib.go:12:38
-  //--- Saving registers before function call end at fib.go:12:38
-  //--- First parameter expression start at fib.go:12:38
-  //--- First parameter expression load start at fib.go:12:38
-  //--- First parameter expression load end at fib.go:12:39
+  //--- Stack pointer offset after function call for local variables start at fib_ultimate.go:19:37
+  //--- ##2##main·fib2## at fib_ultimate.go:19:37
+  ADDQ $80, SP
+  //--- Stack pointer offset after function call for local variables end at fib_ultimate.go:19:37
+  //--- Restoring registers after function call start at fib_ultimate.go:19:37
+  MOVQ -80(SP), R9
+  //--- Restoring registers after function call end at fib_ultimate.go:19:37
+  //--- ##1##main·fib2## at fib_ultimate.go:19:37
+  MOVQ -100072(SP), R8
+  MOVQ R8, (R9)
+  //--- Assignment end at fib_ultimate.go:19:38
+  //--- Saving registers before function call start at fib_ultimate.go:21:38
+  //--- Saving registers before function call end at fib_ultimate.go:21:38
+  //--- First parameter expression start at fib_ultimate.go:21:38
+  //--- First parameter expression load start at fib_ultimate.go:21:38
+  //--- First parameter expression load end at fib_ultimate.go:21:39
   MOVQ data+24(SB), R8
   MOVQ data+32(SB), R9
-  //--- ##1##libgogo·PrintString## at fib.go:12:39
-  MOVQ R8, -100040(SP)
-  //--- ##1##libgogo·PrintString## at fib.go:12:39
-  MOVQ R9, -100032(SP)
-  //--- First parameter expression end at fib.go:12:39
-  //--- Stack pointer offset before function call for local variables start at fib.go:12:39
-  //--- ##2##libgogo·PrintString## at fib.go:12:39
-  SUBQ $40, SP
-  //--- Stack pointer offset before function call for local variables end at fib.go:12:39
+  //--- ##1##libgogo·PrintString## at fib_ultimate.go:21:39
+  MOVQ R8, -100072(SP)
+  //--- ##1##libgogo·PrintString## at fib_ultimate.go:21:39
+  MOVQ R9, -100064(SP)
+  //--- First parameter expression end at fib_ultimate.go:21:39
+  //--- Stack pointer offset before function call for local variables start at fib_ultimate.go:21:39
+  //--- ##2##libgogo·PrintString## at fib_ultimate.go:21:39
+  SUBQ $72, SP
+  //--- Stack pointer offset before function call for local variables end at fib_ultimate.go:21:39
   CALL libgogo·PrintString(SB)
-  //--- Stack pointer offset after function call for local variables start at fib.go:12:39
-  //--- ##2##libgogo·PrintString## at fib.go:12:39
-  ADDQ $40, SP
-  //--- Stack pointer offset after function call for local variables end at fib.go:12:39
-  //--- Restoring registers after function call start at fib.go:12:39
-  //--- Restoring registers after function call end at fib.go:12:39
-  //--- Saving registers before function call start at fib.go:13:38
-  //--- Saving registers before function call end at fib.go:13:38
-  //--- First parameter expression start at fib.go:13:38
-  //--- First parameter expression load start at fib.go:13:38
-  //--- First parameter expression load end at fib.go:13:39
+  //--- Stack pointer offset after function call for local variables start at fib_ultimate.go:21:39
+  //--- ##2##libgogo·PrintString## at fib_ultimate.go:21:39
+  ADDQ $72, SP
+  //--- Stack pointer offset after function call for local variables end at fib_ultimate.go:21:39
+  //--- Restoring registers after function call start at fib_ultimate.go:21:39
+  //--- Restoring registers after function call end at fib_ultimate.go:21:39
+  //--- Saving registers before function call start at fib_ultimate.go:22:38
+  //--- Saving registers before function call end at fib_ultimate.go:22:38
+  //--- First parameter expression start at fib_ultimate.go:22:38
+  //--- First parameter expression load start at fib_ultimate.go:22:38
+  //--- First parameter expression load end at fib_ultimate.go:22:39
   MOVQ data+56(SB), R8
   MOVQ data+64(SB), R9
-  //--- ##1##libgogo·PrintString## at fib.go:13:39
-  MOVQ R8, -100040(SP)
-  //--- ##1##libgogo·PrintString## at fib.go:13:39
-  MOVQ R9, -100032(SP)
-  //--- First parameter expression end at fib.go:13:39
-  //--- Stack pointer offset before function call for local variables start at fib.go:13:39
-  //--- ##2##libgogo·PrintString## at fib.go:13:39
-  SUBQ $40, SP
-  //--- Stack pointer offset before function call for local variables end at fib.go:13:39
+  //--- ##1##libgogo·PrintString## at fib_ultimate.go:22:39
+  MOVQ R8, -100072(SP)
+  //--- ##1##libgogo·PrintString## at fib_ultimate.go:22:39
+  MOVQ R9, -100064(SP)
+  //--- First parameter expression end at fib_ultimate.go:22:39
+  //--- Stack pointer offset before function call for local variables start at fib_ultimate.go:22:39
+  //--- ##2##libgogo·PrintString## at fib_ultimate.go:22:39
+  SUBQ $72, SP
+  //--- Stack pointer offset before function call for local variables end at fib_ultimate.go:22:39
   CALL libgogo·PrintString(SB)
-  //--- Stack pointer offset after function call for local variables start at fib.go:13:39
-  //--- ##2##libgogo·PrintString## at fib.go:13:39
-  ADDQ $40, SP
-  //--- Stack pointer offset after function call for local variables end at fib.go:13:39
-  //--- Restoring registers after function call start at fib.go:13:39
-  //--- Restoring registers after function call end at fib.go:13:39
-  //--- Saving registers before function call start at fib.go:14:41
-  //--- Saving registers before function call end at fib.go:14:41
-  //--- First parameter expression start at fib.go:14:41
-  //--- First parameter expression load start at fib.go:14:41
-  //--- First parameter expression load end at fib.go:14:42
+  //--- Stack pointer offset after function call for local variables start at fib_ultimate.go:22:39
+  //--- ##2##libgogo·PrintString## at fib_ultimate.go:22:39
+  ADDQ $72, SP
+  //--- Stack pointer offset after function call for local variables end at fib_ultimate.go:22:39
+  //--- Restoring registers after function call start at fib_ultimate.go:22:39
+  //--- Restoring registers after function call end at fib_ultimate.go:22:39
+  //--- Saving registers before function call start at fib_ultimate.go:23:41
+  //--- Saving registers before function call end at fib_ultimate.go:23:41
+  //--- First parameter expression start at fib_ultimate.go:23:41
+  //--- First parameter expression load start at fib_ultimate.go:23:41
+  //--- First parameter expression load end at fib_ultimate.go:23:42
   MOVQ data+88(SB), R8
   MOVQ data+96(SB), R9
-  //--- ##1##libgogo·PrintString## at fib.go:14:42
-  MOVQ R8, -100040(SP)
-  //--- ##1##libgogo·PrintString## at fib.go:14:42
-  MOVQ R9, -100032(SP)
-  //--- First parameter expression end at fib.go:14:42
-  //--- Stack pointer offset before function call for local variables start at fib.go:14:42
-  //--- ##2##libgogo·PrintString## at fib.go:14:42
-  SUBQ $40, SP
-  //--- Stack pointer offset before function call for local variables end at fib.go:14:42
+  //--- ##1##libgogo·PrintString## at fib_ultimate.go:23:42
+  MOVQ R8, -100072(SP)
+  //--- ##1##libgogo·PrintString## at fib_ultimate.go:23:42
+  MOVQ R9, -100064(SP)
+  //--- First parameter expression end at fib_ultimate.go:23:42
+  //--- Stack pointer offset before function call for local variables start at fib_ultimate.go:23:42
+  //--- ##2##libgogo·PrintString## at fib_ultimate.go:23:42
+  SUBQ $72, SP
+  //--- Stack pointer offset before function call for local variables end at fib_ultimate.go:23:42
   CALL libgogo·PrintString(SB)
-  //--- Stack pointer offset after function call for local variables start at fib.go:14:42
-  //--- ##2##libgogo·PrintString## at fib.go:14:42
-  ADDQ $40, SP
-  //--- Stack pointer offset after function call for local variables end at fib.go:14:42
-  //--- Restoring registers after function call start at fib.go:14:42
-  //--- Restoring registers after function call end at fib.go:14:42
-  //--- Assignment start at fib.go:15:14
-  //--- Assignment LHS load start at fib.go:15:14
-  //--- Assignment LHS load end at fib.go:15:14
-  //--- Saving registers before function call start at fib.go:15:41
-  //--- Saving registers before function call end at fib.go:15:41
-  //--- First parameter expression start at fib.go:15:41
-  //--- First parameter expression load start at fib.go:15:41
-  //--- First parameter expression load end at fib.go:15:41
-  MOVQ -16(SP), R8
-  //--- ##1##libgogo·IntToString## at fib.go:15:41
-  MOVQ R8, -100040(SP)
-  //--- First parameter expression end at fib.go:15:41
-  //--- Stack pointer offset before function call for local variables start at fib.go:15:41
-  //--- ##2##libgogo·IntToString## at fib.go:15:41
-  SUBQ $40, SP
-  //--- Stack pointer offset before function call for local variables end at fib.go:15:41
+  //--- Stack pointer offset after function call for local variables start at fib_ultimate.go:23:42
+  //--- ##2##libgogo·PrintString## at fib_ultimate.go:23:42
+  ADDQ $72, SP
+  //--- Stack pointer offset after function call for local variables end at fib_ultimate.go:23:42
+  //--- Restoring registers after function call start at fib_ultimate.go:23:42
+  //--- Restoring registers after function call end at fib_ultimate.go:23:42
+  //--- Assignment start at fib_ultimate.go:24:14
+  //--- Assignment LHS load start at fib_ultimate.go:24:14
+  //--- Assignment LHS load end at fib_ultimate.go:24:14
+  //--- Saving registers before function call start at fib_ultimate.go:24:44
+  //--- Saving registers before function call end at fib_ultimate.go:24:44
+  //--- First parameter expression start at fib_ultimate.go:24:44
+  //--- First parameter expression load start at fib_ultimate.go:24:44
+  //--- First parameter expression load end at fib_ultimate.go:24:52
+  MOVQ -56(SP), R8
+  //--- ##1##libgogo·IntToString## at fib_ultimate.go:24:52
+  MOVQ R8, -100072(SP)
+  //--- First parameter expression end at fib_ultimate.go:24:52
+  //--- Stack pointer offset before function call for local variables start at fib_ultimate.go:24:52
+  //--- ##2##libgogo·IntToString## at fib_ultimate.go:24:52
+  SUBQ $72, SP
+  //--- Stack pointer offset before function call for local variables end at fib_ultimate.go:24:52
   CALL libgogo·IntToString(SB)
-  //--- Stack pointer offset after function call for local variables start at fib.go:15:41
-  //--- ##2##libgogo·IntToString## at fib.go:15:41
-  ADDQ $40, SP
-  //--- Stack pointer offset after function call for local variables end at fib.go:15:41
-  //--- Restoring registers after function call start at fib.go:15:41
-  //--- Restoring registers after function call end at fib.go:15:41
-  //--- ##1##libgogo·IntToString## at fib.go:15:41
-  MOVQ -100032(SP), R8
-  //--- ##1##libgogo·IntToString## at fib.go:15:41
-  MOVQ -100024(SP), R9
+  //--- Stack pointer offset after function call for local variables start at fib_ultimate.go:24:52
+  //--- ##2##libgogo·IntToString## at fib_ultimate.go:24:52
+  ADDQ $72, SP
+  //--- Stack pointer offset after function call for local variables end at fib_ultimate.go:24:52
+  //--- Restoring registers after function call start at fib_ultimate.go:24:52
+  //--- Restoring registers after function call end at fib_ultimate.go:24:52
+  //--- ##1##libgogo·IntToString## at fib_ultimate.go:24:52
+  MOVQ -100064(SP), R8
+  //--- ##1##libgogo·IntToString## at fib_ultimate.go:24:52
+  MOVQ -100056(SP), R9
   MOVQ R8, -40(SP)
   MOVQ R9, -32(SP)
-  //--- Assignment end at fib.go:15:42
-  //--- Saving registers before function call start at fib.go:16:32
-  //--- Saving registers before function call end at fib.go:16:32
-  //--- First parameter expression start at fib.go:16:32
-  //--- First parameter expression load start at fib.go:16:32
-  //--- First parameter expression load end at fib.go:16:32
+  //--- Assignment end at fib_ultimate.go:24:53
+  //--- Saving registers before function call start at fib_ultimate.go:25:32
+  //--- Saving registers before function call end at fib_ultimate.go:25:32
+  //--- First parameter expression start at fib_ultimate.go:25:32
+  //--- First parameter expression load start at fib_ultimate.go:25:32
+  //--- First parameter expression load end at fib_ultimate.go:25:32
   MOVQ -40(SP), R8
   MOVQ -32(SP), R9
-  //--- ##1##libgogo·PrintString## at fib.go:16:32
-  MOVQ R8, -100040(SP)
-  //--- ##1##libgogo·PrintString## at fib.go:16:32
-  MOVQ R9, -100032(SP)
-  //--- First parameter expression end at fib.go:16:32
-  //--- Stack pointer offset before function call for local variables start at fib.go:16:32
-  //--- ##2##libgogo·PrintString## at fib.go:16:32
-  SUBQ $40, SP
-  //--- Stack pointer offset before function call for local variables end at fib.go:16:32
+  //--- ##1##libgogo·PrintString## at fib_ultimate.go:25:32
+  MOVQ R8, -100072(SP)
+  //--- ##1##libgogo·PrintString## at fib_ultimate.go:25:32
+  MOVQ R9, -100064(SP)
+  //--- First parameter expression end at fib_ultimate.go:25:32
+  //--- Stack pointer offset before function call for local variables start at fib_ultimate.go:25:32
+  //--- ##2##libgogo·PrintString## at fib_ultimate.go:25:32
+  SUBQ $72, SP
+  //--- Stack pointer offset before function call for local variables end at fib_ultimate.go:25:32
   CALL libgogo·PrintString(SB)
-  //--- Stack pointer offset after function call for local variables start at fib.go:16:32
-  //--- ##2##libgogo·PrintString## at fib.go:16:32
-  ADDQ $40, SP
-  //--- Stack pointer offset after function call for local variables end at fib.go:16:32
-  //--- Restoring registers after function call start at fib.go:16:32
-  //--- Restoring registers after function call end at fib.go:16:32
-  //--- Saving registers before function call start at fib.go:17:29
-  //--- Saving registers before function call end at fib.go:17:29
-  //--- First parameter expression start at fib.go:17:29
-  //--- First parameter expression load start at fib.go:17:29
-  //--- First parameter expression load end at fib.go:17:30
+  //--- Stack pointer offset after function call for local variables start at fib_ultimate.go:25:32
+  //--- ##2##libgogo·PrintString## at fib_ultimate.go:25:32
+  ADDQ $72, SP
+  //--- Stack pointer offset after function call for local variables end at fib_ultimate.go:25:32
+  //--- Restoring registers after function call start at fib_ultimate.go:25:32
+  //--- Restoring registers after function call end at fib_ultimate.go:25:32
+  //--- Saving registers before function call start at fib_ultimate.go:26:29
+  //--- Saving registers before function call end at fib_ultimate.go:26:29
+  //--- First parameter expression start at fib_ultimate.go:26:29
+  //--- First parameter expression load start at fib_ultimate.go:26:29
+  //--- First parameter expression load end at fib_ultimate.go:26:30
   MOVQ data+112(SB), R8
   MOVQ data+120(SB), R9
-  //--- ##1##libgogo·PrintString## at fib.go:17:30
-  MOVQ R8, -100040(SP)
-  //--- ##1##libgogo·PrintString## at fib.go:17:30
-  MOVQ R9, -100032(SP)
-  //--- First parameter expression end at fib.go:17:30
-  //--- Stack pointer offset before function call for local variables start at fib.go:17:30
-  //--- ##2##libgogo·PrintString## at fib.go:17:30
-  SUBQ $40, SP
-  //--- Stack pointer offset before function call for local variables end at fib.go:17:30
+  //--- ##1##libgogo·PrintString## at fib_ultimate.go:26:30
+  MOVQ R8, -100072(SP)
+  //--- ##1##libgogo·PrintString## at fib_ultimate.go:26:30
+  MOVQ R9, -100064(SP)
+  //--- First parameter expression end at fib_ultimate.go:26:30
+  //--- Stack pointer offset before function call for local variables start at fib_ultimate.go:26:30
+  //--- ##2##libgogo·PrintString## at fib_ultimate.go:26:30
+  SUBQ $72, SP
+  //--- Stack pointer offset before function call for local variables end at fib_ultimate.go:26:30
   CALL libgogo·PrintString(SB)
-  //--- Stack pointer offset after function call for local variables start at fib.go:17:30
-  //--- ##2##libgogo·PrintString## at fib.go:17:30
-  ADDQ $40, SP
-  //--- Stack pointer offset after function call for local variables end at fib.go:17:30
-  //--- Restoring registers after function call start at fib.go:17:30
-  //--- Restoring registers after function call end at fib.go:17:30
-  //--- Saving registers before function call start at fib.go:18:41
-  //--- Saving registers before function call end at fib.go:18:41
-  //--- First parameter expression start at fib.go:18:41
-  //--- First parameter expression load start at fib.go:18:41
-  //--- First parameter expression load end at fib.go:18:42
+  //--- Stack pointer offset after function call for local variables start at fib_ultimate.go:26:30
+  //--- ##2##libgogo·PrintString## at fib_ultimate.go:26:30
+  ADDQ $72, SP
+  //--- Stack pointer offset after function call for local variables end at fib_ultimate.go:26:30
+  //--- Restoring registers after function call start at fib_ultimate.go:26:30
+  //--- Restoring registers after function call end at fib_ultimate.go:26:30
+  //--- Saving registers before function call start at fib_ultimate.go:27:41
+  //--- Saving registers before function call end at fib_ultimate.go:27:41
+  //--- First parameter expression start at fib_ultimate.go:27:41
+  //--- First parameter expression load start at fib_ultimate.go:27:41
+  //--- First parameter expression load end at fib_ultimate.go:27:42
   MOVQ data+144(SB), R8
   MOVQ data+152(SB), R9
-  //--- ##1##libgogo·PrintString## at fib.go:18:42
-  MOVQ R8, -100040(SP)
-  //--- ##1##libgogo·PrintString## at fib.go:18:42
-  MOVQ R9, -100032(SP)
-  //--- First parameter expression end at fib.go:18:42
-  //--- Stack pointer offset before function call for local variables start at fib.go:18:42
-  //--- ##2##libgogo·PrintString## at fib.go:18:42
-  SUBQ $40, SP
-  //--- Stack pointer offset before function call for local variables end at fib.go:18:42
+  //--- ##1##libgogo·PrintString## at fib_ultimate.go:27:42
+  MOVQ R8, -100072(SP)
+  //--- ##1##libgogo·PrintString## at fib_ultimate.go:27:42
+  MOVQ R9, -100064(SP)
+  //--- First parameter expression end at fib_ultimate.go:27:42
+  //--- Stack pointer offset before function call for local variables start at fib_ultimate.go:27:42
+  //--- ##2##libgogo·PrintString## at fib_ultimate.go:27:42
+  SUBQ $72, SP
+  //--- Stack pointer offset before function call for local variables end at fib_ultimate.go:27:42
   CALL libgogo·PrintString(SB)
-  //--- Stack pointer offset after function call for local variables start at fib.go:18:42
-  //--- ##2##libgogo·PrintString## at fib.go:18:42
-  ADDQ $40, SP
-  //--- Stack pointer offset after function call for local variables end at fib.go:18:42
-  //--- Restoring registers after function call start at fib.go:18:42
-  //--- Restoring registers after function call end at fib.go:18:42
-  //--- Assignment start at fib.go:19:14
-  //--- Assignment LHS load start at fib.go:19:14
-  //--- Assignment LHS load end at fib.go:19:14
-  //--- Saving registers before function call start at fib.go:19:41
-  //--- Saving registers before function call end at fib.go:19:41
-  //--- First parameter expression start at fib.go:19:41
-  //--- First parameter expression load start at fib.go:19:41
-  //--- First parameter expression load end at fib.go:19:41
-  MOVQ -24(SP), R8
-  //--- ##1##libgogo·IntToString## at fib.go:19:41
-  MOVQ R8, -100040(SP)
-  //--- First parameter expression end at fib.go:19:41
-  //--- Stack pointer offset before function call for local variables start at fib.go:19:41
-  //--- ##2##libgogo·IntToString## at fib.go:19:41
-  SUBQ $40, SP
-  //--- Stack pointer offset before function call for local variables end at fib.go:19:41
+  //--- Stack pointer offset after function call for local variables start at fib_ultimate.go:27:42
+  //--- ##2##libgogo·PrintString## at fib_ultimate.go:27:42
+  ADDQ $72, SP
+  //--- Stack pointer offset after function call for local variables end at fib_ultimate.go:27:42
+  //--- Restoring registers after function call start at fib_ultimate.go:27:42
+  //--- Restoring registers after function call end at fib_ultimate.go:27:42
+  //--- Assignment start at fib_ultimate.go:28:14
+  //--- Assignment LHS load start at fib_ultimate.go:28:14
+  //--- Assignment LHS load end at fib_ultimate.go:28:14
+  //--- Saving registers before function call start at fib_ultimate.go:28:44
+  //--- Saving registers before function call end at fib_ultimate.go:28:44
+  //--- First parameter expression start at fib_ultimate.go:28:44
+  //--- First parameter expression load start at fib_ultimate.go:28:44
+  //--- First parameter expression load end at fib_ultimate.go:28:52
+  MOVQ -48(SP), R8
+  //--- ##1##libgogo·IntToString## at fib_ultimate.go:28:52
+  MOVQ R8, -100072(SP)
+  //--- First parameter expression end at fib_ultimate.go:28:52
+  //--- Stack pointer offset before function call for local variables start at fib_ultimate.go:28:52
+  //--- ##2##libgogo·IntToString## at fib_ultimate.go:28:52
+  SUBQ $72, SP
+  //--- Stack pointer offset before function call for local variables end at fib_ultimate.go:28:52
   CALL libgogo·IntToString(SB)
-  //--- Stack pointer offset after function call for local variables start at fib.go:19:41
-  //--- ##2##libgogo·IntToString## at fib.go:19:41
-  ADDQ $40, SP
-  //--- Stack pointer offset after function call for local variables end at fib.go:19:41
-  //--- Restoring registers after function call start at fib.go:19:41
-  //--- Restoring registers after function call end at fib.go:19:41
-  //--- ##1##libgogo·IntToString## at fib.go:19:41
-  MOVQ -100032(SP), R8
-  //--- ##1##libgogo·IntToString## at fib.go:19:41
-  MOVQ -100024(SP), R9
+  //--- Stack pointer offset after function call for local variables start at fib_ultimate.go:28:52
+  //--- ##2##libgogo·IntToString## at fib_ultimate.go:28:52
+  ADDQ $72, SP
+  //--- Stack pointer offset after function call for local variables end at fib_ultimate.go:28:52
+  //--- Restoring registers after function call start at fib_ultimate.go:28:52
+  //--- Restoring registers after function call end at fib_ultimate.go:28:52
+  //--- ##1##libgogo·IntToString## at fib_ultimate.go:28:52
+  MOVQ -100064(SP), R8
+  //--- ##1##libgogo·IntToString## at fib_ultimate.go:28:52
+  MOVQ -100056(SP), R9
   MOVQ R8, -40(SP)
   MOVQ R9, -32(SP)
-  //--- Assignment end at fib.go:19:42
-  //--- Saving registers before function call start at fib.go:20:32
-  //--- Saving registers before function call end at fib.go:20:32
-  //--- First parameter expression start at fib.go:20:32
-  //--- First parameter expression load start at fib.go:20:32
-  //--- First parameter expression load end at fib.go:20:32
+  //--- Assignment end at fib_ultimate.go:28:53
+  //--- Saving registers before function call start at fib_ultimate.go:29:32
+  //--- Saving registers before function call end at fib_ultimate.go:29:32
+  //--- First parameter expression start at fib_ultimate.go:29:32
+  //--- First parameter expression load start at fib_ultimate.go:29:32
+  //--- First parameter expression load end at fib_ultimate.go:29:32
   MOVQ -40(SP), R8
   MOVQ -32(SP), R9
-  //--- ##1##libgogo·PrintString## at fib.go:20:32
-  MOVQ R8, -100040(SP)
-  //--- ##1##libgogo·PrintString## at fib.go:20:32
-  MOVQ R9, -100032(SP)
-  //--- First parameter expression end at fib.go:20:32
-  //--- Stack pointer offset before function call for local variables start at fib.go:20:32
-  //--- ##2##libgogo·PrintString## at fib.go:20:32
-  SUBQ $40, SP
-  //--- Stack pointer offset before function call for local variables end at fib.go:20:32
+  //--- ##1##libgogo·PrintString## at fib_ultimate.go:29:32
+  MOVQ R8, -100072(SP)
+  //--- ##1##libgogo·PrintString## at fib_ultimate.go:29:32
+  MOVQ R9, -100064(SP)
+  //--- First parameter expression end at fib_ultimate.go:29:32
+  //--- Stack pointer offset before function call for local variables start at fib_ultimate.go:29:32
+  //--- ##2##libgogo·PrintString## at fib_ultimate.go:29:32
+  SUBQ $72, SP
+  //--- Stack pointer offset before function call for local variables end at fib_ultimate.go:29:32
   CALL libgogo·PrintString(SB)
-  //--- Stack pointer offset after function call for local variables start at fib.go:20:32
-  //--- ##2##libgogo·PrintString## at fib.go:20:32
-  ADDQ $40, SP
-  //--- Stack pointer offset after function call for local variables end at fib.go:20:32
-  //--- Restoring registers after function call start at fib.go:20:32
-  //--- Restoring registers after function call end at fib.go:20:32
-  //--- Saving registers before function call start at fib.go:21:29
-  //--- Saving registers before function call end at fib.go:21:29
-  //--- First parameter expression start at fib.go:21:29
-  //--- First parameter expression load start at fib.go:21:29
-  //--- First parameter expression load end at fib.go:21:30
+  //--- Stack pointer offset after function call for local variables start at fib_ultimate.go:29:32
+  //--- ##2##libgogo·PrintString## at fib_ultimate.go:29:32
+  ADDQ $72, SP
+  //--- Stack pointer offset after function call for local variables end at fib_ultimate.go:29:32
+  //--- Restoring registers after function call start at fib_ultimate.go:29:32
+  //--- Restoring registers after function call end at fib_ultimate.go:29:32
+  //--- Saving registers before function call start at fib_ultimate.go:30:29
+  //--- Saving registers before function call end at fib_ultimate.go:30:29
+  //--- First parameter expression start at fib_ultimate.go:30:29
+  //--- First parameter expression load start at fib_ultimate.go:30:29
+  //--- First parameter expression load end at fib_ultimate.go:30:30
   MOVQ data+168(SB), R8
   MOVQ data+176(SB), R9
-  //--- ##1##libgogo·PrintString## at fib.go:21:30
-  MOVQ R8, -100040(SP)
-  //--- ##1##libgogo·PrintString## at fib.go:21:30
-  MOVQ R9, -100032(SP)
-  //--- First parameter expression end at fib.go:21:30
-  //--- Stack pointer offset before function call for local variables start at fib.go:21:30
-  //--- ##2##libgogo·PrintString## at fib.go:21:30
-  SUBQ $40, SP
-  //--- Stack pointer offset before function call for local variables end at fib.go:21:30
+  //--- ##1##libgogo·PrintString## at fib_ultimate.go:30:30
+  MOVQ R8, -100072(SP)
+  //--- ##1##libgogo·PrintString## at fib_ultimate.go:30:30
+  MOVQ R9, -100064(SP)
+  //--- First parameter expression end at fib_ultimate.go:30:30
+  //--- Stack pointer offset before function call for local variables start at fib_ultimate.go:30:30
+  //--- ##2##libgogo·PrintString## at fib_ultimate.go:30:30
+  SUBQ $72, SP
+  //--- Stack pointer offset before function call for local variables end at fib_ultimate.go:30:30
   CALL libgogo·PrintString(SB)
-  //--- Stack pointer offset after function call for local variables start at fib.go:21:30
-  //--- ##2##libgogo·PrintString## at fib.go:21:30
-  ADDQ $40, SP
-  //--- Stack pointer offset after function call for local variables end at fib.go:21:30
-  //--- Restoring registers after function call start at fib.go:21:30
-  //--- Restoring registers after function call end at fib.go:21:30
+  //--- Stack pointer offset after function call for local variables start at fib_ultimate.go:30:30
+  //--- ##2##libgogo·PrintString## at fib_ultimate.go:30:30
+  ADDQ $72, SP
+  //--- Stack pointer offset after function call for local variables end at fib_ultimate.go:30:30
+  //--- Restoring registers after function call start at fib_ultimate.go:30:30
+  //--- Restoring registers after function call end at fib_ultimate.go:30:30
   RET
 
 TEXT main·fib1(SB),0,$0-0
-  //--- If start at fib.go:28:8
+  //--- If start at fib_ultimate.go:37:8
   CMPQ 8(SP), $2
-  JLE IF_fib_28_1_END
-  JMP IF_fib_28_END
-IF_fib_28_1_END:
-  //--- Assignment start at fib.go:29:18
-  //--- Assignment LHS load start at fib.go:29:18
-  //--- Assignment LHS load end at fib.go:29:18
-  //--- Assignment RHS load start at fib.go:29:20
-  //--- Assignment RHS load end at fib.go:29:20
+  JLE IF_fib_ultimate_37_1_END
+  JMP IF_fib_ultimate_37_END
+IF_fib_ultimate_37_1_END:
+  //--- Assignment start at fib_ultimate.go:38:18
+  //--- Assignment LHS load start at fib_ultimate.go:38:18
+  //--- Assignment LHS load end at fib_ultimate.go:38:18
+  //--- Assignment RHS load start at fib_ultimate.go:38:20
+  //--- Assignment RHS load end at fib_ultimate.go:38:20
   MOVQ $1, -8(SP)
-  //--- Assignment end at fib.go:29:20
-  JMP IF_fib_28_ELSE_END
-IF_fib_28_END:
-  //--- Else start at fib.go:30:12
-  //--- Assignment start at fib.go:31:16
-  //--- Assignment LHS load start at fib.go:31:16
-  //--- Assignment LHS load end at fib.go:31:16
-  //--- Saving registers before function call start at fib.go:31:23
-  //--- Saving registers before function call end at fib.go:31:23
-  //--- First parameter expression start at fib.go:31:23
-  //--- First parameter expression load start at fib.go:31:23
+  //--- Assignment end at fib_ultimate.go:38:20
+  JMP IF_fib_ultimate_37_ELSE_END
+IF_fib_ultimate_37_END:
+  //--- Else start at fib_ultimate.go:39:12
+  //--- Assignment start at fib_ultimate.go:40:16
+  //--- Assignment LHS load start at fib_ultimate.go:40:16
+  //--- Assignment LHS load end at fib_ultimate.go:40:16
+  //--- Saving registers before function call start at fib_ultimate.go:40:23
+  //--- Saving registers before function call end at fib_ultimate.go:40:23
+  //--- First parameter expression start at fib_ultimate.go:40:23
+  //--- First parameter expression load start at fib_ultimate.go:40:23
   MOVQ 8(SP), R8
   SUBQ $1, R8
-  //--- First parameter expression load end at fib.go:31:25
+  //--- First parameter expression load end at fib_ultimate.go:40:25
   MOVQ R8, -40(SP)
-  //--- First parameter expression end at fib.go:31:25
-  //--- Stack pointer offset before function call for local variables start at fib.go:31:25
+  //--- First parameter expression end at fib_ultimate.go:40:25
+  //--- Stack pointer offset before function call for local variables start at fib_ultimate.go:40:25
   SUBQ $40, SP
-  //--- Stack pointer offset before function call for local variables end at fib.go:31:25
+  //--- Stack pointer offset before function call for local variables end at fib_ultimate.go:40:25
   CALL main·fib1(SB)
-  //--- Stack pointer offset after function call for local variables start at fib.go:31:25
+  //--- Stack pointer offset after function call for local variables start at fib_ultimate.go:40:25
   ADDQ $40, SP
-  //--- Stack pointer offset after function call for local variables end at fib.go:31:25
-  //--- Restoring registers after function call start at fib.go:31:25
-  //--- Restoring registers after function call end at fib.go:31:25
+  //--- Stack pointer offset after function call for local variables end at fib_ultimate.go:40:25
+  //--- Restoring registers after function call start at fib_ultimate.go:40:25
+  //--- Restoring registers after function call end at fib_ultimate.go:40:25
   MOVQ -32(SP), R8
   MOVQ R8, -16(SP)
-  //--- Assignment end at fib.go:31:26
-  //--- Assignment start at fib.go:32:16
-  //--- Assignment LHS load start at fib.go:32:16
-  //--- Assignment LHS load end at fib.go:32:16
-  //--- Saving registers before function call start at fib.go:32:23
-  //--- Saving registers before function call end at fib.go:32:23
-  //--- First parameter expression start at fib.go:32:23
-  //--- First parameter expression load start at fib.go:32:23
+  //--- Assignment end at fib_ultimate.go:40:26
+  //--- Assignment start at fib_ultimate.go:41:16
+  //--- Assignment LHS load start at fib_ultimate.go:41:16
+  //--- Assignment LHS load end at fib_ultimate.go:41:16
+  //--- Saving registers before function call start at fib_ultimate.go:41:23
+  //--- Saving registers before function call end at fib_ultimate.go:41:23
+  //--- First parameter expression start at fib_ultimate.go:41:23
+  //--- First parameter expression load start at fib_ultimate.go:41:23
   MOVQ 8(SP), R8
   SUBQ $2, R8
-  //--- First parameter expression load end at fib.go:32:25
+  //--- First parameter expression load end at fib_ultimate.go:41:25
   MOVQ R8, -40(SP)
-  //--- First parameter expression end at fib.go:32:25
-  //--- Stack pointer offset before function call for local variables start at fib.go:32:25
+  //--- First parameter expression end at fib_ultimate.go:41:25
+  //--- Stack pointer offset before function call for local variables start at fib_ultimate.go:41:25
   SUBQ $40, SP
-  //--- Stack pointer offset before function call for local variables end at fib.go:32:25
+  //--- Stack pointer offset before function call for local variables end at fib_ultimate.go:41:25
   CALL main·fib1(SB)
-  //--- Stack pointer offset after function call for local variables start at fib.go:32:25
+  //--- Stack pointer offset after function call for local variables start at fib_ultimate.go:41:25
   ADDQ $40, SP
-  //--- Stack pointer offset after function call for local variables end at fib.go:32:25
-  //--- Restoring registers after function call start at fib.go:32:25
-  //--- Restoring registers after function call end at fib.go:32:25
+  //--- Stack pointer offset after function call for local variables end at fib_ultimate.go:41:25
+  //--- Restoring registers after function call start at fib_ultimate.go:41:25
+  //--- Restoring registers after function call end at fib_ultimate.go:41:25
   MOVQ -32(SP), R8
   MOVQ R8, -24(SP)
-  //--- Assignment end at fib.go:32:26
-  //--- Assignment start at fib.go:33:18
-  //--- Assignment LHS load start at fib.go:33:18
-  //--- Assignment LHS load end at fib.go:33:18
-  //--- Assignment RHS load start at fib.go:33:24
+  //--- Assignment end at fib_ultimate.go:41:26
+  //--- Assignment start at fib_ultimate.go:42:18
+  //--- Assignment LHS load start at fib_ultimate.go:42:18
+  //--- Assignment LHS load end at fib_ultimate.go:42:18
+  //--- Assignment RHS load start at fib_ultimate.go:42:24
   MOVQ -16(SP), R8
   ADDQ -24(SP), R8
-  //--- Assignment RHS load end at fib.go:33:30
+  //--- Assignment RHS load end at fib_ultimate.go:42:30
   MOVQ R8, -8(SP)
-  //--- Assignment end at fib.go:33:30
-  //--- Else end at fib.go:34:6
-IF_fib_28_ELSE_END:
-  //--- Return value assignment start at fib.go:35:12
-  //--- Return expression load start at fib.go:35:12
-  //--- Return expression load end at fib.go:35:19
+  //--- Assignment end at fib_ultimate.go:42:30
+  //--- Else end at fib_ultimate.go:43:6
+IF_fib_ultimate_37_ELSE_END:
+  //--- Return value assignment start at fib_ultimate.go:44:12
+  //--- Return expression load start at fib_ultimate.go:44:12
+  //--- Return expression load end at fib_ultimate.go:44:19
   MOVQ -8(SP), R8
   MOVQ R8, 16(SP)
-  //--- Return value assignment end at fib.go:35:19
+  //--- Return value assignment end at fib_ultimate.go:44:19
   RET
 
 TEXT main·fib2(SB),0,$0-0
-  //--- If start at fib.go:45:8
+  //--- If start at fib_ultimate.go:54:8
   CMPQ 8(SP), $2
-  JLE IF_fib_45_1_END
-  JMP IF_fib_45_END
-IF_fib_45_1_END:
-  //--- Assignment start at fib.go:46:20
-  //--- Assignment LHS load start at fib.go:46:20
-  //--- Assignment LHS load end at fib.go:46:20
-  //--- Assignment RHS load start at fib.go:46:22
-  //--- Assignment RHS load end at fib.go:46:22
+  JLE IF_fib_ultimate_54_1_END
+  JMP IF_fib_ultimate_54_END
+IF_fib_ultimate_54_1_END:
+  //--- Assignment start at fib_ultimate.go:55:20
+  //--- Assignment LHS load start at fib_ultimate.go:55:20
+  //--- Assignment LHS load end at fib_ultimate.go:55:20
+  //--- Assignment RHS load start at fib_ultimate.go:55:22
+  //--- Assignment RHS load end at fib_ultimate.go:55:22
   MOVQ $1, -40(SP)
-  //--- Assignment end at fib.go:46:22
-  JMP IF_fib_45_ELSE_END
-IF_fib_45_END:
-  //--- Else start at fib.go:47:12
-  //--- Assignment start at fib.go:48:13
-  //--- Assignment LHS load start at fib.go:48:13
-  //--- Assignment LHS load end at fib.go:48:13
-  //--- Assignment RHS load start at fib.go:48:15
-  //--- Assignment RHS load end at fib.go:48:15
+  //--- Assignment end at fib_ultimate.go:55:22
+  JMP IF_fib_ultimate_54_ELSE_END
+IF_fib_ultimate_54_END:
+  //--- Else start at fib_ultimate.go:56:12
+  //--- Assignment start at fib_ultimate.go:57:13
+  //--- Assignment LHS load start at fib_ultimate.go:57:13
+  //--- Assignment LHS load end at fib_ultimate.go:57:13
+  //--- Assignment RHS load start at fib_ultimate.go:57:15
+  //--- Assignment RHS load end at fib_ultimate.go:57:15
   MOVQ $1, -8(SP)
-  //--- Assignment end at fib.go:48:15
-  //--- Assignment start at fib.go:49:13
-  //--- Assignment LHS load start at fib.go:49:13
-  //--- Assignment LHS load end at fib.go:49:13
-  //--- Assignment RHS load start at fib.go:49:15
-  //--- Assignment RHS load end at fib.go:49:15
+  //--- Assignment end at fib_ultimate.go:57:15
+  //--- Assignment start at fib_ultimate.go:58:13
+  //--- Assignment LHS load start at fib_ultimate.go:58:13
+  //--- Assignment LHS load end at fib_ultimate.go:58:13
+  //--- Assignment RHS load start at fib_ultimate.go:58:15
+  //--- Assignment RHS load end at fib_ultimate.go:58:15
   MOVQ $1, -16(SP)
-  //--- Assignment end at fib.go:49:15
-  //--- For start at fib.go:50:13
-  //--- For [initial assignment] start at fib.go:50:17
-  //--- Assignment start at fib.go:50:17
-  //--- Assignment LHS load start at fib.go:50:17
-  //--- Assignment LHS load end at fib.go:50:18
-  //--- Assignment RHS load start at fib.go:50:19
-  //--- Assignment RHS load end at fib.go:50:19
+  //--- Assignment end at fib_ultimate.go:58:15
+  //--- For start at fib_ultimate.go:59:13
+  //--- For [initial assignment] start at fib_ultimate.go:59:17
+  //--- Assignment start at fib_ultimate.go:59:17
+  //--- Assignment LHS load start at fib_ultimate.go:59:17
+  //--- Assignment LHS load end at fib_ultimate.go:59:18
+  //--- Assignment RHS load start at fib_ultimate.go:59:19
+  //--- Assignment RHS load end at fib_ultimate.go:59:19
   MOVQ $3, -32(SP)
-  //--- Assignment end at fib.go:50:19
-  //--- For [initial assignment] end at fib.go:50:19
-FOR_fib_50_EXPR_START:
-  //--- For [expression] start at fib.go:50:23
+  //--- Assignment end at fib_ultimate.go:59:19
+  //--- For [initial assignment] end at fib_ultimate.go:59:19
+FOR_fib_ultimate_59_EXPR_START:
+  //--- For [expression] start at fib_ultimate.go:59:23
   MOVQ 8(SP), R8
   CMPQ -32(SP), R8
-  JLE FOR_fib_50_1_END
-  JMP FOR_fib_50_END
-FOR_fib_50_1_END:
-  //--- For [expression] end at fib.go:50:26
-  JMP FOR_fib_50_BODY
-FOR_fib_50_EXTENDED_BODY:
-  //--- For [post assignment] start at fib.go:50:30
-  //--- Assignment start at fib.go:50:30
-  //--- Assignment LHS load start at fib.go:50:30
-  //--- Assignment LHS load end at fib.go:50:31
-  //--- Assignment RHS load start at fib.go:50:34
+  JLE FOR_fib_ultimate_59_1_END
+  JMP FOR_fib_ultimate_59_END
+FOR_fib_ultimate_59_1_END:
+  //--- For [expression] end at fib_ultimate.go:59:26
+  JMP FOR_fib_ultimate_59_BODY
+FOR_fib_ultimate_59_EXTENDED_BODY:
+  //--- For [post assignment] start at fib_ultimate.go:59:30
+  //--- Assignment start at fib_ultimate.go:59:30
+  //--- Assignment LHS load start at fib_ultimate.go:59:30
+  //--- Assignment LHS load end at fib_ultimate.go:59:31
+  //--- Assignment RHS load start at fib_ultimate.go:59:34
   MOVQ -32(SP), R8
   ADDQ $1, R8
-  //--- Assignment RHS load end at fib.go:50:37
+  //--- Assignment RHS load end at fib_ultimate.go:59:37
   MOVQ R8, -32(SP)
-  //--- Assignment end at fib.go:50:37
-  //--- For [post assignment] end at fib.go:50:37
-  JMP FOR_fib_50_EXPR_START
-FOR_fib_50_BODY:
-  //--- Assignment start at fib.go:51:19
-  //--- Assignment LHS load start at fib.go:51:19
-  //--- Assignment LHS load end at fib.go:51:19
-  //--- Assignment RHS load start at fib.go:51:21
+  //--- Assignment end at fib_ultimate.go:59:37
+  //--- For [post assignment] end at fib_ultimate.go:59:37
+  JMP FOR_fib_ultimate_59_EXPR_START
+FOR_fib_ultimate_59_BODY:
+  //--- Assignment start at fib_ultimate.go:60:19
+  //--- Assignment LHS load start at fib_ultimate.go:60:19
+  //--- Assignment LHS load end at fib_ultimate.go:60:19
+  //--- Assignment RHS load start at fib_ultimate.go:60:21
   MOVQ -8(SP), R8
   ADDQ -16(SP), R8
-  //--- Assignment RHS load end at fib.go:51:23
+  //--- Assignment RHS load end at fib_ultimate.go:60:23
   MOVQ R8, -24(SP)
-  //--- Assignment end at fib.go:51:23
-  //--- Assignment start at fib.go:52:17
-  //--- Assignment LHS load start at fib.go:52:17
-  //--- Assignment LHS load end at fib.go:52:17
-  //--- Assignment RHS load start at fib.go:52:19
-  //--- Assignment RHS load end at fib.go:52:19
+  //--- Assignment end at fib_ultimate.go:60:23
+  //--- Assignment start at fib_ultimate.go:61:17
+  //--- Assignment LHS load start at fib_ultimate.go:61:17
+  //--- Assignment LHS load end at fib_ultimate.go:61:17
+  //--- Assignment RHS load start at fib_ultimate.go:61:19
+  //--- Assignment RHS load end at fib_ultimate.go:61:19
   MOVQ -16(SP), R8
   MOVQ R8, -8(SP)
-  //--- Assignment end at fib.go:52:19
-  //--- Assignment start at fib.go:53:17
-  //--- Assignment LHS load start at fib.go:53:17
-  //--- Assignment LHS load end at fib.go:53:17
-  //--- Assignment RHS load start at fib.go:53:21
-  //--- Assignment RHS load end at fib.go:53:21
+  //--- Assignment end at fib_ultimate.go:61:19
+  //--- Assignment start at fib_ultimate.go:62:17
+  //--- Assignment LHS load start at fib_ultimate.go:62:17
+  //--- Assignment LHS load end at fib_ultimate.go:62:17
+  //--- Assignment RHS load start at fib_ultimate.go:62:21
+  //--- Assignment RHS load end at fib_ultimate.go:62:21
   MOVQ -24(SP), R8
   MOVQ R8, -16(SP)
-  //--- Assignment end at fib.go:53:21
-  JMP FOR_fib_50_EXTENDED_BODY
-FOR_fib_50_END:
-  //--- For end at fib.go:54:10
-  //--- Assignment start at fib.go:55:20
-  //--- Assignment LHS load start at fib.go:55:20
-  //--- Assignment LHS load end at fib.go:55:20
-  //--- Assignment RHS load start at fib.go:55:24
-  //--- Assignment RHS load end at fib.go:55:24
+  //--- Assignment end at fib_ultimate.go:62:21
+  JMP FOR_fib_ultimate_59_EXTENDED_BODY
+FOR_fib_ultimate_59_END:
+  //--- For end at fib_ultimate.go:63:10
+  //--- Assignment start at fib_ultimate.go:64:20
+  //--- Assignment LHS load start at fib_ultimate.go:64:20
+  //--- Assignment LHS load end at fib_ultimate.go:64:20
+  //--- Assignment RHS load start at fib_ultimate.go:64:24
+  //--- Assignment RHS load end at fib_ultimate.go:64:24
   MOVQ -24(SP), R8
   MOVQ R8, -40(SP)
-  //--- Assignment end at fib.go:55:24
-  //--- Else end at fib.go:56:6
-IF_fib_45_ELSE_END:
-  //--- Return value assignment start at fib.go:57:12
-  //--- Return expression load start at fib.go:57:12
-  //--- Return expression load end at fib.go:57:21
+  //--- Assignment end at fib_ultimate.go:64:24
+  //--- Else end at fib_ultimate.go:65:6
+IF_fib_ultimate_54_ELSE_END:
+  //--- Return value assignment start at fib_ultimate.go:66:12
+  //--- Return expression load start at fib_ultimate.go:66:12
+  //--- Return expression load end at fib_ultimate.go:66:21
   MOVQ -40(SP), R8
   MOVQ R8, 16(SP)
-  //--- Return value assignment end at fib.go:57:21
+  //--- Return value assignment end at fib_ultimate.go:66:21
   RET
 
 TEXT libgogo·StringToInt(SB),0,$0-0
@@ -2363,7 +2394,7 @@ FOR_libgogo_convert_77_BODY:
   MOVQ -56(SP), R8
   //--- Restoring registers after function call end at libgogo/convert.go:78:59
   ANDQ $255, R9
-  MOVB -64(SP), R9
+  MOVB -72(SP), R9
   MOVB R9, (R8)
   //--- Assignment end at libgogo/convert.go:78:60
   //--- Assignment start at libgogo/convert.go:79:15
@@ -2855,7 +2886,7 @@ TEXT libgogo·InitializeList(SB),0,$0-0
   MOVQ -8(SP), R8
   //--- Restoring registers after function call end at libgogo/list.go:27:99
   //--- ##1##libgogo·Alloc## at libgogo/list.go:27:99
-  MOVQ -99992(SP), R9
+  MOVQ -100000(SP), R9
   MOVQ R9, (R8)
   //--- Assignment end at libgogo/list.go:27:100
   //--- Assignment start at libgogo/list.go:28:35
@@ -4434,7 +4465,7 @@ TEXT libgogo·AddFields(SB),0,$0-0
   //--- Restoring registers after function call start at libgogo/symbol.go:99:58
   MOVQ -8(SP), R8
   //--- Restoring registers after function call end at libgogo/symbol.go:99:58
-  MOVQ -16(SP), R9
+  MOVQ -24(SP), R9
   MOVQ R9, (R8)
   //--- Assignment end at libgogo/symbol.go:99:59
   RET
@@ -4608,7 +4639,7 @@ TEXT libgogo·AddParameters(SB),0,$0-0
   //--- Restoring registers after function call start at libgogo/symbol.go:129:50
   MOVQ -8(SP), R8
   //--- Restoring registers after function call end at libgogo/symbol.go:129:50
-  MOVQ -16(SP), R9
+  MOVQ -24(SP), R9
   MOVQ R9, (R8)
   //--- Assignment end at libgogo/symbol.go:129:51
   //--- Assignment start at libgogo/symbol.go:130:15
