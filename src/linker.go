@@ -317,10 +317,18 @@ func FixOffset(ld *LineDesc) {
     var newLine string;
     var strCmp uint64;
     var fixedAdr string = "-";
+    var skip uint64 = 0;
 
     for i = 0; i < 6;i = i+1 {
         libgogo.CharAppend(&newLine, ld.Line[i]);   
     }
+
+    strCmp = libgogo.StringCompare("  ANDQ", newLine);
+    if (strCmp == 0) { // this line needs to be skipped
+        skip = ld.NeedsFix;
+        ld.NeedsFix = 0;
+    }
+
     strCmp = libgogo.StringCompare("  MOVB", newLine);
     if strCmp == 0 {
         ld.NeedsByteFix = 1;
@@ -370,6 +378,18 @@ func FixOffset(ld *LineDesc) {
 
     }
 
+    if skip != 0 {
+        ld.NeedsFix = skip;
+        strLen = libgogo.StringLength(ld.Line);
+        for i = 6; i < strLen; i = i + 1 {
+            libgogo.CharAppend(&newLine, ld.Line[i]);
+        }
+    } else {
+        ld.Line = newLine;
+        ld.NeedsFix = 0;
+    }
+
+
     libgogo.PrintString(newLine);
     libgogo.PrintString("\n");
     if ld.NeedsByteFix == 1 {
@@ -378,9 +398,6 @@ func FixOffset(ld *LineDesc) {
         libgogo.PrintString("\n");
         ld.NeedsByteFix = 0;
     }
-
-    ld.Line = newLine;
-    ld.NeedsFix = 0;
 }
 
 //
