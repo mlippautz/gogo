@@ -88,13 +88,20 @@ func AddArtificialParameterIfNecessary(FunctionCalled *libgogo.TypeDesc, ExprIte
 func AddArtificialReturnValueIfNecessary(FunctionCalled *libgogo.TypeDesc, ReturnValue *libgogo.Item, ForwardDeclExpectedReturnType *libgogo.TypeDesc, ForwardDeclExpectedReturnPtrType uint64, SavedRegisterOffset uint64) *libgogo.Item {
     var TotalLocalVariableSize uint64;
     var TempObject *libgogo.ObjectDesc;
-    if (FunctionCalled.ForwardDecl == 1) && (FunctionCalled.Base == nil) { //Create artifical return value if function is called the first time
+    if FunctionCalled.ForwardDecl == 1 { //Create artifical return value if function is called in a forward declaration
         if ForwardDeclExpectedReturnType != nil { //Return type expected
-            TempObject = libgogo.NewObject("return value", "", libgogo.CLASS_PARAMETER); //Create artificial return value
-            TempObject.ObjType = ForwardDeclExpectedReturnType;
-            TempObject.PtrType = ForwardDeclExpectedReturnPtrType;
-            libgogo.AddParameters(TempObject, FunctionCalled); //Add a new, artificial return value
-            FunctionCalled.Len = FunctionCalled.Len - 1; //Don't count parameter as input parameter
+            TempObject = libgogo.GetObject("return value", "", FunctionCalled.Fields); //Check if there is a return value
+            if TempObject == nil { //If there is no return value, create one
+                TempObject = libgogo.NewObject("return value", "", libgogo.CLASS_PARAMETER); //Create artificial return value
+                TempObject.ObjType = ForwardDeclExpectedReturnType;
+                TempObject.PtrType = ForwardDeclExpectedReturnPtrType;
+                libgogo.AddParameters(TempObject, FunctionCalled); //Add a new, artificial return value
+                FunctionCalled.Len = FunctionCalled.Len - 1; //Don't count parameter as input parameter
+            } else { //If there is already a return value, validate it
+                if (TempObject.ObjType != ForwardDeclExpectedReturnType) || (TempObject.PtrType != ForwardDeclExpectedReturnPtrType) {
+                    SymbolTableError("Function has been forward declared with", "different", "return value type, function", CurrentFunction.Name);
+                }
+            }
             TotalLocalVariableSize = libgogo.GetAlignedObjectListSize(LocalObjects); //Take local variable size into consideration for offset below
             ReturnValue = ObjectToStackParameter(TempObject, FunctionCalled, TotalLocalVariableSize);
             ReturnValue.A = ReturnValue.A + SavedRegisterOffset;
