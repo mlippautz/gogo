@@ -11,6 +11,7 @@ type LineDesc struct {
     Offset uint64;
 
     NeedsFix uint64;
+    NeedsByteFix uint64;
     PackageName string;
     FunctionName string;
 };
@@ -307,18 +308,30 @@ func GetParameterSize(pkgName string, funcName string) uint64 {
 //
 // Function processing a line and fixing offsets if necessary
 //
-func FixOffset(ld *LineDesc) string {
+func FixOffset(ld *LineDesc) {
     var i uint64;
     var strLen uint64;
     var size uint64;
     var oldsize uint64;
     var numstr string;
     var newLine string;
+    var strCmp uint64;
+    var fixedAdr string = "-";
+
+    for i = 0; i < 6;i = i+1 {
+        libgogo.CharAppend(&newLine, ld.Line[i]);   
+    }
+    strCmp = libgogo.StringCompare("  MOVB", newLine);
+    if strCmp == 0 {
+        ld.NeedsByteFix = 1;
+    } else {
+        ld.NeedsByteFix = 0;
+    }
     
     if ld.NeedsFix == 1 { // Type 1 fix of offsets
         strLen = libgogo.StringLength(ld.Line);
         size = GetParameterSize(ld.PackageName, ld.FunctionName);
-        for i = 0; ld.Line[i] != '-' ; i = i +1 {
+        for i = 6; ld.Line[i] != '-' ; i = i +1 {
             libgogo.CharAppend(&newLine, ld.Line[i]);
         }
         libgogo.CharAppend(&newLine, ld.Line[i]);
@@ -330,6 +343,8 @@ func FixOffset(ld *LineDesc) string {
         size = size - 100000;
         numstr = libgogo.IntToString(size);
         libgogo.StringAppend(&newLine, numstr);
+        libgogo.StringAppend(&fixedAdr, numstr);
+        libgogo.StringAppend(&fixedAdr, "(SP)");
         for ; i < strLen; i = i +1 {
             libgogo.CharAppend(&newLine, ld.Line[i]);
         }
@@ -337,7 +352,7 @@ func FixOffset(ld *LineDesc) string {
     if ld.NeedsFix == 2 { // Type 2 fix of offsets
         strLen = libgogo.StringLength(ld.Line);
         size = GetParameterSize(ld.PackageName, ld.FunctionName);
-        for i = 0; ld.Line[i] != '$' ; i = i +1 {
+        for i = 6; ld.Line[i] != '$' ; i = i +1 {
             libgogo.CharAppend(&newLine, ld.Line[i]);
         }
 
@@ -354,16 +369,24 @@ func FixOffset(ld *LineDesc) string {
         }
 
     }
-    ld.NeedsFix = 0;
+
+    libgogo.PrintString(newLine);
+    libgogo.PrintString("\n");
+    if ld.NeedsByteFix == 1 {
+        libgogo.PrintString("  ANDQ $255, ");
+        libgogo.PrintString(fixedAdr);
+        libgogo.PrintString("\n");
+        ld.NeedsByteFix = 0;
+    }
+
     ld.Line = newLine;
-    return newLine;
+    ld.NeedsFix = 0;
 }
 
 //
 // Main linking method
 //
 func Link() {
-    var newLine string;
     var strCmp uint64;
     var symtable uint64 = 0;
     var ld LineDesc;
@@ -386,13 +409,7 @@ func Link() {
         } else { // Parse normal lines and fix everything
             if ld.NeedsFix != 0 {
                 GetLine(&ld);
-                newLine = FixOffset(&ld);
-                //libgogo.PrintString("...");
-                //libgogo.PrintString(ld.Line);
-                //libgogo.PrintString("\n");
-                ld.NeedsFix = 0;
-                libgogo.PrintString(newLine);
-                libgogo.PrintString("\n");
+                FixOffset(&ld);
             } else {
                 strCmp = libgogo.StringCompare(ld.Line, "__UNLINKED_CODE");
                 if strCmp != 0 {

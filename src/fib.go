@@ -1,22 +1,31 @@
-// fib test
-
 package main
+
+type FibHolder struct {
+    Unused uint64;
+    Fibs [2]uint64;
+};
 
 func main() uint64 {
     var retValue uint64;
     var tofib1 uint64;
     var tofib2 uint64;
     var tmpStr string;
-    tofib1 = fib1(11);
-    tofib2 = fib2(11);
+    var fibHolder FibHolder;
+    var index uint64;
+
+    index = 0;
+    fibHolder.Fibs[index] = fib1(11);
+    index = 1;
+    fibHolder.Fibs[index] = fib2(93);
+
     libgogo.PrintString("Fibonacci\n");
     libgogo.PrintString("=========\n");
     libgogo.PrintString("Rekursiv(11): ");
-    tmpStr = libgogo.IntToString(tofib1);
+    tmpStr = libgogo.IntToString(fibHolder.Fibs[0]);
     libgogo.PrintString(tmpStr);
     libgogo.PrintString("\n");
-    libgogo.PrintString("Iterativ(11): ");
-    tmpStr = libgogo.IntToString(tofib2);
+    libgogo.PrintString("Iterativ(93): ");
+    tmpStr = libgogo.IntToString(fibHolder.Fibs[1]);
     libgogo.PrintString(tmpStr);
     libgogo.PrintString("\n");
 }
@@ -56,3 +65,4 @@ func fib2(n uint64) uint64 {
     }
     return retValue;
 }
+
