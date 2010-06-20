@@ -134,34 +134,36 @@ func SwitchOutputToDataSegment() {
     OutputStringPtr = &DataSegment;
 }
 
-func PrintCodeOutput(output string) {
+func SplitStringIfNecessary(appendLength uint64) {
     var tempPtr *string;
     var oldLength uint64;
-    var appendLength uint64;
     oldLength = libgogo.StringLength2(OutputStringPtr);
-    appendLength = libgogo.StringLength(output);
     if oldLength + appendLength >= 65534 { //If code output exceeds max. string size allowed by Go runtime...
         tempPtr = &DataSegment;
         if OutputStringPtr == tempPtr {
             libgogo.AddStringItem(&DataSegmentList, DataSegment); //...save the current code to the code list...
-            //DataSegment = "";
         }
         tempPtr = &InitCodeSegment;
         if OutputStringPtr == tempPtr {
             libgogo.AddStringItem(&InitCodeSegmentList, InitCodeSegment); //...save the current code to the code list...
-            //InitCodeSegment = "";
         }
         tempPtr = &CodeSegment;
         if OutputStringPtr == tempPtr {
             libgogo.AddStringItem(&CodeSegmentList, CodeSegment); //...save the current code to the code list...
-            //CodeSegment = ""; 
         }
         libgogo.ResetString(OutputStringPtr); //... and start over with a new output string
     }
+}
+
+func PrintCodeOutput(output string) {
+    var appendLength uint64;
+    appendLength = libgogo.StringLength(output);
+    SplitStringIfNecessary(appendLength);
     libgogo.StringAppend(OutputStringPtr, output);
 }
 
 func PrintCodeOutputChar(output byte) {
+    SplitStringIfNecessary(1);
     libgogo.CharAppend(OutputStringPtr, output);
 }
 
