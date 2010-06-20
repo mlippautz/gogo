@@ -5,15 +5,15 @@ libgogo·ToUint64FromUint64Ptr                   | ok (asm)
 libgogo·ToUint64PtrFromUint64                   | ok (asm)
 libgogo·ToUint64FromStringPtr                   | ok (asm)
 libgogo·GetStringFromAddress                    | ok (asm)
-libgogo·StringToInt                             |
+libgogo·StringToInt                             | ok
 libgogo·StringLength                            | ok (asm)
-libgogo·IntToString                             |
-libgogo·CharAppend                              |
+libgogo·IntToString                             | ok
+libgogo·CharAppend                              | ok
 libgogo·Write                                   | ok
-libgogo·WriteString                             |
+libgogo·WriteString                             | ok
 libgogo·PrintString                             | ok
 libgogo·PrintChar                               | ok
-libgogo·PrintNumber                             | fail
+libgogo·PrintNumber                             | ok
 libgogo·Read                                    |
 libgogo·GetChar                                 |
 libgogo·FileOpen                                |
@@ -67,7 +67,7 @@ libgogo·PrintObjects                            |
 libgogo·PrintTypes                              |
 libgogo·PrintFunctions                          |
 libgogo·SymbolTableFunctionsToStringList        |
-libgogo·StringAppend                            | ? (maybe ok)
+libgogo·StringAppend                            | ok
 libgogo·SymbolTableTypesToStringList            |
 libgogo·StringLength2                           | ok (asm)
 libgogo·GetStringAddress                        | ok (asm)
