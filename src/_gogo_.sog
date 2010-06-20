@@ -22,8 +22,10 @@ __UNLINKED_CODE
 //TYPE,0,libgogo·Item,72,72
 //FUNC,0,main·init
 //FUNC,0,main·main
-//FUNC,1,main·StringAppend,Artificial parameter:*·string,Artificial parameter:·string
-//FUNC,1,main·PrintString,Artificial parameter:·string
+//FUNC,0,libgogo·StringAppend,str:*·string,append_str:·string
+//FUNC,0,libgogo·PrintString,msg:·string
+//FUNC,0,libgogo·PrintNumber,num:·uint64
+//FUNC,0,libgogo·PrintChar,char:·byte
 //FUNC,0,libgogo·ToIntFromByte,b:·byte,return value:·uint64
 //FUNC,0,libgogo·ToByteFromInt,i:·uint64,return value:·byte
 //FUNC,0,libgogo·ToUint64FromBytePtr,char:*·byte,return value:·uint64
@@ -37,9 +39,6 @@ __UNLINKED_CODE
 //FUNC,0,libgogo·CharAppend,str:*·string,char:·byte
 //FUNC,0,libgogo·Write,fd:·uint64,text:·string,length:·uint64,return value:·uint64
 //FUNC,0,libgogo·WriteString,fd:·uint64,msg:·string
-//FUNC,0,libgogo·PrintString,msg:·string
-//FUNC,0,libgogo·PrintChar,char:·byte
-//FUNC,0,libgogo·PrintNumber,num:·uint64
 //FUNC,0,libgogo·Read,fd:·uint64,buffer:·string,buffer_size:·uint64,return value:·uint64
 //FUNC,0,libgogo·GetChar,fd:·uint64,return value:·byte
 //FUNC,0,libgogo·FileOpen,filename:·string,flags:·uint64,return value:·uint64
@@ -93,7 +92,6 @@ __UNLINKED_CODE
 //FUNC,0,libgogo·PrintTypes,list:*libgogo·TypeDesc
 //FUNC,0,libgogo·PrintFunctions,list:*libgogo·TypeDesc
 //FUNC,0,libgogo·SymbolTableFunctionsToStringList,list:*libgogo·TypeDesc,result:*libgogo·StringList
-//FUNC,0,libgogo·StringAppend,str:*·string,append_str:·string
 //FUNC,0,libgogo·SymbolTableTypesToStringList,list:*libgogo·TypeDesc,result:*libgogo·StringList
 //FUNC,0,libgogo·StringLength2,str:*·string,return value:·uint64
 //FUNC,0,libgogo·GetStringAddress,str:*·string,return value:·uint64
@@ -111,15 +109,15 @@ __UNLINKED_CODE
 //--- String buffer start ('') at test.go:4:22
 DATA data+8(SB)/1, $0
 //--- String buffer end at test.go:4:22
-//--- String buffer start ('Hello') at test.go:5:29
+//--- String buffer start ('Hello') at test.go:5:37
 DATA data+32(SB)/1, $72
 DATA data+33(SB)/1, $101
 DATA data+34(SB)/1, $108
 DATA data+35(SB)/1, $108
 DATA data+36(SB)/1, $111
 DATA data+37(SB)/1, $0
-//--- String buffer end at test.go:5:29
-//--- String buffer start (' world!\n') at test.go:6:33
+//--- String buffer end at test.go:5:37
+//--- String buffer start (' world!\n') at test.go:6:41
 DATA data+56(SB)/1, $32
 DATA data+57(SB)/1, $119
 DATA data+58(SB)/1, $111
@@ -129,7 +127,7 @@ DATA data+61(SB)/1, $100
 DATA data+62(SB)/1, $33
 DATA data+63(SB)/1, $10
 DATA data+64(SB)/1, $0
-//--- String buffer end at test.go:6:33
+//--- String buffer end at test.go:6:41
 //--- String buffer start ('') at libgogo/convert.go:74:24
 DATA data+88(SB)/1, $0
 //--- String buffer end at libgogo/convert.go:74:24
@@ -1005,20 +1003,20 @@ TEXT main·init(SB),0,$0-0
   //--- Assign string length to new string constant start at test.go:4:22
   MOVQ $0, data+24(SB)
   //--- Assign string length to new string constant end at test.go:4:22
-  //--- Assign byte buffer to new string constant start at test.go:5:29
+  //--- Assign byte buffer to new string constant start at test.go:5:37
   LEAQ data+32(SB), R8
   MOVQ R8, data+40(SB)
-  //--- Assign byte buffer to new string constant end at test.go:5:29
-  //--- Assign string length to new string constant start at test.go:5:29
+  //--- Assign byte buffer to new string constant end at test.go:5:37
+  //--- Assign string length to new string constant start at test.go:5:37
   MOVQ $5, data+48(SB)
-  //--- Assign string length to new string constant end at test.go:5:29
-  //--- Assign byte buffer to new string constant start at test.go:6:33
+  //--- Assign string length to new string constant end at test.go:5:37
+  //--- Assign byte buffer to new string constant start at test.go:6:41
   LEAQ data+56(SB), R8
   MOVQ R8, data+72(SB)
-  //--- Assign byte buffer to new string constant end at test.go:6:33
-  //--- Assign string length to new string constant start at test.go:6:33
+  //--- Assign byte buffer to new string constant end at test.go:6:41
+  //--- Assign string length to new string constant start at test.go:6:41
   MOVQ $8, data+80(SB)
-  //--- Assign string length to new string constant end at test.go:6:33
+  //--- Assign string length to new string constant end at test.go:6:41
   //--- Assign byte buffer to new string constant start at libgogo/convert.go:74:24
   LEAQ data+88(SB), R8
   MOVQ R8, data+96(SB)
@@ -1608,89 +1606,127 @@ TEXT main·main(SB),0,$0-0
   MOVQ R8, -16(SP)
   MOVQ R9, -8(SP)
   //--- Local variable assignment end at test.go:4:23
-  //--- Saving registers before function call start at test.go:5:20
-  //--- Saving registers before function call end at test.go:5:20
-  //--- First parameter expression start at test.go:5:20
-  //--- First parameter expression load start at test.go:5:20
-  //--- First parameter expression load end at test.go:5:21
+  //--- Saving registers before function call start at test.go:5:28
+  //--- Saving registers before function call end at test.go:5:28
+  //--- First parameter expression start at test.go:5:28
+  //--- First parameter expression load start at test.go:5:28
+  //--- First parameter expression load end at test.go:5:29
   LEAQ -16(SP), R8
-  //--- ##1##main·StringAppend## at test.go:5:21
+  //--- ##1##libgogo·StringAppend## at test.go:5:29
   MOVQ R8, -100016(SP)
-  //--- First parameter expression end at test.go:5:21
-  //--- Subsequent parameter expression start at test.go:5:21
-  //--- Subsequent parameter expression load start at test.go:5:21
-  //--- Subsequent parameter expression load end at test.go:5:30
+  //--- First parameter expression end at test.go:5:29
+  //--- Subsequent parameter expression start at test.go:5:29
+  //--- Subsequent parameter expression load start at test.go:5:29
+  //--- Subsequent parameter expression load end at test.go:5:38
   MOVQ data+40(SB), R8
   MOVQ data+48(SB), R9
-  //--- ##1##main·StringAppend## at test.go:5:30
+  //--- ##1##libgogo·StringAppend## at test.go:5:38
   MOVQ R8, -100008(SP)
-  //--- ##1##main·StringAppend## at test.go:5:30
+  //--- ##1##libgogo·StringAppend## at test.go:5:38
   MOVQ R9, -100000(SP)
-  //--- Subsequent parameter expression end at test.go:5:30
-  //--- Stack pointer offset before function call for local variables start at test.go:5:30
-  //--- ##2##main·StringAppend## at test.go:5:30
+  //--- Subsequent parameter expression end at test.go:5:38
+  //--- Stack pointer offset before function call for local variables start at test.go:5:38
+  //--- ##2##libgogo·StringAppend## at test.go:5:38
   SUBQ $16, SP
-  //--- Stack pointer offset before function call for local variables end at test.go:5:30
-  CALL main·StringAppend(SB)
-  //--- Stack pointer offset after function call for local variables start at test.go:5:30
-  //--- ##2##main·StringAppend## at test.go:5:30
+  //--- Stack pointer offset before function call for local variables end at test.go:5:38
+  CALL libgogo·StringAppend(SB)
+  //--- Stack pointer offset after function call for local variables start at test.go:5:38
+  //--- ##2##libgogo·StringAppend## at test.go:5:38
   ADDQ $16, SP
-  //--- Stack pointer offset after function call for local variables end at test.go:5:30
-  //--- Restoring registers after function call start at test.go:5:30
-  //--- Restoring registers after function call end at test.go:5:30
-  //--- Saving registers before function call start at test.go:6:20
-  //--- Saving registers before function call end at test.go:6:20
-  //--- First parameter expression start at test.go:6:20
-  //--- First parameter expression load start at test.go:6:20
-  //--- First parameter expression load end at test.go:6:21
+  //--- Stack pointer offset after function call for local variables end at test.go:5:38
+  //--- Restoring registers after function call start at test.go:5:38
+  //--- Restoring registers after function call end at test.go:5:38
+  //--- Saving registers before function call start at test.go:6:28
+  //--- Saving registers before function call end at test.go:6:28
+  //--- First parameter expression start at test.go:6:28
+  //--- First parameter expression load start at test.go:6:28
+  //--- First parameter expression load end at test.go:6:29
   LEAQ -16(SP), R8
-  //--- ##1##main·StringAppend## at test.go:6:21
+  //--- ##1##libgogo·StringAppend## at test.go:6:29
   MOVQ R8, -100016(SP)
-  //--- First parameter expression end at test.go:6:21
-  //--- Subsequent parameter expression start at test.go:6:21
-  //--- Subsequent parameter expression load start at test.go:6:21
-  //--- Subsequent parameter expression load end at test.go:6:34
+  //--- First parameter expression end at test.go:6:29
+  //--- Subsequent parameter expression start at test.go:6:29
+  //--- Subsequent parameter expression load start at test.go:6:29
+  //--- Subsequent parameter expression load end at test.go:6:42
   MOVQ data+72(SB), R8
   MOVQ data+80(SB), R9
-  //--- ##1##main·StringAppend## at test.go:6:34
+  //--- ##1##libgogo·StringAppend## at test.go:6:42
   MOVQ R8, -100008(SP)
-  //--- ##1##main·StringAppend## at test.go:6:34
+  //--- ##1##libgogo·StringAppend## at test.go:6:42
   MOVQ R9, -100000(SP)
-  //--- Subsequent parameter expression end at test.go:6:34
-  //--- Stack pointer offset before function call for local variables start at test.go:6:34
-  //--- ##2##main·StringAppend## at test.go:6:34
+  //--- Subsequent parameter expression end at test.go:6:42
+  //--- Stack pointer offset before function call for local variables start at test.go:6:42
+  //--- ##2##libgogo·StringAppend## at test.go:6:42
   SUBQ $16, SP
-  //--- Stack pointer offset before function call for local variables end at test.go:6:34
-  CALL main·StringAppend(SB)
-  //--- Stack pointer offset after function call for local variables start at test.go:6:34
-  //--- ##2##main·StringAppend## at test.go:6:34
+  //--- Stack pointer offset before function call for local variables end at test.go:6:42
+  CALL libgogo·StringAppend(SB)
+  //--- Stack pointer offset after function call for local variables start at test.go:6:42
+  //--- ##2##libgogo·StringAppend## at test.go:6:42
   ADDQ $16, SP
-  //--- Stack pointer offset after function call for local variables end at test.go:6:34
-  //--- Restoring registers after function call start at test.go:6:34
-  //--- Restoring registers after function call end at test.go:6:34
-  //--- Saving registers before function call start at test.go:7:19
-  //--- Saving registers before function call end at test.go:7:19
-  //--- First parameter expression start at test.go:7:19
-  //--- First parameter expression load start at test.go:7:19
-  //--- First parameter expression load end at test.go:7:19
+  //--- Stack pointer offset after function call for local variables end at test.go:6:42
+  //--- Restoring registers after function call start at test.go:6:42
+  //--- Restoring registers after function call end at test.go:6:42
+  //--- Saving registers before function call start at test.go:7:27
+  //--- Saving registers before function call end at test.go:7:27
+  //--- First parameter expression start at test.go:7:27
+  //--- First parameter expression load start at test.go:7:27
+  //--- First parameter expression load end at test.go:7:27
   MOVQ -16(SP), R8
   MOVQ -8(SP), R9
-  //--- ##1##main·PrintString## at test.go:7:19
+  //--- ##1##libgogo·PrintString## at test.go:7:27
   MOVQ R8, -100016(SP)
-  //--- ##1##main·PrintString## at test.go:7:19
+  //--- ##1##libgogo·PrintString## at test.go:7:27
   MOVQ R9, -100008(SP)
-  //--- First parameter expression end at test.go:7:19
-  //--- Stack pointer offset before function call for local variables start at test.go:7:19
-  //--- ##2##main·PrintString## at test.go:7:19
+  //--- First parameter expression end at test.go:7:27
+  //--- Stack pointer offset before function call for local variables start at test.go:7:27
+  //--- ##2##libgogo·PrintString## at test.go:7:27
   SUBQ $16, SP
-  //--- Stack pointer offset before function call for local variables end at test.go:7:19
-  CALL main·PrintString(SB)
-  //--- Stack pointer offset after function call for local variables start at test.go:7:19
-  //--- ##2##main·PrintString## at test.go:7:19
+  //--- Stack pointer offset before function call for local variables end at test.go:7:27
+  CALL libgogo·PrintString(SB)
+  //--- Stack pointer offset after function call for local variables start at test.go:7:27
+  //--- ##2##libgogo·PrintString## at test.go:7:27
   ADDQ $16, SP
-  //--- Stack pointer offset after function call for local variables end at test.go:7:19
-  //--- Restoring registers after function call start at test.go:7:19
-  //--- Restoring registers after function call end at test.go:7:19
+  //--- Stack pointer offset after function call for local variables end at test.go:7:27
+  //--- Restoring registers after function call start at test.go:7:27
+  //--- Restoring registers after function call end at test.go:7:27
+  //--- Saving registers before function call start at test.go:8:29
+  //--- Saving registers before function call end at test.go:8:29
+  //--- First parameter expression start at test.go:8:29
+  //--- First parameter expression load start at test.go:8:29
+  //--- First parameter expression load end at test.go:8:29
+  //--- ##1##libgogo·PrintNumber## at test.go:8:29
+  MOVB $123, -100016(SP)
+  //--- First parameter expression end at test.go:8:29
+  //--- Stack pointer offset before function call for local variables start at test.go:8:29
+  //--- ##2##libgogo·PrintNumber## at test.go:8:29
+  SUBQ $16, SP
+  //--- Stack pointer offset before function call for local variables end at test.go:8:29
+  CALL libgogo·PrintNumber(SB)
+  //--- Stack pointer offset after function call for local variables start at test.go:8:29
+  //--- ##2##libgogo·PrintNumber## at test.go:8:29
+  ADDQ $16, SP
+  //--- Stack pointer offset after function call for local variables end at test.go:8:29
+  //--- Restoring registers after function call start at test.go:8:29
+  //--- Restoring registers after function call end at test.go:8:29
+  //--- Saving registers before function call start at test.go:9:27
+  //--- Saving registers before function call end at test.go:9:27
+  //--- First parameter expression start at test.go:9:27
+  //--- First parameter expression load start at test.go:9:27
+  //--- First parameter expression load end at test.go:9:28
+  //--- ##1##libgogo·PrintChar## at test.go:9:28
+  MOVB $10, -100016(SP)
+  //--- First parameter expression end at test.go:9:28
+  //--- Stack pointer offset before function call for local variables start at test.go:9:28
+  //--- ##2##libgogo·PrintChar## at test.go:9:28
+  SUBQ $16, SP
+  //--- Stack pointer offset before function call for local variables end at test.go:9:28
+  CALL libgogo·PrintChar(SB)
+  //--- Stack pointer offset after function call for local variables start at test.go:9:28
+  //--- ##2##libgogo·PrintChar## at test.go:9:28
+  ADDQ $16, SP
+  //--- Stack pointer offset after function call for local variables end at test.go:9:28
+  //--- Restoring registers after function call start at test.go:9:28
+  //--- Restoring registers after function call end at test.go:9:28
   RET
 
 TEXT libgogo·StringToInt(SB),0,$0-0
@@ -1784,8 +1820,8 @@ FOR_libgogo_convert_62_BODY:
   //--- Multiplication/division by one omitted at libgogo/convert.go:64:36
   ADDQ -16(SP), R8
   //--- First parameter expression load end at libgogo/convert.go:64:37
-  ANDQ $255, R8
   MOVB (R8), R8
+  ANDQ $255, R8
   MOVB R8, -48(SP)
   //--- First parameter expression end at libgogo/convert.go:64:37
   //--- Stack pointer offset before function call for local variables start at libgogo/convert.go:64:37
@@ -1988,8 +2024,8 @@ FOR_libgogo_convert_87_BODY:
   LEAQ -48(SP), R8
   ADDQ -24(SP), R8
   //--- Subsequent parameter expression load end at libgogo/convert.go:88:33
-  ANDQ $255, R8
   MOVB (R8), R8
+  ANDQ $255, R8
   //--- ##1##libgogo·CharAppend## at libgogo/convert.go:88:33
   MOVB R8, -100040(SP)
   //--- Subsequent parameter expression end at libgogo/convert.go:88:33
@@ -9207,8 +9243,8 @@ FOR_libgogo_string_55_BODY:
   MOVQ 24(SP), R9
   //--- Multiplication/division by one omitted at libgogo/string.go:56:34
   ADDQ -8(SP), R9
-  ANDQ $255, R8
   MOVB (R8), R8
+  ANDQ $255, R8
   CMPQ R8, R9
   JNE IF_libgogo_string_56_1_END
   JMP IF_libgogo_string_56_END
@@ -10430,8 +10466,8 @@ FOR_libgogo_libgogo_32_BODY:
   //--- If start at libgogo/libgogo.go:33:12
   MOVQ -32(SP), R8
   //--- Addition/subtraction by zero omitted at libgogo/libgogo.go:33:19
-  ANDQ $255, R8
   MOVB (R8), R8
+  ANDQ $255, R8
   CMPQ R8, $0
   JE IF_libgogo_libgogo_33_1_END
   JMP IF_libgogo_libgogo_33_END
@@ -10466,8 +10502,8 @@ IF_libgogo_libgogo_33_END:
   MOVQ -32(SP), R8
   //--- Addition/subtraction by zero omitted at libgogo/libgogo.go:36:44
   //--- Subsequent parameter expression load end at libgogo/libgogo.go:36:45
-  ANDQ $255, R8
   MOVB (R8), R8
+  ANDQ $255, R8
   MOVB R8, -40(SP)
   //--- Subsequent parameter expression end at libgogo/libgogo.go:36:45
   //--- Stack pointer offset before function call for local variables start at libgogo/libgogo.go:36:45
