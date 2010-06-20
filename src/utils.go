@@ -78,8 +78,7 @@ func ScanErrorChar(char byte) {
     libgogo.Exit(2);
 }
 
-func ParseErrorWeak(ue uint64, e[2]uint64, eLen uint64) {
-    var i uint64;
+func ParseErrorWeak(ue uint64, expectedToken1 uint64, expectedToken2 uint64, expectedLen uint64) {
     var str string;
     
     errors = errors+1;
@@ -101,14 +100,14 @@ func ParseErrorWeak(ue uint64, e[2]uint64, eLen uint64) {
         libgogo.PrintString(")");
     }
 
-    if eLen > 0 {
+    if expectedLen > 0 {
         libgogo.PrintString(", expecting one of: ");
-        str = TokenToString(e[i]);
+        str = TokenToString(expectedToken1);
         libgogo.PrintString(str);
-        for i = 1; i < eLen; i = i+1 {
-            str = TokenToString(e[i]);
+        if expectedLen >= 2 {
+            libgogo.PrintString(", ");
+            str = TokenToString(expectedToken2);
             libgogo.PrintString(str);
-            libgogo.PrintString(", ");        
         }
     } 
     libgogo.PrintString("\n");
@@ -123,11 +122,11 @@ func ParseErrorWeak(ue uint64, e[2]uint64, eLen uint64) {
 //
 // Function printing a parse error using only libgogo.
 // ue ... unexpected token
-// e .... array of expected tokens
-// eLen . actual length (items) of array
+// expectedToken1,2 .... expected tokens
+// expectedLen . actual number of expected tokens (others will be ignored)
 //
-func ParseErrorFatal(ue uint64, e [2]uint64, eLen uint64) {
-    ParseErrorWeak(ue,e,eLen);
+func ParseErrorFatal(ue uint64, expectedToken1 uint64, expectedToken2 uint64, expectedLen uint64) {
+    ParseErrorWeak(ue, expectedToken1, expectedToken2, expectedLen);
     libgogo.Exit(3); 
 }
 

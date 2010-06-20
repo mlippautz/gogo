@@ -50,11 +50,9 @@ func GetNextTokenSafe() {
 }
 
 func AssertNextTokenWeak(tokenNumber uint64) {
-    var expectedTokens [2]uint64;
     GetNextTokenSafe();
     if tok.id != tokenNumber {
-        expectedTokens[0] = tokenNumber;
-        ParseErrorWeak(tok.id, expectedTokens, 1);
+        ParseErrorWeak(tok.id, tokenNumber, 0, 1);
         tok.nextToken = tok.id;
     }
 }
@@ -71,10 +69,8 @@ func AssertNextToken(tokenNumber uint64) {
 // Asserts an already read token. (no GetNextToken() before the check)
 //
 func AssertToken(tokenNumber uint64) {
-    var expectedTokens [2]uint64;
     if tok.id != tokenNumber {
-        expectedTokens[0] = tokenNumber;
-        ParseErrorWeak(tok.id, expectedTokens, 1);
+        ParseErrorWeak(tok.id, tokenNumber, 0, 1);
         //tok.nextToken = tok.id;
         ParserSync();
     }

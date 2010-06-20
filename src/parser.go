@@ -530,7 +530,6 @@ func ParseBinaryArithOp() uint64 {
 func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
     var doneFlag uint64 = 1;
     var boolFlag uint64;
-    var es [2]uint64;
 
     GetNextTokenSafe();
     if (doneFlag == 1) && (tok.id == TOKEN_IDENTIFIER) {
@@ -569,7 +568,7 @@ func ParseFactor(item *libgogo.Item, ed *ExpressionDescriptor) uint64 {
         boolFlag = 1;
         tok.nextToken = tok.id;
         // Fix (?) empty factor, which should not be possible.
-        ParseErrorWeak(tok.id,es,0);
+        ParseErrorWeak(tok.id, 0, 0, 0);
         ParserSync();
     } else {
         boolFlag = 0;
@@ -713,7 +712,6 @@ func ParseFuncDeclList() {
 //
 //
 func ParseFuncDeclListSub() uint64 {
-    var es [2]uint64;
     var boolFlag uint64;    
     PrintDebugString("Entering ParseFuncDeclListSub()",1000);
     boolFlag = ParseFuncDeclHead();
@@ -723,9 +721,7 @@ func ParseFuncDeclListSub() uint64 {
             boolFlag = ParseFuncDecl();
         }
         if boolFlag != 0 {
-            es[0] = TOKEN_SEMICOLON;
-            es[1] = TOKEN_LCBRAC;
-            ParseErrorFatal(tok.id,es,2);
+            ParseErrorFatal(tok.id, TOKEN_SEMICOLON, TOKEN_LCBRAC, 2);
         }
     }
     PrintDebugString("Leaving ParseFuncDeclListSub()",1000);
