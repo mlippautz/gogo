@@ -52,7 +52,7 @@ TEXT ·GetChar(SB),$0-16 //Read: 1 parameter (2), 1 return value
   MOVQ $1, DX //buffer size (size 1)
   SYSCALL //Linux syscall
   CMPQ AX, $0xFFFFFFFFFFFFF001 //Check for success
-  JLS READ_SUCCESS //Return result if successful
+  JLS GETCHAR_SUCCESS //Return result if successful
 GETCHAR_ERROR:
   MOVQ $0, 16(SP) //Return 0 (return value after one parameter => SP+2*64bit)
 GETCHAR_SUCCESS:

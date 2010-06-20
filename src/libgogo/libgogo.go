@@ -22,19 +22,21 @@ var Argc uint64 = 0;
 func GetArgv() {
     var fd uint64;
     var errno uint64;    
-    var char string = "#";
+    var singleChar byte;
+    var lastChar byte = 1; // needs to be != 0 at start
 
     fd = FileOpen("/proc/self/cmdline", 0); //Open file that contains the program's arguments
     if fd == 0 { //Error check (the system may have been compiled with proc fs disabled)
         ExitError("Error opening /proc/self/cmdline. Currently GoGo is only supported on systems with /proc enabled.", 1);
-    }
+    }    
 
-    for errno = Read(fd, char, 1) ; errno != 0 ; errno = Read(fd, char, 1) { //Read characters one by one
-        if char[0] == 0 { //0 terminates one argument and lets a new one begin
-            Argc = Argc + 1; //Increase argument count
+    for singleChar = GetChar(fd);(singleChar != 0) || (lastChar != 0); singleChar = GetChar(fd) {
+        if (singleChar == 0) {
+            Argc = Argc +1;
         } else {
-            CharAppend(&Argv[Argc], char[0]); //Append the next character read to the current argument
+            CharAppend(&Argv[Argc], singleChar);
         }
+        lastChar = singleChar;
     }
 
     errno = FileClose(fd);
