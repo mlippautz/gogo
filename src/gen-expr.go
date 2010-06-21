@@ -158,6 +158,7 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
 // Note: This function can only handle operands with a maximum of 8 bytes in size
 //
 func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
+    var opsize uint64;
     if Compile != 0 {   
         // Type/Pointer checking
 
@@ -215,18 +216,17 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
                 item2.A = 0;
                 op = TOKEN_NOTEQUAL; // Force != for comparison against 0
             } else {
-                if item1.PtrType == 0 {
-                    MakeRegistered(item1, 0);
-                } else {
-                    MakeRegistered(item1, 1);
-                }
+                MakeRegistered(item1, 0);
                 if item2.Mode == libgogo.MODE_REG {
-                    PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
+                    DereferRegisterIfNecessary(item2);
+                    opsize = GetOpSize(item2, "CMP");
+                    PrintInstruction_Reg_Reg("CMP", opsize, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
                 }
                 if item2.Mode == libgogo.MODE_VAR {
                     if item2.PtrType == 1 {
-                        MakeRegistered(item2, 1);
-                        PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
+                        MakeRegistered(item2, 0);
+                        opsize = GetOpSize(item2, "CMP");
+                        PrintInstruction_Reg_Reg("CMP", opsize, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
                     } else {
                         PrintInstruction_Reg_Var("CMP", "R", item1.R, "", 0, item2);
                     }
@@ -236,10 +236,13 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
         if item1.Mode == libgogo.MODE_REG {
             DereferRegisterIfNecessary(item1);
             if item2.Mode == libgogo.MODE_CONST {
-                PrintInstruction_Reg_Imm("CMP", 8, "R", item1.R, 0, 0, 0, "", item2.A);
+                opsize = GetOpSize(item2, "CMP");
+                PrintInstruction_Reg_Imm("CMP", opsize, "R", item1.R, 0, 0, 0, "", item2.A);
             }
             if item2.Mode == libgogo.MODE_REG {
-                PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
+                DereferRegisterIfNecessary(item2);
+                opsize = GetOpSize(item2, "CMP");
+                PrintInstruction_Reg_Reg("CMP", opsize, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
             }
             if item2.Mode == libgogo.MODE_VAR {
                 PrintInstruction_Reg_Var("CMP", "R", item1.R, "", 0, item2);
@@ -250,23 +253,16 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
                 PrintInstruction_Var_Imm("CMP", item1, item2.A);
             }
             if item2.Mode == libgogo.MODE_REG {
-                DereferRegisterIfNecessary(item1);
-                if item1.PtrType == 1 {
-                    MakeRegistered(item1, 1);
-                    PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
-                } else {
-                    PrintInstruction_Var_Reg("CMP", item1, "R", item2.R, "", 0);
-                }
+                DereferRegisterIfNecessary(item2);
+                MakeRegistered(item1, 0);
+                PrintInstruction_Var_Reg("CMP", item1, "R", item2.R, "", 0);
             }
             if item2.Mode == libgogo.MODE_VAR {
-                if item2.PtrType == 0 {
-                    MakeRegistered(item2, 0);
-                } else {
-                    MakeRegistered(item2, 1);
-                }
+                MakeRegistered(item2, 0);
                 if item1.PtrType == 1 {
-                    MakeRegistered(item1, 1);
-                    PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
+                    MakeRegistered(item1, 0);
+                    opsize = GetOpSize(item2, "CMP");
+                    PrintInstruction_Reg_Reg("CMP", opsize, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
                 } else {
                     PrintInstruction_Var_Reg("CMP", item1, "R", item2.R, "", 0);
                 }
