@@ -481,7 +481,7 @@ func PrintFunctionCall(packagename string, label string, stackoffset uint64, unk
     PrintInstructionEnd();
     GenerateComment("Stack pointer offset after function call for local variables start");
     if unknownoffset != 0 { //Output linker information
-        GenerateComment(comment);
+        GenerateLinkerComment(comment);
     }
     PrintInstruction_Imm_Reg("ADD", 8, stackoffset, "SP", 0, 0, 0, 0, ""); //ADDQ $stackoffset, SP
     GenerateComment("Stack pointer offset after function call for local variables end");
