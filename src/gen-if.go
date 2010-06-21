@@ -14,9 +14,7 @@ func GenerateIfStart(item *libgogo.Item, ed *ExpressionDescriptor) {
     var labelString string;
     var jmp string;
     var stacksize uint64;
-
     labelString = GenerateSubLabel(ed,1,"END");
-
     if ed.Not == 0 {
         jmp = GetJump(item.C, 0);
     } else {

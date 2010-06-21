@@ -44,7 +44,7 @@ func PrintLabelWrapped(ed *ExpressionDescriptor, global uint64, localBranch uint
 // by GetSubLabel().
 //
 func GenerateSubLabel(ed *ExpressionDescriptor, i uint64, label string) string {
-    var str string;
+    var str string = "";
     var tmpStr string;
 
     var depth uint64;
