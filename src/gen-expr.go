@@ -216,22 +216,29 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
                 item2.A = 0;
                 op = TOKEN_NOTEQUAL; // Force != for comparison against 0
             } else {
-                MakeRegistered(item1, 0);
+                if item1.PtrType == 0 {
+                    MakeRegistered(item1, 0);
+                } else {
+                    MakeRegistered(item1, 1);
+                }
                 if item2.Mode == libgogo.MODE_REG {
-                    DereferRegisterIfNecessary(item2);
                     opsize = GetOpSize(item2, "CMP");
                     PrintInstruction_Reg_Reg("CMP", opsize, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
                 }
                 if item2.Mode == libgogo.MODE_VAR {
-                    PrintInstruction_Reg_Var("CMP", "R", item1.R, "", 0, item2);
+                    if item2.PtrType == 1 {
+                        MakeRegistered(item2, 1);
+                        PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
+                    } else {
+                        PrintInstruction_Reg_Var("CMP", "R", item1.R, "", 0, item2);
+                    }
                 }
             }
         }
         if item1.Mode == libgogo.MODE_REG {
             DereferRegisterIfNecessary(item1);
             if item2.Mode == libgogo.MODE_CONST {
-                opsize = GetOpSize(item2, "CMP");
-                PrintInstruction_Reg_Imm("CMP", opsize, "R", item1.R, 0, 0, 0, "", item2.A);
+                PrintInstruction_Reg_Imm("CMP", 8, "R", item1.R, 0, 0, 0, "", item2.A);
             }
             if item2.Mode == libgogo.MODE_REG {
                 DereferRegisterIfNecessary(item2);
@@ -248,15 +255,28 @@ func GenerateComparison(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
             }
             if item2.Mode == libgogo.MODE_REG {
                 DereferRegisterIfNecessary(item2);
-                MakeRegistered(item1, 0);
-                PrintInstruction_Var_Reg("CMP", item1, "R", item2.R, "", 0);
+                if item1.PtrType == 1 {
+                    MakeRegistered(item1, 1);
+                    PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
+                } else {
+                    PrintInstruction_Var_Reg("CMP", item1, "R", item2.R, "", 0);
+                }
             }
             if item2.Mode == libgogo.MODE_VAR {
-                MakeRegistered(item2, 0);
-                PrintInstruction_Var_Reg("CMP", item1, "R", item2.R, "", 0);
+                if item2.PtrType == 0 {
+                    MakeRegistered(item2, 0);
+                } else {
+                    MakeRegistered(item2, 1);
+                }
+                if item1.PtrType == 1 {
+                    MakeRegistered(item1, 1);
+                    PrintInstruction_Reg_Reg("CMP", 8, "R", item1.R, 0, 0, 0, "", "R", item2.R, 0, 0, 0, "");
+                } else {
+                    PrintInstruction_Var_Reg("CMP", item1, "R", item2.R, "", 0);
+                }
             }
         }
-
+        
         // Prepare item
         item1.Itemtype = bool_t;
         item1.Mode = libgogo.MODE_COND;
