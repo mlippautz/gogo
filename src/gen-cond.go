@@ -46,12 +46,62 @@ func PrintLabelWrapped(ed *ExpressionDescriptor, global uint64, localBranch uint
 func GenerateSubLabel(ed *ExpressionDescriptor, i uint64, label string) string {
     var str string;
     var tmpStr string;
+
+    var depth uint64;
+    var labelnr uint64;
+    var stacksize uint64;
+
     libgogo.StringAppend(&str, ed.CurFile);
     libgogo.StringAppend(&str, "_");
     tmpStr = libgogo.IntToString(ed.CurLine);
     libgogo.StringAppend(&str, tmpStr);
     libgogo.StringAppend(&str, "_");
 
+    if i == 0 {
+        stacksize = libgogo.GetStackItemCount(&ed.FS);
+        if stacksize == 0 {
+            tmpStr = libgogo.IntToString(ed.IncCnt);
+            labelnr = ed.IncCnt;
+            depth = ed.ExpressionDepth;
+            ed.IncCnt = ed.IncCnt + 1;
+            libgogo.Push(&ed.FS, labelnr);
+            libgogo.Push(&ed.FDepthS, depth);
+        } else {
+            labelnr = libgogo.Peek(&ed.FS);
+            depth = libgogo.Peek(&ed.FDepthS); 
+            if ed.ExpressionDepth > depth {
+                labelnr = ed.IncCnt;
+                depth = ed.ExpressionDepth;
+                libgogo.Push(&ed.FS, labelnr);
+                libgogo.Push(&ed.FDepthS, depth);
+                ed.IncCnt = ed.IncCnt +1;
+            }
+        }
+        tmpStr = libgogo.IntToString(labelnr);
+    } else {
+        stacksize = libgogo.GetStackItemCount(&ed.TS);
+        if stacksize == 0 {
+            tmpStr = libgogo.IntToString(ed.IncCnt);
+            labelnr = ed.IncCnt;
+            depth = ed.ExpressionDepth;
+            ed.IncCnt = ed.IncCnt + 1;
+            libgogo.Push(&ed.TS, labelnr);
+            libgogo.Push(&ed.TDepthS, depth);
+        } else {
+            labelnr = libgogo.Peek(&ed.TS);
+            depth = libgogo.Peek(&ed.TDepthS); 
+            if ed.ExpressionDepth > depth {
+                labelnr = ed.IncCnt;
+                depth = ed.ExpressionDepth;
+                libgogo.Push(&ed.TS, labelnr);
+                libgogo.Push(&ed.TDepthS, depth);
+                ed.IncCnt = ed.IncCnt + 1;
+            }
+        }
+        tmpStr = libgogo.IntToString(labelnr);
+    }
+
+/*
     if i == 0 {
         if ed.F == 0 {
             tmpStr = libgogo.IntToString(ed.IncCnt);
@@ -71,6 +121,7 @@ func GenerateSubLabel(ed *ExpressionDescriptor, i uint64, label string) string {
             tmpStr = libgogo.IntToString(ed.T);
         }
     }
+*/
     libgogo.StringAppend(&str, tmpStr);
 
     libgogo.StringAppend(&str, "_");
@@ -85,6 +136,8 @@ func GenerateSubLabel(ed *ExpressionDescriptor, i uint64, label string) string {
 func GetSubLabel(ed *ExpressionDescriptor, i uint64, label string) string {
     var str string;
     var tmpStr string;
+    var labelnr uint64;
+
     libgogo.StringAppend(&str, ed.CurFile);
     libgogo.StringAppend(&str, "_");
     tmpStr = libgogo.IntToString(ed.CurLine);
@@ -92,9 +145,13 @@ func GetSubLabel(ed *ExpressionDescriptor, i uint64, label string) string {
     libgogo.StringAppend(&str, "_");
 
     if i == 0 {
-        tmpStr = libgogo.IntToString(ed.F);
+        labelnr = libgogo.Peek(&ed.FS);
+        tmpStr = libgogo.IntToString(labelnr);
+        //tmpStr = libgogo.IntToString(ed.F);
     } else {
-        tmpStr = libgogo.IntToString(ed.T);
+        labelnr = libgogo.Peek(&ed.TS);
+        tmpStr = libgogo.IntToString(labelnr);
+        //tmpStr = libgogo.IntToString(ed.T);
     }
     libgogo.StringAppend(&str, tmpStr);
 

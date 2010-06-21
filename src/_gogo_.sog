@@ -5502,9 +5502,9 @@ FOR_libgogo_symbol_267_BODY:
   JNE IF_libgogo_symbol_271_1_END
   CMPQ -32(SP), $0
   JE IF_libgogo_symbol_271_2_END
-IF_libgogo_symbol_271_1_END:
   CMPQ -40(SP), $0
   JE IF_libgogo_symbol_271_2_END
+IF_libgogo_symbol_271_1_END:
   JMP IF_libgogo_symbol_271_END
 IF_libgogo_symbol_271_2_END:
   //--- Assignment start at libgogo/symbol.go:272:24
@@ -5696,9 +5696,9 @@ FOR_libgogo_symbol_289_BODY:
   JNE IF_libgogo_symbol_293_1_END
   CMPQ -32(SP), $0
   JE IF_libgogo_symbol_293_2_END
-IF_libgogo_symbol_293_1_END:
   CMPQ -40(SP), $0
   JE IF_libgogo_symbol_293_2_END
+IF_libgogo_symbol_293_1_END:
   JMP IF_libgogo_symbol_293_END
 IF_libgogo_symbol_293_2_END:
   //--- If start at libgogo/symbol.go:294:16
@@ -5706,15 +5706,14 @@ IF_libgogo_symbol_293_2_END:
   JE IF_libgogo_symbol_294_1_END
   CMPQ 48(SP), $0
   JNE IF_libgogo_symbol_294_2_END
-IF_libgogo_symbol_294_1_END:
   MOVQ -8(SP), R8
   ADDQ $32, R8
   MOVQ (R8), R8
   CMPQ R8, $0
-  JE IF_libgogo_symbol_294_3_END
+  JE IF_libgogo_symbol_294_1_END
 IF_libgogo_symbol_294_2_END:
   JMP IF_libgogo_symbol_294_END
-IF_libgogo_symbol_294_3_END:
+IF_libgogo_symbol_294_1_END:
   //--- Assignment start at libgogo/symbol.go:295:28
   //--- Assignment LHS load start at libgogo/symbol.go:295:28
   //--- Assignment LHS load end at libgogo/symbol.go:295:28

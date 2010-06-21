@@ -41,6 +41,11 @@ func SetExpressionDescriptor(ed *ExpressionDescriptor, labelPrefix string) {
     ed.F = 0;
     ed.TDepth = 0;
     ed.FDepth = 0;
+
+    libgogo.InitializeStack(&ed.TS);
+    libgogo.InitializeStack(&ed.FS);
+    libgogo.InitializeStack(&ed.TDepthS);
+    libgogo.InitializeStack(&ed.FDepthS);
 }
 
 //
@@ -96,18 +101,20 @@ func GenerateTermArith(item1 *libgogo.Item, item2 *libgogo.Item, op uint64) {
 func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
     var labelString string;
     var jmp string;
+    var depth uint64;
+    var stacksize uint64;
 
     if Compile != 0 {
         if item.Mode != libgogo.MODE_COND {
             GenErrorWeak("Can use relative operators only with conditionals.");
         }
         if op == TOKEN_REL_AND {
-            labelString = GenerateSubLabel(ed,0,"END");
+            labelString = GenerateSubLabel(ed,0 /*negative*/,"END");
             if ed.Not == 0 {
                 jmp = GetJump(item.C, 1);
             } else {
                 if ed.TDepth > ed.ExpressionDepth {
-                    labelString = GenerateSubLabel(ed,1,"END");
+                    labelString = GenerateSubLabel(ed,1 /*positive*/ ,"END");
                     jmp = GetJump(item.C, 0);
                     ed.Not = 0;
                     SwapExpressionBranches(ed);
@@ -116,12 +123,23 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
                 }
             }
             PrintJump(jmp, labelString);
-            if ed.T != 0 {
-                if ed.TDepth >= ed.ExpressionDepth {
+
+            stacksize = libgogo.GetStackItemCount(&ed.TS);
+            if stacksize > 0 {
+                depth = libgogo.Peek(&ed.TDepthS);
+                if depth >= ed.ExpressionDepth {
                     PrintLabelWrapped(ed, 1 /*local*/, 1 /*positive*/, "END");
-                    ed.T = 0;
+                    libgogo.Pop(&ed.TS);
+                    libgogo.Pop(&ed.TDepthS);
                 }
             }
+            
+            //if ed.T != 0 {
+            //    if ed.TDepth < ed.ExpressionDepth {
+            //        PrintLabelWrapped(ed, 1 /*local*/, 1 /*positive*/, "END");
+            //        ed.T = 0;
+            //    }
+            //}
         } else {
             if op == TOKEN_REL_OR {
                 labelString = GenerateSubLabel(ed,1,"END");
@@ -138,12 +156,21 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
                     }   
                 }
                 PrintJump(jmp, labelString);
-                if ed.F != 0 {
-                    if ed.FDepth >= ed.ExpressionDepth {
-                        PrintLabelWrapped(ed, 1 /*local*/, 0 /*negative*/, "END")
-                        ed.F = 0;
+                stacksize = libgogo.GetStackItemCount(&ed.FS);
+                if stacksize > 0 {
+                    depth = libgogo.Peek(&ed.FDepthS);
+                    if depth >= ed.ExpressionDepth {
+                        PrintLabelWrapped(ed, 1 /*local*/, 0 /*negative*/, "END");
+                        libgogo.Pop(&ed.FS);
+                        libgogo.Pop(&ed.FDepthS);
                     }
                 }
+                //if ed.F != 0 {
+                //    if ed.FDepth < ed.ExpressionDepth {
+                //        PrintLabelWrapped(ed, 1 /*local*/, 0 /*negative*/, "END")
+                //        ed.F = 0;
+                //    }
+                //}
             } else {
                 GenErrorWeak("Relative AND or OR expected.");
             }
@@ -327,3 +354,4 @@ func GetConditionalBool(op uint64, val1 uint64, val2 uint64) uint64 {
     }
     return ret;
 }
+

@@ -13,6 +13,7 @@ import "./libgogo/_obj/libgogo"
 func GenerateIfStart(item *libgogo.Item, ed *ExpressionDescriptor) {
     var labelString string;
     var jmp string;
+    var stacksize uint64;
 
     labelString = GenerateSubLabel(ed,1,"END");
     if ed.Not == 0 {
@@ -26,15 +27,26 @@ func GenerateIfStart(item *libgogo.Item, ed *ExpressionDescriptor) {
 
     // Important: Since last jump is a positive one, we have to start with the
     // negative path
-    if ed.F != 0 {
+
+    //if ed.F != 0 {
+    //    PrintLabelWrapped(ed, 1 /*local*/, 0 /*negative*/, "END");
+    //}
+    for stacksize = libgogo.GetStackItemCount(&ed.FS); stacksize > 0 ; stacksize = libgogo.GetStackItemCount(&ed.FS) {
         PrintLabelWrapped(ed, 1 /*local*/, 0 /*negative*/, "END");
+        libgogo.Pop(&ed.FS);
+        libgogo.Pop(&ed.FDepthS);
     }
     PrintJumpWrapped("JMP", ed, 0 /*global*/, 0 /*unused*/, "END");
 
     // Positive branch starts after this label, thus insert last remaining 
     // positive label (if available) here
-    if ed.T != 0 {
+    //if ed.T != 0 {
+    //    PrintLabelWrapped(ed, 1 /*local*/, 1 /*positive*/, "END");
+    //}
+    for stacksize = libgogo.GetStackItemCount(&ed.TS); stacksize > 0 ; stacksize = libgogo.GetStackItemCount(&ed.TS) {
         PrintLabelWrapped(ed, 1 /*local*/, 1 /*positive*/, "END");
+        libgogo.Pop(&ed.TS);
+        libgogo.Pop(&ed.TDepthS);
     }
 
     item.C = 0;

@@ -8,6 +8,8 @@
 
 package main
 
+import "./libgogo/_obj/libgogo"
+
 //
 // Struct holding the information about a file that is compiled
 //
@@ -36,6 +38,11 @@ type ExpressionDescriptor struct {
       and printing. */
     FDepth uint64; // Same as true depth.
     Not uint64; // Flag indicating not branch
+
+    TS libgogo.Stack;
+    FS libgogo.Stack;
+    TDepthS libgogo.Stack;
+    FDepthS libgogo.Stack;
 
     //
     // Break continue information
