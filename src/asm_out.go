@@ -53,7 +53,7 @@ func ResetCode() {
 // This code is automatically generated. DO NOT EDIT IT!\n\
 //\n\
 ");
-    //InspectorGadget();
+    InspectorGadget();
     InitCodeSegment = "TEXT main·init(SB),0,$0-0\n";
     
     libgogo.InitializeStringList(&DataSegmentList);
@@ -173,13 +173,13 @@ func PrintCodeOutputValue(value uint64) {
     PrintCodeOutput(temp);
 }
 
-func GenerateComment(msg string) {
+func GenerateCommentInternal(msg string, forcePrint uint64) {
     var str string = "";
     var tmpPtr *string;
     var temp string;
     var i uint64;
     var n uint64;
-    if DEBUG_LEVEL >= 10 {
+    if (DEBUG_LEVEL >= 10) || (forcePrint != 0) {
         tmpPtr = &DataSegment;
         if (OutputStringPtr != tmpPtr) {
             str = "  //--- ";
@@ -200,6 +200,14 @@ func GenerateComment(msg string) {
         libgogo.StringAppend(&str, "\n");
         PrintCodeOutput(str);
     }
+}
+
+func GenerateComment(msg string) {
+    GenerateCommentInternal(msg, 0);
+}
+
+func GenerateLinkerComment(msg string) {
+    GenerateCommentInternal(msg, 1); //Force comment printing regardless of debug level
 }
 
 func PrintRegister(name string, number uint64, indirect uint64, offset uint64, negativeoffset uint64, optionaloffsetname string) {
@@ -348,7 +356,7 @@ func PrintInstruction_Imm_Var(op string, value uint64, variable *libgogo.Item) {
         } else { //Local
             temp = libgogo.StringLength(variable.LinkerInformation);
             if temp != 0 {
-                GenerateComment(variable.LinkerInformation);
+                GenerateLinkerComment(variable.LinkerInformation);
             }
             PrintInstruction_Imm_Reg(op, opsize, value, "SP", 0, 1, variable.A + 8, 1, ""); //OP $value, -[variable.A+8](SP)
         }
@@ -367,7 +375,7 @@ func PrintInstruction_Var_Imm(op string, variable *libgogo.Item, value uint64) {
         } else { //Local
             temp = libgogo.StringLength(variable.LinkerInformation);
             if temp != 0 {
-                GenerateComment(variable.LinkerInformation);
+                GenerateLinkerComment(variable.LinkerInformation);
             }
             PrintInstruction_Reg_Imm(op, opsize, "SP", 0, 1, variable.A + 8, 1, "", value); // OP -[variable.A+8](SP), $value
         }
@@ -393,12 +401,12 @@ func PrintInstruction_Reg_Var(op string, regname string, regnumber uint64, optre
         } else { //Local
             temp = libgogo.StringLength(variable.LinkerInformation);
             if temp != 0 {
-                GenerateComment(variable.LinkerInformation);
+                GenerateLinkerComment(variable.LinkerInformation);
             }
             retVal = PrintInstruction_Reg_Reg(op, opsize, regname, regnumber, 0, 0, 0, "", "SP", 0, 1, variable.A + 8, 1, ""); //OP regname_regnumber, -[variable.A+8](SP)
             if retVal != 0 { //Handle operands > 8 bytes
                 if temp != 0 {
-                    GenerateComment(variable.LinkerInformation);
+                    GenerateLinkerComment(variable.LinkerInformation);
                 }
                 PrintInstruction_Reg_Reg(op, retVal, optregname, optregnumber, 0, 0, 0, "", "SP", 0, 1, variable.A, 1, ""); //OP optregname_optregnumber, -[variable.A+8-8](SP)
             }
@@ -425,12 +433,12 @@ func PrintInstruction_Var_Reg(op string, variable *libgogo.Item, regname string,
         } else { //Local
             temp = libgogo.StringLength(variable.LinkerInformation);
             if temp != 0 {
-                GenerateComment(variable.LinkerInformation);
+                GenerateLinkerComment(variable.LinkerInformation);
             }
             retVal = PrintInstruction_Reg_Reg(op, opsize, "SP", 0, 1, variable.A + 8, 1, "", regname, regnumber, 0, 0, 0, ""); //OP -[variable.A+8](SP), regname_regnumber
             if retVal != 0 { //Handle operands > 8 byte
                 if temp != 0 {
-                    GenerateComment(variable.LinkerInformation);
+                    GenerateLinkerComment(variable.LinkerInformation);
                 }
                 PrintInstruction_Reg_Reg(op, retVal, "SP", 0, 1, variable.A, 1, "", optregname, optregnumber, 0, 0, 0, ""); //OP -[variable.A+8-8](SP), optregname_optregnumber
             }
@@ -461,7 +469,7 @@ func PrintFunctionCall(packagename string, label string, stackoffset uint64, unk
         libgogo.StringAppend(&comment, "·");
         libgogo.StringAppend(&comment, label);
         libgogo.StringAppend(&comment, "##");
-        GenerateComment(comment);
+        GenerateLinkerComment(comment);
     }
     PrintInstruction_Imm_Reg("SUB", 8, stackoffset, "SP", 0, 0, 0, 0, ""); //SUBQ $stackoffset, SP
     GenerateComment("Stack pointer offset before function call for local variables end");

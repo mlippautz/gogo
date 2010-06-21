@@ -24,6 +24,7 @@ symtable.go \
 parser.go \
 gogo.go \
 asm_out.go \
+inspector.go \
 codegen.go \
 gen-arith.go \
 gen-assign.go \
