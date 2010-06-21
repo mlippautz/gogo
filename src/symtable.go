@@ -630,3 +630,20 @@ func FindIdentifierAndParseSelector_FunctionCall(FunctionCalled *libgogo.TypeDes
     }
     return tempFcn;
 }
+
+//
+// Checks whether a given type list contains any forward declarations.
+// Returns: 1 if there are any, 0 otherwise
+//
+func ContainsFwdDecls(list *libgogo.TypeDesc) uint64 {
+    var tmpObjType *libgogo.TypeDesc;
+    var retValue uint64 = 0;
+    if list != nil {
+        for tmpObjType = list; tmpObjType.Next != nil; tmpObjType = tmpObjType.Next { 
+            if tmpObjType.ForwardDecl != 0 {
+                retValue = 1;
+            }
+        }
+    }
+    return retValue;
+}

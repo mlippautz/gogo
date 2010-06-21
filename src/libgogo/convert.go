@@ -8,6 +8,8 @@
 
 package libgogo
 
+func DerefUint64Ptr(ptr *uint64) uint64;
+
 //
 // Converts a byte to an unsigned 64-bit integer
 // Implemented in assembler (see corresponding .s file)

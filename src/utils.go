@@ -191,25 +191,3 @@ func SymbolTableError(msg string, position string, msg2 string, identifier strin
     libgogo.Exit(4);
 }
 
-func DebugItem(item *libgogo.Item) {
-    var tmpStr string;
-    libgogo.PrintString("Item\n");
-    libgogo.PrintString("====\n");
-    tmpStr = libgogo.IntToString(item.Mode);
-    libgogo.PrintString("Mode: ");
-    libgogo.PrintString(tmpStr);
-    libgogo.PrintString("\n");
-    tmpStr = libgogo.IntToString(item.A);
-    libgogo.PrintString("A: ");
-    libgogo.PrintString(tmpStr);
-    libgogo.PrintString("\n");
-    libgogo.PrintString("R: ");
-    tmpStr = libgogo.IntToString(item.R);
-    libgogo.PrintString(tmpStr);
-    libgogo.PrintString("\n");
-    libgogo.PrintString("C: ");
-    tmpStr = libgogo.IntToString(item.C);
-    libgogo.PrintString(tmpStr);
-    libgogo.PrintString("\n");
-    libgogo.PrintString("\n");
-}

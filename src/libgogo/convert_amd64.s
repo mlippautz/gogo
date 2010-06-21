@@ -6,6 +6,13 @@
 // GoGo conversion functions (ASM)
 //
 
+TEXT ·DerefUint64Ptr(SB),$0-16
+  MOVQ $0, 16(SP)
+  MOVQ 8(SP), AX
+  MOVQ (AX), AX
+  MOVQ AX, 16(SP)
+  RET
+
 TEXT ·ToIntFromByte(SB),$0-16 //ToIntFromByte: 1 parameter, 1 return value
   MOVQ $0, 16(SP) //Initialize return value (return value after one parameter => SP+2*64bit)
   MOVB 8(SP), AX //Move byte parameter to AX (first parameter => SP+64bit)
