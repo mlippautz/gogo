@@ -2383,7 +2383,7 @@ FOR_libgogo_convert_77_BODY:
   MOVQ -56(SP), R8
   //--- Restoring registers after function call end at libgogo/convert.go:78:59
   ANDQ $255, R9
-  MOVB -72(SP), R9
+  MOVB -64(SP), R9
   MOVB R9, (R8)
   //--- Assignment end at libgogo/convert.go:78:60
   //--- Assignment start at libgogo/convert.go:79:15
@@ -4453,7 +4453,7 @@ TEXT libgogo·AddFields(SB),0,$0-0
   //--- Restoring registers after function call start at libgogo/symbol.go:99:58
   MOVQ -8(SP), R8
   //--- Restoring registers after function call end at libgogo/symbol.go:99:58
-  MOVQ -24(SP), R9
+  MOVQ -16(SP), R9
   MOVQ R9, (R8)
   //--- Assignment end at libgogo/symbol.go:99:59
   RET
@@ -4626,7 +4626,7 @@ TEXT libgogo·AddParameters(SB),0,$0-0
   //--- Restoring registers after function call start at libgogo/symbol.go:129:50
   MOVQ -8(SP), R8
   //--- Restoring registers after function call end at libgogo/symbol.go:129:50
-  MOVQ -24(SP), R9
+  MOVQ -16(SP), R9
   MOVQ R9, (R8)
   //--- Assignment end at libgogo/symbol.go:129:51
   //--- Assignment start at libgogo/symbol.go:130:15

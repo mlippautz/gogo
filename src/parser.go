@@ -1053,7 +1053,7 @@ func ParseFunctionCall(FunctionCalled *libgogo.TypeDesc) *libgogo.Item {
         RestoreUsedRegisters(TotalLocalVariableSize, RegisterStackOffset);
     }
     PrintDebugString("Leaving ParseFunctionCall()",1000);
-    ReturnItem = GetReturnItem(FunctionCalled, TotalLocalVariableSize, TotalParameterSize, RegisterStackOffset);
+    ReturnItem = GetReturnItem(FunctionCalled, TotalLocalVariableSize, TotalParameterSize, 0); //No stack offset as TotalLocalVariableSize already includes it
     return ReturnItem;
 }
 
