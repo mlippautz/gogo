@@ -94,6 +94,9 @@ func ResetToken() {
     tok.nextChar = 0;
     tok.nextToken = 0;   
     tok.llCnt = 0; 
+    tok.intValue = 0;
+    tok.strValue = "";
+    tok.toRead = 0;
 }
 
 //

@@ -28,7 +28,7 @@ type ParamDesc struct {
 //
 func GetLine(ld *LineDesc) {
     var line string = "";
-    var i uint64 =0;
+    var i uint64 = 0;
     var singleChar byte;
     var cmp uint64;
 
@@ -74,7 +74,6 @@ func GetLine(ld *LineDesc) {
     }
     ld.Line = line;
     ld.Offset = 0;
-
 }
 
 func GetNextSymToken(ld *LineDesc) string {
@@ -197,6 +196,8 @@ func ParseSymTblFunc(ld *LineDesc) {
     var paramType string;
     var tmpParam *libgogo.ObjectDesc;
 
+    InitParamDesc(&pd);
+
     fwdStr = GetNextSymToken(ld);
     fwdNum = libgogo.StringToInt(fwdStr);
     pkgFunc = GetNextSymToken(ld);
@@ -313,7 +314,7 @@ func FixOffset(ld *LineDesc) {
     var strLen uint64;
     var size uint64;
     var oldsize uint64;
-    var numstr string;
+    var numstr string = "";
     var newLine string = "";
     var strCmp uint64;
     var fixedAdr string = "-";
@@ -339,6 +340,7 @@ func FixOffset(ld *LineDesc) {
     if ld.NeedsFix == 1 { // Type 1 fix of offsets
         strLen = libgogo.StringLength(ld.Line);
         size = GetParameterSize(ld.PackageName, ld.FunctionName);
+       
         for i = 6; ld.Line[i] != '-' ; i = i +1 {
             libgogo.CharAppend(&newLine, ld.Line[i]);
         }
@@ -408,6 +410,8 @@ func Link() {
     var symtable uint64 = 0;
     var ld LineDesc;
 
+    InitLineDesc(&ld);
+
     for curFileIndex=0;curFileIndex<fileInfoLen;curFileIndex=curFileIndex+1 {
 
         ResetToken();
@@ -438,8 +442,26 @@ func Link() {
                 }
 
             }
-            GetLine(&ld);
+            if ld.NeedsFix == 0 { // fetch a new line if currently no fix needed
+                GetLine(&ld);
+            }
         }
 
     }
+}
+
+func InitLineDesc(ld *LineDesc) {
+    ld.Line = "";
+    ld.Offset = 0;
+    ld.NeedsFix = 0;
+    ld.NeedsByteFix = 0;
+    ld.PackageName = "";
+    ld.FunctionName = "";
+}
+
+func InitParamDesc(pd *ParamDesc) {
+    pd.Name = "";
+    pd.TypePackage = "";
+    pd.TypeName = "";
+    pd.Ptr = 0;
 }
