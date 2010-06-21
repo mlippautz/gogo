@@ -453,7 +453,7 @@ func PrintLabel(label string) {
 }
 
 func PrintFunctionCall(packagename string, label string, stackoffset uint64, unknownoffset uint64) {
-    var comment string;
+    var comment string = "";
     GenerateComment("Stack pointer offset before function call for local variables start");
     if unknownoffset != 0 { //Output linker information
         comment = "##2##";

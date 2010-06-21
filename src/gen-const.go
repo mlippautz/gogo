@@ -23,7 +23,7 @@ func CreateStringConstant(str string, item *libgogo.Item) {
     var startAddress uint64;
     var LHSItem *libgogo.Item;
     var RHSItem *libgogo.Item;
-    var s string;
+    var s string = "String buffer start ('";
 
     boolFlag = libgogo.StringLength(str); //Compute length
     tempType = libgogo.NewType("byteArray", ".internal", 0, boolFlag + 1, byte_t); //Create byte array type of according length (including trailing 0) to be able to address the characters
@@ -33,7 +33,6 @@ func CreateStringConstant(str string, item *libgogo.Item) {
     startAddress = libgogo.GetObjectOffset(tempByteArray, GlobalObjects); //Calculate buffer start address
     
     SwitchOutputToDataSegment(); //Place content of byte array in data segment
-    s = "String buffer start ('";
     libgogo.StringAppend(&s, str);
     libgogo.StringAppend(&s, "')");
     GenerateComment(s); //Output string in comment

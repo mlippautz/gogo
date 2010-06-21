@@ -27,7 +27,7 @@ type ParamDesc struct {
 // Function fetches the next line from the assembly file.
 //
 func GetLine(ld *LineDesc) {
-    var line string;
+    var line string = "";
     var i uint64 =0;
     var singleChar byte;
     var cmp uint64;
@@ -130,7 +130,7 @@ func IsDefaultType(pkgType string) uint64 {
 }
 
 func GetPackageName(pkgType string) string {
-    var retStr string;
+    var retStr string = "";
     var i uint64;
     for i = 0; pkgType[i] != 194 ; i=i+1 {
         libgogo.CharAppend(&retStr, pkgType[i]);
@@ -139,7 +139,7 @@ func GetPackageName(pkgType string) string {
 }
 
 func GetFuncName(pkgType string) string {
-    var retStr string;
+    var retStr string = "";
     var i uint64;
     var strLen uint64;
     strLen = libgogo.StringLength(pkgType);
@@ -243,7 +243,7 @@ func ParseSymTblType(ld *LineDesc) {
     var ind uint64;
     var tmp1 uint64;
     var tmp2 uint64;
-    var tmpStr1 string;
+    var tmpStr1 string = "";
     var tmpStr2 string;
     // maybe some more flags, indicators, temps, strings, numbers, ... ?!? ;)
 
@@ -314,7 +314,7 @@ func FixOffset(ld *LineDesc) {
     var size uint64;
     var oldsize uint64;
     var numstr string;
-    var newLine string;
+    var newLine string = "";
     var strCmp uint64;
     var fixedAdr string = "-";
     var skip uint64 = 0;

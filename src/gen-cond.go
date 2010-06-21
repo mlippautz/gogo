@@ -134,7 +134,7 @@ func GenerateSubLabel(ed *ExpressionDescriptor, i uint64, label string) string {
 // (=Global Label + True|False Branch)
 //
 func GetSubLabel(ed *ExpressionDescriptor, i uint64, label string) string {
-    var str string;
+    var str string = "";
     var tmpStr string;
     var labelnr uint64;
 
@@ -164,7 +164,7 @@ func GetSubLabel(ed *ExpressionDescriptor, i uint64, label string) string {
 // Returns the global label that is represented by an ExpressionDescriptor.
 //
 func GetGlobLabel(ed *ExpressionDescriptor, label string) string {
-    var str string;
+    var str string = "";
     var tmpStr string;
     libgogo.StringAppend(&str, ed.CurFile);
     libgogo.StringAppend(&str, "_");
@@ -179,7 +179,7 @@ func GetGlobLabel(ed *ExpressionDescriptor, label string) string {
 // Returns the jump expression that represents a given conditional
 //
 func GetJump(condition uint64, invert uint64) string {
-    var jmp string;
+    var jmp string = "J?";
 
     if invert != 0 { // invert logic if necessary (T|F jump)
         if (condition == 0) || (condition == 2) || (condition == 4) {

@@ -7,7 +7,7 @@ package main
 import "./libgogo/_obj/libgogo"
 
 func ZeroParameterCheck(FunctionCalled *libgogo.TypeDesc) {
-    var FullFunctionName string;
+    var FullFunctionName string = "";
     if FunctionCalled.Len == 0 { //Check if function expects parameters
         FullFunctionName = "";
         libgogo.StringAppend(&FullFunctionName, FunctionCalled.PackageName);
@@ -18,10 +18,9 @@ func ZeroParameterCheck(FunctionCalled *libgogo.TypeDesc) {
 }
 
 func ParameterCheck_More(FunctionCalled *libgogo.TypeDesc, paramCount uint64) {
-    var FullFunctionName string;
+    var FullFunctionName string = "";
     var tempString string;
     if FunctionCalled.Len > paramCount { //Compare number of actual parameters
-        FullFunctionName = "";
         libgogo.StringAppend(&FullFunctionName, FunctionCalled.PackageName);
         libgogo.CharAppend(&FullFunctionName, '.');
         libgogo.StringAppend(&FullFunctionName, FunctionCalled.Name);
@@ -31,10 +30,9 @@ func ParameterCheck_More(FunctionCalled *libgogo.TypeDesc, paramCount uint64) {
 }
 
 func ParameterCheck_Less(FunctionCalled *libgogo.TypeDesc, paramCount uint64) {
-    var FullFunctionName string;
+    var FullFunctionName string = "";
     var tempString string;
     if FunctionCalled.Len < paramCount { //Compare number of actual parameters
-        FullFunctionName = "";
         libgogo.StringAppend(&FullFunctionName, FunctionCalled.PackageName);
         libgogo.CharAppend(&FullFunctionName, '.');
         libgogo.StringAppend(&FullFunctionName, FunctionCalled.Name);
