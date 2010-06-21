@@ -4256,8 +4256,7 @@ TEXT libgogo·AppendObject(SB),0,$0-0
   //--- Local variable assignment end at libgogo/symbol.go:63:37
   //--- If start at libgogo/symbol.go:64:8
   MOVQ data(SB), R8
-  MOVQ 16(SP), R9
-  CMPQ R9, R8
+  CMPQ 16(SP), R8
   JNE IF_libgogo_symbol_64_1_END
   JMP IF_libgogo_symbol_64_END
 IF_libgogo_symbol_64_1_END:
@@ -4339,8 +4338,7 @@ TEXT libgogo·AppendType(SB),0,$0-0
   //--- Local variable assignment end at libgogo/symbol.go:81:40
   //--- If start at libgogo/symbol.go:82:8
   MOVQ data(SB), R8
-  MOVQ 16(SP), R9
-  CMPQ R9, R8
+  CMPQ 16(SP), R8
   JNE IF_libgogo_symbol_82_1_END
   JMP IF_libgogo_symbol_82_END
 IF_libgogo_symbol_82_1_END:
@@ -4506,8 +4504,7 @@ TEXT libgogo·HasField(SB),0,$0-0
   //--- Assignment end at libgogo/symbol.go:108:38
   //--- If start at libgogo/symbol.go:109:8
   MOVQ data(SB), R8
-  MOVQ -8(SP), R9
-  CMPQ R9, R8
+  CMPQ -8(SP), R8
   JNE IF_libgogo_symbol_109_1_END
   JMP IF_libgogo_symbol_109_END
 IF_libgogo_symbol_109_1_END:
@@ -4656,8 +4653,7 @@ TEXT libgogo·GetTypeSize(SB),0,$0-0
   //--- Local variable assignment end at libgogo/symbol.go:138:25
   //--- If start at libgogo/symbol.go:141:8
   MOVQ data(SB), R8
-  MOVQ 8(SP), R9
-  CMPQ R9, R8
+  CMPQ 8(SP), R8
   JNE IF_libgogo_symbol_141_1_END
   JMP IF_libgogo_symbol_141_END
 IF_libgogo_symbol_141_1_END:
@@ -4714,8 +4710,7 @@ IF_libgogo_symbol_146_1_END:
 FOR_libgogo_symbol_147_EXPR_START:
   //--- For [expression] start at libgogo/symbol.go:147:55
   MOVQ data(SB), R8
-  MOVQ -16(SP), R9
-  CMPQ R9, R8
+  CMPQ -16(SP), R8
   JNE FOR_libgogo_symbol_147_1_END
   JMP FOR_libgogo_symbol_147_END
 FOR_libgogo_symbol_147_1_END:
@@ -5076,8 +5071,7 @@ TEXT libgogo·GetObjectOffset(SB),0,$0-0
 FOR_libgogo_symbol_215_EXPR_START:
   //--- For [expression] start at libgogo/symbol.go:215:25
   MOVQ data(SB), R8
-  MOVQ -16(SP), R9
-  CMPQ R9, R8
+  CMPQ -16(SP), R8
   JNE FOR_libgogo_symbol_215_1_END
   JMP FOR_libgogo_symbol_215_END
 FOR_libgogo_symbol_215_1_END:
@@ -5100,8 +5094,7 @@ FOR_libgogo_symbol_215_EXTENDED_BODY:
 FOR_libgogo_symbol_215_BODY:
   //--- If start at libgogo/symbol.go:216:12
   MOVQ 8(SP), R8
-  MOVQ -16(SP), R9
-  CMPQ R9, R8
+  CMPQ -16(SP), R8
   JE IF_libgogo_symbol_216_1_END
   JMP IF_libgogo_symbol_216_END
 IF_libgogo_symbol_216_1_END:
@@ -5146,8 +5139,7 @@ FOR_libgogo_symbol_215_END:
   //--- For end at libgogo/symbol.go:221:6
   //--- If start at libgogo/symbol.go:222:8
   MOVQ data(SB), R8
-  MOVQ -16(SP), R9
-  CMPQ R9, R8
+  CMPQ -16(SP), R8
   JE IF_libgogo_symbol_222_1_END
   JMP IF_libgogo_symbol_222_END
 IF_libgogo_symbol_222_1_END:
@@ -5235,8 +5227,7 @@ TEXT libgogo·GetAlignedObjectListSize(SB),0,$0-0
 FOR_libgogo_symbol_247_EXPR_START:
   //--- For [expression] start at libgogo/symbol.go:247:28
   MOVQ data(SB), R8
-  MOVQ -32(SP), R9
-  CMPQ R9, R8
+  CMPQ -32(SP), R8
   JNE FOR_libgogo_symbol_247_1_END
   JMP FOR_libgogo_symbol_247_END
 FOR_libgogo_symbol_247_1_END:
@@ -5299,8 +5290,7 @@ FOR_libgogo_symbol_247_END:
   //--- For end at libgogo/symbol.go:250:6
   //--- If start at libgogo/symbol.go:251:8
   MOVQ data(SB), R8
-  MOVQ -24(SP), R9
-  CMPQ R9, R8
+  CMPQ -24(SP), R8
   JNE IF_libgogo_symbol_251_1_END
   JMP IF_libgogo_symbol_251_END
 IF_libgogo_symbol_251_1_END:
@@ -5368,8 +5358,7 @@ TEXT libgogo·GetObject(SB),0,$0-0
 FOR_libgogo_symbol_267_EXPR_START:
   //--- For [expression] start at libgogo/symbol.go:267:37
   MOVQ data(SB), R8
-  MOVQ -8(SP), R9
-  CMPQ R9, R8
+  CMPQ -8(SP), R8
   JNE FOR_libgogo_symbol_267_1_END
   JMP FOR_libgogo_symbol_267_END
 FOR_libgogo_symbol_267_1_END:
@@ -5563,8 +5552,7 @@ TEXT libgogo·GetType(SB),0,$0-0
 FOR_libgogo_symbol_289_EXPR_START:
   //--- For [expression] start at libgogo/symbol.go:289:33
   MOVQ data(SB), R8
-  MOVQ -8(SP), R9
-  CMPQ R9, R8
+  CMPQ -8(SP), R8
   JNE FOR_libgogo_symbol_289_1_END
   JMP FOR_libgogo_symbol_289_END
 FOR_libgogo_symbol_289_1_END:
@@ -5774,8 +5762,7 @@ TEXT libgogo·FindPackageName(SB),0,$0-0
 FOR_libgogo_symbol_311_EXPR_START:
   //--- For [expression] start at libgogo/symbol.go:311:31
   MOVQ data(SB), R8
-  MOVQ -16(SP), R9
-  CMPQ R9, R8
+  CMPQ -16(SP), R8
   JNE FOR_libgogo_symbol_311_1_END
   JMP FOR_libgogo_symbol_311_END
 FOR_libgogo_symbol_311_1_END:
@@ -5886,8 +5873,7 @@ TEXT libgogo·FindTypePackageName(SB),0,$0-0
 FOR_libgogo_symbol_329_EXPR_START:
   //--- For [expression] start at libgogo/symbol.go:329:31
   MOVQ data(SB), R8
-  MOVQ -16(SP), R9
-  CMPQ R9, R8
+  CMPQ -16(SP), R8
   JNE FOR_libgogo_symbol_329_1_END
   JMP FOR_libgogo_symbol_329_END
 FOR_libgogo_symbol_329_1_END:
@@ -5995,8 +5981,7 @@ TEXT libgogo·GetParameterAt(SB),0,$0-0
 FOR_libgogo_symbol_345_EXPR_START:
   //--- For [expression] start at libgogo/symbol.go:345:42
   MOVQ data(SB), R8
-  MOVQ -8(SP), R9
-  CMPQ R9, R8
+  CMPQ -8(SP), R8
   JNE FOR_libgogo_symbol_345_1_END
   JMP FOR_libgogo_symbol_345_END
 FOR_libgogo_symbol_345_1_END:
@@ -6247,8 +6232,7 @@ TEXT libgogo·NewType(SB),0,$0-0
   //--- Assignment end at libgogo/symbol.go:381:39
   //--- If start at libgogo/symbol.go:382:8
   MOVQ data(SB), R8
-  MOVQ 56(SP), R9
-  CMPQ R9, R8
+  CMPQ 56(SP), R8
   JNE IF_libgogo_symbol_382_1_END
   JMP IF_libgogo_symbol_382_END
 IF_libgogo_symbol_382_1_END:
@@ -6340,8 +6324,7 @@ TEXT libgogo·PrintObjects(SB),0,$0-0
 FOR_libgogo_symbol_401_EXPR_START:
   //--- For [expression] start at libgogo/symbol.go:401:21
   MOVQ data(SB), R8
-  MOVQ -8(SP), R9
-  CMPQ R9, R8
+  CMPQ -8(SP), R8
   JNE FOR_libgogo_symbol_401_1_END
   JMP FOR_libgogo_symbol_401_END
 FOR_libgogo_symbol_401_1_END:
@@ -6950,8 +6933,7 @@ TEXT libgogo·PrintTypes(SB),0,$0-0
 FOR_libgogo_symbol_448_EXPR_START:
   //--- For [expression] start at libgogo/symbol.go:448:21
   MOVQ data(SB), R8
-  MOVQ -8(SP), R9
-  CMPQ R9, R8
+  CMPQ -8(SP), R8
   JNE FOR_libgogo_symbol_448_1_END
   JMP FOR_libgogo_symbol_448_END
 FOR_libgogo_symbol_448_1_END:
@@ -7186,8 +7168,7 @@ IF_libgogo_symbol_451_ELSE_END:
 FOR_libgogo_symbol_460_EXPR_START:
   //--- For [expression] start at libgogo/symbol.go:460:25
   MOVQ data(SB), R8
-  MOVQ -16(SP), R9
-  CMPQ R9, R8
+  CMPQ -16(SP), R8
   JNE FOR_libgogo_symbol_460_1_END
   JMP FOR_libgogo_symbol_460_END
 FOR_libgogo_symbol_460_1_END:
@@ -7722,8 +7703,7 @@ TEXT libgogo·PrintFunctions(SB),0,$0-0
 FOR_libgogo_symbol_503_EXPR_START:
   //--- For [expression] start at libgogo/symbol.go:503:21
   MOVQ data(SB), R8
-  MOVQ -8(SP), R9
-  CMPQ R9, R8
+  CMPQ -8(SP), R8
   JNE FOR_libgogo_symbol_503_1_END
   JMP FOR_libgogo_symbol_503_END
 FOR_libgogo_symbol_503_1_END:
@@ -7896,8 +7876,7 @@ FOR_libgogo_symbol_503_BODY:
 FOR_libgogo_symbol_511_EXPR_START:
   //--- For [expression] start at libgogo/symbol.go:511:33
   MOVQ data(SB), R8
-  MOVQ -16(SP), R9
-  CMPQ R9, R8
+  CMPQ -16(SP), R8
   JNE FOR_libgogo_symbol_511_1_END
   JMP FOR_libgogo_symbol_511_END
 FOR_libgogo_symbol_511_1_END:
@@ -8432,8 +8411,7 @@ TEXT libgogo·SymbolTableFunctionsToStringList(SB),0,$0-0
 FOR_libgogo_symbol_555_EXPR_START:
   //--- For [expression] start at libgogo/symbol.go:555:21
   MOVQ data(SB), R8
-  MOVQ -8(SP), R9
-  CMPQ R9, R8
+  CMPQ -8(SP), R8
   JNE FOR_libgogo_symbol_555_1_END
   JMP FOR_libgogo_symbol_555_END
 FOR_libgogo_symbol_555_1_END:
@@ -8659,8 +8637,7 @@ FOR_libgogo_symbol_555_BODY:
   //--- Assignment end at libgogo/symbol.go:563:22
   //--- If start at libgogo/symbol.go:564:12
   MOVQ data(SB), R8
-  MOVQ -16(SP), R9
-  CMPQ R9, R8
+  CMPQ -16(SP), R8
   JNE IF_libgogo_symbol_564_1_END
   JMP IF_libgogo_symbol_564_END
 IF_libgogo_symbol_564_1_END:
@@ -8701,8 +8678,7 @@ IF_libgogo_symbol_564_ELSE_END:
 FOR_libgogo_symbol_567_EXPR_START:
   //--- For [expression] start at libgogo/symbol.go:567:17
   MOVQ data(SB), R8
-  MOVQ -16(SP), R9
-  CMPQ R9, R8
+  CMPQ -16(SP), R8
   JNE FOR_libgogo_symbol_567_1_END
   JMP FOR_libgogo_symbol_567_END
 FOR_libgogo_symbol_567_1_END:
@@ -9023,8 +8999,7 @@ TEXT libgogo·SymbolTableTypesToStringList(SB),0,$0-0
 FOR_libgogo_symbol_595_EXPR_START:
   //--- For [expression] start at libgogo/symbol.go:595:21
   MOVQ data(SB), R8
-  MOVQ -8(SP), R9
-  CMPQ R9, R8
+  CMPQ -8(SP), R8
   JNE FOR_libgogo_symbol_595_1_END
   JMP FOR_libgogo_symbol_595_END
 FOR_libgogo_symbol_595_1_END:
