@@ -74,9 +74,7 @@ func main() {
             }
         }
     } else { // Compile==2 => Link
-        for curFileIndex=0;curFileIndex<fileInfoLen;curFileIndex=curFileIndex+1 {
-            Link();
-        }
+        Link();
     }
 
     for curFileIndex=0;curFileIndex<fileInfoLen;curFileIndex=curFileIndex+1 {

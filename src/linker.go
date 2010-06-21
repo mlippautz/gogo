@@ -408,34 +408,38 @@ func Link() {
     var symtable uint64 = 0;
     var ld LineDesc;
 
-    ResetToken();
-    GetLine(&ld);
-    for ;tok.id != TOKEN_EOS;{
-        strCmp = libgogo.StringCompare("//Symbol table:", ld.Line);
-        if strCmp == 0 {
-            symtable = 1;
-            GetLine(&ld); // Proceed to next line
-        } 
-        if symtable != 0 { // Parse symtable entries
-            strCmp = libgogo.StringCompare("//End Symbol table", ld.Line);
-            if strCmp == 0 {
-                symtable = 0;
-            } else {
-                ParseSymTblLine(&ld);
-            }
-        } else { // Parse normal lines and fix everything
-            if ld.NeedsFix != 0 {
-                GetLine(&ld);
-                FixOffset(&ld);
-            } else {
-                strCmp = libgogo.StringCompare(ld.Line, "__UNLINKED_CODE");
-                if strCmp != 0 {
-                    libgogo.PrintString(ld.Line);
-                    libgogo.PrintString("\n");
-                }
-            }
+    for curFileIndex=0;curFileIndex<fileInfoLen;curFileIndex=curFileIndex+1 {
 
-        }
+        ResetToken();
         GetLine(&ld);
+        for ;tok.id != TOKEN_EOS;{
+            strCmp = libgogo.StringCompare("//Symbol table:", ld.Line);
+            if strCmp == 0 {
+                symtable = 1;
+                GetLine(&ld); // Proceed to next line
+            } 
+            if symtable != 0 { // Parse symtable entries
+                strCmp = libgogo.StringCompare("//End Symbol table", ld.Line);
+                if strCmp == 0 {
+                    symtable = 0;
+                } else {
+                    ParseSymTblLine(&ld);
+                }
+            } else { // Parse normal lines and fix everything
+                if ld.NeedsFix != 0 {
+                    GetLine(&ld);
+                    FixOffset(&ld);
+                } else {
+                    strCmp = libgogo.StringCompare(ld.Line, "__UNLINKED_CODE");
+                    if strCmp != 0 {
+                        libgogo.PrintString(ld.Line);
+                        libgogo.PrintString("\n");
+                    }
+                }
+
+            }
+            GetLine(&ld);
+        }
+
     }
 }
