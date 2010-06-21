@@ -11,10 +11,33 @@ package main
 import "./libgogo/_obj/libgogo"
 
 func SwapExpressionBranches(ed *ExpressionDescriptor) {
-    var tmp uint64;
-    tmp = ed.T;
-    ed.T = ed.F;
-    ed.F = tmp;
+    var stacksize uint64;
+    var depth uint64;
+    var tvalue uint64 = 0;
+    var fvalue uint64 = 0;
+
+    stacksize = libgogo.GetStackItemCount(&ed.FS);
+    if stacksize > 0 {
+        depth = libgogo.Peek(&ed.FDepthS);
+        if depth >= ed.ExpressionDepth {
+            fvalue = libgogo.Pop(&ed.FS);
+        }
+    }
+
+    stacksize = libgogo.GetStackItemCount(&ed.TS);
+    if stacksize > 0 {
+        depth = libgogo.Peek(&ed.TDepthS);
+        if depth >= ed.ExpressionDepth {
+            tvalue = libgogo.Pop(&ed.TS);
+        }
+    }
+
+    if tvalue != 0 {
+        libgogo.Push(&ed.FS, tvalue);
+    }
+    if fvalue != 0 {
+        libgogo.Push(&ed.TS, fvalue);
+    }
 }
 
 //
@@ -113,13 +136,17 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
             if ed.Not == 0 {
                 jmp = GetJump(item.C, 1);
             } else {
-                if ed.TDepth > ed.ExpressionDepth {
-                    labelString = GenerateSubLabel(ed,1 /*positive*/ ,"END");
-                    jmp = GetJump(item.C, 0);
-                    ed.Not = 0;
-                    SwapExpressionBranches(ed);
+                ed.Not = 0;
+                stacksize = libgogo.GetStackItemCount(&ed.TS);
+                if stacksize > 0 {
+                    depth = libgogo.Peek(&ed.TDepthS);
+                    if depth >= ed.ExpressionDepth {
+                        labelString = GenerateSubLabel(ed,1,"END");
+                        jmp = GetJump(item.C, 0);
+                        SwapExpressionBranches(ed);
+                    }
                 } else {
-                    jmp = GetJump(item.C,1);
+                    jmp = GetJump(item.C,0);
                 }
             }
             PrintJump(jmp, labelString);
@@ -133,26 +160,24 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
                     libgogo.Pop(&ed.TDepthS);
                 }
             }
-            
-            //if ed.T != 0 {
-            //    if ed.TDepth < ed.ExpressionDepth {
-            //        PrintLabelWrapped(ed, 1 /*local*/, 1 /*positive*/, "END");
-            //        ed.T = 0;
-            //    }
-            //}
         } else {
             if op == TOKEN_REL_OR {
                 labelString = GenerateSubLabel(ed,1,"END");
                 if ed.Not == 0 {
                     jmp = GetJump(item.C, 0);
                 } else {
-                    if ed.FDepth > ed.ExpressionDepth {
-                        labelString = GenerateSubLabel(ed,0,"END");
-                        jmp = GetJump(item.C, 1);
-                        ed.Not = 0;
-                        SwapExpressionBranches(ed);
+                    ed.Not = 0;
+                    stacksize = libgogo.GetStackItemCount(&ed.FS);
+                    if stacksize > 0 {
+                        depth = libgogo.Peek(&ed.FDepthS);
+                        if depth >= ed.ExpressionDepth {
+
+                            labelString = GenerateSubLabel(ed,0,"END");
+                            jmp = GetJump(item.C, 1);
+                            SwapExpressionBranches(ed);
+                        }
                     } else {
-                        jmp = GetJump(item.C,0);
+                        jmp = GetJump(item.C,1);
                     }   
                 }
                 PrintJump(jmp, labelString);
@@ -165,12 +190,6 @@ func GenerateRelative(item *libgogo.Item, op uint64, ed *ExpressionDescriptor) {
                         libgogo.Pop(&ed.FDepthS);
                     }
                 }
-                //if ed.F != 0 {
-                //    if ed.FDepth < ed.ExpressionDepth {
-                //        PrintLabelWrapped(ed, 1 /*local*/, 0 /*negative*/, "END")
-                //        ed.F = 0;
-                //    }
-                //}
             } else {
                 GenErrorWeak("Relative AND or OR expected.");
             }
