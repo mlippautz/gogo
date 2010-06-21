@@ -47,7 +47,7 @@ READ_SUCCESS:
 TEXT ·GetChar(SB),$0-16 //Read: 1 parameter (2), 1 return value
   MOVQ $0, AX //sys_read (3 parameters)
   MOVQ 8(SP), DI //fd (first parameter => SP+64bit)
-  MOVQ $0, 16(SP) //Initialize result with 0
+  MOVQ $0, 16(SP) //Initialize return value (return value after one parameter => SP+2*64bit)
   LEAQ 16(SP), SI //buffer (return value after one parameter => SP+2*64bit)
   MOVQ $1, DX //buffer size (size 1)
   SYSCALL //Linux syscall

@@ -2538,15 +2538,15 @@ FOR_libgogo_convert_87_END:
 //
 
 TEXT libgogo·ToIntFromByte(SB),$0-16 //ToIntFromByte: 1 parameter, 1 return value
-  MOVQ $0, AX //Set AX to 0
-  MOVB 8(SP), AL //Move byte parameter to AL (first parameter => SP+64bit)
-  MOVQ AX, 16(SP) //Move whole AX register with byte parameter to result (return value after one parameter => SP+2*64bit)
+  MOVQ $0, 16(SP) //Initialize return value (return value after one parameter => SP+2*64bit)
+  MOVB 8(SP), AX //Move byte parameter to AX (first parameter => SP+64bit)
+  MOVB AX, 16(SP) //Move whole AX register with byte parameter to result (return value after one parameter => SP+2*64bit)
   RET
 
 TEXT libgogo·ToByteFromInt(SB),$0-16 //ToByteFromInt: 1 parameter, 1 return value
   MOVQ $0, 16(SP) //Clear whole return value (return value after one parameter => SP+2*64bit)
-  MOVQ 8(SP), AX //Move whole parameter to AX (first parameter => SP+64bit)
-  MOVB AL, 16(SP) //Move AL (last byte of parameter) to result (return value after one parameter => SP+2*64bit)
+  MOVB 8(SP), AX //Move byte parameter (part) to AX (first parameter => SP+64bit)
+  MOVB AX, 16(SP) //Move AL (last byte of parameter) to result (return value after one parameter => SP+2*64bit)
   RET
 
 TEXT libgogo·ToUint64FromBytePtr(SB),$0-16 //ToUint64FromBytePtr: 1 parameter, 1 return value
@@ -2760,7 +2760,7 @@ READ_SUCCESS:
 TEXT libgogo·GetChar(SB),$0-16 //Read: 1 parameter (2), 1 return value
   MOVQ $0, AX //sys_read (3 parameters)
   MOVQ 8(SP), DI //fd (first parameter => SP+64bit)
-  MOVQ $0, 16(SP) //Initialize result with 0
+  MOVQ $0, 16(SP) //Initialize return value (return value after one parameter => SP+2*64bit)
   LEAQ 16(SP), SI //buffer (return value after one parameter => SP+2*64bit)
   MOVQ $1, DX //buffer size (size 1)
   SYSCALL //Linux syscall
@@ -9473,7 +9473,6 @@ TEXT libgogo·Uint64ToTypeDescPtr(SB),$0-16 //Uint64ToTypeDescPtr: 1 parameter, 
   MOVQ AX, 16(SP) //Move address from BX to return value (return value after one parameter => SP+2*64bit)
   RET
 
-
 TEXT libgogo·ResetString(SB),0,$0-0
   //--- Local variable assignment start at libgogo/string.go:33:25
   //--- Local variable assignment RHS load start at libgogo/string.go:33:25
@@ -10577,16 +10576,16 @@ IF_libgogo_string_139_ELSE_END:
 //
 
 TEXT libgogo·StringLength(SB),$0-24 //StringLength: 1 parameter (2), 1 return value
-  MOVQ $0, 24(SP) //Set return value to 0
-  MOVW 16(SP), AX //String length is stored together with the string (first parameter = SP+64bit -> +64bit = SP+2*64bit)
-  MOVW AX, 24(SP) //Move length to result with only 32 bits (return value after one parameter => SP+3*64bit)
+  MOVQ $0, 24(SP) //Set return value to 0 (return value after one parameter => SP+3*64bit)
+  MOVL 16(SP), AX //String length is stored together with the string (first parameter = SP+64bit -> +64bit = SP+2*64bit)
+  MOVL AX, 24(SP) //Move length to result with only 32 bits (return value after one parameter => SP+3*64bit)
   RET
 
 TEXT libgogo·StringLength2(SB),$0-16 //StringLength2: 1 parameter, 1 return value
-  MOVQ $0, 16(SP) //Set return value to 0
+  MOVQ $0, 16(SP) //Set return value to 0 (return value after one parameter => SP+2*64bit)
   MOVQ 8(SP), AX //Load string address to AX (first parameter = SP+64bit)
-  MOVW 8(AX), BX //String length is stored together with the string
-  MOVW BX, 16(SP) //Move length to result with only 32 bits (return value after one parameter => SP+3*64bit)
+  MOVL 8(AX), BX //String length is stored together with the string at offset 8
+  MOVL BX, 16(SP) //Move length to result with only 32 bits (return value after one parameter => SP+2*64bit)
   RET
 
 TEXT libgogo·GetStringAddress(SB),$0-16 //GetStringAddress: 1 parameter, 1 return value

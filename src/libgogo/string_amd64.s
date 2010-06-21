@@ -7,16 +7,16 @@
 //
 
 TEXT ·StringLength(SB),$0-24 //StringLength: 1 parameter (2), 1 return value
-  MOVQ $0, 24(SP) //Set return value to 0
-  MOVW 16(SP), AX //String length is stored together with the string (first parameter = SP+64bit -> +64bit = SP+2*64bit)
-  MOVW AX, 24(SP) //Move length to result with only 32 bits (return value after one parameter => SP+3*64bit)
+  MOVQ $0, 24(SP) //Set return value to 0 (return value after one parameter => SP+3*64bit)
+  MOVL 16(SP), AX //String length is stored together with the string (first parameter = SP+64bit -> +64bit = SP+2*64bit)
+  MOVL AX, 24(SP) //Move length to result with only 32 bits (return value after one parameter => SP+3*64bit)
   RET
 
 TEXT ·StringLength2(SB),$0-16 //StringLength2: 1 parameter, 1 return value
-  MOVQ $0, 16(SP) //Set return value to 0
+  MOVQ $0, 16(SP) //Set return value to 0 (return value after one parameter => SP+2*64bit)
   MOVQ 8(SP), AX //Load string address to AX (first parameter = SP+64bit)
-  MOVW 8(AX), BX //String length is stored together with the string
-  MOVW BX, 16(SP) //Move length to result with only 32 bits (return value after one parameter => SP+3*64bit)
+  MOVL 8(AX), BX //String length is stored together with the string at offset 8
+  MOVL BX, 16(SP) //Move length to result with only 32 bits (return value after one parameter => SP+2*64bit)
   RET
 
 TEXT ·GetStringAddress(SB),$0-16 //GetStringAddress: 1 parameter, 1 return value

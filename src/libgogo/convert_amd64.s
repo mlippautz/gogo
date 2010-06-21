@@ -7,15 +7,15 @@
 //
 
 TEXT ·ToIntFromByte(SB),$0-16 //ToIntFromByte: 1 parameter, 1 return value
-  MOVQ $0, AX //Set AX to 0
-  MOVB 8(SP), AL //Move byte parameter to AL (first parameter => SP+64bit)
-  MOVQ AX, 16(SP) //Move whole AX register with byte parameter to result (return value after one parameter => SP+2*64bit)
+  MOVQ $0, 16(SP) //Initialize return value (return value after one parameter => SP+2*64bit)
+  MOVB 8(SP), AX //Move byte parameter to AX (first parameter => SP+64bit)
+  MOVB AX, 16(SP) //Move whole AX register with byte parameter to result (return value after one parameter => SP+2*64bit)
   RET
 
 TEXT ·ToByteFromInt(SB),$0-16 //ToByteFromInt: 1 parameter, 1 return value
   MOVQ $0, 16(SP) //Clear whole return value (return value after one parameter => SP+2*64bit)
-  MOVQ 8(SP), AX //Move whole parameter to AX (first parameter => SP+64bit)
-  MOVB AL, 16(SP) //Move AL (last byte of parameter) to result (return value after one parameter => SP+2*64bit)
+  MOVB 8(SP), AX //Move byte parameter (part) to AX (first parameter => SP+64bit)
+  MOVB AX, 16(SP) //Move AL (last byte of parameter) to result (return value after one parameter => SP+2*64bit)
   RET
 
 TEXT ·ToUint64FromBytePtr(SB),$0-16 //ToUint64FromBytePtr: 1 parameter, 1 return value

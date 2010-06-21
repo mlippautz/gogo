@@ -12,4 +12,3 @@ TEXT ·Uint64ToTypeDescPtr(SB),$0-16 //Uint64ToTypeDescPtr: 1 parameter, 1 retur
   MOVQ AX, 16(SP) //Move address from BX to return value (return value after one parameter => SP+2*64bit)
   RET
 
-
