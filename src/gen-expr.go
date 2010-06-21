@@ -64,6 +64,7 @@ func SetExpressionDescriptor(ed *ExpressionDescriptor, labelPrefix string) {
     ed.F = 0;
     ed.TDepth = 0;
     ed.FDepth = 0;
+    ed.Not = 0;
 
     libgogo.InitializeStack(&ed.TS);
     libgogo.InitializeStack(&ed.FS);
