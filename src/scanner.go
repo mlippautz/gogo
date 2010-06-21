@@ -171,7 +171,7 @@ func GetNextTokenRaw() {
         tok.id = TOKEN_IDENTIFIER;
         // preceding characters may be letter,_, or a number
         for ; ((singleChar >= 'A') && (singleChar <= 'Z')) || ((singleChar >= 'a') && (singleChar <= 'z')) || (singleChar == '_') || ((singleChar >= '0') && (singleChar <= '9')); singleChar = GetCharWrapped() {
-            tmp_TokAppendStr(singleChar);
+            libgogo.CharAppend(&tok.strValue, singleChar);
         }
         // save the last read character for the next GetNextToken() cycle
         tok.nextChar = singleChar;
@@ -182,7 +182,7 @@ func GetNextTokenRaw() {
     if (done != 1) && (singleChar == '"') {
         tok.id = TOKEN_STRING;        
         for singleChar = GetEscapedCharWrapped(); singleChar != '"';singleChar = GetEscapedCharWrapped() {
-            tmp_TokAppendStr(singleChar);
+            libgogo.CharAppend(&tok.strValue, singleChar);
         }
         if singleChar != '"' {
             ScanErrorString("String not closing.");
@@ -459,8 +459,4 @@ func debugToken(tok *Token) {
         libgogo.PrintNumber(tok.intValue);
         libgogo.PrintString("\n");
     }
-}
-
-func tmp_TokAppendStr(b byte) {
-    libgogo.CharAppend(&tok.strValue, b);
 }
