@@ -1,0 +1,216 @@
+#!/bin/sh
+
+# Copyright 2009 The GoGo Authors. All rights reserved.
+# Use of this source code is governed by the MIT
+# license that can be found in the LICENSE file.
+
+# Program name from it's filename
+prog=${0##*/}
+
+# Text color variables
+txtund=$(tput sgr 0 1)    # Underline
+txtbld=$(tput bold)       # Bold
+txtred=$(tput setaf 1)    # Red
+txtgrn=$(tput setaf 2)    # Green
+txtylw=$(tput setaf 3)    # Yellow
+txtblu=$(tput setaf 4)    # Blue
+txtpur=$(tput setaf 5)    # Purple
+txtcyn=$(tput setaf 6)    # Cyan
+txtwht=$(tput setaf 7)    # White
+txtrst=$(tput sgr0)       # Text reset
+txtund=$(tput sgr 0 1)          # Underline
+txtbld=$(tput bold)             # Bold
+bldred=${txtbld}$(tput setaf 1) #  red
+bldblu=${txtbld}$(tput setaf 4) #  blue
+bldwht=${txtbld}$(tput setaf 7) #  white
+txtrst=$(tput sgr0)             # Reset
+info=${txtgrn}*${txtrst}        # Feedback
+pass=${bldblu}*${txtrst}
+warn=${bldred}!${txtrst}
+
+COMPILE="\
+./gogo-bs -c \
+libgogo/convert.go \
+libgogo/convert_amd64.s \
+libgogo/io.go \
+libgogo/io_amd64.s \
+libgogo/list.go \
+libgogo/memmgr.go \
+libgogo/memmgr_amd64.s \
+libgogo/strlist.go \
+libgogo/symbol.go \
+libgogo/symbol_amd64.s \
+libgogo/string.go \
+libgogo/string_amd64.s \
+libgogo/item.go \
+libgogo/item_amd64.s \
+libgogo/libgogo.go \
+libgogo/libgogo_amd64.s \
+libgogo/stack.go \
+globals.go \
+token.go \
+symtable.go \
+parser.go \
+gogo.go \
+asm_out.go \
+inspector.go \
+codegen.go \
+gen-arith.go \
+gen-assign.go \
+gen-cond.go \
+gen-const.go \
+gen-expr.go \
+gen-fcn.go \
+gen-for.go \
+gen-if.go \
+linker.go \
+parse-utils.go \
+scanner.go \
+utils.go \
+"
+
+COMPILE2="\
+./gogo-self -c \
+libgogo/convert.go \
+libgogo/convert_amd64.s \
+libgogo/io.go \
+libgogo/io_amd64.s \
+libgogo/list.go \
+libgogo/memmgr.go \
+libgogo/memmgr_amd64.s \
+libgogo/strlist.go \
+libgogo/symbol.go \
+libgogo/symbol_amd64.s \
+libgogo/string.go \
+libgogo/string_amd64.s \
+libgogo/item.go \
+libgogo/item_amd64.s \
+libgogo/libgogo.go \
+libgogo/libgogo_amd64.s \
+libgogo/stack.go \
+globals.go \
+token.go \
+symtable.go \
+parser.go \
+gogo.go \
+asm_out.go \
+inspector.go \
+codegen.go \
+gen-arith.go \
+gen-assign.go \
+gen-cond.go \
+gen-const.go \
+gen-expr.go \
+gen-fcn.go \
+gen-for.go \
+gen-if.go \
+linker.go \
+parse-utils.go \
+scanner.go \
+utils.go \
+"
+
+echo ""
+echo ">>> ${txtbld}Cleaning${txtrst}"
+echo ""
+cd libgogo
+make clean
+cd ..
+make clean
+
+echo ""
+echo ">>> ${txtbld}Bootstrapping${txtrst}"
+echo ""
+cd libgogo
+make
+cd ..
+make
+
+echo ""
+echo ">>> ${txtbld}Preparing for self-compilation${txtrst} (using bootstrapped compiler)"
+echo ""
+CMD="mv gogo gogo-bs"
+echo $CMD
+$($CMD)
+
+echo ""
+echo ">>> ${txtbld}Compiling compiler${txtrst} (=> _gogo_.sog)"
+echo ""
+echo $COMPILE
+TIME=$(time $COMPILE)
+echo $TIME
+
+echo ""
+echo ">>> ${txtbld}Linking compiler${txtrst} (=> _final_.sog)"
+echo ""
+LINK="./gogo-bs -l _gogo_.sog"
+echo $LINK
+TIME=$(time $LINK)
+echo $TIME
+
+echo ""
+echo ">>> ${txtbld}Saving output for fixpoint test${txtrst} (=> _final_1_.sog)"
+echo ""
+CMD="cp _final_.sog _final_1_.sog"
+echo $CMD
+$($CMD)
+
+echo ""
+echo ">>> ${txtbld}Assembly to Linux amd64 ELF${txtrst} (=> 6.out)"
+echo ""
+CMD="6a _final_.sog"
+echo $CMD
+$($CMD)
+CMD="6l _final_.sog.6"
+echo $CMD
+$($CMD)
+
+echo ""
+echo ">>> ${txtbld}Preparing for self-compilation${txtrst} (using our own compiler)"
+echo ""
+CMD="mv ./6.out gogo-self"
+echo $CMD
+$($CMD)
+
+echo ""
+echo ">>> ${txtbld}Compiling compiler${txtrst} (=> _gogo_.sog)"
+echo ""
+echo $COMPILE2
+TIME=$(time $COMPILE2)
+echo $TIME
+
+echo ""
+echo ">>> ${txtbld}Linking compiler${txtrst} (=> _final_.sog)"
+echo ""
+LINK="./gogo-self -l _gogo_.sog"
+echo $LINK
+TIME=$(time $LINK)
+echo $TIME
+
+echo ""
+echo ">>> ${txtbld}Saving output for fixpoint test${txtrst} (=> _final_2_.sog)"
+echo ""
+CMD="cp _final_.sog _final_2_.sog"
+echo $CMD
+$($CMD)
+
+echo ""
+echo ">>> ${txtbld}Assembly to Linux amd64 ELF${txtrst} (=> 6.out)"
+echo ""
+CMD="6a _final_.sog"
+echo $CMD
+$($CMD)
+CMD="6l _final_.sog.6"
+echo $CMD
+$($CMD)
+
+echo ""
+echo ">>> ${txtbld}Fixpoint test${txtrst}"
+echo ""
+CMD="diff -u _final_1_.sog _final_2_.sog"
+echo $CMD
+$($CMD)
+
+echo ""
+echo ">>> ${txtbld}Cu!${txtrst}"
+echo ""

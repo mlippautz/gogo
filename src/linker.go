@@ -309,7 +309,7 @@ func GetParameterSize(pkgName string, funcName string) uint64 {
 //
 // Function processing a line and fixing offsets if necessary
 //
-func FixOffset(ld *LineDesc) {
+func FixOffset(fd uint64, ld *LineDesc) {
     var i uint64;
     var strLen uint64;
     var size uint64;
@@ -392,12 +392,12 @@ func FixOffset(ld *LineDesc) {
     }
 
 
-    libgogo.PrintString(newLine);
-    libgogo.PrintString("\n");
+    libgogo.WriteString(fd, newLine);
+    libgogo.WriteString(fd, "\n");
     if ld.NeedsByteFix == 1 {
-        libgogo.PrintString("  ANDQ $255, ");
-        libgogo.PrintString(fixedAdr);
-        libgogo.PrintString("\n");
+        libgogo.WriteString(fd, "  ANDQ $255, ");
+        libgogo.WriteString(fd, fixedAdr);
+        libgogo.WriteString(fd, "\n");
         ld.NeedsByteFix = 0;
     }
 }
@@ -409,8 +409,14 @@ func Link() {
     var strCmp uint64;
     var symtable uint64 = 0;
     var ld LineDesc;
+    var fd uint64;
 
     InitLineDesc(&ld);
+
+    // The following line creates a new file for the assembler code
+    // flags: O_WRONLY | O_CREAT | O_TRUNC => 577
+    // mode: S_IWUSR | S_IRUSR | S_IRGRP => 416
+    fd = libgogo.FileOpen2("_final_.sog", 577, 416);
 
     for curFileIndex=0;curFileIndex<fileInfoLen;curFileIndex=curFileIndex+1 {
 
@@ -432,12 +438,12 @@ func Link() {
             } else { // Parse normal lines and fix everything
                 if ld.NeedsFix != 0 {
                     GetLine(&ld);
-                    FixOffset(&ld);
+                    FixOffset(fd, &ld);
                 } else {
                     strCmp = libgogo.StringCompare(ld.Line, "__UNLINKED_CODE");
                     if strCmp != 0 {
-                        libgogo.PrintString(ld.Line);
-                        libgogo.PrintString("\n");
+                        libgogo.WriteString(fd, ld.Line);
+                        libgogo.WriteString(fd, "\n");
                     }
                 }
 
