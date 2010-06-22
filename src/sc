@@ -4,9 +4,6 @@
 # Use of this source code is governed by the MIT
 # license that can be found in the LICENSE file.
 
-# Program name from it's filename
-prog=${0##*/}
-
 # Text color variables
 txtund=$(tput sgr 0 1)    # Underline
 txtbld=$(tput bold)       # Bold
@@ -28,8 +25,9 @@ info=${txtgrn}*${txtrst}        # Feedback
 pass=${bldblu}*${txtrst}
 warn=${bldred}!${txtrst}
 
-COMPILE="\
-./gogo-bs -c \
+
+COMPILE_ALL=" \
+-c \
 libgogo/convert.go \
 libgogo/convert_amd64.s \
 libgogo/io.go \
@@ -69,148 +67,120 @@ scanner.go \
 utils.go \
 "
 
-COMPILE2="\
-./gogo-self -c \
-libgogo/convert.go \
-libgogo/convert_amd64.s \
-libgogo/io.go \
-libgogo/io_amd64.s \
-libgogo/list.go \
-libgogo/memmgr.go \
-libgogo/memmgr_amd64.s \
-libgogo/strlist.go \
-libgogo/symbol.go \
-libgogo/symbol_amd64.s \
-libgogo/string.go \
-libgogo/string_amd64.s \
-libgogo/item.go \
-libgogo/item_amd64.s \
-libgogo/libgogo.go \
-libgogo/libgogo_amd64.s \
-libgogo/stack.go \
-globals.go \
-token.go \
-symtable.go \
-parser.go \
-gogo.go \
-asm_out.go \
-inspector.go \
-codegen.go \
-gen-arith.go \
-gen-assign.go \
-gen-cond.go \
-gen-const.go \
-gen-expr.go \
-gen-fcn.go \
-gen-for.go \
-gen-if.go \
-linker.go \
-parse-utils.go \
-scanner.go \
-utils.go \
+LINK_ALL=" \
+-l \
+_gogo_.sog \
 "
 
-echo ""
-echo ">>> ${txtbld}Cleaning${txtrst}"
-echo ""
-cd libgogo
-make clean
-cd ..
-make clean
+function clean() {
+  echo ""
+  echo ">>> ${txtbld}Cleaning${txtrst}"
+  echo ""
+  cd libgogo
+  make clean
+  cd ..
+  make clean
+}
 
-echo ""
-echo ">>> ${txtbld}Bootstrapping${txtrst}"
-echo ""
-cd libgogo
-make
-cd ..
-make
+function bootstrap() {
+  echo ""
+  echo ">>> ${txtbld}Bootstrapping${txtrst}"
+  echo ""
+  cd libgogo
+  make
+  cd ..
+  make
+}
 
-echo ""
-echo ">>> ${txtbld}Preparing for self-compilation${txtrst} (using bootstrapped compiler)"
-echo ""
-CMD="mv gogo gogo-bs"
-echo $CMD
-$($CMD)
+function prepare() {
+  echo ""
+  echo ">>> ${txtbld}Preparing compilation${txtrst}"
+  echo ""
+  CMD="mv $1 $2"
+  echo $CMD
+  $($CMD)
+}
 
-echo ""
-echo ">>> ${txtbld}Compiling compiler${txtrst} (=> _gogo_.sog)"
-echo ""
-echo $COMPILE
-TIME=$(time $COMPILE)
-echo $TIME
+function compile() {
+  echo ""
+  echo ">>> ${txtbld}Compiling compiler${txtrst} ($1 => _gogo_.sog)"
+  echo ""
+  CMD="./$1 $COMPILE_ALL"
+  echo $CMD
+  TIME=$(time $CMD)
+  echo $TIME
+}
 
-echo ""
-echo ">>> ${txtbld}Linking compiler${txtrst} (=> _final_.sog)"
-echo ""
-LINK="./gogo-bs -l _gogo_.sog"
-echo $LINK
-TIME=$(time $LINK)
-echo $TIME
+function link() {
+  echo ""
+  echo ">>> ${txtbld}Linking compiler${txtrst} ($1 =>  _final_.sog)"
+  echo ""
+  CMD="./$1 $LINK_ALL"
+  echo $CMD
+  TIME=$(time $CMD)
+  echo $TIME
+}
 
-echo ""
-echo ">>> ${txtbld}Saving output for fixpoint test${txtrst} (=> _final_1_.sog)"
-echo ""
-CMD="cp _final_.sog _final_1_.sog"
-echo $CMD
-$($CMD)
+function save() {
+  echo ""
+  echo ">>> ${txtbld}Saving output for fixpoint test${txtrst} (=>  _final_$1_.sog)"
+  echo ""
+  CMD="cp _final_.sog _final_$1_.sog"
+  echo $CMD
+  $($CMD)
+}
 
-echo ""
-echo ">>> ${txtbld}Assembly to Linux amd64 ELF${txtrst} (=> 6.out)"
-echo ""
-CMD="6a _final_.sog"
-echo $CMD
-$($CMD)
-CMD="6l _final_.sog.6"
-echo $CMD
-$($CMD)
+function assemble() {
+  echo ""
+  echo ">>> ${txtbld}Assembly to Linux amd64 ELF${txtrst} (=> gogo-$1)"
+  echo ""
+  CMD="6a _final_.sog"
+  echo $CMD
+  $($CMD)
+  CMD="6l _final_.sog.6"
+  echo $CMD
+  $($CMD)
+  CMD="mv 6.out gogo-$1"
+  echo $CMD
+  $($CMD)
+}
 
-echo ""
-echo ">>> ${txtbld}Preparing for self-compilation${txtrst} (using our own compiler)"
-echo ""
-CMD="mv ./6.out gogo-self"
-echo $CMD
-$($CMD)
+function fixpointtest() {
+  echo ""
+  echo ">>> ${txtbld}Fixpoint test${txtrst}"
+  echo ""
+  CMD="diff -u _final_$1_.sog _final_$2_.sog"
+  echo $CMD
+  $($CMD)
+}
 
-echo ""
-echo ">>> ${txtbld}Compiling compiler${txtrst} (=> _gogo_.sog)"
-echo ""
-echo $COMPILE2
-TIME=$(time $COMPILE2)
-echo $TIME
 
-echo ""
-echo ">>> ${txtbld}Linking compiler${txtrst} (=> _final_.sog)"
-echo ""
-LINK="./gogo-self -l _gogo_.sog"
-echo $LINK
-TIME=$(time $LINK)
-echo $TIME
+clean
+bootstrap
+prepare gogo gogo-bootstrapped
 
-echo ""
-echo ">>> ${txtbld}Saving output for fixpoint test${txtrst} (=> _final_2_.sog)"
-echo ""
-CMD="cp _final_.sog _final_2_.sog"
-echo $CMD
-$($CMD)
+COMPILER=gogo-bootstrapped
+CNT=1
+while [ 1 ]; do
+  compile $COMPILER
+  link $COMPILER
+  save $CNT
+  assemble $CNT
 
-echo ""
-echo ">>> ${txtbld}Assembly to Linux amd64 ELF${txtrst} (=> 6.out)"
-echo ""
-CMD="6a _final_.sog"
-echo $CMD
-$($CMD)
-CMD="6l _final_.sog.6"
-echo $CMD
-$($CMD)
+  if [ $CNT -gt 1 ]; then
+    fixpointtest $(( $CNT-1 )) $CNT
+  fi
 
-echo ""
-echo ">>> ${txtbld}Fixpoint test${txtrst}"
-echo ""
-CMD="diff -u _final_1_.sog _final_2_.sog"
-echo $CMD
-$($CMD)
-
-echo ""
-echo ">>> ${txtbld}Cu!${txtrst}"
-echo ""
+  echo ""
+  echo ""
+  echo -n "--- ${txtbld}Created 'gogo-$CNT'. One more iteration?${txtrst} [y/N]: "
+  read -n1 -s input
+  echo ""
+  if [ -z $input ] || test $input != "y" ; then
+    echo "Exiting."
+    exit
+  fi
+  echo ""
+  COMPILER=gogo-$CNT
+  CNT=$(( $CNT + 1 ))
+done

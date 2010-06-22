@@ -1,0 +1,10 @@
+#!/bin/sh
+
+rm -f gogo-*
+rm -f _final_*
+rm -f fib
+rm -f _go*
+cd libgogo
+make clean > /dev/null
+cd .. 
+make clean > /dev/null

@@ -1,0 +1,72 @@
+#!/bin/sh
+
+if [ $# -ne 1 ]; then
+  echo -e "Usage: $prog <compiler/linker>"
+  exit 1;
+fi
+
+# Text color variables
+txtund=$(tput sgr 0 1)    # Underline
+txtbld=$(tput bold)       # Bold
+txtred=$(tput setaf 1)    # Red
+txtgrn=$(tput setaf 2)    # Green
+txtylw=$(tput setaf 3)    # Yellow
+txtblu=$(tput setaf 4)    # Blue
+txtpur=$(tput setaf 5)    # Purple
+txtcyn=$(tput setaf 6)    # Cyan
+txtwht=$(tput setaf 7)    # White
+txtrst=$(tput sgr0)       # Text reset
+txtund=$(tput sgr 0 1)          # Underline
+txtbld=$(tput bold)             # Bold
+bldred=${txtbld}$(tput setaf 1) #  red
+bldblu=${txtbld}$(tput setaf 4) #  blue
+bldwht=${txtbld}$(tput setaf 7) #  white
+txtrst=$(tput sgr0)             # Reset
+info=${txtgrn}*${txtrst}        # Feedback
+pass=${bldblu}*${txtrst}
+warn=${bldred}!${txtrst}
+
+COMPILE_FIB=" \
+-c fib.go \
+libgogo/convert.go \
+libgogo/convert_amd64.s \
+libgogo/io.go \
+libgogo/io_amd64.s \
+libgogo/list.go \
+libgogo/memmgr.go \
+libgogo/memmgr_amd64.s \
+libgogo/strlist.go \
+libgogo/symbol.go \
+libgogo/symbol_amd64.s \
+libgogo/string.go \
+libgogo/string_amd64.s \
+libgogo/item.go \
+libgogo/item_amd64.s \
+libgogo/libgogo.go \
+libgogo/libgogo_amd64.s \
+"
+
+LINK_FIB=" \
+-l _gogo_.sog \
+"
+
+echo ""
+echo ">>> ${txtbld} Creating fibonacci sample using '$1'${txtrst}"
+echo ""
+CMD="./$1 $COMPILE_FIB"
+echo $CMD
+TIME=$(time $CMD)
+echo $TIME
+CMD="./$1 $LINK_FIB"
+echo $CMD
+TIME=$(time $CMD)
+echo $TIME
+CMD="6a _final_.sog"
+echo $CMD
+$($CMD)
+CMD="6l _final_.sog.6"
+echo $CMD
+$($CMD)
+CMD="mv 6.out fib"
+echo $CMD
+$($CMD)
