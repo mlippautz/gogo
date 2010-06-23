@@ -69,15 +69,6 @@
                 \item No explicit dereferring possible (EBNF)
                 \item Address operator (\&) complicates assignments
             \end{itemize}
-            \tiny \textbf{Example:} \normalsize
-            \begin{lstlisting}
-a = &b[i].c.d[3];
-            \end{lstlisting}
-        \item  Explanatory \textbf{comments} in assembly output\\
-            \begin{itemize}
-                \item Source file and line included
-                \item Option to disable (debug level reduction)
-            \end{itemize}
     \end{itemize}
 }
 
@@ -97,6 +88,11 @@ if (done!=1) && (((a<1) && (b<2)) || ((c<3) && (d<4))) { ...
                 \item Weak symbols (';', ...)
                 \item Syncing points (functions)
                 \item Code generation error stop compiling, but continues parsing
+            \end{itemize}
+        \item  Explanatory \textbf{comments} in assembly output\\
+            \begin{itemize}
+                \item Source file and line included
+                \item Option to disable (debug level reduction)
             \end{itemize}
     \end{itemize}
 \end{frame}
