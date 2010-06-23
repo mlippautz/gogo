@@ -5,7 +5,7 @@
 
 \definecolor{lightgray}{RGB}{250,250,250}
 \lstset{
-    language=Java,
+    language=C,
     basicstyle=\tiny,
     frame=lines,
     backgroundcolor=\color{lightgray}
@@ -23,11 +23,8 @@
 
 \frame{\titlepage} 
 
-%\frame{\frametitle{Contents}
-%  \tableofcontents
-%}
-
 \frame{\frametitle{Responsibilities}
+    \begin{center}
     \begin{tabular}{c | c}
         \textbf{Michael Lippautz} & \textbf{Andreas Unterweger}\\
         \hline
@@ -38,12 +35,13 @@
         Loops & Address/offset calculcations\\
         Test suite & Symbol table\\
     \end{tabular}
+    \end{center}
 }
 
 \frame{\frametitle{What is GoGo?}
     \begin{itemize}
         \item A self-compiling Go compiler
-        \item Input language: A subset of the Go language\\
+        \item Input language: A subset of the Go language \footnote{golang.org}\\
             \begin{itemize}
                 \item C-like syntax with additional keywords
                 \item Reduced feature set through EBNF
@@ -57,28 +55,55 @@
     \end{itemize}
 }
 
-\frame{\frametitle{What is so special about GoGo?}
+\frame[containsverbatim]{\frametitle{What is so special about GoGo? (1/2)}
     \begin{itemize}
-        \item Advanced string management\\
+        \item Advanced \textbf{string} management\\
             \begin{itemize}
                 \item More memory allocated than initially needed
                 \item "Spare" memory for future concatenations
                 \item Drastically reduces memory consumption
             \end{itemize}
-        \item Implementation of pointers\\
+        \item Implementation of \textbf{pointers}\\
             \begin{itemize}
                 \item Implicit dereferring on structure access
                 \item No explicit dereferring possible (EBNF)
                 \item Address operator (\&) complicates assignments
             \end{itemize}
-        \item Explanatory comments in assembly output\\
+            \tiny \textbf{Example:} \normalsize
+            \begin{lstlisting}
+a = &b[i].c.d[3];
+            \end{lstlisting}
+        \item  Explanatory \textbf{comments} in assembly output\\
             \begin{itemize}
                 \item Source file and line included
                 \item Option to disable (debug level reduction)
-                \item More information in live demo
             \end{itemize}
     \end{itemize}
 }
+
+\begin{frame}[containsverbatim]
+    \frametitle{What is so special about GoGo? (2/2)}
+    \begin{itemize}
+        \item \textbf{Lazy evaluation} over multiple expression levels\\
+            \begin{itemize}
+                \item Merging of positive and negative labels (if appropriate)
+            \end{itemize} 
+            \tiny \textbf{Example:} \normalsize
+            \begin{lstlisting}
+if (done!=1) && (((a<1) && (b<2)) || ((c<3) && (d<4))) { ...
+            \end{lstlisting}
+        \item \textbf{Error handling}
+            \begin{itemize}
+                \item Weak symbols (';', ...)
+                \item Syncing points (functions)
+                \item Code generation error stop compiling, but continues parsing
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Building}
+\end{frame}
 
 \frame{\frametitle{Demo}
     \begin{itemize}
