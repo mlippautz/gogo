@@ -16,16 +16,76 @@
 \begin{document}
 
 \title{\hspace{1.8cm}\textbf{GoGo} \includegraphics[scale=0.3]{files/inspector.jpg}}
-\subtitle{A Go compiler written in Go \tiny{(... and asm)}}
+\subtitle{A Go compiler written in Go \tiny{(... and assembly)}}
 \author{Michael~Lippautz \and Andreas~Unterweger} 
 \date{June 24, 2010} 
 \institute{Compiler Construction Course, Summer 2010}
 
 \frame{\titlepage} 
 
-\frame{\frametitle{Contents}
-  \tableofcontents
-} 
+%\frame{\frametitle{Contents}
+%  \tableofcontents
+%}
+
+\frame{\frametitle{Responsibilities}
+    \begin{tabular}{c | c}
+        \textbf{Michael Lippautz} & \textbf{Andreas Unterweger}\\
+        \hline
+        Scanner & I/O library\\
+        Parser & Memory/string management\\
+        Multiplication/Division & Addition/Subtraction\\
+        Conditionals & Assignments\\
+        Loops & Address/offset calculcations\\
+        Test suite & Symbol table\\
+    \end{tabular}
+}
+
+\frame{\frametitle{What is GoGo?}
+    \begin{itemize}
+        \item A self-compiling Go compiler
+        \item Input language: A subset of the Go language\\
+            \begin{itemize}
+                \item C-like syntax with additional keywords
+                \item Reduced feature set through EBNF
+            \end{itemize}
+        \item Output language: Plan9 x64 assembly\\
+            \begin{itemize}
+                \item Output in text form, not binary form
+                \item Requires Plan9 assembler for binary form
+                \item Requires Plan9 linker for ELF executables
+            \end{itemize}
+    \end{itemize}
+}
+
+\frame{\frametitle{What is so special about GoGo?}
+    \begin{itemize}
+        \item Advanced string management\\
+            \begin{itemize}
+                \item More memory allocated than initially needed
+                \item "Spare" memory for future concatenations
+                \item Drastically reduces memory consumption
+            \end{itemize}
+        \item Implementation of pointers\\
+            \begin{itemize}
+                \item Implicit dereferring on structure access
+                \item No explicit dereferring possible (EBNF)
+                \item Address operator (\&) complicates assignments
+            \end{itemize}
+        \item Explanatory comments in assembly output\\
+            \begin{itemize}
+                \item Source file and line included
+                \item Option to disable (debug level reduction)
+                \item More information in live demo
+            \end{itemize}
+    \end{itemize}
+}
+
+\frame{\frametitle{Demo}
+    \begin{itemize}
+        \item Recursive self-compilation
+        \item Advanced Fibonacci example
+    \end{itemize}
+}
 
 \end{document}
 
