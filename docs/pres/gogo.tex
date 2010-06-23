@@ -69,6 +69,10 @@
                 \item No explicit dereferring possible (EBNF)
                 \item Address operator (\&) complicates assignments
             \end{itemize}
+        \item \textbf{Namespace}
+            \begin{itemize}
+                \item One package hierachy level
+            \end{itemize}
     \end{itemize}
 }
 
@@ -83,11 +87,11 @@
             \begin{lstlisting}
 if (done!=1) && (((a<1) && (b<2)) || ((c<3) && (d<4))) { ...
             \end{lstlisting}
-        \item \textbf{Error handling}
+        \item Self-contained \textbf{library}
             \begin{itemize}
-                \item Weak symbols (';', ...)
-                \item Syncing points (functions)
-                \item Code generation error stop compiling, but continues parsing
+                \item I/O 
+                \item Memory manager
+                \item Lists, Stacks, String operations
             \end{itemize}
         \item  Explanatory \textbf{comments} in assembly output\\
             \begin{itemize}
