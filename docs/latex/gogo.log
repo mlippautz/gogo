@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2010.6.7)  26 JUN 2010 15:16
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2010.6.7)  26 JUN 2010 18:42
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -456,58 +456,83 @@ Overfull \hbox (4.06653pt too wide) in paragraph at lines 185--194
 [] 
  []
 
+
+Underfull \hbox (badness 10000) in paragraph at lines 196--211
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 196--211
+
+ []
+
 [11] [12]
 Chapter 7.
 [13
 
-] [14] [15]
-Chapter 8.
-LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <10.95> not available
-(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 246.
-
-Underfull \hbox (badness 10000) in paragraph at lines 242--254
+]
+Underfull \hbox (badness 10000) in paragraph at lines 230--244
 
  []
 
-[16
 
-] [17] [18]
+Overfull \hbox (16.95285pt too wide) in paragraph at lines 230--244
+[] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 230--244
+
+ []
+
+[14] [15] [16]
+Chapter 8.
+LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <10.95> not available
+(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 270.
+
+Underfull \hbox (badness 10000) in paragraph at lines 266--278
+
+ []
+
+[17
+
+] [18] [19]
 Chapter 9.
-[19
+[20
 
 ]
 Chapter 10.
 
-Underfull \hbox (badness 10000) in paragraph at lines 272--274
+Underfull \hbox (badness 10000) in paragraph at lines 296--298
 
  []
 
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 275.
-(./gogo.bbl [20
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 299.
+(./gogo.bbl [21
 
-]) [21
+]) [22
 
 ] (./gogo.aux) ) 
 Here is how much of TeX's memory you used:
- 7393 strings out of 495061
- 107325 string characters out of 1182622
+ 7396 strings out of 495061
+ 107358 string characters out of 1182622
  238137 words of memory out of 3000000
- 10352 multiletter control sequences out of 15000+50000
- 9595 words of font info for 34 fonts, out of 3000000 for 9000
+ 10353 multiletter control sequences out of 15000+50000
+ 9763 words of font info for 35 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
- 43i,8n,43p,916b,1788s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 43i,8n,43p,938b,1788s stack positions out of 5000i,500n,10000p,200000b,50000s
 </usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmbx10
-.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/
-share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-
-texlive/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-texlive/font
-s/type1/public/amsfonts/cm/cmssbx10.pfb></usr/share/texmf-texlive/fonts/type1/p
-ublic/amsfonts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfo
-nts/cm/cmti10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmtt
-10.pfb>
-Output written on gogo.pdf (21 pages, 188982 bytes).
+.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmitt10.pfb></usr
+/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texm
+f-texlive/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-texlive/fo
+nts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texmf-texlive/fonts/type1/pu
+blic/amsfonts/cm/cmssbx10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsf
+onts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmt
+i10.pfb></usr/share/texmf-texlive/fonts/type1/public/amsfonts/cm/cmtt10.pfb>
+Output written on gogo.pdf (22 pages, 199605 bytes).
 PDF statistics:
- 402 PDF objects out of 1000 (max. 8388607)
- 135 named destinations out of 1000 (max. 500000)
+ 410 PDF objects out of 1000 (max. 8388607)
+ 136 named destinations out of 1000 (max. 500000)
  217 words of extra memory for PDF output out of 10000 (max. 10000000)
 
