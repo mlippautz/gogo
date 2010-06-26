@@ -200,22 +200,25 @@ go_program = package_stmt import_stmt_list struct_decl_list
       Offset calculations within types (p.e. calculating the field offsets in a struct or an array index) require a slightly different handling. Global variables as well as parameters can be treated the same way as explained above as their internal offsets' ascending order corresponds to their memory layout (ascending addresses). Local variables require a different calculation as their memory layout (descending addresses) differs. This is necessary in order to be able to assign global to local variables and vice verse so that their internal memory layouts correspond from the programmer's point of view. This is also done by a distinction based on the item's \texttt{Global} flag as explained above: during code generation, the internal offset of a local variable has to be calculated by subtraction instead of addition due to the negative sign of the offset.
 
   \chapter{Code generation}
-    Lorem ipsum dolor sit amet...
+    GoGo emits assembly code in text form based on the Go input files. This section briefly explains the main features implemented in the code generating functions of GoGo.
 
     \section{Assembly output}
-      Lorem ipsum dolor sit amet...
+      GoGo creates an output file with assembly instructions and comments using mnemonics for op codes and operands/registers which means that it outputs in text form, not in binary form. Thereforce, an assembler is needed to process the output in order to make it executable. Like the Go compiler, GoGo relies on \texttt{6a} and \texttt{6l} of the Plan9 tools in order to acomplish this\cite{pik00}.\\
+      The assembly output consists basically of three sections: the data segment, the initialization segment and the code segment. GoGo's assembly output framework provides basic output routines which make it possible to switch between those three segments. Whereas the data segment is used to reserve space for global variables and strings in the data segment, the initialization segment and the code segment contain the code for global variable initialization and the functions from the input, respectively. All other functions (code generation for arithmetical expressions etc.) rely on the assembly output framework which is also able to place comments with the corresponding input file name and line number for debugging purposes in the output file.
 
     \section{Register allocation}
         The target architecture provides 8 general purpose registers (\texttt{R8}-\texttt{R15}) as well as the registers \texttt{RAX}, \texttt{RBX}, \texttt{RCX} and \texttt{RDX}\cite{int09}. The latter are not being used by GoGo to store variables as their values may change when performing arithmetical operations (p.e. \texttt{RAX} and \texttt{RDX} are always used as the destination registers for multiplications), thus possibly overwriting values previously stored there.\\
         GoGo stores a list for every one of the 8 registers currently free, returning the first free register if required by the code generator. Whenever a register is no longer required (freed), it will be reinserted into the "free" list in order to make it available for future use. Due to the limited amout of registers, the list described is implemented in form of a bit array in the compiler.
 
     \section{The generation of arithmetical expressions}
-      Lorem ipsum dolor sit amet...
+      As described in \cite{wir96}, code generation for arithmetical expressions basically relies on an operand stack and delayed code generation based on \texttt{Items}. For constant operands, constant folding is applied; variable operands are loaded into a free register in order to perform arithmetical operations on them.\\
+      GoGo makes use of the capabilities of the target architecture by not loading constants into registers, thus reducing the number of registers required. Consider the expression \texttt{a + 1} where \texttt{a} is a variable of type \texttt{uint64}. As the target architecture is able to perform an operation like \texttt{ADDQ R8, \$1} (add 1 to the register R8), only \texttt{a} needs to be loaded into a register, whereas 1 can be used directly be incorporated into the instruction itself.\\
+      Multiplication and division on the target architecture both require special treatment: The multiplication instruction only takes the second operand and requires the first operand to be in the register \texttt{RAX}\cite{int09}. Therefore, the first operand has to be loaded into \texttt{RAX} prior multiplication. The multiplication result is stored as 128 bit value in \texttt{RDX} (upper 64 bits) and \texttt{RAX} (lower 64 bits). As GoGo does not support data types other than \texttt{byte} and \texttt{uint64}, the upper 64 bits in \texttt{RDX} are ignored, and the lower 64 bits are moved to one of the 8 registers to save the result before another multiplication is being performed. Similarly, division allows for an 128 bit operand (also in \texttt{RDX} and \texttt{RAX}). As GoGo does not support 128 bit size data types, \texttt{RDX} is always being zeroed prior division.
 
     \section{The generation of assignments}
       Lorem ipsum dolor sit amet...
 
-    \subsection{The generation of conditional expressions}
+    \section{The generation of conditional expressions}
       Lorem ipsum dolor sit amet...
 
     \section{The generation of loops}

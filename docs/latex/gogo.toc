@@ -19,17 +19,17 @@
 \contentsline {chapter}{\numberline {7}Code generation}{13}{chapter.7}
 \contentsline {section}{\numberline {7.1}Assembly output}{13}{section.7.1}
 \contentsline {section}{\numberline {7.2}Register allocation}{13}{section.7.2}
-\contentsline {section}{\numberline {7.3}The generation of arithmetical expressions}{13}{section.7.3}
-\contentsline {section}{\numberline {7.4}The generation of assignments}{13}{section.7.4}
-\contentsline {subsection}{\numberline {7.4.1}The generation of conditional expressions}{13}{subsection.7.4.1}
-\contentsline {section}{\numberline {7.5}The generation of loops}{13}{section.7.5}
-\contentsline {section}{\numberline {7.6}The generation of functions}{14}{section.7.6}
-\contentsline {section}{\numberline {7.7}Global variable initialization}{14}{section.7.7}
-\contentsline {section}{\numberline {7.8}String constants}{14}{section.7.8}
-\contentsline {chapter}{\numberline {8}Library and run time}{15}{chapter.8}
-\contentsline {section}{\numberline {8.1}I/O syscalls}{15}{section.8.1}
-\contentsline {section}{\numberline {8.2}The memory manager}{15}{section.8.2}
-\contentsline {section}{\numberline {8.3}String memory management}{16}{section.8.3}
-\contentsline {section}{\numberline {8.4}Program parameter determination}{16}{section.8.4}
-\contentsline {chapter}{\numberline {9}Building}{18}{chapter.9}
-\contentsline {chapter}{\numberline {10}Testing}{19}{chapter.10}
+\contentsline {section}{\numberline {7.3}The generation of arithmetical expressions}{14}{section.7.3}
+\contentsline {section}{\numberline {7.4}The generation of assignments}{14}{section.7.4}
+\contentsline {section}{\numberline {7.5}The generation of conditional expressions}{14}{section.7.5}
+\contentsline {section}{\numberline {7.6}The generation of loops}{14}{section.7.6}
+\contentsline {section}{\numberline {7.7}The generation of functions}{14}{section.7.7}
+\contentsline {section}{\numberline {7.8}Global variable initialization}{14}{section.7.8}
+\contentsline {section}{\numberline {7.9}String constants}{15}{section.7.9}
+\contentsline {chapter}{\numberline {8}Library and run time}{16}{chapter.8}
+\contentsline {section}{\numberline {8.1}I/O syscalls}{16}{section.8.1}
+\contentsline {section}{\numberline {8.2}The memory manager}{16}{section.8.2}
+\contentsline {section}{\numberline {8.3}String memory management}{17}{section.8.3}
+\contentsline {section}{\numberline {8.4}Program parameter determination}{17}{section.8.4}
+\contentsline {chapter}{\numberline {9}Building}{19}{chapter.9}
+\contentsline {chapter}{\numberline {10}Testing}{20}{chapter.10}
