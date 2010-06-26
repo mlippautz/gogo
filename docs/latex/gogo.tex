@@ -42,10 +42,10 @@
         \item Simplified expressions, following Wirth's \cite{wir96} defintions.
       \end{enumerate}
 
-    \subsection{EBNF}
+    \section{EBNF}
       Lorem ipsum dolor sit amet...
 
-      \subsubsection{Atoms}
+      \subsection*{Atoms}
         The following listing described the basic atoms that are possible in GoGo programs.
 
         \begin{lstlisting}[caption=Atoms]
@@ -62,7 +62,7 @@ selector = { "." identifier
     | "[" (integer | identifier selector) "]" }.
         \end{lstlisting}
 
-      \subsubsection{Expressions}
+      \subsection*{Expressions}
         Although not as expressive as the ones from Go, these rules define expressions that have comparisons, relations and arithmetical terms. 
 
         \begin{lstlisting}[caption=Expressions]
@@ -79,7 +79,7 @@ expression = "&" identifier selector
     | simple_expression [ cmp_op simple_expression ].
         \end{lstlisting}
 
-      \subsubsection{Types and Variable Declarations}
+      \subsection*{Types and Variable Declarations}
 
         \begin{lstlisting}[caption=Types]
 type = ([ "[" integer "]" ] identifier | "uint64" | "byte") 
@@ -88,7 +88,7 @@ var_decl = "var" identifier type [ "=" expression ] ";".
 var_decl_list = { var_decl }
         \end{lstlisting}
 
-      \subsubsection{Structs}
+      \subsection*{Structs}
 
         \begin{lstlisting}[caption=Structs]
 struct_var_decl = identifier type ";".
@@ -98,7 +98,7 @@ struct_decl = "type" identifier "struct" "{"
 struct_decl_list = { struct_decl }. 
         \end{lstlisting}
 
-      \subsubsection{Statements}
+      \subsection*{Statements}
 
         \begin{lstlisting}[caption=Statements]
 package_stmt = "package" identifier ";".
@@ -116,7 +116,7 @@ for_stmt = "for" [assignment] ";" [expression] ";" [assignment]
     "{" stmt_sequence "}".
         \end{lstlisting}
 
-      \subsubsection{Functions}
+      \subsection*{Functions}
 
         \begin{lstlisting}[caption=Functions]
 expression_list = expression { "," expression }.
@@ -133,7 +133,7 @@ func_decl_raw = ";".
 func_decl_list = { func_decl_head (func_decl | func_decl_raw) 
         \end{lstlisting}
 
-      \subsubsection{The GoGo Program}
+      \subsection*{The GoGo Program}
         Finally, the main program structure is defined by \texttt{go\_program}. The sequence of the various program parts has been forced to the following to make parsing easier.
 
         \begin{lstlisting}[caption=GoGo Program]
@@ -144,6 +144,10 @@ go_program = package_stmt import_stmt_list struct_decl_list
 
   \chapter{Output Language}
     The output language is Plan-9 assembler \cite{pik00}. It is a modified version of 64 bit assembly for Intel x86 processors with AT\&T syntax that has been created by Bell Labs to be used in their compiler and assembler collection.
+    
+    \section{Assembly output}
+      GoGo creates an output file with assembly instructions and comments using mnemonics for op codes and operands/registers which means that it outputs in text form, not in binary form. Thereforce, an assembler is needed to process the output in order to make it executable. Like the Go compiler, GoGo relies on \texttt{6a} and \texttt{6l} of the Plan9 tools in order to acomplish this\cite{pik00}.\\
+      The assembly output consists basically of three sections: the data segment, the initialization segment and the code segment. GoGo's assembly output framework provides basic output routines which make it possible to switch between those three segments. Whereas the data segment is used to reserve space for global variables and strings in the data segment, the initialization segment and the code segment contain the code for global variable initialization and the functions from the input, respectively. All other functions (code generation for arithmetical expressions etc.) rely on the assembly output framework which is also able to place comments with the corresponding input file name and line number for debugging purposes in the output file.
 
   \chapter{Scanner}
     Lorem ipsum dolor sit amet...
@@ -199,22 +203,18 @@ go_program = package_stmt import_stmt_list struct_decl_list
       \begin{tabular}{|l|l|p{2cm}l}
         \cline{1-2}
         \textbf{Address} & \textbf{Content} & & \textbf{Source code}\\ \cline{1-2}
-        \texttt{SP - 0} & Saved \texttt{IP} & & \\ \cline{1-2}
-        \texttt{SP - 8} & \texttt{a} & & \texttt{var a uint64;}\\ \cline{1-2}
-        \texttt{SP - 16} & \texttt{b} & & \texttt{var b uint64;}\\ \cline{1-2}
-        \texttt{SP - 24} & \texttt{c} & & \texttt{var c uint64;}\\ \cline{1-2}
-        \texttt{SP - 32} & \texttt{s} (higher 8 bytes) & & \texttt{var s string;}\\ \cline{1-2}
-        \texttt{SP - 40} & \texttt{s} (lower 8 bytes) & & \\ \cline{1-2}
+        \texttt{SP-0} & Saved \texttt{IP} & & \\ \cline{1-2}
+        \texttt{SP-8} & \texttt{a} & & \texttt{var a uint64;}\\ \cline{1-2}
+        \texttt{SP-16} & \texttt{b} & & \texttt{var b uint64;}\\ \cline{1-2}
+        \texttt{SP-24} & \texttt{c} & & \texttt{var c uint64;}\\ \cline{1-2}
+        \texttt{SP-32} & \texttt{s} (higher 8 bytes) & & \texttt{var s string;}\\ \cline{1-2}
+        \texttt{SP-40} & \texttt{s} (lower 8 bytes) & & \\ \cline{1-2}
       \end{tabular}\\ \\
       As global and local variables as well as parameters share the same offset calculation as described above, they can be treated equally with no change of the offset calculation mechanism. When printing a reference to a variable address in the output, the relative offset does not need to be changed, only the reference address (the beginning of the data segment, \texttt{data}, or \texttt{SP} respectively) and the offset's sign. This requires the variable's kind (local, global, parameter) to be stored during code generation until both address and offset are needed. This is done by introducing a new field named \texttt{Global} to the \texttt{Item} type (see next section), indicating whether an object is a global or a local variable or a parameter, respectively.\\
       Offset calculations within types (p.e. calculating the field offsets in a struct or an array index) require a slightly different handling. Global variables as well as parameters can be treated the same way as explained above as their internal offsets' ascending order corresponds to their memory layout (ascending addresses). Local variables require a different calculation as their memory layout (descending addresses) differs. This is necessary in order to be able to assign global to local variables and vice verse so that their internal memory layouts correspond from the programmer's point of view. This is also done by a distinction based on the item's \texttt{Global} flag as explained above: during code generation, the internal offset of a local variable has to be calculated by subtraction instead of addition due to the negative sign of the offset (also see table above).
 
   \chapter{Code generation}
     GoGo emits assembly code in text form based on the Go input files. This section briefly explains the main features implemented in the code generating functions of GoGo.
-
-    \section{Assembly output}
-      GoGo creates an output file with assembly instructions and comments using mnemonics for op codes and operands/registers which means that it outputs in text form, not in binary form. Thereforce, an assembler is needed to process the output in order to make it executable. Like the Go compiler, GoGo relies on \texttt{6a} and \texttt{6l} of the Plan9 tools in order to acomplish this\cite{pik00}.\\
-      The assembly output consists basically of three sections: the data segment, the initialization segment and the code segment. GoGo's assembly output framework provides basic output routines which make it possible to switch between those three segments. Whereas the data segment is used to reserve space for global variables and strings in the data segment, the initialization segment and the code segment contain the code for global variable initialization and the functions from the input, respectively. All other functions (code generation for arithmetical expressions etc.) rely on the assembly output framework which is also able to place comments with the corresponding input file name and line number for debugging purposes in the output file.
 
     \section{Register allocation}
         The target architecture provides 8 general purpose registers (\texttt{R8}-\texttt{R15}) as well as the registers \texttt{RAX}, \texttt{RBX}, \texttt{RCX} and \texttt{RDX}\cite{int09}. The latter are not being used by GoGo to store variables as their values may change when performing arithmetical operations (p.e. \texttt{RAX} and \texttt{RDX} are always used as the destination registers for multiplications), thus possibly overwriting values previously stored there.\\
@@ -224,7 +224,7 @@ go_program = package_stmt import_stmt_list struct_decl_list
       As described in \cite{wir96}, code generation for arithmetical expressions basically relies on an operand stack and delayed code generation based on \texttt{Items}. For constant operands, constant folding is applied; variable operands are loaded into a free register in order to perform arithmetical operations on them.\\
       GoGo makes use of the capabilities of the target architecture by not loading constants into registers, thus reducing the number of registers required. Consider the expression \texttt{a + b} where both \texttt{a} and \texttt{b} are variables of type \texttt{uint64} with negative offsets 8 and 16 relative to the stack pointer. As the target architecture is able to perform an operation like \texttt{ADDQ R8, -16(SP)} (add the value at address \texttt{SP-16} to the register \texttt{R8}), only \texttt{a} needs to be loaded into a register, whereas \texttt{b} can be directly incorporated into the instruction itself.\\
       Multiplication and division on the target architecture both require special treatment: The multiplication instruction only takes the second operand and requires the first operand to be in the register \texttt{RAX}\cite{int09}. Therefore, the first operand has to be loaded into \texttt{RAX} prior multiplication. The multiplication result is stored as 128 bit value in \texttt{RDX} (upper 64 bits) and \texttt{RAX} (lower 64 bits). As GoGo does not support data types other than \texttt{byte} and \texttt{uint64}, the upper 64 bits in \texttt{RDX} are ignored, and the lower 64 bits are moved to one of the 8 registers to save the result before another multiplication is being performed. Similarly, division allows for an 128 bit operand (also in \texttt{RDX} and \texttt{RAX}). As GoGo does not support 128 bit size data types, \texttt{RDX} is always being zeroed prior division.\\
-      The addition and substraction operations are also used for offset calculations, although an additional distinction per \texttt{Item} is required in order to be able to distinguish addresses and values stored in registers. As arithmetical operations on \texttt{bytes} and \texttt{uint64} types always operate on a value, the actual value to be calculated with has to be loaded prior calculation. As offset calculations always require the address to be loaded into the register instead of the value, it has to be made sure that the address is loaded, not the value. In order to distinguish addresses and values in registers, the \texttt{A} field of the \texttt{Item} structure is used. Additionally, the code generation routines for addition and subtraction have an additional parameter specifying whether to calculate with addresses or values, issuing the necessary dereferencing operations if required.
+      The addition, substraction and multiplication operations are also used for offset calculations. Thus, an additional distinction per \texttt{Item} is required in order to be able to distinguish between addresses and values stored in registers. As arithmetical operations on \texttt{byte} and \texttt{uint64} types always operate on a value, the actual value to be calculated with has to be loaded prior calculation. As offset calculations always require the address to be loaded into the register instead of the value, it has to be made sure that the address is loaded, not the value. In order to distinguish between addresses and values in registers, the \texttt{A} field of the \texttt{Item} structure is used. Additionally, the code generation routines for addition and subtraction have an additional parameter specifying whether to calculate with addresses or values, issuing the necessary dereferencing operations if required.
 
     \section{The generation of assignments}
       As pointer types are supported, type checks in assignments as well as the assignments themselves get harder to implement as additional cases have to be dealt with. Additionally, the possible occurrence of the address operator (\texttt{\&}) on the right hand side of an assignment doubles the number of cases. The following table illustrates the distinctions made and the code generated for some of the cases allowed by the EBNF (* denotes pointer types, LHS and RHS are the \texttt{Items} on the left and right hand side, respectively). For the sake of clearity, only the cases with a non-pointer type variable \texttt{Item} on the left hand side and no address operator on the right hand side using \texttt{uint64} types are shown. The compiler is also able to assign \texttt{byte} values to one another as well as to \texttt{uint64} types.\\ \\
