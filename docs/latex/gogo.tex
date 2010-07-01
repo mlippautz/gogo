@@ -170,7 +170,6 @@ go_program = package_stmt import_stmt_list struct_decl_list
     \begin{tabular}{ll}
         \toprule
         Simple tokens & \&\&, +, -, \{, \}, $($, $)$, \dots \\
-        \midrule
         Complex tokens & for, if, else, func, type \\
         \bottomrule
     \end{tabular}
@@ -222,31 +221,43 @@ go_program = package_stmt import_stmt_list struct_decl_list
     For Both symbol tables the build-up and lookup is integrated into the parser. Whenever sufficient information (variable name, function name, type name; optionally preceeded by a package name) is encountered, a lookup in the symbol table is issued. Declarations issue new symbol table entries with the corresponding descriptor properties as described above.\\
     Forward declarations are currently only supported for type pointers (as pointers are always 64 bits in size) and functions (as the affected offsets can be fixed by the linker if necessary). Whenever supported forward declarations are encountered, a new symbol table entry is created with \texttt{ForwardDecl} set to 1. Forward declared function can then be called, although forward declared type pointers cannot be dereferred until the size of the type they are pointing to is known (\texttt{ForwardDecl} is 0). When forward declared functions are implemented, the corresponding symbol table entry is modified (\texttt{ForwardDecl} is set to 0) instead of creating a new one.
       
-    \section{Supported data types}
-      GoGo supports 4 built-in value types and the declaration of new struct and array types as well as pointers to value, struct and array types. The 4 built-in data types are based on the data types supported by the Go compiler and form a minimal subset of them in order to perform basic integer and string operations. The following table lists the built-in value types, together with their purpose and size.\\ \\
-      \begin{tabular}{|c|c|l|}
-        \hline
-        \textbf{Type} & \textbf{Size} & \textbf{Purpose}\\ \hline
-        \texttt{uint64} & 8 bytes (64 bits) & Unsigned integer with the target platform's register size\\ \hline
-        \texttt{byte} & 1 byte (8 bits) & Single ASCII character or unsigned 8 bit integer value\\ \hline
-        \texttt{string} & 16 bytes (see \ref{String constants}) & Character sequences\\ \hline
-        \texttt{bool} & 8 bytes (64 bits) & Internal type used for comparisions and jumps\\ \hline
+    \section{Supported data type}
+      GoGo supports 4 built-in value types and the declaration of new struct and array types as well as pointers to value, struct and array types. The 4 built-in data types are based on the data types supported by the Go compiler and form a minimal subset of them in order to perform basic integer and string operations. The following table \ref{tbl:types} lists the built-in value types, together with their purpose and size.
+      
+      \begin{table}[htb]
+      \centering
+      \begin{tabular}{cc p{0.5\textwidth}}
+        \toprule
+        \textbf{Type} & \textbf{Size} & \textbf{Purpose}\\
+        \midrule
+        \texttt{uint64} & 8 bytes (64 bits) & Unsigned integer with the target platform's register size\\
+        \texttt{byte} & 1 byte (8 bits) & Single ASCII character or unsigned 8 bit integer value\\
+        \texttt{string} & 16 bytes (see section \ref{String constants}) & Character sequences\\
+        \texttt{bool} & 8 bytes (64 bits) & Internal type used for comparisions and jumps\\
+        \bottomrule
       \end{tabular}
-		
+      \caption{Built in types}
+      \label{tbl:types}
+	  \end{table}
+
     \section{Local variables and offset calculations}
       In order to be able to distinguish between parameters, local and global variables, a global and a local symbol table as well the function's parameters as third, virtual symbol table are used. Local variables hide global variables of the same name by performing the symbol table lookup for local variables and parameters first and returning the first match if there is any.\\
       The memory layout for local and global variables as well as parameters is equal: the object's offset address contains the first 64 bits of the object, the next highest address (offset address plus 64 bits) contains the next 64 bits etc. All local and global variable offset addresses are 64 bit aligned. The offset of an object can be calculated by summing the aligned sizes of its predecessors in the corresponding variable list. Doing this, it has to be taken into consideration that pointers always occupy 8 bytes (64 bits), regardless of the type they are actually pointing to.\\
       Global variables start at offset 0 of the data segment, referred to as \texttt{data+0} in the output. Subsequent global variables use ascending offsets as described above (p.e. referred to as \texttt{data+8} for offset 8). Local variables and parameters are addressed relative to the stack pointer \texttt{SP}, starting at offset \texttt{SP+8} for parameters with ascending offsets as described for global variables (\texttt{SP} is reserved for the saved instruction pointer \texttt{IP}, see \ref{The generation of functions}). Local variables start at offset \texttt{SP-8} in descending order (\texttt{SP-16} for the second 64 bit variable, \texttt{SP-24} for the third etc., see table below) in descending order. Ignoring the sign, the offset relative to SP is still in ascending order, so the offset calculation method as used for global variables and parameters can be used.\\ \\
-      \begin{tabular}{|l|l|p{2cm}l}
-        \cline{1-2}
-        \textbf{Address} & \textbf{Content} & & \textbf{Source code}\\ \cline{1-2}
-        \texttt{SP-0} & Saved \texttt{IP} & & \\ \cline{1-2}
-        \texttt{SP-8} & \texttt{a} & & \texttt{var a uint64;}\\ \cline{1-2}
-        \texttt{SP-16} & \texttt{b} & & \texttt{var b uint64;}\\ \cline{1-2}
-        \texttt{SP-24} & \texttt{c} & & \texttt{var c uint64;}\\ \cline{1-2}
-        \texttt{SP-32} & \texttt{s} (higher 8 bytes) & & \texttt{var s string;}\\ \cline{1-2}
-        \texttt{SP-40} & \texttt{s} (lower 8 bytes) & & \\ \cline{1-2}
-      \end{tabular}\\ \\
+      \begin{table}
+      \begin{tabular}{llp{2cm}l}
+        \cmidrule{1-2}
+        \textbf{Address} & \textbf{Content} & & \textbf{Source code}\\
+        \cmidrule{1-2}
+        \texttt{SP-0} & Saved \texttt{IP} & & \\
+        \texttt{SP-8} & \texttt{a} & & \texttt{var a uint64;}\\
+        \texttt{SP-16} & \texttt{b} & & \texttt{var b uint64;}\\
+        \texttt{SP-24} & \texttt{c} & & \texttt{var c uint64;}\\
+        \texttt{SP-32} & \texttt{s} (higher 8 bytes) & & \texttt{var s string;}\\
+        \texttt{SP-40} & \texttt{s} (lower 8 bytes) & & \\
+        \cmidrule{1-2}
+      \end{tabular}
+      \end{table}\\ \\
       As global and local variables as well as parameters share the same offset calculation as described above, they can be treated equally with no change of the offset calculation mechanism. When printing a reference to a variable address in the output, the relative offset does not need to be changed, only the reference address (the beginning of the data segment, \texttt{data}, or \texttt{SP} respectively) and the offset's sign. This requires the variable's kind (local, global, parameter) to be stored during code generation until both address and offset are needed. This is done by introducing a new field named \texttt{Global} to the \texttt{Item} type (see next section), indicating whether an object is a global or a local variable or a parameter, respectively.\\
       Offset calculations within types (p.e. calculating the field offsets in a struct or an array index) require a slightly different handling. Global variables as well as parameters can be treated the same way as explained above as their internal offsets' ascending order corresponds to their memory layout (ascending addresses). Local variables require a different calculation as their memory layout (descending addresses) differs. This is necessary in order to be able to assign global to local variables and vice verse so that their internal memory layouts correspond from the programmer's point of view. This is also done by a distinction based on the item's \texttt{Global} flag as explained above: during code generation, the internal offset of a local variable has to be calculated by subtraction instead of addition due to the negative sign of the offset (also see table above).
 
