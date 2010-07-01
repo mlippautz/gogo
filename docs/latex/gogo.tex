@@ -1,5 +1,6 @@
 \documentclass[a4paper]{scrreprt}
 
+\usepackage{booktabs}
 \usepackage[usenames,dvipsnames]{color}
 \usepackage[latin1]{inputenc}
 \usepackage{listings}
@@ -150,22 +151,58 @@ go_program = package_stmt import_stmt_list struct_decl_list
       The assembly output consists basically of three sections: the data segment, the initialization segment and the code segment. GoGo's assembly output framework provides basic output routines which make it possible to switch between those three segments. Whereas the data segment is used to reserve space for global variables and strings in the data segment, the initialization segment and the code segment contain the code for global variable initialization and the functions from the input, respectively. All other functions (code generation for arithmetical expressions etc.) rely on the assembly output framework which is also able to place comments with the corresponding input file name and line number for debugging purposes in the output file.
 
   \chapter{Scanner / Parser}
-    Lorem ipsum dolor sit amet...
+    The scanner is basically the provider of tokens that are used by the parser
+    to interpret the code. In order to generate these tokens the scanner reads
+    the file character by character. If a sequence is known, it converts this 
+    sequence of characters into the corresponding token. Tokens generated this
+    way are called simple tokens, as they can be generated right away. For 
+    instance, a sequence \textit{'A'} can be directly converted into a token 
+    representing a byte value. \\
+    Before providing a token to the parser, the scanner may convert such a 
+    simple token one more time. These complex tokens are generated from simple
+    ones that represent identifiers. The identifiers are compared to a 
+    predefined list of keywords. If a keyword matches a token value, the token
+    is converted to the one representing the keyword. Table \ref{tbl:tokens} 
+    lists some of these tokens.
+
+    \begin{table}[htb]
+    \centering
+    \begin{tabular}{ll}
+        \toprule
+        Simple tokens & \&\&, +, -, \{, \}, $($, $)$, \dots \\
+        \midrule
+        Complex tokens & for, if, else, func, type \\
+        \bottomrule
+    \end{tabular}
+    \caption{Token examples}
+    \label{tbl:tokens}
+    \end{table}
 
   \chapter{Symbol table}
     In order to be able to lookup local and global variable names as well as function names, a symbol table is required. Based on \cite{wir96}, object and type descriptors were used, each containing the information required for lookup and code generation. Object descriptors are used to store information about variables and parameters whereas type descriptors are used to store information about types and functions.\\
-    The following table summarizes the fields of the object and type descriptors and their respective purpose. Some fields had to be added in order to support forward declarations and the distinction between values and pointers.\\ \\
-      \textbf{ObjectDesc:}\\
-      \begin{tabular}{|c|c|l|}
-        \hline
-        \textbf{Field} & \textbf{Type} & \textbf{Purpose}\\ \hline
-        Name & \texttt{string} & The object's name\\ \hline
-        PackageName & \texttt{string} & The object's package (Go name space)\\ \hline
-        Class & \texttt{uint64} & The descriptors's kind (variable, field, parameter)\\ \hline
-        ObjType & \texttt{*TypeDesc} & The object's type\\ \hline
-        PtrType & \texttt{uint64} & If 1, the object's type is \texttt{*ObjType}; if 0, \texttt{ObjType}\\ \hline
-        Next & \texttt{*ObjType} & Next object (linked list)\\ \hline
-      \end{tabular}\\ \\
+    The following table \ref{tbl:objectdesc} summarizes the fields of the object and type descriptors and their respective purpose. Some fields had to be added in order to support forward declarations and the distinction between values and pointers.\\ \\
+      \begin{table}[htb]
+      \centering
+      \begin{tabular}{ccl}
+        \toprule
+        \textbf{Field} & \textbf{Type} & \textbf{Purpose}\\ 
+        \midrule
+        Name & \texttt{string} & The object's name\\
+        \midrule
+        PackageName & \texttt{string} & The object's package (Go name space)\\
+        \midrule
+        Class & \texttt{uint64} & The descriptors's kind (variable, field, parameter)\\
+        \midrule
+        ObjType & \texttt{*TypeDesc} & The object's type\\
+        \midrule
+        PtrType & \texttt{uint64} & If 1, the object's type is \texttt{*ObjType}; if 0, \texttt{ObjType}\\
+        \midrule
+        Next & \texttt{*ObjType} & Next object (linked list)\\
+        \bottomrule
+      \end{tabular}
+      \caption{ObjectDesc}
+      \label{tbl:objectdesc}
+      \end{table}\\ \\
       \textbf{TypeDesc:}\\
       \begin{tabular}{|c|c|l|}
         \hline
