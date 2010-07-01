@@ -180,43 +180,46 @@ go_program = package_stmt import_stmt_list struct_decl_list
 
   \chapter{Symbol table}
     In order to be able to lookup local and global variable names as well as function names, a symbol table is required. Based on \cite{wir96}, object and type descriptors were used, each containing the information required for lookup and code generation. Object descriptors are used to store information about variables and parameters whereas type descriptors are used to store information about types and functions.\\
-    The following table \ref{tbl:objectdesc} summarizes the fields of the object and type descriptors and their respective purpose. Some fields had to be added in order to support forward declarations and the distinction between values and pointers.\\ \\
+    The following tables \ref{tbl:objectdesc} and \ref{tbl:typedesc} summarize the fields of the object and type descriptors and their respective purpose. Some fields had to be added in order to support forward declarations and the distinction between values and pointers.
       \begin{table}[htb]
       \centering
-      \begin{tabular}{ccl}
+      \begin{tabular}{lcl}
         \toprule
         \textbf{Field} & \textbf{Type} & \textbf{Purpose}\\ 
         \midrule
         Name & \texttt{string} & The object's name\\
-        \midrule
         PackageName & \texttt{string} & The object's package (Go name space)\\
-        \midrule
         Class & \texttt{uint64} & The descriptors's kind (variable, field, parameter)\\
-        \midrule
         ObjType & \texttt{*TypeDesc} & The object's type\\
-        \midrule
         PtrType & \texttt{uint64} & If 1, the object's type is \texttt{*ObjType}; if 0, \texttt{ObjType}\\
-        \midrule
         Next & \texttt{*ObjType} & Next object (linked list)\\
         \bottomrule
       \end{tabular}
       \caption{ObjectDesc}
       \label{tbl:objectdesc}
-      \end{table}\\ \\
-      \textbf{TypeDesc:}\\
-      \begin{tabular}{|c|c|l|}
-        \hline
-        \textbf{Field} & \textbf{Type} & \textbf{Purpose}\\ \hline
-        Name & \texttt{string} & The type's/function's name\\ \hline
-        PackageName & \texttt{string} & The type's/function's package (Go name space)\\ \hline
-        ForwardDecl & \texttt{uint64} & If 1, the type/function has not yet been fully delcared/implemented\\ \hline
-        Form & \texttt{uint64} & The descriptor's kind (simple type, array type, struct type, function)\\ \hline
-        Len & \texttt{uint64} & For simple types: type size in bytes, for arrays: array size\\ \hline
-        Fields & \texttt{*ObjDesc} & For struct types: struct fields, for functions: function parameters\\ \hline
-        Base & \texttt{*TypeDesc} & For array types: the array base type\\ \hline
-        Next & \texttt{*TypeDesc} & Next type/function (linked list)\\ \hline
-      \end{tabular}\\ \\
-    Both symbol table build-up and lookup is integrated into the parser. Whenever sufficient information (variable name, function name, type name; optionally preceeded by a package name) is encountered, a lookup in the symbol table is issued. Declarations issue new symbol table entries with the corresponding descriptor properties as described above.\\
+      \end{table}
+
+      \begin{table}[htb]
+      \centering
+      \begin{tabular}{lc p{0.6\textwidth}}
+        \toprule
+        \textbf{Field} & \textbf{Type} & \textbf{Purpose}\\
+        \midrule
+        Name & \texttt{string} & The type's/function's name\\
+        PackageName & \texttt{string} & The type's/function's package (Go name space)\\
+        ForwardDecl & \texttt{uint64} & If 1, the type/function has not yet been fully delcared/implemented\\
+        Form & \texttt{uint64} & The descriptor's kind (simple type, array type, struct type, function)\\
+        Len & \texttt{uint64} & For simple types: type size in bytes, for arrays: array size\\
+        Fields & \texttt{*ObjDesc} & For struct types: struct fields, for functions: function parameters\\
+        Base & \texttt{*TypeDesc} & For array types: the array base type\\
+        Next & \texttt{*TypeDesc} & Next type/function (linked list)\\
+        \bottomrule
+      \end{tabular}
+      \caption{TypeDesc}
+      \label{tbl:typedesc}
+      \end{table}
+
+    For Both symbol tables the build-up and lookup is integrated into the parser. Whenever sufficient information (variable name, function name, type name; optionally preceeded by a package name) is encountered, a lookup in the symbol table is issued. Declarations issue new symbol table entries with the corresponding descriptor properties as described above.\\
     Forward declarations are currently only supported for type pointers (as pointers are always 64 bits in size) and functions (as the affected offsets can be fixed by the linker if necessary). Whenever supported forward declarations are encountered, a new symbol table entry is created with \texttt{ForwardDecl} set to 1. Forward declared function can then be called, although forward declared type pointers cannot be dereferred until the size of the type they are pointing to is known (\texttt{ForwardDecl} is 0). When forward declared functions are implemented, the corresponding symbol table entry is modified (\texttt{ForwardDecl} is set to 0) instead of creating a new one.
       
     \section{Supported data types}
