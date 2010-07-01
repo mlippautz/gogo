@@ -44,6 +44,7 @@
       \end{enumerate}
 
     \section{EBNF}
+    \label{sec:ebnf}
       Lorem ipsum dolor sit amet...
 
       \subsection*{Atoms}
@@ -158,9 +159,9 @@ go_program = package_stmt import_stmt_list struct_decl_list
     way are called simple tokens, as they can be generated right away. For 
     instance, a sequence \textit{'A'} can be directly converted into a token 
     representing a byte value. \\
-    Before providing a token to the parser, the scanner may convert such a 
-    simple token one more time. These complex tokens are generated from simple
-    ones that represent identifiers. The identifiers are compared to a 
+    Before providing a token to the parser, the scanner may convert such 
+    simple tokens one more time. These complex tokens are generated from simple
+    ones that represent \texttt{identifiers}. \texttt{Identifiers} are compared to a 
     predefined list of keywords. If a keyword matches a token value, the token
     is converted to the one representing the keyword. Table \ref{tbl:tokens} 
     lists some of these tokens.
@@ -169,13 +170,25 @@ go_program = package_stmt import_stmt_list struct_decl_list
     \centering
     \begin{tabular}{ll}
         \toprule
-        Simple tokens & \&\&, +, -, \{, \}, $($, $)$, \dots \\
-        Complex tokens & for, if, else, func, type \\
+        Simple tokens & \texttt{\&\&}, \texttt{+}, \texttt{-}, \texttt{\{}, \texttt{\}}, \texttt{$($}, \texttt{$)$}, \dots \\
+        Complex tokens & \texttt{for}, \texttt{if}, \texttt{else}, \texttt{func}, \texttt{type} \\
         \bottomrule
     \end{tabular}
     \caption{Token examples}
     \label{tbl:tokens}
     \end{table}
+
+    The scanner also implements a very simple escaping mechanism that allows 
+    sequences like \textit{'\textbackslash n'} to be used in strings. \\
+    Comments can be written as \textit{/* ... */} blocks or 
+    \textit{\textbackslash \textbackslash} till line ending, like in C/C++.
+    \\ \\
+    The parser then takes these tokens and represents the language defined by
+    the EBNF from section \ref{sec:ebnf}. The parser is basically implemented 
+    as LL1 like in \cite{wir96}, with one minor difference. In order to be 
+    compatible with Go it was necesarry to include one namespace hierachy that 
+    is represented by packages. Since this namescope is prefixed 
+    using \texttt{package.} the parser needs a lookup of three in this case.
 
   \chapter{Symbol table}
     In order to be able to lookup local and global variable names as well as function names, a symbol table is required. Based on \cite{wir96}, object and type descriptors were used, each containing the information required for lookup and code generation. Object descriptors are used to store information about variables and parameters whereas type descriptors are used to store information about types and functions.\\
@@ -275,19 +288,27 @@ go_program = package_stmt import_stmt_list struct_decl_list
       The addition, substraction and multiplication operations are also used for offset calculations. Thus, an additional distinction per \texttt{Item} is required in order to be able to distinguish between addresses and values stored in registers. As arithmetical operations on \texttt{byte} and \texttt{uint64} types always operate on a value, the actual value to be calculated with has to be loaded prior calculation. As offset calculations always require the address to be loaded into the register instead of the value, it has to be made sure that the address is loaded, not the value. In order to distinguish between addresses and values in registers, the \texttt{A} field of the \texttt{Item} structure is used. Additionally, the code generation routines for addition and subtraction have an additional parameter specifying whether to calculate with addresses or values, issuing the necessary dereferencing operations if required.
 
     \section{The generation of assignments}
-      As pointer types are supported, type checks in assignments as well as the assignments themselves get harder to implement as additional cases have to be dealt with. Additionally, the possible occurrence of the address operator (\texttt{\&}) on the right hand side of an assignment doubles the number of cases. The following table illustrates the distinctions made and the code generated for some of the cases allowed by the EBNF (* denotes pointer types, LHS and RHS are the \texttt{Items} on the left and right hand side, respectively). For the sake of clearity, only the cases with a non-pointer type variable \texttt{Item} on the left hand side and no address operator on the right hand side using \texttt{uint64} types are shown. The compiler is also able to assign \texttt{byte} values to one another as well as to \texttt{uint64} types.\\ \\
-      \begin{tabular}{|l|l|l|}
-        \hline
-        \textbf{LHS type} & \textbf{RHS type} & \textbf{Code/Error generated}\\ \hline
-        Variable & Constant & \texttt{MOVQ \$RHS.A, (LHS.A)}\\ \hline
-        Variable & Constant* & Type error\\ \hline
-        Variable & Variable & \texttt{MOVQ (RHS.A), R\textit{temp} | MOVQ R\textit{temp}, (LHS.A)}\\ \hline
-        Variable & Variable* & Type error\\ \hline
-        Variable & Register with value & \texttt{MOVQ RHS.R, (LHS.A)}\\ \hline
-        Variable & Register with value* & Type error\\ \hline
-        Variable & Register with address & \texttt{MOVQ (RHS.R), RHS.R | MOVQ RHS.R, (LHS.A)}\\ \hline
-        Variable & Register with address* & Type error\\ \hline
-      \end{tabular}\\ \\
+      As pointer types are supported, type checks in assignments as well as the assignments themselves get harder to implement as additional cases have to be dealt with. Additionally, the possible occurrence of the address operator (\texttt{\&}) on the right hand side of an assignment doubles the number of cases. The following table \ref{tbl:assigntypes} illustrates the distinctions made and the code generated for some of the cases allowed by the EBNF (* denotes pointer types, LHS and RHS are the \texttt{Items} on the left and right hand side, respectively). For the sake of clearity, only the cases with a non-pointer type variable \texttt{Item} on the left hand side and no address operator on the right hand side using \texttt{uint64} types are shown. The compiler is also able to assign \texttt{byte} values to one another as well as to \texttt{uint64} types.
+
+      \begin{table}[htb]
+      \begin{tabular}{lll}
+        \toprule
+        \textbf{LHS type} & \textbf{RHS type} & \textbf{Code/Error generated}\\
+        \midrule
+        Variable & Constant & \texttt{MOVQ \$RHS.A, (LHS.A)}\\
+        Variable & Constant* & Type error\\
+        Variable & Variable & \texttt{MOVQ (RHS.A), R\textit{temp} | MOVQ R\textit{temp}, (LHS.A)}\\
+        Variable & Variable* & Type error\\
+        Variable & Register with value & \texttt{MOVQ RHS.R, (LHS.A)}\\
+        Variable & Register with value* & Type error\\
+        Variable & Register with address & \texttt{MOVQ (RHS.R), RHS.R | MOVQ RHS.R, (LHS.A)}\\
+        Variable & Register with address* & Type error\\
+        \bottomrule
+      \end{tabular}
+      \caption{Assignment types}
+      \label{tbl:assigntypes}
+      \end{table}
+      
       String assignments are handled separately as they require 16 bytes to be assigned. As one register can only hold 8 bytes, a second register needs to be allocated in order to perform the assignment. Although this may not be necessary in trivial cases where one string variable is assigned to another, strings in structures which require offset calculations force the use of a register when performing the offset calculation and therefore require a second register to dereference the value of the other 8 bytes. In order to be able to do this, the \texttt{C} field of the \texttt{Item} structure is being used as it is not needed for other purposes outside conditionals.
 
     \section{The generation of conditional expressions}
@@ -312,17 +333,25 @@ go_program = package_stmt import_stmt_list struct_decl_list
 
     \section{I/O syscalls}
       Besides read and write operations to files (and the console), exiting the program as well as opening and closing files requires the use of syscalls. On Linux 64 bit operating systems with Intel architecture, these syscalls can be invoked by the assembly mnemonic \texttt{SYSCALL} where the register \texttt{RAX} contains the syscall number defining the syscall, and the registers \texttt{RDI}, \texttt{RSI} and \texttt{RDX} contain the first, second and third parameter respectively\cite{var08}.\\
-      The following table lists the syscalls used by libgogo, together with the value of \texttt{RAX} representing the syscall number. The latter were derived from the constants defined in \texttt{/usr/src/linux-headers-2.6.32-22/arch/x86/include/asm/unistd\_64.h} of the current Linux kernel source\cite{var10}. The syscall function prototypes (for semantics and formal parameters) were derived from the corresponding Linux man pages (see \cite{var97} and others).\\ \\
-      \begin{tabular}{|c|c|c|}
-        \hline
-        \textbf{Syscall number (\texttt{RAX})} & \textbf{Syscall function} & \textbf{Purpose}\\ \hline
-        0 & \texttt{sys\_read} & Reads from a file\\ \hline
-        1 & \texttt{sys\_write} & Writes to a file\\ \hline
-        2 & \texttt{sys\_open} & Opens a file\\ \hline
-        3 & \texttt{sys\_close} & Closes a file\\ \hline
-        12 & \texttt{sys\_brk} & See next section\\ \hline
-        60 & \texttt{sys\_exit} & Exits the program\\ \hline
+      The following table \ref{tbl:syscalls} lists the syscalls used by libgogo, together with the value of \texttt{RAX} representing the syscall number. The latter were derived from the C constants defined in \texttt{/usr/src/linux-headers-2.6.32-22/arch/x86/include/asm/unistd\_64.h} of the current Linux kernel source\cite{var10}. The syscall function prototypes (for semantics and formal parameters) were derived from the corresponding Linux man pages (see \cite{var97} and others).
+
+      \begin{table}[htb]
+      \centering
+      \begin{tabular}{ccc}
+        \toprule
+        \textbf{Syscall number (\texttt{RAX})} & \textbf{Syscall function} & \textbf{Purpose}\\
+        \midrule
+        0 & \texttt{sys\_read} & Reads from a file\\
+        1 & \texttt{sys\_write} & Writes to a file\\
+        2 & \texttt{sys\_open} & Opens a file\\
+        3 & \texttt{sys\_close} & Closes a file\\
+        12 & \texttt{sys\_brk} & See next section\\
+        60 & \texttt{sys\_exit} & Exits the program\\
+        \bottomrule
       \end{tabular}
+      \caption{Syscalls}
+      \label{tbl:syscalls}
+      \end{table}
 
     \section{The memory manager}
       Libgogo provides a very simple memory manager using a bump pointer which can allocate, but not free memory. By using the \texttt{sys\_brk}\cite{var97} function, the memory manager expands the data segment of the running program in steps of 10 KB if necessary in order to deal with subsequent allocations.\\
