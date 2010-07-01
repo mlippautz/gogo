@@ -149,10 +149,7 @@ go_program = package_stmt import_stmt_list struct_decl_list
       GoGo creates an output file with assembly instructions and comments using mnemonics for op codes and operands/registers which means that it outputs in text form, not in binary form. Thereforce, an assembler is needed to process the output in order to make it executable. Like the Go compiler, GoGo relies on \texttt{6a} and \texttt{6l} of the Plan9 tools in order to acomplish this\cite{pik00}.\\
       The assembly output consists basically of three sections: the data segment, the initialization segment and the code segment. GoGo's assembly output framework provides basic output routines which make it possible to switch between those three segments. Whereas the data segment is used to reserve space for global variables and strings in the data segment, the initialization segment and the code segment contain the code for global variable initialization and the functions from the input, respectively. All other functions (code generation for arithmetical expressions etc.) rely on the assembly output framework which is also able to place comments with the corresponding input file name and line number for debugging purposes in the output file.
 
-  \chapter{Scanner}
-    Lorem ipsum dolor sit amet...
-    
-  \chapter{Parser}
+  \chapter{Scanner / Parser}
     Lorem ipsum dolor sit amet...
 
   \chapter{Symbol table}
@@ -289,8 +286,8 @@ go_program = package_stmt import_stmt_list struct_decl_list
       Usually, a program's parameters are accessible through \texttt{argc} and \texttt{argv}, positioned on the stack as function parameters of the main (entry) function. As the Go compiler used for bootstrapping adds run time routines which are invoked before the main function, the parameters cannot be fetched from the stack as their position cannot be determined. The Go compiler allows to access these parameters using a separate package (library) which could not be used in order to remain independent of third party libraries.\\
       The current approach to fetch parameters requires the activation of the \texttt{proc} file system in the Linux kernel which is enabled by default in most Linux distributions\cite{var06}. The \texttt{proc} file system allows (among other information) to access parameters of all processes running in the system, including the current process. The latter's parameters can be through the virtual file \texttt{/proc/self/cmdline} where \texttt{self} refers to the current process. The virtual file contains all parameters, separated by zero bytes and terminated by a sequence of two zero bytes. When parsed, this allows to access the program's parameters without having to access the stack.
 	
-  \chapter{Building}
-    Lorem ipsum dolor sit amet...
+  \chapter{Building / Self-compilation}
+    This section deals with the building process of GoGo and how self-compilation is achieved.
 
   \chapter{Testing}
     In order to test the compiler, a test suite has been constructed that may be used to verify results against an already existing result set. \\ \\
