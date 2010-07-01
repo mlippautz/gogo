@@ -1,0 +1,3 @@
+#!/bin/sh
+
+rm -rf *.bbl *.log *.toc *.aux *.out *.blg *.nav *.snm
