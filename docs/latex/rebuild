@@ -1,6 +1,0 @@
-#!/bin/sh
-
-pdflatex gogo.tex
-bibtex gogo
-pdflatex gogo.tex
-pdflatex gogo.tex
