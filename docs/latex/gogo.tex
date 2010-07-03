@@ -30,6 +30,7 @@
   \tableofcontents
 
   \chapter{Introduction}
+    GoGo is a self-compiling Go compiler written in Go which implements scanning, parsing and code generation for a subset of the Go language\cite{goo10}. It is mostly compatible with the Go compiler available in \cite{goo10} and outputs valid Plan9 assembly code which can be assembled by the latter as well as the Plan9 assembly tools \texttt{6a} and \texttt{6l}\cite{pik00}.\\
     Lorem ipsum dolor sit amet...
 
   \chapter{Input Language}
@@ -317,8 +318,51 @@ go_program = package_stmt import_stmt_list struct_decl_list
     \section{The generation of loops}
       Lorem ipsum dolor sit amet...
 
-    \section{The generation of functions} \label{The generation of functions}
-      Lorem ipsum dolor sit amet...
+    \section{The generation of functions calls} \label{The generation of functions}
+      Consider the following example with the current function having 3 local variables -- 2 of type \texttt{uint64} and one of type \texttt{string} -- calling the function \texttt{foo} which has the following prototype:
+        \begin{lstlisting}
+func foo(param1 uint64, param2 uint64, param3 string) uint64;
+        \end{lstlisting}
+      In order to be compatible to the Go calling convention, the stack is organized as follows before calling \texttt{foo}:
+      \begin{table}[h!]
+      \begin{tabular}{ll}
+        \toprule
+        \textbf{Address} & \textbf{Content}\\
+        \midrule
+        \texttt{SP-0} & Saved \texttt{IP}\\
+        \texttt{SP-8} & Local variable 1 (uint64)\\
+        \texttt{SP-16} & Local variable 2 (uint64)\\
+        \texttt{SP-24} & Local variable 3 (string), higher 8 bytes\\
+        \texttt{SP-32} & Local variable 3 (string), lower 8 bytes\\
+        \midrule
+        \texttt{SP-40} & Placeholder for return value of foo\\
+        \texttt{SP-48} & \texttt{param3} of \texttt {foo}, higher 8 bytes\\
+        \texttt{SP-56} & \texttt{param3} of \texttt {foo}, lower 8 bytes\\
+        \texttt{SP-64} & \texttt{param2} of \texttt {foo}\\
+        \texttt{SP-72} & \texttt{param1} of \texttt {foo}\\
+        \bottomrule
+      \end{tabular}
+      \end{table}\\ \\
+      As can be seen, the parameters are pushed in reverse order and share the address calculation algorithm of local variables (considering the offsets of the local variables), allowing to reuse the latter for this purpose. In order to move the parameters to their corresponding positions on the stack, the offsets are calculated and an assignment statement with the stack offset on the LHS (as variable \texttt{Item}) is being performed which allows to reuse the code for assignment generation, including all type checks and conversions. Optionally, currently used registers are pushed onto the stack between the local variables and the return value, yielding an offset correction to be considered when pushing the parameters.\\
+      When calling \texttt{foo} in the above example, the \texttt{SP} is first decreased by 72, followed by another implicit decrease of 8 due to the \texttt{CALL} instruction which pushes the current \texttt{IP} onto the stack and decreases the \texttt{SP} automatically. The stack is then prepared for \texttt{foo} to which it appears similar as to the callee, with the old \texttt{IP} at offset \texttt{SP}, the parameters on positive offsets relative to \texttt{SP} and the local variables (if any) with negative offsets.
+      \begin{table}[h!]
+      \begin{tabular}{lll}
+        \toprule
+        \textbf{Address after call} & \textbf{Address before call} & \textbf{Content}\\
+        \midrule
+        \texttt{SP+40} & \texttt{SP-40} & Placeholder for return value of foo\\
+        \texttt{SP+32} & \texttt{SP-48} & \texttt{param3} of \texttt {foo}, higher 8 bytes\\
+        \texttt{SP+24} & \texttt{SP-56} & \texttt{param3} of \texttt {foo}, lower 8 bytes\\
+        \texttt{SP+16} & \texttt{SP-64} & \texttt{param2} of \texttt {foo}\\
+        \texttt{SP+8} & \texttt{SP-72} & \texttt{param1} of \texttt {foo}\\
+        \texttt{SP} & -- & \texttt{IP} of callee\\
+        \texttt{SP-8} & -- & Possible local variable of \texttt{foo}\\
+        \bottomrule
+      \end{tabular}
+      \end{table}\\ \\
+      As can be seen, the offsets before and after the call differ by \texttt{72+8=80} as explained above. GoGo does not use base or frame pointers, but relies only on the stack pointer to perform all offset calculations. The return value is always located "after" the other parameters and can be used as the RHS of an assignment with its known offset as explained with the parameters above. After the function call, 80 is added to the stack pointer in order to restore the previous stack "view" for the callee. Optionally saved registered are restored considering their additional offset in reverse order.\\
+      Internally, a function is represented by a \texttt{TypeDesc} (compare table \ref{tbl:typedesc}) where the fields represent the functions parmaeters, including an optional return value at their end. When a function is being called without prior declaration, the parameter types have to be derived from the types of the expressions encountered. As the total number of parameters is unknown before the end function call in the input file, a marker is inserted in the output code and comments to indicate that the final offset has yet to be determined. As the offset due to local variables is known, it is included. Due to the marker which includes information about the name of the function called, the linker is able to adapt the unfinished offsets in order to correct them accordingly.\\
+      When functions have been called, but not declared, and then called again, the type check included in the code generation for assignments is already effective and detects improper assignment types. However, it is necessary to extend this check as the first call can p.e. be with a parameter of type \texttt{byte} and the second call with a parameter of type \texttt{uint64}. This is allowed, as a \texttt{byte} type represents a subset of the \texttt{uint64} type, requiring a conversion for the former in order to assure that the 7 additional bytes are zero. This can be done by simply extending the type check of the assignment. This also applies to the return value (as it is treated like a parameter), although it has to be considered that calls of functions without return value assignments do not necessarily mean that the function called has no return value. Therefore, additional checks are necessary, including the check of the return value's existence and type when the actual function declaration is being made.
 
     \section{Global variable initialization}
         Besides the compiled functions from the input file, the code segment contains a function called main.init which performs the initialization of global variables. In contrast to local variables which can be initialized directly at point of their declaration, global variables need to be initialized before any other methods are called, thus requiring the main.init function.\\
