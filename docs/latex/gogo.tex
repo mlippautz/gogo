@@ -312,11 +312,131 @@ go_program = package_stmt import_stmt_list struct_decl_list
       
       String assignments are handled separately as they require 16 bytes to be assigned. As one register can only hold 8 bytes, a second register needs to be allocated in order to perform the assignment. Although this may not be necessary in trivial cases where one string variable is assigned to another, strings in structures which require offset calculations force the use of a register when performing the offset calculation and therefore require a second register to dereference the value of the other 8 bytes. In order to be able to do this, the \texttt{C} field of the \texttt{Item} structure is being used as it is not needed for other purposes outside conditionals.
 
-    \section{The generation of conditional expressions}
-      Lorem ipsum dolor sit amet...
+    \section{Generation of conditional expressions and control structures}
+      In order to achieve condional jumps, GoGo (and thus Go) provides expressions 
+      that allow comparisons (\texttt{==}, \texttt{!=}, \texttt{$>$}, \texttt{$<$},
+      \texttt{$\ge$}, \texttt{$\le$}) and relative operators (\texttt{\&\&},
+      \texttt{$||$}). The approach how code is generated differs from \cite{wir96}.
+      Since our output language is text-based Plan9 assembly, there exists no way
+      to create a fixup chain that could be used to fix conditional jumps after
+      generating the code. As a result GoGo creates labels that are then 
+      translated into adresses by the Plan9 assembly tools. \\
 
-    \section{The generation of loops}
-      Lorem ipsum dolor sit amet...
+      Since jumps are always generation after comparisons the code generation 
+      for conditional jumps just needs two instructions. A \texttt{CMP} instruction
+      for the actual comparisons (this instruction is not bound to the comparison
+      operator) and the conditional jump that takes the evaluates the registers
+      of the comparison. The jumps that are needed can be seen in table \ref{tbl:jumps}.
+
+      \begin{table}[htb]
+        \centering
+        \begin{tabular}{ll}
+        \toprule
+        \textbf{Comparisons} & \textbf{Positive Jump} \\
+        \midrule
+        Equal \texttt{==} & \texttt{JE}\\
+        Not equal \texttt{!=} & \texttt{JNE}\\
+        Greater than \texttt{$>$} & \texttt{JG}\\
+        Less than \texttt{$<$} & \texttt{JL}\\
+        Less than or equal \texttt{$\le$} & \texttt{JLE}\\
+        Greater than or equal \texttt{$\ge$} & \texttt{JGE}\\
+        \bottomrule
+        \end{tabular}
+        \caption{Conditional jumps used}
+        \label{tbl:jumps}
+      \end{table}
+
+      The label generation (and thus the resulting labels) can be summarized as 
+      follows:
+      \begin{itemize}
+        \item Each label has a suffix indicating whether it is used by an 
+          \texttt{if/else} or \texttt{for} statement.
+        \item Per convinience (Go forces this) programs compiled with GoGo
+          are only allowed to have one statement (or control structure) per 
+          line. A side-effect of this limitation is that the addition of line
+          and column number of the expression into the label guarantees global
+          uniqueness.
+        \item Furthermore a expression local counter, representing a \texttt{true} 
+          or \texttt{false} branch is included.
+        \item A simple prefix (used for debugging readability) makes a GoGo
+          label complete.
+      \end{itemize}
+
+      In order to provide common programming constructs that involve pointer 
+      comparisons (see listing \ref{lst:pointer}) GoGo uses lazy-evaluation.
+
+      \begin{lstlisting}[label=lst:pointer,caption=Pointer comparison]
+if object != nil && object.field ... {
+      \end{lstlisting}
+
+      Lazy-evaluation is provided over multiple levels of expressions using
+      label merging to minimize the overhead. Each top level expression gets 
+      its own stacks for \texttt{true} and \texttt{false} branching. Further 
+      sub-expressions labels (in fact, just their local counters) are then just 
+      pushed and poped into the coresponding stacks. An example illustrating 
+      this need is stated in \ref{lst:lazy}.
+      \begin{lstlisting}[caption=Lazy-evaluation over multiple expression levels, label=lst:lazy]
+if (done!=1) && (((a<1) && (b<2)) || ((c<3) && (d<4))) { ...
+      \end{lstlisting}
+      While the first \texttt{false} branch has to be generated for the term
+      $(done!=1)$, further ones are needed for $(a<1)$ and $(c<3)$. Although these are
+      \texttt{false} branches, they have different levels and result in different
+      merging points.
+
+    \subsection{Conditional Jumps}
+      GoGo provides one control structure that can be used for conditional jumps,
+      namely \texttt{if}/\texttt{else}. While elseif and case statements could
+      have provided further programming experience, the compiler itself uses only
+      \texttt{if}. The \texttt{if}/\texttt{else} construct uses the condional
+      expressions explained above and results in a structure as follows:
+      \begin{table}[hbt]
+        \centering
+        \begin{tabular}{l}
+          \toprule
+          Code generated for expression\\
+          \texttt{If} prolog including possible \texttt{else} jump\\
+          \hspace{0.5cm} \texttt{True} body\\
+          \texttt{Else} header\\
+          \hspace{0.5cm} \texttt{False} body\\
+          Epilog catching \texttt{true} body exit\\
+          \bottomrule
+        \end{tabular}
+      \end{table}
+
+    \subsection{Loops}
+      GoGo supports only \texttt{for} structures to construct loops, because
+      Go doesn't offer anything other itself. In order to provide a more 
+      lightweight loop variant, one may skip parts of the \texttt{for} construct.
+      The language construct is defined as follows:
+      \begin{lstlisting}
+for <initial-assignment> ; <expression> ; <loop-assignment> { ...
+      \end{lstlisting}
+
+      While usually one might use the initial-assignment and the loop-assignment
+      to control the flow, they can be skipped. In fact, each part may be skipped
+      to generate a very lightweight \texttt{while(true)} loop. The code that is
+      usually (using all three clauses) generated has the structure:
+
+      \begin{table}[hbt]
+        \centering
+        \begin{tabular}{l}
+          \toprule
+          \textbf{Code structure}\\
+          \midrule
+          Initial-assignment\\
+          Expression label\\
+          Expression evaluation\\
+          (Jump to body if first iteration)\\
+          Conditional jump to epilog depending on the expression\\
+          Loop-assignment label\\
+          \hspace{0.5cm} Loop-assignment\\
+          Loop body label\\
+          \hspace{0.5cm} Loop body\\
+          Epilog catching exits\\
+          \bottomrule
+        \end{tabular}
+      \end{table}
+    
 
     \section{The generation of functions calls} \label{The generation of functions}
       Consider the following example with the current function having 3 local variables -- 2 of type \texttt{uint64} and one of type \texttt{string} -- calling the function \texttt{foo} which has the following prototype:
