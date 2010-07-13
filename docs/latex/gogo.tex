@@ -1,12 +1,23 @@
-\documentclass[a4paper]{scrreprt}
+\documentclass[a4paper]{scrartcl}
+
+\let\chapter\section 
+\let\section\subsection 
+\let\subsection\subsubsection 
+\let\subsubsection\paragraph 
+\let\paragraph\subparagraph 
+\let\subparagraph\undefined 
 
 \usepackage{booktabs}
 \usepackage[usenames,dvipsnames]{color}
 \usepackage[latin1]{inputenc}
 \usepackage{listings}
 \usepackage[english]{babel}
-\usepackage[pdftex,plainpages=false,pdfpagelabels,hyperfootnotes=false]{hyperref}
-\hypersetup{pdftitle={GoGo -- A Go compiler written in Go},pdfauthor={Michael Lippautz, Andreas Unterweger},pdfsubject={GoGo},pdfkeywords={Go,Compiler,GoGo}}
+\usepackage[pdftex,plainpages=false,pdfpagelabels,
+    hyperfootnotes=false]{hyperref}
+\hypersetup{pdftitle={GoGo -- A Go compiler written in Go},
+    pdfauthor={Michael Lippautz, Andreas Unterweger},
+    pdfsubject={GoGo},pdfkeywords={Go,Compiler,GoGo}}
+\usepackage{graphicx}
 
 \definecolor{lightgray}{RGB}{250,250,250}
 
@@ -30,27 +41,38 @@
   \tableofcontents
 
   \chapter{Introduction}
-    GoGo is a self-compiling Go compiler written in Go which implements scanning, parsing and code generation for a subset of the Go language\cite{goo10}. It is mostly compatible with the Go compiler available in \cite{goo10} and outputs valid Plan9 assembly code which can be assembled by the latter as well as the Plan9 assembly tools \texttt{6a} and \texttt{6l}\cite{pik00}.\\
-    Lorem ipsum dolor sit amet...
+    GoGo is a self-compiling (see section \ref{chpt:building}) Go compiler 
+    written in Go which implements scanning, parsing and code generation for a 
+    subset of the Go language \cite{goo10}. It is mostly compatible with the Go 
+    compiler available at \cite{goo10} and outputs valid Plan9 assembly code 
+    which can be assembled by the latter as well as the Plan9 assembly tools 
+    \texttt{6a} and \texttt{6l}\cite{pik00}.\\
+
 
   \chapter{Input Language}
     Go is a programming language developed by Google, based on a C like syntax and fully specified in \cite{goo10}. The input language follows the one defined by Go. This results in programs being able to be compiled by the official Go compilers and GoGo.
 
-    \section{Differences to Go}
+    \section{Some differences to Go}
       \begin{enumerate}
-        \item GoGo only provides only a \textbf{very} basic featureset. Expect every advanced and interesting feature to be missing.
-        \item GoGo forces the usage of semicolons at the end of statements. This restriction was made to make parsing easier.
+        \item GoGo only provides only a \textbf{very} basic featureset. Expect 
+          every advanced and interesting feature to be missing.
+        \item GoGo forces the usage of semicolons at the end of statements, 
+          while in actual Go these token is optional. This restriction was made 
+          to make parsing easier.
         \item Go is fully Unicode compatible, while GoGo uses ASCII characters only.
         \item Simplified expressions, following Wirth's \cite{wir96} defintions.
       \end{enumerate}
 
     \section{EBNF}
     \label{sec:ebnf}
-      Lorem ipsum dolor sit amet...
+      The following section deals with the input language specification in 
+      EBNF form. Additionally to the specification below, GoGo also allows 
+      source code comments following the C++ multiline style(\texttt{/* ... */}) 
+      and the C inline style (\texttt{//}).
 
       \subsection*{Atoms}
-        The following listing described the basic atoms that are possible in GoGo programs.
-
+        The following listing describes the basic atoms that are possible in 
+        GoGo programs.
         \begin{lstlisting}[caption=Atoms]
 single_char = CHR(32)|...|CHR(127).
 char = "'" single_char "'".
@@ -189,7 +211,8 @@ go_program = package_stmt import_stmt_list struct_decl_list
     as LL1 like in \cite{wir96}, with one minor difference. In order to be 
     compatible with Go it was necesarry to include one namespace hierachy that 
     is represented by packages. Since this namescope is prefixed 
-    using \texttt{package.} the parser needs a lookup of three in this case.
+    using \texttt{package.} the parser needs a lookup of three (LL3)in this 
+    case.
 
   \chapter{Symbol table}
     In order to be able to lookup local and global variable names as well as function names, a symbol table is required. Based on \cite{wir96}, object and type descriptors were used, each containing the information required for lookup and code generation. Object descriptors are used to store information about variables and parameters whereas type descriptors are used to store information about types and functions.\\
@@ -531,14 +554,104 @@ func foo(param1 uint64, param2 uint64, param3 string) uint64;
       The current approach to fetch parameters requires the activation of the \texttt{proc} file system in the Linux kernel which is enabled by default in most Linux distributions\cite{var06}. The \texttt{proc} file system allows (among other information) to access parameters of all processes running in the system, including the current process. The latter's parameters can be through the virtual file \texttt{/proc/self/cmdline} where \texttt{self} refers to the current process. The virtual file contains all parameters, separated by zero bytes and terminated by a sequence of two zero bytes. When parsed, this allows to access the program's parameters without having to access the stack.
 	
   \chapter{Building / Self-compilation}
-    This section deals with the building process of GoGo and how self-compilation is achieved.
+  \label{chpt:building}
+    This section deals with the building process of GoGo and how self-compilation 
+    is achieved.
+
+    \section{Go language tools}
+      Before introducing the compilation procedure it is important to know how
+      the Go language tools (which are actually Plan9 tools) are organized.
+
+      Each CPU architecture gets a number that is prefixed before a tool. In
+      GoGo's case this would be \texttt{6}, indicating an amd64 architecture.
+      The toolsuite is then organized into various compilers/linkers:
+      \begin{itemize}
+        \item \texttt{6a} - Assembler for amd64 arch (creating \texttt{*.6} 
+          object files)
+        \item \texttt{6g} - Go compiler for amd64 arch (creating \texttt{*.6}
+          object files)
+        \item \texttt{6l} - Linker creating and amd64 ELF binary out of object 
+          files
+      \end{itemize}
+      Again, the fileendings of the object format indicate the used CPU
+      architecture.
+
+    \section{Bootstrapping}
+      To create the first compiler, that is then used for furter subsequent 
+      compilations, the Go language tools are used. Go uses \texttt{Makefile}s 
+      for defining the appropriate compilation procedure. Basically, three steps 
+      are needed to create the GoGo binary:      
+      \begin{enumerate}
+        \item Library compilation - The \texttt{6g} and \texttt{6a} tools are
+          used to create a single object file containing the library code.
+        \item Compiler compilation - Compile the compiler using texttt{6g}.
+        \item Link - Link the compiler object file and the library object file
+          into an ELF binary using \texttt{6l}.
+      \end{enumerate}
+      At the end of this procedure an architecture dependent (amd64) GoGo
+     compiler has been created.
+
+    \section{Self-compilation}
+    \label{sec:sc}
+      After creating a first bootstrapped version of the compiler, this one may
+      be used for self-compilation. GoGo is written in the same language it 
+      is able to compile to assembly level and therefore no further additions
+      or changes have to be made to the source code.
+      The procedure to achieve self-compilation until assembly level is shown
+      in figure \ref{fig:sc}.
+
+      \begin{figure}
+        \centering
+        \includegraphics[scale=0.4,angle=-90,clip=true,trim=0cm 0cm 3cm 0cm]{files/building}
+        \label{fig:sc}
+        \caption{Self-compilation approach}
+      \end{figure}  
+
+      Although GoGo is capable of doing some very basic linking (i.e. copy 
+      functions from different files and adjust symbol table), it is not
+      possible to use separate compilation during self-compilation. Altough
+      function linking would work, GoGo is not able to handle global variables
+      , that are spread over multiple packages, correctly in the linking process.
+      Thus the approach is straight-forward and can be summarized by the following:
+      \begin{enumerate}
+        \item All sources, this includes library, as well as compiler sources, 
+          are compiled in one step. The bootstrapped compiler is used in compile
+          mode for this step. 
+          File ordering does not matter as long as there are no global
+          variables involved (where a type has to be known). While \texttt{*.go}
+          files are compiled, \texttt{*.s} files are treated as assembly and 
+          directly copied into the output.
+        \item The compiled source file (\_gogo\_.sog) is then again processed by
+          the bootstrapped compiler in the linker mode. This mode is used to fix
+          certain offset addresses in the parameter handling of functions.
+        \item The received file (\_final\_.sog) then contains the compiled 
+          compiler in assembly language.
+        \item Finally, this file is used as input for \texttt{6a}/\texttt{6l} to
+          create a platform-dependent ELF binary. This is not part of the self-compilation,
+          but necessary to get an executable file.
+      \end{enumerate}
+
+      In order to do a fixpoint-test this procedure is then used to generate 
+      another copy using the previously compiled GoGo compiler. The 
+      fixpoint-test passes and there are no differences in subsequent compilations.
 
   \chapter{Testing}
-    In order to test the compiler, a test suite has been constructed that may be used to verify results against an already existing result set. \\ \\
+    In order to test the compiler, a test suite (using \texttt{bash}) has been 
+    constructed that may be used to verify results against an already existing 
+    result set. \\ \\
     The test suite offers the following functions:
     \begin{itemize}
-      \item \textbf{newvalids/ackvalids/fullclean} -- These commands are used to create a new result set as reference for further tests. While \texttt{fullclean} deletes the old set, \texttt{newvalids} is used to create a new one. After verifying that the compiled output is correct (by manually checking it), the command \texttt{ackvalids} can be used to acknowledge the set (resulting in a checksum file). 
-      \item \textbf{test/clean} -- \texttt{test} is used to perform a compilation and compare the results against the last valid result set. In order to do so, checksums of the tests are compared. If they are not equal, a \texttt{diff} is printed to the user.
+      \item \textbf{newvalids/ackvalids/fullclean} -- These commands are used to
+        create a new result set as reference for further tests. While 
+        \texttt{fullclean} deletes the old set, \texttt{newvalids} is used to 
+        create a new one. After verifying that the compiled output is correct 
+        (by manually checking it), the command \texttt{ackvalids} can be used to 
+        acknowledge the set (resulting in a checksum file). 
+      \item \textbf{test/clean} -- \texttt{test} is used to perform a 
+        compilation and compare the results against the last valid result set. 
+        In order to do so, checksums of the tests are compared. If they are not 
+        equal, a \texttt{diff} is printed to the user. \texttt{Clean} deletes
+        all temporary files.
     \end{itemize}
 
   \bibliographystyle{alpha}
