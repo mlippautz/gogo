@@ -57,10 +57,10 @@
         \item GoGo only provides only a \textbf{very} basic featureset. Expect 
           every advanced and interesting feature to be missing.
         \item GoGo forces the usage of semicolons at the end of statements, 
-          while in actual Go these token is optional. This restriction was made 
+          while in actual Go this token is optional. This restriction was made 
           to make parsing easier.
         \item Go is fully Unicode compatible, while GoGo uses ASCII characters only.
-        \item Simplified expressions, following Wirth's \cite{wir96} defintions.
+        \item Simplified expressions, following Wirth's defintions\cite{wir96}.
       \end{enumerate}
 
     \section{EBNF}
@@ -176,12 +176,12 @@ go_program = package_stmt import_stmt_list struct_decl_list
 
   \chapter{Scanner / Parser}
     The scanner is basically the provider of tokens that are used by the parser
-    to interpret the code. In order to generate these tokens the scanner reads
+    to process the code. In order to generate these tokens, the scanner reads
     the file character by character. If a sequence is known, it converts this 
     sequence of characters into the corresponding token. Tokens generated this
     way are called simple tokens, as they can be generated right away. For 
-    instance, a sequence \textit{'A'} can be directly converted into a token 
-    representing a byte value. \\
+    instance, the sequence \textit{'A'} can be directly converted into a token 
+    representing the byte value 65. \\
     Before providing a token to the parser, the scanner may convert such 
     simple tokens one more time. These complex tokens are generated from simple
     ones that represent \texttt{identifiers}. \texttt{Identifiers} are compared to a 
@@ -204,14 +204,14 @@ go_program = package_stmt import_stmt_list struct_decl_list
     The scanner also implements a very simple escaping mechanism that allows 
     sequences like \textit{'\textbackslash n'} to be used in strings. \\
     Comments can be written as \textit{/* ... */} blocks or 
-    \textit{\textbackslash \textbackslash} till line ending, like in C/C++.
+    \textit{\textbackslash \textbackslash} until the line ending, like in C/C++.
     \\ \\
     The parser then takes these tokens and represents the language defined by
     the EBNF from section \ref{sec:ebnf}. The parser is basically implemented 
     as LL1 like in \cite{wir96}, with one minor difference. In order to be 
     compatible with Go it was necesarry to include one namespace hierachy that 
-    is represented by packages. Since this namescope is prefixed 
-    using \texttt{package.} the parser needs a lookup of three (LL3)in this 
+    is represented by packages. Since this name scope is prefixed 
+    using \texttt{package.}, the parser needs a lookup of three (LL3)in this 
     case.
 
   \chapter{Symbol table}
@@ -255,10 +255,10 @@ go_program = package_stmt import_stmt_list struct_decl_list
       \label{tbl:typedesc}
       \end{table}
 
-    For Both symbol tables the build-up and lookup is integrated into the parser. Whenever sufficient information (variable name, function name, type name; optionally preceeded by a package name) is encountered, a lookup in the symbol table is issued. Declarations issue new symbol table entries with the corresponding descriptor properties as described above.\\
+    For both global and function-local symbol tables the build-up and lookup is integrated into the parser. Whenever sufficient information (variable name, function name, type name; optionally preceeded by a package name) is encountered, a lookup in the symbol table is issued. Declarations issue new symbol table entries with the corresponding descriptor properties as described above.\\
     Forward declarations are currently only supported for type pointers (as pointers are always 64 bits in size) and functions (as the affected offsets can be fixed by the linker if necessary). Whenever supported forward declarations are encountered, a new symbol table entry is created with \texttt{ForwardDecl} set to 1. Forward declared function can then be called, although forward declared type pointers cannot be dereferred until the size of the type they are pointing to is known (\texttt{ForwardDecl} is 0). When forward declared functions are implemented, the corresponding symbol table entry is modified (\texttt{ForwardDecl} is set to 0) instead of creating a new one.
       
-    \section{Supported data type}
+    \section{Supported data types}
       GoGo supports 4 built-in value types and the declaration of new struct and array types as well as pointers to value, struct and array types. The 4 built-in data types are based on the data types supported by the Go compiler and form a minimal subset of them in order to perform basic integer and string operations. The following table \ref{tbl:types} lists the built-in value types, together with their purpose and size.
       
       \begin{table}[htb]
@@ -273,7 +273,7 @@ go_program = package_stmt import_stmt_list struct_decl_list
         \texttt{bool} & 8 bytes (64 bits) & Internal type used for comparisions and jumps\\
         \bottomrule
       \end{tabular}
-      \caption{Built in types}
+      \caption{Built-in types}
       \label{tbl:types}
 	  \end{table}
 
@@ -281,7 +281,7 @@ go_program = package_stmt import_stmt_list struct_decl_list
       In order to be able to distinguish between parameters, local and global variables, a global and a local symbol table as well the function's parameters as third, virtual symbol table are used. Local variables hide global variables of the same name by performing the symbol table lookup for local variables and parameters first and returning the first match if there is any.\\
       The memory layout for local and global variables as well as parameters is equal: the object's offset address contains the first 64 bits of the object, the next highest address (offset address plus 64 bits) contains the next 64 bits etc. All local and global variable offset addresses are 64 bit aligned. The offset of an object can be calculated by summing the aligned sizes of its predecessors in the corresponding variable list. Doing this, it has to be taken into consideration that pointers always occupy 8 bytes (64 bits), regardless of the type they are actually pointing to.\\
       Global variables start at offset 0 of the data segment, referred to as \texttt{data+0} in the output. Subsequent global variables use ascending offsets as described above (p.e. referred to as \texttt{data+8} for offset 8). Local variables and parameters are addressed relative to the stack pointer \texttt{SP}, starting at offset \texttt{SP+8} for parameters with ascending offsets as described for global variables (\texttt{SP} is reserved for the saved instruction pointer \texttt{IP}, see \ref{The generation of functions}). Local variables start at offset \texttt{SP-8} in descending order (\texttt{SP-16} for the second 64 bit variable, \texttt{SP-24} for the third etc., see table below) in descending order. Ignoring the sign, the offset relative to SP is still in ascending order, so the offset calculation method as used for global variables and parameters can be used.\\ \\
-      \begin{table}
+      \begin{table}[h]
       \begin{tabular}{llp{2cm}l}
         \cmidrule{1-2}
         \textbf{Address} & \textbf{Content} & & \textbf{Source code}\\
@@ -342,12 +342,12 @@ go_program = package_stmt import_stmt_list struct_decl_list
       \texttt{$||$}). The approach how code is generated differs from \cite{wir96}.
       Since our output language is text-based Plan9 assembly, there exists no way
       to create a fixup chain that could be used to fix conditional jumps after
-      generating the code. As a result GoGo creates labels that are then 
+      generating the code. As a result, GoGo creates labels that are then 
       translated into adresses by the Plan9 assembly tools. \\
 
       Since jumps are always generation after comparisons the code generation 
       for conditional jumps just needs two instructions. A \texttt{CMP} instruction
-      for the actual comparisons (this instruction is not bound to the comparison
+      for the actual comparison (this instruction is not bound to the comparison
       operator) and the conditional jump that takes the evaluates the registers
       of the comparison. The jumps that are needed can be seen in table \ref{tbl:jumps}.
 
@@ -379,14 +379,14 @@ go_program = package_stmt import_stmt_list struct_decl_list
           line. A side-effect of this limitation is that the addition of line
           and column number of the expression into the label guarantees global
           uniqueness.
-        \item Furthermore a expression local counter, representing a \texttt{true} 
+        \item Furthermore, an expression local counter, representing a \texttt{true} 
           or \texttt{false} branch is included.
         \item A simple prefix (used for debugging readability) makes a GoGo
           label complete.
       \end{itemize}
 
       In order to provide common programming constructs that involve pointer 
-      comparisons (see listing \ref{lst:pointer}) GoGo uses lazy-evaluation.
+      comparisons (see listing \ref{lst:pointer}), GoGo uses lazy-evaluation.
 
       \begin{lstlisting}[label=lst:pointer,caption=Pointer comparison]
 if object != nil && object.field ... {
@@ -395,8 +395,8 @@ if object != nil && object.field ... {
       Lazy-evaluation is provided over multiple levels of expressions using
       label merging to minimize the overhead. Each top level expression gets 
       its own stacks for \texttt{true} and \texttt{false} branching. Further 
-      sub-expressions labels (in fact, just their local counters) are then just 
-      pushed and poped into the coresponding stacks. An example illustrating 
+      sub-expressions labels (in fact, just their local counters) are then 
+      pushed and poped to/from the coresponding stacks. An example illustrating 
       this need is stated in \ref{lst:lazy}.
       \begin{lstlisting}[caption=Lazy-evaluation over multiple expression levels, label=lst:lazy]
 if (done!=1) && (((a<1) && (b<2)) || ((c<3) && (d<4))) { ...
@@ -406,7 +406,7 @@ if (done!=1) && (((a<1) && (b<2)) || ((c<3) && (d<4))) { ...
       \texttt{false} branches, they have different levels and result in different
       merging points.
 
-    \subsection{Conditional Jumps}
+    \subsection*{Conditional Jumps}
       GoGo provides one control structure that can be used for conditional jumps,
       namely \texttt{if}/\texttt{else}. While elseif and case statements could
       have provided further programming experience, the compiler itself uses only
@@ -426,9 +426,9 @@ if (done!=1) && (((a<1) && (b<2)) || ((c<3) && (d<4))) { ...
         \end{tabular}
       \end{table}
 
-    \subsection{Loops}
+    \subsection*{Loops}
       GoGo supports only \texttt{for} structures to construct loops, because
-      Go doesn't offer anything other itself. In order to provide a more 
+      Go doesn't offer any other form of loops itself. In order to provide a more 
       lightweight loop variant, one may skip parts of the \texttt{for} construct.
       The language construct is defined as follows:
       \begin{lstlisting}
@@ -563,39 +563,38 @@ func foo(param1 uint64, param2 uint64, param3 string) uint64;
       the Go language tools (which are actually Plan9 tools) are organized.
 
       Each CPU architecture gets a number that is prefixed before a tool. In
-      GoGo's case this would be \texttt{6}, indicating an amd64 architecture.
-      The toolsuite is then organized into various compilers/linkers:
+      GoGo's case this would be \texttt{6}, indicating an AMD64 architecture.
+      The tool suite is then organized into various compilers/linkers:
       \begin{itemize}
-        \item \texttt{6a} - Assembler for amd64 arch (creating \texttt{*.6} 
+        \item \texttt{6a} - Assembler for AMD64 architecture (creating \texttt{*.6} 
           object files)
-        \item \texttt{6g} - Go compiler for amd64 arch (creating \texttt{*.6}
+        \item \texttt{6g} - Go compiler for AMD64 architecture (creating \texttt{*.6}
           object files)
-        \item \texttt{6l} - Linker creating and amd64 ELF binary out of object 
-          files
+        \item \texttt{6l} - Linker creating an AMD64 ELF binary out of object files
       \end{itemize}
-      Again, the fileendings of the object format indicate the used CPU
-      architecture.
+      Again, the file extensions of the object format indicate the CPU
+      architecture used.
 
-    \section{Bootstrapping}
-      To create the first compiler, that is then used for furter subsequent 
+    \section{Boot-strapping}
+      To create the initial compiler that is then used for subsequent 
       compilations, the Go language tools are used. Go uses \texttt{Makefile}s 
       for defining the appropriate compilation procedure. Basically, three steps 
       are needed to create the GoGo binary:      
       \begin{enumerate}
         \item Library compilation - The \texttt{6g} and \texttt{6a} tools are
           used to create a single object file containing the library code.
-        \item Compiler compilation - Compile the compiler using texttt{6g}.
+        \item Compiler compilation - Compile the compiler using \texttt{6g}.
         \item Link - Link the compiler object file and the library object file
           into an ELF binary using \texttt{6l}.
       \end{enumerate}
-      At the end of this procedure an architecture dependent (amd64) GoGo
+      At the end of this procedure, an architecture-dependent (AMD64) GoGo
      compiler has been created.
 
     \section{Self-compilation}
     \label{sec:sc}
       After creating a first bootstrapped version of the compiler, this one may
       be used for self-compilation. GoGo is written in the same language it 
-      is able to compile to assembly level and therefore no further additions
+      is able to compile to assembly level. Therefore, no further additions
       or changes have to be made to the source code.
       The procedure to achieve self-compilation until assembly level is shown
       in figure \ref{fig:sc}.
@@ -608,22 +607,22 @@ func foo(param1 uint64, param2 uint64, param3 string) uint64;
       \end{figure}  
 
       Although GoGo is capable of doing some very basic linking (i.e. copy 
-      functions from different files and adjust symbol table), it is not
+      functions from different files and adjust the symbol table), it is not
       possible to use separate compilation during self-compilation. Altough
       function linking would work, GoGo is not able to handle global variables
-      , that are spread over multiple packages, correctly in the linking process.
-      Thus the approach is straight-forward and can be summarized by the following:
+      that are spread over multiple packages correctly in the linking process.
+      Thus, the approach is straight-forward and can be summarized by the following:
       \begin{enumerate}
         \item All sources, this includes library, as well as compiler sources, 
           are compiled in one step. The bootstrapped compiler is used in compile
           mode for this step. 
-          File ordering does not matter as long as there are no global
+          File ordering does not matter as long as there are no forward declared global
           variables involved (where a type has to be known). While \texttt{*.go}
           files are compiled, \texttt{*.s} files are treated as assembly and 
           directly copied into the output.
         \item The compiled source file (\_gogo\_.sog) is then again processed by
           the bootstrapped compiler in the linker mode. This mode is used to fix
-          certain offset addresses in the parameter handling of functions.
+          offset addresses in the parameter handling of previously forward declared functions.
         \item The received file (\_final\_.sog) then contains the compiled 
           compiler in assembly language.
         \item Finally, this file is used as input for \texttt{6a}/\texttt{6l} to
@@ -631,8 +630,8 @@ func foo(param1 uint64, param2 uint64, param3 string) uint64;
           but necessary to get an executable file.
       \end{enumerate}
 
-      In order to do a fixpoint-test this procedure is then used to generate 
-      another copy using the previously compiled GoGo compiler. The 
+      In order to perform a fixpoint-test, this procedure is used to generate 
+      another instance using the previously compiled GoGo compiler. The 
       fixpoint-test passes and there are no differences in subsequent compilations.
 
   \chapter{Testing}
