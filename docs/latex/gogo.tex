@@ -49,7 +49,7 @@
     \texttt{6a} and \texttt{6l}\cite{pik00}.\\
 
 
-  \chapter{Input Language}
+  \chapter{Input language}
     Go is a programming language developed by Google, based on a C like syntax and fully specified in \cite{goo10}. The input language follows the one defined by Go. This results in programs being able to be compiled by the official Go compilers and GoGo.
 
     \section{Some differences to Go}
@@ -167,7 +167,7 @@ go_program = package_stmt import_stmt_list struct_decl_list
         \end{lstlisting}
 
 
-  \chapter{Output Language}
+  \chapter{Output language}
     The output language is Plan-9 assembler \cite{pik00}. It is a modified version of 64 bit assembly for Intel x86 processors with AT\&T syntax that has been created by Bell Labs to be used in their compiler and assembler collection.
     
     \section{Assembly output}
@@ -182,6 +182,8 @@ go_program = package_stmt import_stmt_list struct_decl_list
     way are called simple tokens, as they can be generated right away. For 
     instance, the sequence \textit{'A'} can be directly converted into a token 
     representing the byte value 65. \\
+
+
     Before providing a token to the parser, the scanner may convert such 
     simple tokens one more time. These complex tokens are generated from simple
     ones that represent \texttt{identifiers}. \texttt{Identifiers} are compared to a 
@@ -305,13 +307,13 @@ go_program = package_stmt import_stmt_list struct_decl_list
         The target architecture provides 8 general purpose registers (\texttt{R8}-\texttt{R15}) as well as the registers \texttt{RAX}, \texttt{RBX}, \texttt{RCX} and \texttt{RDX}\cite{int09}. The latter are not being used by GoGo to store variables as their values may change when performing arithmetical operations (p.e. \texttt{RAX} and \texttt{RDX} are always used as the destination registers for multiplications), thus possibly overwriting values previously stored there.\\
         GoGo stores a list for every one of the 8 registers currently free, returning the first free register if required by the code generator. Whenever a register is no longer required (freed), it will be reinserted into the "free" list in order to make it available for future use. Due to the limited amout of registers, the list described is implemented in form of a bit array in the compiler.
 
-    \section{The generation of arithmetical expressions}
+    \section{Generation of arithmetical expressions}
       As described in \cite{wir96}, code generation for arithmetical expressions basically relies on an operand stack and delayed code generation based on \texttt{Items}. For constant operands, constant folding is applied; variable operands are loaded into a free register in order to perform arithmetical operations on them.\\
       GoGo makes use of the capabilities of the target architecture by not loading constants into registers, thus reducing the number of registers required. Consider the expression \texttt{a + b} where both \texttt{a} and \texttt{b} are variables of type \texttt{uint64} with negative offsets 8 and 16 relative to the stack pointer. As the target architecture is able to perform an operation like \texttt{ADDQ R8, -16(SP)} (add the value at address \texttt{SP-16} to the register \texttt{R8}), only \texttt{a} needs to be loaded into a register, whereas \texttt{b} can be directly incorporated into the instruction itself.\\
       Multiplication and division on the target architecture both require special treatment: The multiplication instruction only takes the second operand and requires the first operand to be in the register \texttt{RAX}\cite{int09}. Therefore, the first operand has to be loaded into \texttt{RAX} prior multiplication. The multiplication result is stored as 128 bit value in \texttt{RDX} (upper 64 bits) and \texttt{RAX} (lower 64 bits). As GoGo does not support data types other than \texttt{byte} and \texttt{uint64}, the upper 64 bits in \texttt{RDX} are ignored, and the lower 64 bits are moved to one of the 8 registers to save the result before another multiplication is being performed. Similarly, division allows for an 128 bit operand (also in \texttt{RDX} and \texttt{RAX}). As GoGo does not support 128 bit size data types, \texttt{RDX} is always being zeroed prior division.\\
       The addition, substraction and multiplication operations are also used for offset calculations. Thus, an additional distinction per \texttt{Item} is required in order to be able to distinguish between addresses and values stored in registers. As arithmetical operations on \texttt{byte} and \texttt{uint64} types always operate on a value, the actual value to be calculated with has to be loaded prior calculation. As offset calculations always require the address to be loaded into the register instead of the value, it has to be made sure that the address is loaded, not the value. In order to distinguish between addresses and values in registers, the \texttt{A} field of the \texttt{Item} structure is used. Additionally, the code generation routines for addition and subtraction have an additional parameter specifying whether to calculate with addresses or values, issuing the necessary dereferencing operations if required.
 
-    \section{The generation of assignments}
+    \section{Generation of assignments}
       As pointer types are supported, type checks in assignments as well as the assignments themselves get harder to implement as additional cases have to be dealt with. Additionally, the possible occurrence of the address operator (\texttt{\&}) on the right hand side of an assignment doubles the number of cases. The following table \ref{tbl:assigntypes} illustrates the distinctions made and the code generated for some of the cases allowed by the EBNF (* denotes pointer types, LHS and RHS are the \texttt{Items} on the left and right hand side, respectively). For the sake of clearity, only the cases with a non-pointer type variable \texttt{Item} on the left hand side and no address operator on the right hand side using \texttt{uint64} types are shown. The compiler is also able to assign \texttt{byte} values to one another as well as to \texttt{uint64} types.
 
       \begin{table}[htb]
@@ -461,7 +463,7 @@ for <initial-assignment> ; <expression> ; <loop-assignment> { ...
       \end{table}
     
 
-    \section{The generation of functions calls} \label{The generation of functions}
+    \section{Generation of functions calls} \label{The generation of functions}
       Consider the following example with the current function having 3 local variables -- 2 of type \texttt{uint64} and one of type \texttt{string} -- calling the function \texttt{foo} which has the following prototype:
         \begin{lstlisting}
 func foo(param1 uint64, param2 uint64, param3 string) uint64;
@@ -540,7 +542,7 @@ func foo(param1 uint64, param2 uint64, param3 string) uint64;
       \label{tbl:syscalls}
       \end{table}
 
-    \section{The memory manager}
+    \section{Memory-Manager}
       Libgogo provides a very simple memory manager using a bump pointer which can allocate, but not free memory. By using the \texttt{sys\_brk}\cite{var97} function, the memory manager expands the data segment of the running program in steps of 10 KB if necessary in order to deal with subsequent allocations.\\
       As the Go compiler used for boot strapping uses a custom memory manager in its run time environment, the libgogo memory manager and the GoGo compiler take measures to avoid conflicts with the former. First and foremost, all implicit and explicit memory allocations in the GoGo compiler rely on the libgogo memory manager in order to keep the amount of memory allocated by the Go run time constant. Additionally, the memory manager does not allocate any memory in the original data segment to not overwrite any string constants or other information stored there by the Go run time. This is achieved by directly expanding the data segment during the initialization of the libgogo memory manager which also allows to store the first address allocated, thus being able to distinguish between memory allocated by the libgogo memory manager and memory allocated by the Go run time.
 
@@ -652,7 +654,29 @@ func foo(param1 uint64, param2 uint64, param3 string) uint64;
         equal, a \texttt{diff} is printed to the user. \texttt{Clean} deletes
         all temporary files.
     \end{itemize}
+    Listing \ref{lst:test} shows the usage and an example output of the testsuite.
+\lstset{
+language=bash
+}
+    \begin{lstlisting}[caption=Testsuite example,label=lst:test]
+$ ./testsuite test
 
+>>> Performing internal checks
+
+Checking for sha256sum tool... ok
+Checking for gogo compiler... ok
+Checking for tests... ok
+
+>>> Checking whether an acknowledged resultset exists
+
+>>> Generating tests
+
+Checking for tmp... creating it
+
+>>> Performing quick check
+
+* Checksums matched. Everything seems fine
+    \end{lstlisting}
   \bibliographystyle{alpha}
   \bibliography{gogo}
 
