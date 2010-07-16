@@ -542,7 +542,7 @@ func foo(param1 uint64, param2 uint64, param3 string) uint64;
       \label{tbl:syscalls}
       \end{table}
 
-    \section{Memory-Manager}
+    \section{Memory manager}
       Libgogo provides a very simple memory manager using a bump pointer which can allocate, but not free memory. By using the \texttt{sys\_brk}\cite{var97} function, the memory manager expands the data segment of the running program in steps of 10 KB if necessary in order to deal with subsequent allocations.\\
       As the Go compiler used for boot strapping uses a custom memory manager in its run time environment, the libgogo memory manager and the GoGo compiler take measures to avoid conflicts with the former. First and foremost, all implicit and explicit memory allocations in the GoGo compiler rely on the libgogo memory manager in order to keep the amount of memory allocated by the Go run time constant. Additionally, the memory manager does not allocate any memory in the original data segment to not overwrite any string constants or other information stored there by the Go run time. This is achieved by directly expanding the data segment during the initialization of the libgogo memory manager which also allows to store the first address allocated, thus being able to distinguish between memory allocated by the libgogo memory manager and memory allocated by the Go run time.
 
